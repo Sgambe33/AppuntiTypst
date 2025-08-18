@@ -1,0 +1,76 @@
+name: Compile Typst Documents
+
+on:
+  # push:
+  #   branches: [ main, master ]
+  #   paths: [ '**/*.typ' ]
+  # pull_request:
+  #   branches: [ main, master ]
+  #   paths: [ '**/*.typ' ]
+  workflow_dispatch:
+
+jobs:
+  compile-typst:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install Typst
+      run: |
+        wget https://github.com/typst/typst/releases/latest/download/typst-x86_64-unknown-linux-musl.tar.xz
+        tar -xf typst-x86_64-unknown-linux-musl.tar.xz
+        sudo mv typst-x86_64-unknown-linux-musl/typst /usr/local/bin/
+        typst --version
+        
+    - name: Find and compile Typst documents
+      run: |
+        # Create output directory
+        mkdir -p compiled-pdfs
+        
+        # Find all main.typ files
+        find . -name "main.typ" -type f | while read -r file; do
+          echo "Processing: $file"
+          
+          # Get the directory path without ./
+          dir_path=$(dirname "$file" | sed 's|^\./||')
+          
+          # Convert path to PDF name: replace spaces and slashes with underscores
+          pdf_name=$(echo "$dir_path" | sed 's|/|_|g' | sed 's| |_|g')
+          
+          # Handle root directory case
+          if [ "$pdf_name" = "." ] || [ -z "$pdf_name" ]; then
+            pdf_name="main"
+          fi
+          
+          # Compile the document
+          typst compile "$file" "compiled-pdfs/${pdf_name}.pdf"
+          
+          if [ $? -eq 0 ]; then
+            echo "✓ Successfully compiled: $file -> compiled-pdfs/${pdf_name}.pdf"
+          else
+            echo "✗ Failed to compile: $file"
+            exit 1
+          fi
+        done
+        
+    - name: List compiled PDFs
+      run: |
+        echo "Compiled PDFs:"
+        ls -la compiled-pdfs/
+        
+    - name: Upload PDF artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: compiled-pdfs
+        path: compiled-pdfs/
+        retention-days: 30
+        
+    - name: Upload to release (on tags)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: compiled-pdfs/*.pdf
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

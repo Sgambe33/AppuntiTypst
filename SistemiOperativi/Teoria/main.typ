@@ -20,6 +20,3 @@
 #include "chapters/chapter6/6-filesystem.typ"
 
 #include "chapters/chapter7/7-dispositivi-io.typ"
-#figure(
-  image("", alt: "hello"),
-)
