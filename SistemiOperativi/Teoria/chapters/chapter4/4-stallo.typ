@@ -1,4 +1,4 @@
-#import "@preview/dvdtyp:1.0.1": *
+#import "../../../../dvd.typ": *
 #import "@preview/numbly:0.1.0": numbly
 
 #set enum(

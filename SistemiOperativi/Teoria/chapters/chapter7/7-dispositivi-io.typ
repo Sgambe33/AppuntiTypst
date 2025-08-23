@@ -1,4 +1,4 @@
-#import "@preview/dvdtyp:1.0.1": *
+#import "../../../../dvd.typ": *
 
 = Dispositivi I/O
 La gestione dei dispositivi periferici (I/O) e della memoria secondaria è un aspetto cruciale del funzionamento di un computer. Mentre l'elaborazione è uno dei due compiti principali di un computer, spesso è l'*I/O (Input/Output)* a rappresentare il compito predominante, con l'elaborazione che diventa meramente incidentale, ad esempio, quando un utente consulta una pagina web o modifica un file. Il *ruolo del Sistema Operativo (SO)* nell'I/O del calcolatore è quello di *gestire e controllare le operazioni e i dispositivi di I/O*. Il codice per l'I/O costituisce una parte significativa del SO ed è fondamentale per integrare la vasta gamma di dispositivi esistenti nei calcolatori e nei SO moderni.

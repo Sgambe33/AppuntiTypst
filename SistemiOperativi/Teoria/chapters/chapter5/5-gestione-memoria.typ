@@ -1,4 +1,4 @@
-#import "@preview/dvdtyp:1.0.1": *
+#import "../../../../dvd.typ": *
 
 = Gestione della Memoria Principale e Virtuale
 

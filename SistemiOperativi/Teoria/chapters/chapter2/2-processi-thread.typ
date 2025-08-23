@@ -1,15 +1,17 @@
-#import "@preview/dvdtyp:1.0.1": *
+#import "../../../../dvd.typ": *
 
 = Capitolo 2: Processi & Thread
 == Il Modello Concorrente e il Concetto di Processo
 
 Un sistema di elaborazione moderno è in grado di eseguire un elevato numero di attività, sia di programmi utente che di sistema, che spesso si sovrappongono nel tempo. Questa sovrapposizione può avvenire tramite *interleaving*, dove le attività si alternano sull'unica CPU disponibile, o tramite *overlapping*, dove le attività vengono eseguite simultaneamente su CPU diverse.
 
-#image("images/image.png")
+#figure(image("images/image.png", height: 30%))
 
 Per gestire e analizzare questa coesistenza di attività, è stato sviluppato il *modello concorrente*, che si basa sul concetto astratto di *processo*.
 
-#definition("Programma e Processo")[
+#definition(
+  "Programma e Processo",
+)[
   Un *programma* è definito come un'entità passiva e statica, come un file eseguibile contenente un algoritmo memorizzato su disco. Al contrario, un *processo* è un'entità attiva e dinamica che rappresenta l'esecuzione di un programma. Un programma si trasforma in un processo nel momento in cui il suo file eseguibile viene caricato in memoria principale.
 ]
 
@@ -24,7 +26,7 @@ Lo spazio di indirizzamento di un processo è suddiviso in diverse sezioni fonda
 - *Heap*: Un'area di memoria allocata dinamicamente durante l'esecuzione del programma, utilizzata ad esempio per strutture dati dinamiche. L'heap può crescere e ridursi dinamicamente, espandendosi quando la memoria viene allocata (ad esempio tramite la system call `malloc`) e riducendosi quando viene rilasciata.
 - *Stack*: Un'area di memoria temporanea utilizzata durante le chiamate di funzione per memorizzare parametri, indirizzi di ritorno e variabili locali. Anche lo stack può espandersi e contrarsi dinamicamente. Quando una funzione viene chiamata, un record di attivazione (o stack frame) viene inserito sullo stack e rimosso al termine della funzione.
 
-#image("images/image 1.png")
+#figure(image("images/image 1.png", height: 20%))
 
 Il sistema operativo ha il compito di garantire che le sezioni stack e heap, che crescono l'una verso l'altra, non si sovrappongano.
 
@@ -38,9 +40,9 @@ Nel corso della sua vita, un processo attraversa diversi stati:
 - *Pronto (ready)*: il processo è stato caricato in memoria principale ed è in attesa di essere assegnato a un processore per l'esecuzione.
 - *Terminato (terminated)*: l'esecuzione del processo è giunta al suo completamento.
 
-#image("images/image 2.png")
+#figure(image("images/image 2.png", height: 15%))
 
-È comune che molti processi si trovino contemporaneamente negli stati “pronto” o “in attesa”.
+È comune che molti processi si trovino contemporaneamente negli stati "pronto" o "in attesa".
 
 == Descrittore di Processo (Process Control Block - PCB)
 
@@ -59,20 +61,19 @@ Il PCB è una struttura complessa che include:
 - Dettagli sulle modalità di servizio (es. FIFO, priorità).
 - Informazioni sull'evento atteso, se il processo è bloccato.
 
-#image("images/image 3.png")
+#figure(image("images/image 3.png", height: 20%))
 
 == Monoprogrammazione e Multiprogrammazione
 
-#image("images/image 4.png")
+#figure(image("images/image 4.png", height: 20%))
 
 Storicamente, i primi sistemi operativi operavano in *monoprogrammazione*, eseguendo un solo programma utente alla volta in memoria, oltre al sistema operativo stesso. Questo approccio, esemplificato dal DOS, non sfruttava appieno le capacità della CPU.
 
 Per ottimizzare l'uso della CPU, è stata introdotta la *multiprogrammazione*. L'idea fondamentale è che se un processo utilizza la CPU solo parzialmente, l'esecuzione simultanea di più processi può portare a un utilizzo più efficiente. La probabilità di utilizzo della CPU aumenta proporzionalmente al *grado di multiprogrammazione*, ovvero al numero di processi residenti in memoria centrale. Questo può portare a guadagni significativi nell'efficienza della CPU, come dimostrato dall'esempio che mostra un aumento dell'utilizzo della CPU aumentando il numero di processi in memoria.
 
-#image("images/image 5.png")
+#figure(image("images/image 5.png", height: 30%))
 
 == Scheduling dei Processi
-
 Gli obiettivi dello scheduling sono duplici: massimizzare l'utilizzo della CPU (multiprogrammazione) e garantire una rapida interazione utente (multitasking o time-sharing). Il sistema operativo mantiene un insieme di processi in memoria, e quando la CPU è disponibile, uno scheduler seleziona un processo pronto per l'esecuzione.
 
 Per un'ottimale gestione, lo scheduler tiene conto del comportamento dei processi:
@@ -84,9 +85,10 @@ Le migliori prestazioni si ottengono con una combinazione equilibrata di questi 
 
 Le strutture dati utilizzate per lo scheduling includono la tabella dei processi, il PCB del processo in esecuzione e diverse *code di processi* (come la coda dei processi pronti e le code specifiche per i dispositivi di I/O).
 
-#image("images/image 6.png")
-
-Il diagramma di accodamento illustra il flusso dei PCB tra queste code durante il ciclo di vita di un processo.
+#figure(
+  image("images/image 6.png", height: 20%),
+  caption: "Il diagramma di accodamento illustra il flusso dei PCB tra queste code durante il ciclo di vita di un processo.",
+)
 
 Esistono tre tipologie principali di scheduling:
 
@@ -96,11 +98,13 @@ Esistono tre tipologie principali di scheduling:
 
 Il diagramma degli stati di un processo può essere esteso per includere stati come “pronto swapped” e “attesa swapped”, che indicano processi la cui memoria si trova nella swap area del disco.
 
-#image("images/image 7.png")
+#figure(image("images/image 7.png", height: 20%), caption: "Diagramma degli stati esteso")
 
 === Context Switch (Commutazione di Contesto)
 
-#definition("Context Switch")[
+#definition(
+  "Context Switch",
+)[
   Il *context switch* è la procedura attraverso cui l'utilizzo della CPU viene trasferito da un processo all'altro. Implica il salvataggio dello stato di esecuzione del processo corrente e il ripristino del contesto del processo successivo da eseguire.
 ]
 
@@ -111,9 +115,9 @@ Le fasi che utilizzano il PCB sono:
 3. Caricamento dell'indirizzo del PCB del nuovo processo nel registro che punta al processo in esecuzione.
 4. Caricamento del contesto del nuovo processo nei registri del processore.
 
-#image("images/image 8.png")
+#figure(image("images/image 8.png", height: 30%))
 
-Il tempo dedicato al context switch è un *overhead* puro per la gestione del sistema, in quanto non produce lavoro utile. Questo processo può richiedere diversi microsecondi e la sua velocità può dipendere dal supporto hardware, ad esempio processori con set di registri multipli possono ridurre il tempo richiesto. La complessità crescente dei sistemi operativi può aumentare il lavoro necessario durante un context switch, specialmente per tecniche avanzate di gestione della memoria.
+Il tempo dedicato al context switch è un *overhead* puro per la gestione del sistema, in quanto non produce lavoro utile. Questo processo può richiedere diversi microsecondi e la sua velocità può dipendere dal supporto hardware. La complessità crescente dei sistemi operativi può aumentare il lavoro durante un context switch, specialmente per tecniche avanzate di gestione della memoria.
 
 == Operazioni sui Processi
 
@@ -172,13 +176,13 @@ Il meccanismo di *scambio di messaggi* richiede operazioni di `send(message)` e 
 === Forme di Comunicazione nello Scambio di Messaggi
 
 La comunicazione tramite messaggi può essere distinta per vari aspetti:
-- *Comunicazione diretta o indiretta*:
+- *Comunicazione diretta*:
 
   - *Diretta simmetrica*: i processi si nominano esplicitamente (`send(P, message)`, `receive(Q, message)`). I canali sono stabiliti automaticamente, associati a una singola coppia di processi, unici e solitamente bidirezionali.
 
   - *Diretta asimmetrica*: solo il mittente nomina il ricevente (`send(P, message)`, `receive(id, message)`). Entrambi gli schemi diretti possono limitare la modularità nella definizione dei processi.
 
-  - *Indiretta*: i messaggi vengono inviati o ricevuti tramite *porte* (o mailbox), ognuna con un identificatore unico (`send(A, message)`, `receive(A, message)`). Un canale si stabilisce quando i processi condividono una porta, che può essere associata a molti processi. Una coppia di processi può condividere diversi canali. Per evitare non-determinismo quando più processi possono ricevere da una porta, si possono adottare soluzioni come limitare la porta a due processi, consentire un solo ricevente per porta, o far scegliere arbitrariamente il sistema. Le porte possono appartenere a un processo (con unico ricevente) o essere gestite dal SO.
+- *Indiretta*: i messaggi vengono inviati o ricevuti tramite *porte* (o mailbox), ognuna con un identificatore unico (`send(A, message)`, `receive(A, message)`). Un canale si stabilisce quando i processi condividono una porta, che può essere associata a molti processi. Una coppia di processi può condividere diversi canali. Per evitare non-determinismo quando più processi possono ricevere da una porta, si possono adottare soluzioni come limitare la porta a due processi, consentire un solo ricevente per porta, o far scegliere arbitrariamente il sistema. Le porte possono appartenere a un processo (con unico ricevente) o essere gestite dal SO.
 
 - *Comunicazione sincrona o asincrona*: Le operazioni `send` e `receive` possono essere *bloccanti (sincrone)* o *non-bloccanti (asincrone)*. Un invio bloccante ferma il mittente finché il messaggio non è ricevuto; una ricezione bloccante ferma il ricevente finché un messaggio non è disponibile. Un *rendezvous* si ha quando sia `send` che `receive` sono bloccanti. Con operazioni non-bloccanti, il mittente invia e prosegue, mentre il ricevente acquisisce un messaggio o un valore nullo e non si blocca.
 
@@ -194,15 +198,19 @@ Esempi di sistemi IPC includono le API POSIX per la memoria condivisa, Mach per 
 
 Nei sistemi client-server, oltre alla memoria condivisa e allo scambio di messaggi, si utilizzano due meccanismi di comunicazione aggiuntivi: *socket* e *Remote Procedure Call (RPC)*.
 
-#definition("Socket")[
-  Un *socket* è l'estremità di un canale di comunicazione, identificato da un indirizzo IP e un numero di porta (es. `161.25.19.8:1625` in UNIX). I server ascoltano su porte prestabilite per specifici servizi (es. HTTP sulla porta 80).
+#definition(
+  "Socket",
+)[
+Un *socket* è l'estremità di un canale di comunicazione, identificato da un indirizzo IP e un numero di porta (es. `161.25.19.8:1625` in UNIX). I server ascoltano su porte prestabilite per specifici servizi (es. HTTP sulla porta 80).
 ]
 
 Una connessione di rete è stabilita tra una coppia di socket. La comunicazione tramite socket è considerata di basso livello perché scambia un flusso non strutturato di byte; è responsabilità delle applicazioni client/server imporre una struttura sui dati.
 
 #image("images/2025-08-03-15-46-08.png")
 
-#definition("Remote Procedure Call RPC")[
+#definition(
+  "Remote Procedure Call RPC",
+)[
   La *Remote Procedure Call (RPC)* offre un metodo di comunicazione di livello più alto, estendendo il meccanismo di chiamata di procedura a sistemi collegati in rete.
 ]
 
@@ -242,16 +250,18 @@ Se i thread sono gestiti dal SO, a ogni thread è associato un Thread Control Bl
 
 #align(center, image("images/2025-08-03-15-55-30.png"))
 
-#align(center, figure(
-  image("images/2025-08-03-15-56-18.png"),
-  caption: "Gli elementi nella colonna di sinistra sono condivisi
-da tutti i thread di uno stesso processo. Quelli della colonna di destra sono replicati per ogni thread.",
-))
+#align(
+  center,
+  figure(image("images/2025-08-03-15-56-18.png"), caption: "Gli elementi nella colonna di sinistra sono condivisi
+    da tutti i thread di uno stesso processo. Quelli della colonna di destra sono replicati per ogni thread."),
+)
 
 I *processi single-thread* operano in modo indipendente, con il proprio program counter, stack pointer, spazio di indirizzamento e set di file aperti, e sono adatti per task non correlati.
 
+\
 I *processi multithread*, grazie alla condivisione, utilizzano meno risorse (memoria, file aperti, scheduling della CPU) e sono più efficienti per task correlati. Entrambi i tipi possono coesistere nello stesso sistema.
 
+\
 Un esempio pratico è un *server web multithread* (, che può essere scomposto in un dispatcher (che riceve le richieste e le assegna) e un numero fisso di worker (che le elaborano). Se un worker si blocca (es. per un'operazione di I/O come la lettura da disco), un altro worker può essere eseguito, migliorando la reattività del server.
 
 #align(center, image("images/2025-08-03-15-58-45.png"))
@@ -265,7 +275,7 @@ I *vantaggi principali dell'uso dei thread* includono:
 
 == Architetture Multicore e Programmazione Multicore
 
-L'evoluzione dei sistemi di elaborazione ha portato all'emergere di architetture *multicore*, dove più unità di elaborazione (core) sono integrate sullo stesso chip, e ciascun core è visto dal sistema operativo come una CPU separata. Negli anni '90, molti sistemi operativi hanno adottato il multithreading, e oggi la maggior parte dei computer è in grado di eseguire thread multipli simultaneamente, spesso con il supporto diretto dell'hardware.
+L'evoluzione dei sistemi di elaborazione ha portato all'emergere di architetture *multicore*, dove più unità di elaborazione (core) sono integrate sullo stesso chip, e ciascun core è visto dal sistema operativo come una CPU separata.
 
 La *programmazione multithread su sistemi multicore* offre l'opportunità di utilizzare in modo più efficiente questi core e di aumentare il grado di concorrenza. In un sistema multicore, l'esecuzione concorrente si traduce in *esecuzione parallela effettiva*, poiché diversi thread possono essere assegnati a core distinti e progredire simultaneamente, a differenza dei sistemi a singolo core dove si ha solo interleaving.
 

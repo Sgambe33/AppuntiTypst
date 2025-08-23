@@ -1,4 +1,4 @@
-#import "@preview/dvdtyp:1.0.1": *
+#import "../../../../dvd.typ": *
 
 
 = Il File System: Concetti, Interfaccia e Realizzazione

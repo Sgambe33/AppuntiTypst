@@ -1,4 +1,4 @@
-#import "@preview/dvdtyp:1.0.1": *
+#import "../../../../dvd.typ": *
 
 = Capitolo 3: Scheduling della CPU
 
