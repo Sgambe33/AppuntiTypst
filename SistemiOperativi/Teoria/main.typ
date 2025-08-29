@@ -1,6 +1,13 @@
 #import "../../dvd.typ": *
+#import "@preview/in-dexter:0.7.2": *
 
-#dvdtyp(title: "Appunti Sistemi Operativi", author: "Cosimo Sgambelluri", cover-image: image("cover.jpg"))[
+#dvdtyp(
+  title: "Appunti Sistemi Operativi",
+  author: none,
+  subtitle: "Corso 2024/2025",
+  cover-image: image("cover.jpg", height: 100%, width: 100%),
+  bottom-logo: image("../../background.png", width: 100%),
+)[
 
   #outline(title: "Contenuti")
 
@@ -19,4 +26,9 @@
   #include "chapters/chapter6/6-filesystem.typ"
 
   #include "chapters/chapter7/7-dispositivi-io.typ"
+
+  #pagebreak()
+  #columns(2)[
+    #make-index(title: "Indice Analitico")
+  ]
 ]
