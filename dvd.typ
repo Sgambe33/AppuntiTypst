@@ -28,20 +28,17 @@
   subtitle: "",
   author: "",
   abstract: none,
-  cover-image: none, // path string or none
+  cover-image: none,
+  bottom-logo: none,
   accent: colors.at(6),
   body,
 ) = {
-  set document(title: title)
+  set document(title: title, date: auto)
 
   show: thmrules
 
-  set page(numbering: "1", number-align: center, header: context {
-    if here().page() == 1 {
-      return
-    }
-    box(stroke: (bottom: 0.7pt), inset: 0.2em)[#text(font: "New Computer Modern Sans")[#author #h(1fr)#title]]
-  })
+  set page(paper: "a4", header: none, footer: none, margin: (top: 0pt, bottom: 0pt, left: 0pt, right: 0pt))
+  cover-image
 
   set heading(numbering: "1.")
   show heading: it => {
@@ -50,38 +47,82 @@
 
     if it.numbering != none {
       text(accent, weight: 500)[#sym.section]
-
       text(accent)[#counter(heading).display() ]
     }
     it.body
   }
 
   set text(font: "New Computer Modern", lang: "en")
-
   show math.equation: set text(weight: 400)
 
+  // Title content over the cover image
+  if cover-image != none {
+    // Full page cover with overlay text
+    place(center + horizon)[
+      #align(center)[
+        #set text(font: "New Computer Modern Sans", fill: white)
+        #block(
+          fill: rgb(0, 0, 0, 150), // Semi-transparent black background
+          inset: 2em,
+          radius: 0.5em,
+          text(weight: 700, 32pt, title),
+        )
+        #v(0.4em, weak: true)
+        #if subtitle != none [
+          #block(fill: rgb(0, 0, 0, 150), inset: 1em, radius: 0.3em, text(20pt, weight: 500)[#subtitle])
+        ]
+        #v(0.3em, weak: true)
+        #if author != none [
+          #block(fill: rgb(0, 0, 0, 150), inset: 1em, radius: 0.3em, text(16pt)[by #author])
+        ]
+      ]
+    ]
 
-  // Title row.
-  align(center)[
-    #set text(font: "New Computer Modern Sans")
-    // optional cover image on first page (full width)
-    #block(text(weight: 700, 25pt, title))
-    #v(0.4em, weak: true)
-    #if subtitle != none [#text(18pt, weight: 500)[#subtitle]]
-    #v(0.3em, weak: true)
-    #if author != none [#text(14pt)[by #author]]
-    #if cover-image != none [
-      #cover-image
+    place(bottom)[
+      #align(center)[
+        #bottom-logo
+      ]
+    ]
+  } else {
+    // Regular title page without cover image
+    set page(margin: auto) // Restore normal margins
+    align(center)[
+      #set text(font: "New Computer Modern Sans")
+      #block(text(weight: 700, 25pt, title))
+      #v(0.4em, weak: true)
+      #if subtitle != none [#text(18pt, weight: 500)[#subtitle]]
+      #v(0.3em, weak: true)
+      #if author != none [#text(14pt)[by #author]]
+    ]
+  }
+
+  if abstract != none [
+    #v(2em)
+    #align(center)[
+      #block(
+        fill: if cover-image != none { rgb(255, 255, 255, 200) } else { none },
+        inset: if cover-image != none { 1.5em } else { 0em },
+        radius: if cover-image != none { 0.5em } else { 0em },
+        width: 80%,
+        text(fill: if cover-image != none { black } else { auto })[#abstract],
+      )
     ]
   ]
 
-  if abstract != none [#align(center)[#abstract]]
-
-  // Move to new page for outline
+  // Move to new page and reset page settings
   pagebreak()
 
-  set outline(indent: 1em)
+  // Reset page settings for content pages
+  set page(background: none, margin: auto, number-align: center, numbering: "1", header: context {
+    if here().page() == 1 {
+      return none
+    }
+    box(stroke: (bottom: 0.7pt), inset: 0.4em)[
+      #text(font: "New Computer Modern Sans")[#h(1fr)#title]
+    ]
+  }, footer: none)
 
+  set outline(indent: 1em)
   show outline: set heading(numbering: none)
   show outline: set par(first-line-indent: 0em)
 
@@ -91,8 +132,8 @@
   show outline.entry: it => {
     text(font: "New Computer Modern Sans", accent)[#it]
   }
-  
-  // Main body.
+
+  // Main body
   set par(justify: true, first-line-indent: 0em)
   body
 }
@@ -197,10 +238,10 @@
 
 #let definition-style = builder-thmline(color: colors.at(8))
 
-#let definition = definition-style("definition", "Definition")
-#let proposition = definition-style("proposition", "Proposition")
-#let remark = definition-style("remark", "Remark")
-#let observation = definition-style("observation", "Observation")
+#let definition = definition-style("definition", "Definizione")
+#let proposition = definition-style("proposition", "Proposizione")
+#let remark = definition-style("remark", "Nota")
+#let observation = definition-style("observation", "Osservazione")
 
 #let example-style = builder-thmline(color: colors.at(16))
 
