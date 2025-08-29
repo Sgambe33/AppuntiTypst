@@ -1,23 +1,27 @@
 #import "../../../../dvd.typ": *
 #import "@preview/numbly:0.1.0": numbly
 
-#set enum(
-  full: true,
-  numbering: numbly("{1:1}.", "{2:a})"),
-)
+#set enum(full: true, numbering: numbly("{1:1}.", "{2:a})"))
 = Capitolo 4: Stallo
 == Il problema del deadlock
 
-#definition("Deadlock")[
-  Il problema dello *stallo (o deadlock)* si verifica quando un insieme di processi si trova in una situazione in cui ciascun processo attende un evento che solo un altro processo dell'insieme può provocare. Questo può accadere a causa della sincronizzazione tra processi, della comunicazione tra processi o, più comunemente, della condivisione di risorse.]
+#definition(
+  "Deadlock",
+)[
+  Il problema dello *stallo (o deadlock)* si verifica quando un insieme di processi si trova in una situazione in cui ciascun processo attende un evento che solo un altro processo dell'insieme può provocare. Questo può accadere a causa della sincronizzazione tra processi, della comunicazione tra processi o, più comunemente, della condivisione di risorse.
+]
 
 Lo stallo sulle risorse è una problematica gestita dal Sistema Operativo (SO), mentre altre forme di stallo non lo sono. È cruciale evitare lo stallo, poiché impedisce l'avanzamento dei processi bloccati e sottrae definitivamente risorse al sistema, compromettendo la produttività e l'uso efficiente delle risorse.
 
-#definition("Livelock")[
+#definition(
+  "Livelock",
+)[
   Un concetto correlato, ma meno comune, è il *livelock (o stallo attivo)*. In un livelock, un processo tenta continuamente un'azione senza successo e, sebbene non sia bloccato, non fa progressi.
 ]
 
-#example("Esempio di livelock")[
+#example(
+  "Esempio di livelock",
+)[
   Un esempio di livelock è quello delle reti Ethernet, dove i dispositivi attendono un periodo di tempo casuale prima di ritrasmettere un pacchetto dopo una collisione, per evitare di riprovare immediatamente e fallire di nuovo.
 ]
 
@@ -30,10 +34,8 @@ Il concetto di deadlock può essere illustrato con diversi esempi:
 #image("images/2025-08-10-15-58-22.png")
 
 - *Problema dei filosofi a cena (Dijkstra)*: Questo è un classico problema di controllo della concorrenza. Cinque filosofi condividono una tavola rotonda con un piatto di spaghetti e cinque forchette. Per mangiare, un filosofo deve prendere la forchetta alla sua destra e quella alla sua sinistra, una per volta. Le forchette devono essere usate in mutua esclusione. L'attività di ogni filosofo è: pensa, prendi forchetta sinistra, prendi forchetta destra, mangia, rilascia entrambe le forchette. Se tutti i filosofi hanno fame contemporaneamente e prendono la forchetta di sinistra, tutte le forchette diventano non disponibili. Quando un filosofo tenta di prendere la forchetta di destra, rimane in attesa indefinitamente, creando un deadlock.
-
-#figure(image("images/2025-08-10-15-59-20.png", height: 20%))
-
-Diverse soluzioni sono state proposte, come ordinare le forchette e richiederle rispettando l'ordinamento, chiedere entrambe le forchette con un'unica richiesta, o ammettere solo 4 filosofi al tavolo. Un'altra idea è che un filosofo prenda le forchette in ordine inverso (prima destra, poi sinistra), ma questo non funziona in generale.
+  #figure(image("images/2025-08-10-15-59-20.png", height: 20%))
+  Diverse soluzioni sono state proposte, come ordinare le forchette e richiederle rispettando l'ordinamento, chiedere entrambe le forchette con un'unica richiesta, o ammettere solo 4 filosofi al tavolo. Un'altra idea è che un filosofo prenda le forchette in ordine inverso (prima destra, poi sinistra), ma questo non funziona in generale.
 
 - *Deadlock con masterizzatori CD*: Un sistema ha due masterizzatori CD. Due processi, P1 e P2, necessitano di entrambi per copiare un CD, utilizzando semafori di mutua esclusione A e B. Se P1 acquisisce A e poi tenta di acquisire B, mentre P2 acquisisce B e poi tenta di acquisire A, si verifica un deadlock. Entrambi i processi possiedono un masterizzatore e attendono l'altro, che è posseduto dal processo concorrente.
 
@@ -94,7 +96,9 @@ Le proprietà del grafo di Holt e il deadlock sono le seguenti:
   Un grafo con cicli e risorse a singola istanza mostra un deadlock
 ]
 
-#example("Grafo con cicli ma senza deadlock")[
+#example(
+  "Grafo con cicli ma senza deadlock",
+)[
   #figure(image("images/2025-08-10-16-20-54.png", height: 20%))
   C'è il ciclo $P_1 arrow R_1 arrow P_3 arrow R_2 arrow P_1$ però non si ha stallo: il processo $P_4$ può rilasciare la propria istanza del tipo di risorsa $R_2$, che si può assegnare al processo $P_3$, rompendo il ciclo.
 
@@ -119,25 +123,27 @@ La *prevenzione statica* dei deadlock impone vincoli sul comportamento dei proce
 
   In un sistema che utilizza l'ordinamento delle risorse, l'assenza di circolarità nelle relazioni di attesa può essere dimostrata *per assurdo*:
 
-  1. Supponiamo ci sia un'attesa circolare malgrado i processi rispettino la politica basata sull'ordinamento nell'effettuare richieste di risorse.
-  2. Sia $\{P_0, P_1, dots, P_n\}$ l'insieme dei processi coinvolti nell'attesa circolare, dove il processo $P_i$ attende una risorsa di tipo $R_(f(i))$ posseduta dal processo $P_(i+1)$ (sugli indici si usa l'aritmetica modulare).
-  3. Poiché il processo $P_(i+1)$ possiede una risorsa di tipo $R_(f(i))$ mentre richiede una risorsa di tipo $R_(f(i+1))$ (dato che a sua volta è in attesa del processo $P_(i+2)$), è necessario che per tutti gli indici $i$ valga la condizione:
-    $
-      F(R_(f(i))) < F(R_(f(i+1)))
-    $
-  4. Ciò implica:
-    $
-      F(R_(f(0))) < F(R_(f(1))) < dots < F(R_(f(n))) < F(R_(f(0)))
-    $
-  5. Per la proprietà transitiva dell'ordinamento risulta quindi che:
-    $
-      F(R_(f(0))) < F(R_(f(0)))
-    $
-    il che è impossibile.
-  6. Quindi, non può esservi attesa circolare.
+  #proof(
+    )[
+    1. Supponiamo ci sia un'attesa circolare malgrado i processi rispettino la politica basata sull'ordinamento nell'effettuare richieste di risorse.
+    2. Sia $\{P_0, P_1, dots, P_n\}$ l'insieme dei processi coinvolti nell'attesa circolare,dove il processo $P_i$ attende una risorsa di tipo $R_(f(i))$ posseduta dal processo $P_(+1)$ (sugli indici si usa l'aritmetica modulare).
+    3. Poiché il processo $P_(i+1)$ possiede una risorsa di tipo $R_(f(i))$ mentre richiedeuna risorsa di tipo $R_(f(i+1))$ (dato che a sua volta è in attesa del processo $P_(i+2$), è necessario che per tutti gli indici $i$ valga la condizione:
+      $
+        F(R_(f(i))) < F(R_(f(i+1)))
+      $
+    4. Ciò implica:
+      $
+        F(R_(f(0))) < F(R_(f(1))) < dots < F(R_(f(n))) < F(R_(f(0)))
+      $
+    5. Per la proprietà transitiva dell'ordinamento risulta quindi che:
+      $
+        F(R_(f(0))) < F(R_(f(0)))
+      $
+      il che è impossibile.
+    6. Quindi, non può esservi attesa circolare.
+  ]
 
   L'inconveniente è che stabilire un ordinamento adatto a tutti i processi può essere difficile in sistemi complessi.
-
 
 #figure(image("images/2025-08-10-17-06-18.png", height: 35%))
 
@@ -147,7 +153,9 @@ La prevenzione statica, sebbene impedisca il deadlock, può causare un scarso ut
 Il SO alloca le risorse dinamicamente solo se il sistema rimane in uno stato "sicuro".
 La *prevenzione dinamica* dei deadlock non impone vincoli sul comportamento dei processi, ma il SO usa algoritmi che esaminano lo stato di allocazione delle risorse per assicurarsi che la condizione di attesa circolare non possa mai verificarsi. Questi algoritmi richiedono informazioni a priori, come il numero massimo di risorse di ogni tipo di cui un processo può avere bisogno.
 
-#definition("Stato sicuro")[
+#definition(
+  "Stato sicuro",
+)[
   Uno stato è *sicuro* se esiste una *sequenza ordinata* con cui il sistema può allocare le risorse a ogni processo (fino alle sue massime richieste) ed evitare deadlock. Se un sistema è in uno stato sicuro, non si presenterà alcun deadlock. Se è in uno stato non sicuro, c'è la possibilità di deadlock.
 ]
 La strategia è che il SO accordi una richiesta solo se l'allocazione lascia il sistema in uno stato sicuro.
@@ -174,13 +182,12 @@ L'esempio mostra come la richiesta di $P_2$ per $R_2$ possa portare a uno stato 
   l'arco di prenotazione $P_2 ⇢ R_2$
   nell'arco di assegnazione $R_2 \to P_2$.
 
-  #figure(
-    grid(
-      columns: 2,
-      gutter: 2mm,
-      image("images/2025-08-10-17-29-49.png", height: 20%), image("images/2025-08-10-17-29-57.png", height: 20%),
-    ),
-  )
+  #figure(grid(
+    columns: 2,
+    gutter: 2mm,
+    image("images/2025-08-10-17-29-49.png", height: 20%),
+    image("images/2025-08-10-17-29-57.png", height: 20%),
+  ))
 
   Si ottiene il grafo che rappresenta uno stato non sicuro (infatti, contiene un ciclo).
 ]
@@ -204,23 +211,20 @@ Sia $n$ il numero dei processi e $m$ il numero di tipi di risorse.
 #align(center, strong[Vale l'invariante: `Need [i,j] = Max[i,j] - Allocation [i,j]`])
 
 - *Algoritmo per verificare se uno stato è sicuro*:
-  1. Siano `Work` e `Finish` vettori rispettivamente di lunghezza $m$ e $n$.
-  *Inizializzazione*:
-  + $"Work" = "Available"$
-  + $"Finish"[i] = "false"$ per $i = 1, 2, dots, n$
 
-  2. Cercare un indice $i$ tale che:
-    + $"Finish"[i] ="false"$
-    + $"Need"_i lt.eq "Work"$
-    Se un tale $i$ non esiste, passare al punto 4
+  Siano `Work` e `Finish` vettori rispettivamente di lunghezza $m$ e $n$. I pedici indicano una riga della matrice mentre se non sono presenti indici di vettori, le operazioni di confronto sono da interpretare su tutto il vettore.
+  1. Inizializzazione:
+    + `Work` = `Available`
+    + `Finish[i]` = `false` per `i` = $1, 2, dots, $`n`
+
+  2. Cercare un indice `i` tale che:
+    + `Finish[i]` == `false`
+    + $"Need"_i lt.eq$ `Work`
+    Se un tale `i` non esiste, passare al punto 4
 
   3. Aggiornare:
-    $
-      "Work" = "Work" + "Allocation"_i
-    $
-    $
-      "Finish"[i] = "true"
-    $
+    + $"Work" = "Work" + "Allocation"_i$
+    + $"Finish"[i] = "true"$
     Tornare al punto 2.
 
   4. Se per ogni $i$, $"Finish"[i] = "true"$, allora lo stato è sicuro; altrimenti non lo è.
@@ -228,17 +232,17 @@ Sia $n$ il numero dei processi e $m$ il numero di tipi di risorse.
   *Costo*: $O(m times n^2)$ operazioni per trovare una sequenza sicura.
 
 - *Algoritmo del banchiere (gestione richiesta)*:
-  Sia Requesti il vettore (di lunghezza $m$) delle richieste di $P_i$
+  Sia $"Request"_i$ il vettore (di lunghezza $m$) delle richieste di $P_i$
   1. Se
   $
-    "Request"_i lt.eq "Need_"i
+    "Request"_i lt.eq "Need"_i
   $
   passare al punto 2.
 
   Altrimenti sollevare una condizione di errore, poichè la richiesta di $P_i$ ha ecceduto il numero massimo di risorse di cui $P_i$ ha dichiarato di aver bisogno per portare a termine la sua esecuzione
   2. Se
   $
-    "Request"_i lt.eq "Available" ????
+    "Request"_i lt.eq "Available"
   $
   passare al punto 3.
 
@@ -257,16 +261,131 @@ Sia $n$ il numero dei processi e $m$ il numero di tipi di risorse.
   - Se lo stato ottenuto è sicuro ⇒ le risorse vengono realmente assegnate a $P_i$ e lo stato diventa effettivo.
   - Se lo stato ottenuto è non sicuro ⇒ $P_i$ deve aspettare e viene ristabilito il vecchio stato di allocazione delle risorse (cioè i precedenti valori di Available, Allocation e Need).
 
-  #example("Esempio algoritmo banchiere")[
-    #image("images/2025-08-12-18-24-54.png")
-    #image("images/2025-08-12-18-29-09.png")
-    #image("images/2025-08-12-18-29-18.png")
-    #image("images/2025-08-12-18-29-29.png")
-    #image("images/2025-08-12-18-29-46.png")
-    #image("images/2025-08-12-18-29-55.png")
+  #example(
+    "Esempio algoritmo banchiere",
+  )[
+  Si consideri un sistema con 5 processi da $P_0$ a $P_4$ e 3 tipi di risorse:
+  - A: 10 istanze
+  - B: 5 istanze
+  - C: 7 istanze
+  Quindi il vettore `Available` sarà:
+  - `Available[A]` = 10
+  - `Available[B]` = 5
+  - `Available[C]` = 7
+
+  Supponiamo che lo stato corrente sia il seguente:
+
+  #grid(columns: 3, column-gutter: 3mm, align: center, table(
+    align: center,
+    columns: 1,
+    table.cell([Processes]),
+    table.cell([ ]),
+    table.footer([$P_0$], [$P_1$], [$P_2$], [$P_3$], [$P_4$]),
+  ), table(
+    align: center,
+    columns: 3,
+    table.cell([Allocation], colspan: 3),
+    table.footer([A], [B], [C], [0], [1], [0], [2], [0], [0], [3], [0], [2], [2], [1], [1], [0], [0], [2]),
+  ), table(
+    align: center,
+    columns: 3,
+    table.cell([Max], colspan: 3),
+    table.footer([A], [B], [C], [7], [5], [3], [3], [2], [2], [9], [0], [2], [2], [2], [2], [4], [3], [3]),
+  ))
+
+  Lo stato corrente è sicuro?
+  La matrice `Need` definita come `Max`-`Allocation`, ed il vettore `Available` delle risorse attualmente disponibili, ricavabile sottraendo all risorse complessive del sistema quelle già allaocate, quindi `Available` = [10,5,7] - $sum_i "Allocation"_i$, sono:
+
+  #grid(
+    columns: 6,
+    column-gutter: 3mm,
+    align: center,
+    table(
+      align: center,
+      columns: 1,
+      table.cell([Processes]),
+      table.cell([ ]),
+      table.footer([$P_0$], [$P_1$], [$P_2$], [$P_3$], [$P_4$]),
+    ),
+    table(
+      align: center,
+      columns: 3,
+      table.cell([Allocation], colspan: 3),
+      table.footer([A], [B], [C], [0], [1], [0], [2], [0], [0], [3], [0], [2], [2], [1], [1], [0], [0], [2]),
+    ),
+    table(
+      align: center,
+      columns: 3,
+      table.cell([Max], colspan: 3),
+      table.footer([A], [B], [C], [7], [5], [3], [3], [2], [2], [9], [0], [2], [2], [2], [2], [4], [3], [3]),
+    ),
+    // DIVIDER
+    table(
+      align: center,
+      columns: 1,
+      table.cell([Processes]),
+      table.cell([ ]),
+      table.footer([$P_0$], [$P_1$], [$P_2$], [$P_3$], [$P_4$]),
+    ),
+    table(
+      align: center,
+      columns: 3,
+      table.cell([Need], colspan: 3),
+      table.footer([A], [B], [C], [7], [4], [3], [1], [2], [2], [6], [0], [0], [0], [1], [1], [4], [3], [1]),
+    ),
+    table(
+      align: center,
+      columns: 3,
+      table.cell([Available], colspan: 3),
+      table.footer([A], [B], [C], [3], [3], [2], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ]),
+    ),
+  )
+
+  Il sistema è in uno stato sicuro poiché la sequenza <$P_1, P_3, P_4, P_2, P_0$> è sicura, infatti...
+
+  - Need1 = (1 2 2) ≤ (3 3 2) ⇒P1 ottiene le risorse e termina e Work = (5 3 2)
+  - Need3 = (0 1 1) ≤ (5 3 2) ⇒P3 ottiene le risorse e termina e Work = (7 4 3)
+  - Need4 = (4 3 1) ≤ (7 4 3) ⇒P4 ottiene le risorse e termina e Work = (7 4 5)
+  - Need2 = (6 0 0) ≤ (7 4 5) ⇒P2 ottiene le risorse e termina e Work = (10 4 7)
+  - Need0 = (7 4 3) ≤ (10 4 7) ⇒P0 ottiene le risorse e termina e Work = (10 5 7)
+
+  La richiesta (1,0,2) da $P_1$ può essere soddisfatta? Applichiamo l'algoritmo del banchiere:
+  - Controlliamo che:
+    + $"Request"_1 lt.eq "Need"_1$ cioè (1 0 2) $lt.eq$ (1 2 2)
+    + $"Request"_1 lt.eq "Available"$ cioè (1 0 2) $lt.eq$ (3 3 2)
+  - Aggiorniamo lo stato:
+    #grid(columns: 6, column-gutter: 3mm, align: center, table(
+      align: center,
+      columns: 1,
+      table.cell([Processes]),
+      table.cell([ ]),
+      table.footer([$P_0$], [$P_1$], [$P_2$], [$P_3$], [$P_4$]),
+    ), table(
+      align: center,
+      columns: 3,
+      table.cell([Allocation], colspan: 3),
+      table.footer([A], [B], [C], [0], [1], [0], [2], [0], [0], [3], [0], [2], [2], [1], [1], [0], [0], [2]),
+    ), table(
+      align: center,
+      columns: 3,
+      table.cell([Need], colspan: 3),
+      table.footer([A], [B], [C], [7], [4], [3], [1], [2], [2], [6], [0], [0], [0], [1], [1], [4], [3], [1]),
+    ), table(
+      align: center,
+      columns: 3,
+      table.cell([Available], colspan: 3),
+      table.footer([A], [B], [C], [2], [3], [0], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ]),
+    ))
+  - Invochiamo l'algoritmo per la verifica dello stato sicuro che restituisce la sequenza sicura <$P_1, P_3, P_4, P_2, P_0$>.
+
+  La richiesta (3,3,0) di $P_4$ può essere soddisfatta?
+  - Non immediatamente, bisogna aspettare disponibilità di ulteriori risorse poiché quelle attualmente disponibili sono (2 3 0).
+
+  La richiesta (0,2,0) di $P_0$ può essere soddisfatta?
+  - No, perché lo stato raggiunto non sarebbe sicuro: è semplice verificarlo in questo caso perché, una volta aggiornato temporaneamente lo stato, non esiste un indice `i` tale che $"Need"_i lt.eq "Work"$ = (2 1 0).
   ]
 
-  L'algoritmo del banchiere è costoso in termini di overhead e non permette di utilizzare al massimo le risorse (basandosi sul caso peggiore), riducendo la produttività. Inoltre, spesso le esigenze massime dei processi non sono note a priori, i processi variano dinamicamente e le risorse possono improvvisamente non essere disponibili, rendendo l'algoritmo poco applicabile nella pratica. Anche se teoricamente risolve il problema, pochi sistemi lo usano, anche se euristiche simili (es. limitare il traffico di rete quando l'utilizzo del buffer supera una soglia) sono impiegate.
+L'algoritmo del banchiere è costoso in termini di overhead e non permette di utilizzare al massimo le risorse (basandosi sul caso peggiore), riducendo la produttività. Inoltre, spesso le esigenze massime dei processi non sono note a priori, i processi variano dinamicamente e le risorse possono improvvisamente non essere disponibili, rendendo l'algoritmo poco applicabile nella pratica. Anche se teoricamente risolve il problema, pochi sistemi lo usano, anche se euristiche simili (es. limitare il traffico di rete quando l'utilizzo del buffer supera una soglia) sono impiegate.
 
 === 3. Rilevare il deadlock e ripristinare il sistema
 Rilevare i deadlock quando si verificano e recuperare il sistema. Nei sistemi che non prevengono o evitano i deadlock, è possibile fornire algoritmi per rilevarne la presenza e ripristinare il sistema.
@@ -274,8 +393,7 @@ Rilevare i deadlock quando si verificano e recuperare il sistema. Nei sistemi ch
 - *Singola istanza per ogni tipo di risorsa*: Si può usare un *grafo di attesa*. I nodi rappresentano solo processi, e un arco $P_i arrow P_j$ esiste se $P_i$ attende che $P_j$ rilasci una risorsa. Nel grafo di attesa, un deadlock esiste se, e solo se, c'è almeno un ciclo. Il SO mantiene questo grafo e periodicamente invoca un algoritmo di ricerca di cicli (costo $O(n^2)$).
 
 #figure(
-  image("images/2025-08-10-17-39-30.png", height: 35%),
-  caption: "La figura in mostra la corrispondenza tra grafo di allocazione e grafo di attesa.",
+  image("images/2025-08-10-17-39-30.png", height: 30%),
 )
 
 

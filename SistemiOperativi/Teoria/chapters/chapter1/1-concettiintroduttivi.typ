@@ -5,9 +5,9 @@
 Un #strong[Sistema Operativo (SO)] è un insieme di programmi che agisce come intermediario tra gli utenti e l'hardware di un sistema di elaborazione. Non esiste una definizione universalmente accettata, ma è possibile identificarne diversi ruoli:
 
 - #strong[Intermediario] tra utenti e hardware.
-- #strong[Virtualizzatore di risorse];, che permette di utilizzare il sistema di elaborazione come se si avesse a disposizione una macchina funzionalmente estesa.
-- #strong[Allocatore di risorse];, gestendo e allocando risorse fisiche e logiche (come tempo di CPU, memoria, dispositivi di I/O) e risolvendo conflitti di accesso.
-- #strong[Programma di controllo];, che supervisiona l'esecuzione dei programmi utente per prevenire errori nell'uso del computer e dei dispositivi.
+- #strong[Virtualizzatore di risorse]; che permette di utilizzare il sistema di elaborazione come se si avesse a disposizione una macchina funzionalmente estesa.
+- #strong[Allocatore di risorse]; gestendo e allocando risorse fisiche e logiche (come tempo di CPU, memoria, dispositivi di I/O) e risolvendo conflitti di accesso.
+- #strong[Programma di controllo]; che supervisiona l'esecuzione dei programmi utente per prevenire errori nell'uso del computer e dei dispositivi.
 - Il #strong[Kernel] è l'unico programma che è sempre in funzione nel calcolatore.
 
 #figure(image("images/image.png", height: 30%))
@@ -24,15 +24,15 @@ Gli #strong[obiettivi principali] di un SO sono:
 
 #figure(image("images/image 1.png", height: 25%))
 
-Un moderno calcolatore general-purpose è composto da una o più #strong[CPU] e da diversi #strong[controllori di dispositivi];, tutti connessi tramite un #strong[bus] che consente l'accesso alla memoria condivisa. CPU e controllori possono operare in parallelo.
+Un moderno calcolatore è composto da una o più #strong[CPU] e da diversi #strong[controllori di dispositivi];, tutti connessi tramite un #strong[bus] che consente l'accesso alla memoria condivisa.
 
 === CPU (Central Processing Unit)
-Contiene #strong[registri interni] (programmabili, di stato e controllo). Esegue le istruzioni dei programmi attraverso il #strong[ciclo prelievo-decodifica-esecuzione] (Fetch, Decode & Execute).
+Contiene #strong[registri interni] (programmabili, di stato e controllo). Esegue le istruzioni dei programmi attraverso il #strong[ciclo Fetch, Decode & Execute];.
 
 I sistemi moderni utilizzano #strong[architetture multiprocessore] (più processori che condividono memoria e clock) o #strong[multicore] (processori con più nuclei di elaborazione sullo stesso chip), che permettono una #strong[concorrenza reale] (più programmi in esecuzione simultanea) e offrono vantaggi come elevata capacità di elaborazione, basso costo e maggiore affidabilità.
 #figure(
   grid(columns: 2, gutter: 2mm, image("images/image 2.png", height: 25%), image("images/image 3.png", height: 25%)),
-  caption: "Architettura multiprocessore con 2 CPU. Architettura dual-core con due core sullo stesso chip.",
+  caption: "A destra un'architettura multiprocessore con 2 CPU. A sinistra un'architettura dual-core con due core sullo stesso chip.",
 )
 
 === Controllori dei dispositivi
@@ -43,33 +43,41 @@ Ciascun controllore è responsabile di un tipo specifico di dispositivo e ha un 
 Una combinazione di comportamenti hardware e software che interrompe l'esecuzione del processo corrente, assegna la CPU a una #strong[funzione di gestione dell'interruzione] e poi riprende il processo sospeso.
 
 #figure(image("images/image 4.png", height: 27%), caption: [
-  #strong[Diagramma temporale delle interruzioni: singolo processo che invia dati in output]
+  Diagramma temporale delle interruzioni: singolo processo che invia dati in output.
 ])
 
-Le interruzioni possono essere causate da eventi esterni (es. completamento I/O), fallimenti hardware, trap (es. divisione per 0) o interruzioni software (system call).
+Le interruzioni possono essere causate da:
+- eventi esterni (es. completamento I/O)
+- fallimenti hardware
+- trap (es. divisione per 0) 
+- interruzioni software (system call)
 
 La gestione delle interruzioni è guidata da un #strong[vettore delle interruzioni] (una tabella con gli indirizzi delle funzioni di gestione) e da un #strong[bit di abilitazione] nel registro PS (Program Status Word). Se posto a 1, dopo il ciclo FDE, la CPU controlla se ci sono interruzioni in attesa.
 
-Le interruzioni possono avere #strong[priorità], quelle a priorità più alta possono sospendere la gestione di quelle a priorità più bassa (necessitando un #strong[kernel prelazionabile];). Alcune interruzioni sono #strong[mascherabili] (disattivabili) e altre no.
+Le interruzioni possono avere #strong[priorità]: quelle a priorità più alta possono sospendere la gestione di quelle a priorità più bassa (necessitando un #strong[kernel prelazionabile];). Alcune interruzioni sono #strong[mascherabili] (disattivabili) e altre no.
 
-#strong[Kernel non prelazionabile];: Disabilita la gestione delle interruzioni durante l'esecuzione dell'handler, semplificando il design ma potendo ritardare interruzioni ad alta priorità.
 
-#figure(image("images/image 5.png"))
+- #strong[Kernel non prelazionabile];: Disabilita la gestione delle interruzioni durante l'esecuzione dell'handler, semplificando il design ma potendo ritardare interruzioni ad alta priorità.
 
-#strong[Kernel prelazionabile];: Permette la gestione di interruzioni più critiche anche mentre un'interruzione è già in corso, tipicamente con uno schema a priorità. Richiede schemi di sincronizzazione per evitare problemi di consistenza dei dati.
+  #figure(image("images/image 5.png"))
 
-#figure(image("images/image 6.png"))
+- #strong[Kernel prelazionabile];: Permette la gestione di interruzioni più critiche anche mentre un'interruzione è già in corso, tipicamente con uno schema a priorità. 
+
+  #figure(image("images/image 6.png"))
 
 === I/O sincrono e asincrono:
-- #strong[I/O sincrono];: Il controllo ritorna al processo utente solo al completamento dell'I/O. La CPU resta inattiva (istruzione `wait`). In un dato istante, al massimo una richiesta di I/O è in sospeso.
+- #strong[I/O sincrono];: avviata un'operazione di I/O il processo utente si mette in attesa fino al completamento e la CPU resta inattiva. In un dato istante, al massimo una richiesta di I/O è in sospeso.
 
-- #strong[I/O asincrono];: Il controllo ritorna al processo utente immediatamente, senza attendere il completamento. Se necessario, si usa una system call bloccante per permettere al processo utente di attendere il completamento dell'I/O. Per tenere traccia delle richieste I/O si usa una #strong[tabella di stato dei dispositivi];.
+- #strong[I/O asincrono];: il processo utente, inviata la richiesta di I/O al kernel, continua la propria esecuzione senza attendere il completamento
+.
 
 #figure(
   grid(columns: 2, gutter: 2mm, image("images/image 7.png", height: 25%), image("images/image 8.png", height: 25%)),
 )
 
 #figure(image("images/image 9.png", height: 25%), caption: "Tabella di stato dei dispositivi")
+
+Per tenere traccia delle richieste I/O si usa una #strong[tabella di stato dei dispositivi];.
 
 === Accesso diretto alla memoria (DMA)
 #definition(
@@ -191,15 +199,13 @@ Necessari per garantire che un programma malfunzionante non influenzi altri prog
   - #strong[Modalità monitor (o kernel/supervisore/sistema)];: Per l'esecuzione dei servizi del SO, senza limiti alle operazioni attraverso system call.
 
 
-  Attenzione, per garantire una gestione delle risorse corretta da parte del SO è necessario garantire che un processo utente non possa mai ottenere il controllo del calcolatore quando esso si trova in modalità monitor.
+  Attenzione, per garantire una gestione delle risorse corretta da parte del SO è necessario garantire che un processo utente non possa mai otenere il controllo del calcolatore quando esso si trova in modalità monitor. Un #strong[bit di modalità] nel registro PS indica la modalità corrente. Il sistema passa alla modalità monitor durante le interruzioni e torna alla modalità utente prima di restituire il controllo a un processo utente.
 
-  Un #strong[bit di modalità] nel registro PS indica la modalità corrente. Il sistema passa alla modalità monitor durante le interruzioni e torna alla modalità utente prima di restituire il controllo a un processo utente.
+  #figure(image("images/image 17.png"), caption: "Ciclo cambiamento modalità di funzionamento")
 
-  #figure(image("images/image 17.png"), caption: "Ciclo cambiamento modalità  di funzionamento")
+  Le system call generano una interruzione che modifica la modalità di funzionamento della CPU e invoca la funzione corrispondente.
 
-  Le system call generano una interruzione (che modifica la modalità di funzionamento della CPU e invoca la funzione corrispondente)
-
-  #figure(image("images/image 18.png", height: 45%), caption: "Generazione di interruzioni attraverso system call")
+  #figure(image("images/image 18.png", width: 60%), caption: "Generazione di interruzioni attraverso system call")
 
 - #strong[Protezione dell' I/O]
 
@@ -215,16 +221,16 @@ Necessari per garantire che un programma malfunzionante non influenzi altri prog
 
   Per definire l'intervallo di indirizzi legali per un processo. Solo il SO può modificare questi registri tramite istruzioni privilegiate.
 
-  #figure(image("images/image 20.png", height: 40%))
+  #figure(image("images/image 20.png", width: 80%))
 
   Ogni indirizzo generato dalla CPU è confrontato con il valore del registro base ed il valore ottenuto dalla soma dei due registri.
 
 - #strong[Protezione della memoria cache]
 
-  Alla cache L1 si accede solo con indirizzi logici (vedi MMU). Diversi processi possono usare gli stessi indirizzi logici quindi il controllo basato su indirizzi non è utilizzabile.
+  Alla cache L1 si accede solo con indirizzi logici (vedi MMU).
 
-  - Approccio semplice: flush (cancellazione) della cache quando cambia il processo in esecuzione (context switch).
-  - Approccio sosfisticato: in ogni blocco della cache si memorizza l'id del processo a cui appartengono i dati / istruzioni.
+  - Approccio semplice: *flush* (cancellazione) della cache durante il context switch.
+  - Approccio sosfisticato: in ogni blocco della cache si memorizza il *PID* del processo a cui appartengono i dati/istruzioni.
 
 - #strong[Protezione della CPU]
 
@@ -233,23 +239,23 @@ Necessari per garantire che un programma malfunzionante non influenzi altri prog
 == Gestione delle Risorse
 I moderni SO supportano la condivisione delle risorse in due modalità: #strong[condivisione nel tempo] (risorse usate a turno, es. CPU) e #strong[condivisione nello spazio] (risorse divise, es. memoria). Utilizzano #strong[multiprogrammazione] e #strong[time-sharing];.
 
-- #strong[Multiprogrammazione];: Il SO mantiene più processi contemporaneamente in memoria centrale per mantenere la CPU in attività. Quando un processo attende un evento (es. I/O), il SO passa a un altro (#strong[context switch];). Richiede scheduling dei processi, gestione della memoria e scheduling della CPU.
+- #strong[Multiprogrammazione];: Il SO mantiene più processi contemporaneamente in memoria centrale per mantenere la CPU in attività. Quando un processo attende un evento (es. I/O), il SO passa a un altro (#strong[context switch];).
 
-  #figure(image("images/image 21.png", height: 30%), caption: [
+  #figure(image("images/image 21.png", width: 60%), caption: [
     Esempio multiprogrammazione
   ])
 
-  #figure(image("images/image 22.png", height: 30%), caption: [
+  #figure(image("images/image 22.png", width: 60%), caption: [
     Differenza esecuzione sequenziale vs. multiprogrammata
   ])
 
-- #strong[Time-sharing (o Multitasking)];: Estensione logica della multiprogrammazione per minimizzare i tempi di risposta e permettere un uso interattivo. I processi si alternano nell'uso della CPU per brevi quanti di tempo (time slice), dando l'illusione all'utente di avere il sistema a disposizione.
+- #strong[Time-sharing (o Multitasking)];: Estensione logica della multiprogrammazione per minimizzare i tempi di risposta e permettere un uso interattivo. I processi si alternano nell'uso della CPU per brevi quanti di tempo, dando l'illusione all'utente di avere il sistema a disposizione.
 
-  #figure(image("images/image 23.png", height: 50%), caption: [
+  #figure(image("images/image 23.png", width: 60%), caption: [
     Esempio di time-sharing
   ])
 
-=== #strong[Funzioni principali di gestione delle risorse svolte dal SO];: <funzioni-principali-di-gestione-delle-risorse-svolte-dal-so>
+=== #strong[Funzioni principali di gestione delle risorse svolte dal SO]; <funzioni-principali-di-gestione-delle-risorse-svolte-dal-so>
 - #strong[Gestione dei processi];: Un processo è un programma in esecuzione che necessita di risorse. Il SO è responsabile della creazione/eliminazione, sospensione/ripresa (scheduling sulla CPU), sincronizzazione, comunicazione e gestione dei deadlock.
 - #strong[Gestione della CPU];: Lo scheduler decide quale processo assegnare alla CPU, e le politiche di scheduling influenzano l'efficienza e la qualità del servizio.
 - #strong[Gestione della memoria principale];: La memoria è un vettore di parole/byte. Il SO tiene traccia dell'uso della memoria, decide quali processi caricare, alloca/dealloca spazio e protegge gli accessi.
@@ -261,14 +267,17 @@ I moderni SO supportano la condivisione delle risorse in due modalità: #strong[
 La #strong[virtualizzazione] si basa sul concetto di #strong[risorsa virtuale];, una risorsa fittizia che è un'astrazione di una risorsa reale, gestita dal SO in modo trasparente. Una singola risorsa reale può supportare molteplici risorse virtuali.
 
 - #strong[Vantaggi];: Le risorse virtuali sono più semplici da usare o appaiono in numero maggiore rispetto alle reali, e la loro molteplicità rimuove i vincoli di uso esclusivo, favorendo l'esecuzione concorrente di più applicazioni.
-- #strong[Esempio: server di stampa];: La stampante reale è la risorsa, il server di stampa è la risorsa virtuale. Quando un programma stampa, il file viene copiato in una "coda di stampa", e il programma può continuare. Il server stampa i file in coda quando la stampante è disponibile, semplificando l'accesso e rimuovendo apparentemente il vincolo di uso esclusivo.
+
+#example(
+  "Server di stampa",
+)[La stampante reale è la risorsa, il server di stampa è la risorsa virtuale. Quando un programma stampa, il file viene copiato in una "coda di stampa", e il programma può continuare. Il server stampa i file in coda quando la stampante è disponibile, semplificando l'accesso e rimuovendo apparentemente il vincolo di uso esclusivo.]
 
 La virtualizzazione può essere applicata a vari livelli e tipi di risorse:
 
 - #strong[CPU];: Multiprogrammazione per la condivisione.
 - #strong[Memoria];: Memoria virtuale per superare i limiti fisici.
 - #strong[I/O];: Accesso semplificato e rimozione del vincolo di uso esclusivo.
-- #strong[Computer];: #strong[Macchine virtuali] che evitano interferenze tra utenti, consentono SO diversi simultaneamente o l'esecuzione di un SO all'interno di un altro.
+- #strong[Macchine virtuali]: Consentono SO diversi simultaneamente o l'esecuzione di un SO all'interno di un altro.
 
 == Sicurezza e Protezione <sicurezza-e-protezione>
 La #strong[sicurezza] si occupa di preservare le risorse del computer da accessi non autorizzati, modifiche dannose e incoerenze. Si basa sull'#strong[autenticazione] (verifica dell'identità di utenti/applicazioni).
@@ -298,19 +307,17 @@ I livelli di un sistema di elaborazione (hardware, SO, software applicativo) si 
 - I #strong[programmatori di applicazioni] si interfacciano tramite system call e API.
 - I #strong[programmatori di sistema] usano funzionalità del SO e direttamente dell'hardware.
 - I #strong[progettisti del SO] si interfacciano direttamente con l'hardware.
-- L'#strong[Interprete di comandi] (o shell) è il software di sistema più importante, leggendo e interpretando i comandi del SO. Può essere a #strong[riga di comando (CLI)];, #strong[grafica (GUI)] o #strong[touch-screen];. Ad esempo #strong[Shell Bash è un interprete di comandi utilizzato in Linux.]
+L'#strong[Interprete di comandi] (o shell) è il software di sistema più importante, leggendo e interpretando i comandi del SO. Può essere a #strong[riga di comando (CLI)];, #strong[grafica (GUI)] o #strong[touch-screen];. Ad esempo #strong[Shell Bash è un interprete di comandi utilizzato in Linux.]
 
 == System Call e API <system-call-e-api>
 Le #strong[System Call] sono richieste che un programma rivolge al kernel del SO tramite #strong[interruzioni software];, e costituiscono l'interfaccia tra il programma in esecuzione e i servizi del SO.
 
-#strong[Tipi di System Call];:
-
 - Controllo dei processi (creazione, terminazione, scheduling)
-- gestione dei file (creazione, lettura, scrittura)
-- gestione dei dispositivi
-- gestione delle informazioni di sistema (data/ora, info HW/SW
-- comunicazioni
-- protezione (permessi).
+- Gestione dei file (creazione, lettura, scrittura)
+- Gestione dei dispositivi
+- Gestione delle informazioni di sistema (data/ora, info HW/SW
+- Comunicazioni
+- Protezione (permessi)
 
 #strong[Implementazione delle System Call];: Ogni system call ha un numero intero associato, che è l'indice in una tabella contenente le informazioni per l'implementazione. L'invocante non ha bisogno di conoscere i dettagli dell'implementazione.
 
@@ -327,12 +334,8 @@ Le system call sono spesso scritte in linguaggio assembler, ma più comunemente 
 
   #figure(
     image("images/image 28.png"),
-    caption: [
-    (Diagramma che mostra il flusso di controllo da un programma C che chiama `printf()`, che passa alla libreria C standard, che invoca la system call `write()` nel kernel, e il risultato viene restituito all'indietro)
-    ],
+    caption: [ Diagramma che mostra il flusso di controllo da un programma C che chiama `printf()`, che passa alla libreria C standard, che invoca la system call `write()` nel kernel, e il risultato viene restituito all'indietro. ],
   )
-
-  (Diagramma che mostra il flusso di controllo da un programma C che chiama `printf()`, che passa alla libreria C standard, che invoca la system call `write()` nel kernel, e il risultato viene restituito all'indietro)
 
 - Lo #strong[standard POSIX] (IEEE 1003) specifica un insieme di procedure che un sistema compatibile deve fornire, garantendo la #strong[portabilità delle applicazioni];. Include chiamate per gestione processi (`fork`, `execve`), gestione file (`open`, `read`, `write`), gestione del file system (`mkdir`, `mount`), e varie (`kill`, `time`).
   //TODO: Rifare tabella
@@ -342,36 +345,36 @@ Le system call sono spesso scritte in linguaggio assembler, ma più comunemente 
     [*Description*],
     [pid=fork()],
     [Create a child process identical to the parent],
+    [pid=waitpid(pid, &statloc, options)],
+    [Wait for a child to terminate],
     [],
+    [Replace a process core image],
     [],
+    [Terminate pricess execution and return status],
     [],
+    [Open a file for reading, writing or both],
     [],
+    [Close an open file],
     [],
+    [Read data from a file into a buffer],
     [],
+    [Write data froma buffer into a file],
     [],
+    [Move the file pointer],
     [],
+    [Get a file status information],
     [],
+    [Create a new directory],
     [],
+    [Remove an empty directory],
     [],
+    [Create a new entry, name2, pointing to name1],
     [],
+    [Remove a directory pointer],
     [],
+    [Move the file pointer],
     [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
+    [Get a file status information],
   )
 
   #figure(image("images/image 29.png"))
@@ -397,7 +400,7 @@ I #strong[servizi di sistema] sono programmi associati al SO ma non fanno necess
 == Progetto e Implementazione di un SO <progetto-e-implementazione-di-un-so>
 Gli scopi del progetto di un SO possono essere visti da un punto di vista #strong[utente] (conveniente, facile, affidabile, sicuro, veloce) e da un punto di vista del #strong[sistema di elaborazione] (facile da progettare/manutenere, affidabile, corretto, efficiente, flessibile, portabile, espandibile).
 
-- #strong[Flessibilità: Politiche & Meccanismi];: Un principio di progettazione chiave è separare le #strong[politiche] (cosa fare) dai #strong[meccanismi] (come farlo). Questo permette la massima flessibilità per modificare le politiche o aggiungere nuove componenti hardware/software.
+- #strong[Flessibilità];: Un principio di progettazione chiave è separare le #strong[politiche] (cosa fare) dai #strong[meccanismi] (come farlo). Questo permette la massima flessibilità per modificare le politiche o aggiungere nuove componenti hardware/software.
 - #strong[Portabilità ed espandibilità];:
   - La #strong[portabilità] è la facilità con cui il software può essere adattato per l'utilizzo su un altro computer, facilitata da codice dipendente dall'hardware ridotto e separato.
   - L'#strong[espandibilità] è la facilità con cui nuove funzionalità possono essere aggiunte, ad esempio per incorporare nuovo hardware o rispondere a nuove aspettative degli utenti. I SO moderni utilizzano funzionalità #strong[plug-and-play] per aggiungere hardware anche durante l'esecuzione.
@@ -411,7 +414,7 @@ Un SO è un software complesso che deve essere strutturato. I principali modelli
   #figure(
     image("images/image 33.png"),
     caption: [
-      (Diagramma che mostra i livelli di un sistema UNIX originario: Hardware, Kernel (controllo HW, gestione memoria, gestione processi, file system), Interfaccia System Call, e sopra di essa la Shell e i Programmi Utente/Compilatori)
+      Diagramma che mostra i livelli di un sistema UNIX originario: Hardware, Kernel (controllo HW, gestione memoria, gestione processi, file system), Interfaccia System Call, e sopra di essa la Shell e i Programmi Utente/Compilatori.
     ],
   )
 
@@ -421,12 +424,7 @@ Un SO è un software complesso che deve essere strutturato. I principali modelli
 
 - #strong[Sistemi a livelli (o strati)];: Le funzionalità del SO sono organizzate in livelli gerarchici, dove ogni livello usa solo funzionalità dei livelli sottostanti. Ogni livello definisce una nuova "macchina astratta".
 
-  #figure(
-    image("images/image 34.png"),
-    caption: [
-      (Diagramma a strati che mostra la Macchina hardware alla base, seguita da moduli di livello 1, interfaccia macchina virtuale di livello 1, e così via fino a moduli di livello N, con l'interfaccia System Call/API sopra)
-    ],
-  )
+  #figure(image("images/image 34.png"))
 
   Sono complessi da progettare a causa della difficoltà nel stratificare le funzionalità e possono avere prestazioni scarse a causa dell'overhead per attraversare i livelli. Tuttavia, una certa stratificazione è ancora comune nei SO moderni.
 
@@ -436,7 +434,6 @@ Un SO è un software complesso che deve essere strutturato. I principali modelli
 
   - Tutto il resto è gestito da #strong[server] (processi di sistema che non terminano mai).
   - Le applicazioni interagiscono con i server tramite #strong[IPC];, il che comporta un overhead dovuto alla copia di messaggi e alla commutazione di contesto.
-  - #strong[Microkernel: funzionamento di base];: (Diagramma che mostra un microkernel al livello più basso, con vari server (file server, terminal server, printer server, ecc.) e applicazioni utente che interagiscono con il microkernel e i server tramite messaggi IPC)
   - Nonostante l'efficienza ridotta, offrono grande #strong[flessibilità] (migliore espandibilità e portabilità) e sono più #strong[affidabili e sicuri] poiché meno codice è eseguito in modalità protetta. Sono adatti per ambienti di rete ed embedded.
 
 - #strong[Sistemi ibridi];: Nella pratica, i SO combinano diverse strutture per ottenere un equilibrio tra prestazioni, sicurezza e flessibilità. Ad esempio, Linux è monolitico ma modulare, mentre Windows è in gran parte monolitico ma incorpora aspetti dei microkernel e moduli caricabili dinamicamente. Anche macOS X, iOS e Android sono ibridi.

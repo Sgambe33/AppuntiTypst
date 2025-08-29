@@ -10,7 +10,9 @@ La gestione della memoria presenta similitudini con quella della CPU. In genere,
 === Differenze
 Tuttavia, esistono importanti differenze. A differenza della CPU, diverse regioni della memoria principale possono essere *allocate contemporaneamente a processi diversi*, un concetto noto come "condivisione nello spazio" (mentre la CPU è un esempio di "condivisione nel tempo", usata a turno). Questa permette l'opportunità di *condivisione di codice e dati* tra processi. È inoltre necessaria l'implementazione di *meccanismi di protezione* per impedire accessi non voluti a regioni di memoria del sistema operativo (SO) o di altri processi.
 
-#definition("Risorsa virtuale")[
+#definition(
+  "Risorsa virtuale",
+)[
   Una risorsa virtuale è solitamente una struttura dati che rappresenta lo stato della risorsa fisica quando questa non è assegnata al processo cui è associata la risorsa virtuale.
 ]
 Ad esempio una CPU virtuale è una struttura dati che contiene i valori dei registri della CPU ed è allocata in memoria principale (fa parte del PCB).
@@ -61,15 +63,14 @@ In caso di *rilocazione statica*, gli indirizzi logici e fisici sono identici e 
 
 #figure(
   image("images/2025-08-14-17-38-07.png", height: 30%),
-  caption: "L'immagine mostra come un indirizzo logico di 28 (riferimento a JMP) diventi un indirizzo fisico di 16412 con una rilocazione di 16384 (28 + 16384 = 16412).",
+  caption: "Le figure (a) e (b) rappresentano 2 processi. Il processo (a) viene caricato per primo in memoria a partire dall'indirizzo 0. Il processo (b) quando viene caricato subisce una rilocazione: l'indirizzo logico 28 (riferimento a JMP) diventa un indirizzo fisico di 16412 con una rilocazione di 16384 (28 + 16384 = 16412).",
 )
 
 Con la *rilocazione dinamica*, gli indirizzi logici e fisici sono diversi e i loro spazi differiscono. Per rilocare i processi dinamicamente, si utilizza una *MMU (Memory Management Unit)*, un hardware specifico che modifica gli indirizzi ad ogni riferimento in memoria. La MMU implementa una funzione $y = f(x)$ (funzione di rilocazione) che calcola l'indirizzo fisico $y$ corrispondente a un indirizzo logico $x$.
 
 #figure(
-  image("images/2025-08-14-17-41-39.png", height: 30%),
-  caption: "
-Ad esempio, un valore nel *registro di rilocazione* viene sommato all'indirizzo logico generato dal programma (es. 346 + 14000 = 14346) prima di essere inviato all'unità di memoria.",
+  image("images/2025-08-14-17-41-39.png", height: 20%),
+  caption: "Ad esempio, un valore nel registro di rilocazione*viene sommato all'indirizzo logico generato dal programma (es. 346 + 14000 = 14346) prima di essere inviato all'unità di memoria.",
 )
 
 == Memoria Virtuale
@@ -80,7 +81,7 @@ La *memoria virtuale* si basa sulla separazione tra spazio di indirizzi logico (
 
 #figure(
   image("images/2025-08-14-18-24-31.png", height: 30%),
-  caption: "Il SO si occupa di trasferire porzioni della memoria virtuale di ogni processo tra memoria fisica e ausiliaria, sulla base delle necessità del processo. *memoria virtuale = memoria fisica + memoria ausiliaria*",
+  caption: "Il SO si occupa di trasferire porzioni della memoria virtuale di ogni processo tra memoria fisica e ausiliaria, sulla base delle necessità del processo.",
 )
 
 2. *Facilita la programmazione:* Il programmatore non deve preoccuparsi della quantità di memoria fisica disponibile, potendosi concentrare sul problema da risolvere. Il SO gestisce il trasferimento dinamico delle porzioni necessarie in modo trasparente al processo.
@@ -128,7 +129,7 @@ I sistemi mobili generalmente non supportano alcuna forma di swapping. Questo è
 
 == Aspetti Caratterizzanti la Gestione della Memoria
 Le tecniche di gestione della memoria sono caratterizzate da quattro parametri principali che dipendono dall'architettura hardware e dalle scelte di progetto del SO:
-#figure(image("images/2025-08-14-18-35-23.png", height: 30%))
+#figure(image("images/2025-08-14-18-35-23.png", width: 60%))
 
 Come si assegnano le aree di memoria ai processi?
 
@@ -156,7 +157,7 @@ Questa soluzione ritarda la fase di rilocazione degli indirizzi, risolvendo i pr
 - *Spazio segmentato:* I moduli non sono necessariamente contigui. Un programma è suddiviso in un numero arbitrario di *segmenti*, ciascuno con un indirizzo iniziale 0 (es. un segmento per il codice, uno per i dati, ecc.). Ogni segmento può essere rilocato in memoria fisica indipendentemente dagli altri. Un indirizzo virtuale è una coppia `<numero_segmento, locazione_nel_segmento>`. Con rilocazione statica, un compilatore/caricatore usa una tabella di indirizzi fisici iniziali; con rilocazione dinamica, la MMU usa valori base e limite da una tabella.
 #figure(
   image("images/2025-08-14-18-43-26.png", height: 30%),
-  caption: "L'immagine `b) spazio virtuale segmentato` mostra come un unico spazio virtuale sia diviso in segmenti separati. ",
+  caption: "L'immagine (b) mostra come un unico spazio virtuale sia diviso in segmenti separati. ",
 )
 Distinguere tra segmenti di dati e testo è utile per la *sicurezza*. Molti SO moderni cercano di fare in modo che i segmenti di dati siano scrivibili ma non eseguibili e che quelli di testo siano eseguibili ma non scrivibili.
 
@@ -168,15 +169,12 @@ Distinguere tra segmenti di dati e testo è utile per la *sicurezza*. Molti SO m
 )
 
 - *Caricamento a domanda (o su richiesta, o dinamico):* Il programma e i dati non sono necessariamente caricati per intero. Richiede la rilocazione dinamica degli indirizzi. La memoria fisica assegnata a un processo varia nel tempo, e le sue dimensioni virtuali possono essere maggiori di quelle fisiche. Il programma principale viene eseguito, e le procedure ausiliarie sono caricate su disco in formato rilocabile. Quando una procedura è invocata e non è in memoria, il linking loader la carica e aggiorna le tabelle degli indirizzi. Questo ottimizza l'uso della memoria (caricando solo ciò che serve), consente l'esecuzione di processi con spazi virtuali maggiori della memoria fisica totale, e presuppone l'esistenza di un'area di swap.
-#figure(
-  image("images/2025-08-14-18-47-02.png", height: 30%),
-  caption: "L'immagine illustra questo processo.",
-)
+#figure(image("images/2025-08-14-18-47-02.png", height: 30%), caption: "L'immagine illustra questo processo.")
 
 ==== Collegamento (Linking) Statico e Dinamico
 Il caricamento a domanda è legato al concetto di collegamento dinamico.
 
-#figure(image("images/2025-08-14-18-50-20.png", height: 30%))
+#figure(image("images/2025-08-14-18-50-20.png", height: 25%))
 
 - Con il *collegamento statico*, le librerie di sistema sono combinate dal loader nell'immagine binaria del programma, aumentando la dimensione del file eseguibile e potenzialmente sprecando spazio in memoria. L'immagine `SENZA COLLEGAMENTO DINAMICO (COLLEGAMENTO STATICO)` mostra la ripetizione del codice di libreria per ogni chiamata.
 
@@ -207,7 +205,7 @@ Il SO cerca un'area contigua di memoria sufficiente a contenere l'immagine del p
 - *Partizioni Fisse:* La memoria utente è divisa in un numero fisso di partizioni di dimensioni predefinite. Il SO mantiene una tabella delle partizioni. Un processo occupa una partizione fino alla sua terminazione o swap-out. Possono esserci code di processi per ogni partizione.
 #figure(
   image("images/2025-08-14-19-33-21.png", height: 30%),
-  caption: "L'immagine `Partizioni fisse: esempio` mostra una memoria divisa in partizioni D0-D5, con processi P1-P5 che le occupano, lasciando memoria inutilizzata. Questa tecnica è inefficiente. ",
+  caption: "L'immagine mostra una memoria divisa in partizioni D0-D5, con processi P1-P5 che le occupano, lasciando memoria inutilizzata. Questa tecnica è inefficiente. ",
 )
 Il principale svantaggio è la *frammentazione interna*, dove la memoria allocata è maggiore di quella utilizzata all'interno di una partizione. Inoltre, vi è una mancanza di flessibilità, poiché numero e dimensioni sono fissi, limitando il grado di multiprogrammazione e la dimensione massima dei processi.
 
@@ -250,7 +248,6 @@ La memoria virtuale diventa *multidimensionale*, suddivisa in segmenti, ciascuno
 
 === Traduzione degli Indirizzi
 Per tradurre a run-time gli indirizzi logici in fisici, si usa una *tabella dei segmenti* (allocata nella memoria fisica del processo).
-#figure(image("images/2025-08-14-23-58-14.png", height: 30%))
 Ogni elemento (descrittore di segmento) contiene l'indirizzo fisico iniziale (*base*) e la dimensione (*limite*) del segmento. Due registri della CPU, *STBR (Segment Table Base Register)* e *STLR (Segment Table Limit Register)*, contengono l'indirizzo della tabella e il numero di segmenti del processo.
 La traduzione avviene così: l'indirizzo logico `<sg, of>` viene usato per indicizzare la tabella dei segmenti. Se `of` è minore della dimensione del segmento, l'indirizzo fisico è `base + of`.
 
@@ -286,7 +283,7 @@ Le informazioni relative alla gestione della memoria, come l'indirizzo e il nume
 #figure(image("images/2025-08-15-23-38-15.png"))
 Questa tecnica ha rilocazione dinamica, allocazione contigua, spazio virtuale segmentato e *caricamento a domanda*. Permette che lo spazio virtuale di un processo sia *parzialmente caricato* in memoria fisica. Questo significa che lo spazio logico di un processo può essere più grande della memoria fisica. Lo swapping riguarda singoli segmenti, non l'intero processo. Un processo può essere schedulato anche se nessuno dei suoi segmenti è in memoria fisica.
 La rilocazione degli indirizzi diventa più complessa, poiché il SO deve gestire i riferimenti a segmenti non ancora caricati. Ogni descrittore di segmento include un *bit di presenza (P)*: 1 se il segmento è in memoria, 0 altrimenti (in questo caso si genera un'interruzione di *segment fault*). La routine di gestione del segment fault carica il segmento necessario.
-In caso di esaurimento dello spazio, il SO deve scaricare segmenti esistenti usando *algoritmi di sostituzione*. Due bit aggiuntivi, *M (modifica/dirty bit)*  messo a 1 se il segmento è stato modificato dopo essere stato caricato in memoria (se è a zero quando si esegue lo swap-out, non c'è bisogno di aggiornare la cpopia su disco) e *U (uso/riferimento bit)* messo a 1 se il segmento è stato riferito di recente.
+In caso di esaurimento dello spazio, il SO deve scaricare segmenti esistenti usando *algoritmi di sostituzione*. Due bit aggiuntivi, *M (modifica/dirty bit)* messo a 1 se il segmento è stato modificato dopo essere stato caricato in memoria (se è a zero quando si esegue lo swap-out, non c'è bisogno di aggiornare la copia su disco) e *U (uso/riferimento bit)* messo a 1 se il segmento è stato riferito di recente.
 
 #figure(
   image("images/2025-08-15-23-42-34.png"),
@@ -310,7 +307,7 @@ Per individuare la tabella delle pagine di un processo (contenuta in memoria pri
 Alternativamente, quando PTLR non è disponibile e quindi le tabelle delle pagine hanno tutte la stessa lunghezza, si ha un *bit di validità* in ogni elemento della tabella indica se la pagina è *legale* (1), ovvero è nello spazio degli indirizzi logici del processo o *non valida* (0).
 #figure(image("images/2025-08-15-23-50-27.png"))
 
-Un indirizzo logico `x` viene scomposto in due componenti: *`pg` (numero di pagina)* e *`of` (scostamento dall'inizio della pagina)*. Se la dimensione delle pagine `d` è una potenza di 2 (`2^y`), `of` è il *resto* della divisione di `x` per `d` e `pg` è il *quoziente* delle divisione di `x` per `d`.
+Un indirizzo logico `x` viene scomposto in due componenti: *`pg` (numero di pagina)* e *`of` (scostamento dall'inizio della pagina)*. Se la dimensione delle pagine `d` è una potenza di 2 ($2^y$), `of` è il *resto* della divisione di `x` per `d` e `pg` è il *quoziente* delle divisione di `x` per `d`.
 La traduzione (`x = pg • of`) avviene usando `pg` come indice nella tabella delle pagine per selezionare il descrittore che contiene l'indice del frame `fr` che ospita la pagina. L'indirizzo fisico corrispondente `y` è ottenuto concatenando l'indice del frame `fr` con lo scostamento `of` (`fr • of` ovvero *concatenazione*). A differenza della segmentazione, non sono necessari confronti o somme esplicite per ottenere l'indirizzo fisico.
 #figure(image("images/2025-08-15-23-54-20.png"))
 #figure(image("images/2025-08-15-23-54-35.png"))
@@ -342,7 +339,7 @@ La maggior parte dei processi è piccola o utilizza il proprio spazio di indiriz
   caption: "L'immagine mostra come le pagine fisiche di una libreria possono essere condivise pur apparendo in spazi virtuali diversi.",
 )
 
-=== Paginazione a Domanda
+== Paginazione a Domanda
 #figure(image("images/2025-08-16-00-00-23.png"))
 #figure(image("images/2025-08-16-00-02-15.png"))
 La *paginazione a domanda* ha rilocazione dinamica, allocazione non contigua, spazio virtuale unico e *caricamento a domanda*. Il suo spazio virtuale può essere parzialmente caricato in memoria fisica.
@@ -370,7 +367,9 @@ La procedura di gestione di un page fault è la seguente:
 
 La sostituzione è più semplice che nella segmentazione perché pagine e frame hanno dimensioni fisse. La pagina vittima non deve essere scritta su disco se non è stata modificata (M=0). Alcune pagine (es. buffer I/O con DMA) non possono essere selezionate come vittime e vengono bloccate in memoria tramite un *bit di lock* nella tabella dei frame. La scelta della pagina da rimpiazzare è critica per l'efficienza complessiva del sistema, e un numero eccessivo di page fault può portare al *thrashing*.
 
-#definition("Thrashing")[
+#definition(
+  "Thrashing",
+)[
   Stato in cui l'attività della CPU è principalmente dedicata a trasferire pagine avanti e indietro dalla swap-area e alla gestione di page-fault.
 ]
 
@@ -381,9 +380,11 @@ Le pagine scaricate possono risiedere in una partizione dedicata per lo swapping
 L'EMATpf tiene conto della probabilità `p` che una pagina manchi (page fault):
 `EMATpf = (1 - p) * tempo_accesso_memoria + p * tempo_gestione_page_fault`.
 Il tempo di accesso alla memoria è dell'ordine dei nanosecondi, mentre la gestione di un page fault richiede centinaia di microsecondi o millisecondi (a causa delle istruzioni di gestione e dell'I/O su disco).
-#example("Esempito EMATpf")[
-  Ad esempio, con un accesso alla memoria di 200 nanosecondi e un tempo di gestione del page fault di 8 millisecondi, l'EMATpf è dominato dal costo del page fault. Per tollerare un rallentamento del 10%, `p` deve essere estremamente basso (es. al più una pagina mancante ogni 400.000 accessi).
-  #figure(image("images/2025-08-16-00-15-23.png"))
+#example(
+  "Esempito EMATpf",
+)[
+Ad esempio, con un accesso alla memoria di 200 nanosecondi e un tempo di gestione del page fault di 8 millisecondi, l'EMATpf è dominato dal costo del page fault. Per tollerare un rallentamento del 10%, `p` deve essere estremamente basso (es. al più una pagina mancante ogni 400.000 accessi).
+#figure(image("images/2025-08-16-00-15-23.png"))
 ]
 
 
@@ -412,7 +413,7 @@ Nella paginazione a domanda, un processo può essere schedulato anche senza pagi
 );
 
 == Algoritmi di Sostituzione delle Pagine
-In caso di page fault e memoria principale non disponibile, gli algoritmi di sostituzione delle pagine scelgono una pagina logica "vittima" da rimpiazzare. La loro qualità è cruciale per le prestazioni del SO dato che un page fault ritarda i tempi di esecuzione di un processo. Le prestazioni sono misurate dal numero di page fault risultanti per una data quantità di frame e una sequenza di riferimenti. Negli esempi successivi, gli algoritmi verranno valutati effettuandone l'eseguzione sulla seguente successione dei riferimenti alla memoria: `7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1` con 3 frame disponibili messi a disposizione dalla memoria fisica. In generale, all'aumentare dei frame, ci si aspetta che il numero di page fault diminuisca.
+In caso di page fault e memoria principale non disponibile, gli algoritmi di sostituzione delle pagine scelgono una pagina logica "vittima" da rimpiazzare. La loro qualità è cruciale per le prestazioni del SO dato che un page fault ritarda i tempi di esecuzione di un processo. Le prestazioni sono misurate dal numero di page fault risultanti per una data quantità di frame e una sequenza di riferimenti. Negli esempi successivi, gli algoritmi verranno valutati effettuandone l'esecuzione sulla seguente successione dei riferimenti alla memoria: `7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1` con 3 frame disponibili messi a disposizione dalla memoria fisica. In generale, all'aumentare dei frame, ci si aspetta che il numero di page fault diminuisca.
 #figure(image("images/2025-08-17-15-35-32.png"))
 
 === Algoritmo Ottimo
@@ -433,7 +434,7 @@ Associa a ogni pagina l'istante di tempo in cui è stata caricata in memoria e s
 
 ==== Località dei Riferimenti alla Memoria e Working Set
 Si usano allora informazioni relative ad accessi nell'immediato passato.
-- La *località* di un processo è l'insieme delle sue pagine virtuali che sta attivamente usando. Un processo attraversa diverse località durante l'esecuzione. Il *principio di località spaziale* afferma che un processo si sposta di località in località gradualmente. Ad esempio quando si richiama una funzione.
+La *località* di un processo è l'insieme delle sue pagine virtuali che sta attivamente usando. Un processo attraversa diverse località durante l'esecuzione. Il *principio di località spaziale* afferma che un processo si sposta di località in località gradualmente. Ad esempio quando si richiama una funzione.
 Idealmente, ad un dato istante, ad ogni processo bisognerebbe assegnare i frame sufficienti ad ospitare tutte le pagine virtuali che fanno parte della sua località. La località di un processo può essere approssimata tramite
 il concetto di *working set* (o insieme di lavoro): l'insieme delle sue pagine virtuali riferite nei più recenti $Delta$ riferimenti (o nelle $Delta$ più recenti unità di tempo).
 - Se una pagina è in uso attivo si trova nel working set
@@ -455,7 +456,7 @@ Associa a ogni pagina l'istante di tempo in cui è stata acceduta per l'ultima v
 #figure(
   image("images/2025-08-17-15-59-40.png"),
   caption: "
-L'immagine compara Ottimo (6 fault), FIFO (10 fault) e LRU (8 fault) per una sequenza di riferimento diversa, mostrando che LRU si avvicina all'ottimo.",
+                                L'immagine compara Ottimo (6 fault), FIFO (10 fault) e LRU (8 fault) per una sequenza di riferimento diversa, mostrando che LRU si avvicina all'ottimo.",
 )
 
 ==== Implementazione di LRU
@@ -473,35 +474,25 @@ Implementare l'LRU esatto è costoso. Molte architetture offrono un *bit di rife
 - *Algoritmo con seconda chance:* Mantiene le pagine in una lista FIFO. Quando invocato, controlla il bit di riferimento della pagina in testa alla lista. Se R=0, la seleziona come vittima. Se R=1, pone R=0, sposta la pagina in fondo alla lista (dandole una "seconda chance") e ripete. È una variante di FIFO che sceglie la pagina più vecchia non riferita di recente.Nel caso più sfavorevole (tutte le pagine hanno R = 1), l'algoritmo seleziona la pagina da cui è iniziata la ricerca e a cui aveva dato una seconda chance. Usa solo il bit di riferimento R, senza bit supplementari, quindi l'ordine esatto con cui le pagine sono state usate non
 è noto.
 - *Algoritmo dell'orologio:* Implementazione efficiente della seconda chance, dove le pagine sono gestite come una lista circolare e un puntatore `vittima` indica la prossima pagina da esaminare. Funziona in modo simile alla seconda chance ma con operazioni di incremento modulare più semplici.
-Quando viene invocato, l'algoritmo:
-1. Considera la pagina il cui indice è in vittima
-2. Controlla il bit di riferimento di tale pagina
-  - Se R = 0: seleziona la pagina, incrementa la variabile vittima e termina.
-  - Se R = 1: pone R = 0, incrementa la variabile vittima e torna al punto 1.
-La pagina selezionata viene sostituita da una nuova pagina che viene inserita nella lista circolare nella posizione corrispondente (con R = 1).
-#figure(image("images/2025-08-17-16-21-37.png"))
+  Quando viene invocato, l'algoritmo:
+  1. Considera la pagina il cui indice è in vittima
+  2. Controlla il bit di riferimento di tale pagina
+    - Se R = 0: seleziona la pagina, incrementa la variabile vittima e termina.
+    - Se R = 1: pone R = 0, incrementa la variabile vittima e torna al punto 1.
+  La pagina selezionata viene sostituita da una nuova pagina che viene inserita nella lista circolare nella posizione corrispondente (con R = 1).
+  #figure(image("images/2025-08-17-16-21-37.png"))
 
 - *Algoritmo con seconda chance migliorato:* Utilizza sia il bit di riferimento (R) che il *bit di modifica (M, dirty bit)*. Il bit M è 0 se la pagina non è stata modificata dal suo ultimo salvataggio su disco (quindi non necessita di scrittura su swap-area), e 1 altrimenti. Le pagine non modificate sono vittime ideali perché la loro sostituzione è più veloce. Le pagine sono classificate in 4 categorie (R, M):
-- (0,0) (migliore per sostituzione)
-- (0,1) (modificata ma non usata di recente)
-- (1,0) (usata di recente ma pulita)
-- (1,1) (usata di recente e modificata).
-L'algoritmo cerca prima (0,0), poi (0,1) azzerando i bit R, e poi ripete.
+  - (0,0) (migliore per sostituzione)
+  - (0,1) (modificata ma non usata di recente)
+  - (1,0) (usata di recente ma pulita)
+  - (1,1) (usata di recente e modificata).
+  L'algoritmo cerca prima (0,0), poi (0,1) azzerando i bit R, e poi ripete.
 
-Quando viene invocato, l’algoritmo
-a) Scorre la lista a partire da vittima alla ricerca di una pagina
-etichettata (0,0); se ne trova una, la utilizza e termina
-dopo aver incrementato vittima
-b) Altrimenti, scorre (nuovamente) la lista a partire da
-vittima, impostando a 0 il bit di riferimento per tutte le
-pagine incontrate, alla ricerca di una pagina etichettata
-(0,1); se ne trova una, la utilizza e termina dopo aver
-incrementato vittima
-c) Altrimenti, (tutti i bit di riferimento sono ora impostati a
-0) ripete i passi a) e, eventualmente, b) (ciò permetterà
-sicuramente di trovare una pagina da sostituire)
-Per selezionare la nuova vittima la lista delle pagine viene
-scandita più volte (fino a 4)
+  Quando viene invocato, l'algoritmo:
+  + Scorre la lista a partire da vittima alla ricerca di una pagina etichettata (0,0); se ne trova una, la utilizza e termina dopo aver incrementato vittima
+  + Altrimenti, scorre (nuovamente) la lista a partire da vittima, impostando a 0 il bit di riferimento per tutte le pagine incontrate, alla ricerca di una pagina etichettata (0,1); se ne trova una, la utilizza e termina dopo aver incrementato vittima
+  + Altrimenti, (tutti i bit di riferimento sono ora impostati a 0) ripete i passi 1. e, eventualmente, 2. (ciò permetterà sicuramente di trovare una pagina da sostituire). Per selezionare la nuova vittima la lista delle pagine viene scandita più volte (fino a 4).
 
 - *Algoritmi basati su conteggio:*
   - *LFU (Least Frequently Used):* Sostituisce la pagina con il valore minore del contatore (pagine meno usate).
@@ -514,36 +505,38 @@ Per migliorare le prestazioni degli algoritmi di sostituzione:
 - *Trasferimento spontaneo delle pagine modificate:* Il SO scandisce periodicamente le tabelle delle pagine e avvia il trasferimento delle pagine modificate (dirty) in memoria secondaria, resettando il bit M. Ciò aumenta la probabilità di trovare vittime pulite (che non devono essere scritte) quando un frame è richiesto.
 
 == Algoritmi di Allocazione dei Frame
-Gli algoritmi di allocazione dei frame controllano l'assegnazione della memoria fisica (frame) ai processi. La memoria fisica disponibile per un processo può essere inferiore alla sua memoria virtuale (sovrallocazione).
+Gli algoritmi di allocazione dei frame controllano l'assegnazione della memoria fisica (frame) ai processi.
 - Si può usare una *lista di frame liberi* che vengono utilizzati man mano che si generano page fault. Quando la lista si esaurisce, si usa un algoritmo di sostituzione delle pagine.
 - Con la paginazione a domanda, inizialmente solo una pagina è caricata. Per prevenire un alto numero di page fault all'avvio (dovuti al caricamento della località iniziale), si può usare la *prepaginazione*, caricando l'intero working set del processo.
 
 === Numero di Frame Allocati
-Le strategie di allocazione dei frame ai singoli processi
-sono soggette a vari vincoli, quali ad esempio
-1. Non si possono assegnare più frame di quelli disponibili
-2. È necessario allocare almeno un numero minimo di frame
-
-- Il numero massimo dipende dalla memoria fisica disponibile.
-- Il numero minimo dipende dall'architettura del calcolatore (sufficiente a contenere tutte le pagine riferite da un'istruzione).
+Le strategie di allocazione dei frame ai singoli processi sono soggette a vari vincoli, quali ad esempio:
++ Non si possono assegnare più frame di quelli disponibili.
++ È necessario allocare almeno un numero minimo di frame.
++ Il numero massimo dipende dalla memoria fisica disponibile.
++ Il numero minimo dipende dall'architettura del calcolatore (sufficiente a contenere tutte le pagine riferite da un'istruzione).
 Minore è il numero di frame allocati, maggiore è il tasso di page fault e minori le prestazioni.
 
 === Algoritmi di Allocazione
-- *Allocazione uniforme:* Tutti i processi ricevono lo stesso numero di frame.
-- *Allocazione proporzionale:* Il numero di frame è proporzionale alla dimensione della memoria virtuale o alla priorità del processo, con un limite minimo.
+- *Allocazione uniforme:* tutti i processi ricevono lo stesso numero di frame.
+- *Allocazione proporzionale:* il numero di frame è proporzionale alla dimensione della memoria virtuale o alla priorità del processo, con un limite minimo.
 
 === Politiche di Sostituzione delle Pagine
 - *Locale:* La pagina vittima viene scelta solo tra quelle allocate al processo che ha generato il page fault. L'insieme dei frame di un processo dipende solo dal suo comportamento.
 - *Globale:* La pagina vittima viene scelta indipendentemente dal processo a cui è allocata. L'insieme dei frame di un processo dipende anche dal comportamento di paginazione di altri processi. È la politica più usata perché permette una maggiore produttività.
 La politica globale si basa sulla strategia di garantire che ci sia sempre sufficiente memoria libera per soddisfare nuove richieste.
-#example("Implementazione di una politica globale")[
-  #figure(image("images/2025-08-17-16-31-41.png"))
+#example(
+  "Politica Globale",
+)[
+  #figure(image("images/2025-08-17-16-31-41.png", height: 30%))
   Il kernel del SO attiva e sospende tempestivamente l'attività di recupero di
-  pagine (che usa l'algoritmo di sostituzione, qualsiasi esso sia) facendo in modo che la lunghezza della lista dei frame liberi si mantenga costantemente tra un minimo ed un massimo
+  pagine (che usa l'algoritmo di sostituzione, qualsiasi esso sia) facendo in modo che la lunghezza della lista dei frame liberi si mantenga costantemente tra un minimo ed un massimo.
 ]
 
 == Thrashing
-#definition("Thrashing")[
+#definition(
+  "Thrashing",
+)[
   Il *thrashing (o paginazione degenere)* è uno stato in cui l'attività della CPU è principalmente dedicata al trasferimento di pagine da e verso l'area di swap e alla gestione dei page fault. Questo causa notevoli problemi di prestazioni, poiché il sistema dedica più tempo alla paginazione che all'esecuzione dei processi applicativi.
 ]
 
@@ -562,31 +555,44 @@ Per controllare il thrashing, oltre a usare algoritmi di sostituzione più effic
   caption: "L'immagine mostra come l'utilizzo della CPU aumenti con il grado di multiprogrammazione fino a un massimo, per poi crollare bruscamente a causa del thrashing.",
 )
 
-Nei sistemi moderni (PC), il thrashing è meno problematico poiché gli utenti possono gestirlo manualmente (controllando i processi attivi) o, più comunemente, acquistando più memoria. La memoria è diventata così economica che non ha senso affrontare una memoria continuamente sovrallocata.
+Nei sistemi moderni, il thrashing è meno problematico poiché gli utenti possono gestirlo manualmente (controllando i processi attivi) o, più comunemente, acquistando più memoria. La memoria è diventata così economica che non ha senso affrontare una memoria continuamente sovrallocata.
 
 == Organizzazione delle Tabelle delle Pagine
-Un problema critico nei sistemi moderni è la *dimensione enorme delle tabelle delle pagine*. Ad esempio, un sistema con indirizzi virtuali a 32 bit e pagine da 4KB avrebbe bisogno di 2^20 pagine, il che si traduce in una tabella delle pagine da 4MB (1024 frame contigui). Per risolvere questo, le tabelle delle pagine sono strutturate.
+Un problema critico nei sistemi moderni è la *dimensione enorme delle tabelle delle pagine*. Ad esempio, un sistema con indirizzi virtuali a 32 bit e pagine da 4KB avrebbe bisogno di $2^20$ pagine, il che si traduce in una tabella delle pagine da 4MB (1024 frame contigui). Per risolvere questo, le tabelle delle pagine sono strutturate.
 
 === Tabelle delle Pagine Gerarchiche (Multilivello)
-Una tecnica comune è la *paginazione gerarchica a 2 livelli*, usata ad esempio nei microprocessori Intel a 32 bit.
-- La tabella delle pagine è suddivisa in porzioni consecutive (es. 2^10 porzioni, ciascuna di 4KB), che costituiscono le *tabelle delle pagine di 2° livello*. Queste possono essere allocate in memoria fisica in modo non contiguo e solo se necessario.
+Una tecnica comune è la *paginazione gerarchica a 2 livelli*.
+- La tabella delle pagine è suddivisa in porzioni consecutive (es. $2^10$ porzioni, ciascuna di 4KB), che costituiscono le *tabelle delle pagine di 2° livello*. Queste possono essere allocate in memoria fisica in modo non contiguo e solo se necessario.
 - Una *tabella di 1° livello (page directory)*, con un elemento per ogni porzione, è mantenuta in memoria fisica quando il processo è in esecuzione. L'indirizzo della page directory è nel registro *PDAR (Page Directory Address Register)*.
 - L'indirizzo di pagina `pg` (di 20 bit nell'esempio) è suddiviso in un indice di pagina `dr` (10 bit per la page directory) e uno scostamento di pagina `stp` (10 bit per la tabella di 2° livello).
 
-#figure(image("images/2025-08-17-16-39-56.png"), caption: "Organizzazione di un indirizzo a 32bit")
-#figure(image("images/2025-08-17-16-40-16.png"), caption: "Schema di una tabella delle pagine a 2 livelli")
-#figure(image("images/2025-08-17-16-40-44.png"), caption: "Schema di traduzione con tabella delle pagine a 2 livelli")
-L'immagine `Schema di traduzione con tabella delle pagine a 2 livelli` mostra questo processo: prima si accede alla page directory per trovare l'indirizzo della tabella di 2° livello, poi si usa `stp` per trovare il frame. Questo metodo è noto come *tabella delle pagine ad associazione diretta (forward-mapped page table)*.
+#figure(image("images/2025-08-17-16-39-56.png", height: 30%))
+#figure(
+  image("images/2025-08-17-16-40-16.png", height: 40%),
+  caption: "Schema di una tabella delle pagine a 2 livelli",
+)
+#figure(
+  image("images/2025-08-17-16-40-44.png", height: 30%),
+  caption: "Schema di traduzione con tabella delle pagine a 2 livelli",
+)
+L'immagine mostra questo processo: prima si accede alla page directory per trovare l'indirizzo della tabella di 2° livello, poi si usa `stp` per trovare il frame. Questo metodo è noto come *tabella delle pagine ad associazione diretta (forward-mapped page table)*.
 - *Vantaggio:* Mantenere in memoria solo le tabelle delle pagine necessarie.
-#figure(image("images/2025-08-17-16-41-21.png"), caption: "Schema di traduzione degli indirizzi")
+#figure(image("images/2025-08-17-16-41-21.png", height: 25%), caption: "Schema di traduzione degli indirizzi")
 
 ==== Paginazione a Livelli e Indirizzi Virtuali a 64 Bit
-Con spazi di indirizzi virtuali a 64 bit (anche se spesso solo 48 bit sono effettivamente usati, come in Intel x86-64), una singola tabella delle pagine con pagine da 4KB sarebbe enorme. Con descrittori di pagina a 8 byte avremmo che la tabella delle pagine di ogni processo occuperebbe 8×252 byte = 255 byte = 32PB!
+Con spazi di indirizzi virtuali a 64 bit (anche se spesso solo 48 bit sono effettivamente usati), una singola tabella delle pagine con pagine da 4KB sarebbe enorme. Con descrittori di pagina a 8 byte avremmo che la tabella delle pagine di ogni processo occuperebbe $8times 252$ byte = 255 byte = 32PB!
 - Sono necessari schemi di paginazione a *più di due livelli*. L'architettura Intel x86-64 usa *4 livelli di tabelle delle pagine*, ciascuno indicizzato con 9 bit dell'indirizzo virtuale.
 #figure(image("images/2025-08-17-16-46-52.png"))
-#figure(image("images/2025-08-17-16-48-13.png"), caption: "Traduzione degli indirizzi in x86-64")
-L'immagine `Traduzione degli indirizzi in x86-64` mostra i 4 livelli (PML4, PML3, PML2, Page Table) che portano all'offset del frame. Questo significa che sono necessari *4 accessi alla memoria* per tradurre un indirizzo logico in fisico (senza TLB).
-#figure(image("images/2025-08-17-16-51-11.png"))
+#figure(image("images/2025-08-17-16-48-13.png", height: 30%), caption: "Traduzione degli indirizzi in x86-64")
+L'immagine mostra i 4 livelli (PML4, PML3, PML2, Page Table) che portano all'offset del frame. Questo significa che sono necessari *4 accessi alla memoria* per tradurre un indirizzo logico in fisico (senza TLB).
+
+
+#example(
+  )[
+  Per esempio, con paginazione a 4 livelli, indicando con $p$, con $0 lt.eq p lt.eq 1$ la probabilità che la ricerca in TLB abbia successo, la formula per il calcolo del Tempo Effettivo di Accesso in Memoria (EMAT) diventa:
+
+  $"EMAT" = p times ("tempo accesso TLB" + "tempo accesso memoria") + (1-p) times (5 times "tempo accesso memoria" [+ "tempo acesso TLB"]) $
+]
 
 
 - Il *TLB è fondamentale* per ridurre l'impatto degli accessi multipli. Tuttavia, per architetture a 64 bit "vere" (es. UltraSPARC con 7 livelli di paginazione), le tabelle multilivello sono considerate inappropriate a causa del numero proibitivo di accessi alla memoria.
@@ -596,31 +602,30 @@ Questa organizzazione è spesso usata per gestire spazi di indirizzi maggiori di
 - Ogni voce della tabella hash contiene una *lista concatenata di elementi* che hanno lo stesso valore della funzione hash.
 - Ciascun elemento della lista contiene: il numero della pagina virtuale (o descrittore), l'indice del frame che ospita la pagina, e un puntatore all'elemento successivo.
 - Quando un indirizzo virtuale è generato, il suo numero di pagina è passato a una *funzione hash*, il cui output è usato come indice nella tabella hash. La lista associata a quell'indice viene scandita per trovare l'elemento corrispondente alla pagina virtuale, e da lì si estrae l'indice del frame.
-#figure(image("images/2025-08-17-16-52-27.png"), caption: "Schema di traduzione degli indirizzi")
+#figure(image("images/2025-08-17-16-52-27.png", height: 30%))
 - Una variante per spazi a 64 bit è la *tabella delle pagine a gruppi (clustered page table)*, dove ogni elemento della lista non è un singolo descrittore ma un gruppo (cluster) di descrittori di pagine virtuali contigue. È utile per spazi di indirizzi sparsi.
-#figure(image("images/2025-08-17-16-57-30.png"), caption: "Schema di traduzione degli indirizzi")
+#figure(image("images/2025-08-17-16-57-30.png",height: 30%))
 
 === Tabella delle Pagine Invertita
 Si usa una *sola tabella delle pagine per tutto il sistema*, non una per processo.
 - La tabella ha un elemento per ogni pagina fisica della memoria. Ciascun elemento contiene: l'*identificativo dello spazio virtuale (ASID)* del processo a cui la pagina virtuale ospitata appartiene, e l'*indirizzo virtuale* della pagina logica memorizzata in quella posizione fisica.
-- Usata su diversi RISC a 64 bit (UltraSPARC, PowerPC) dove le tabelle delle pagine per processo sarebbero enormi (es. petabyte).
+- Usata su diversi RISC a 64 bit dove le tabelle delle pagine per processo sarebbero enormi (es. petabyte).
 - L'indirizzo logico include il *pid del processo*, il numero di pagina `p` e uno scostamento `d`. La coppia `(pid, p)` è usata per cercare nella tabella invertita, e l'indirizzo fisico è ottenuto concatenando l'indice `i` dell'elemento trovato con lo scostamento `d`.
 #figure(image("images/2025-08-17-17-05-42.png"))
 - *Vantaggio:* Diminuisce la quantità di memoria principale necessaria per le tabelle delle pagine.
 - *Svantaggi:* Non contiene le informazioni necessarie per i page fault (richiede una tabella separata del SO per le locazioni su disco). La *condivisione della memoria è più costosa*: ogni pagina fisica è mappata a una sola pagina virtuale alla volta, quindi un riferimento da un altro processo che condivide la memoria causerà un page fault. La *traduzione è più difficile e lenta* perché la ricerca avviene per indirizzo virtuale in una tabella ordinata per indirizzi fisici. L'uso di un *TLB* o di una *tabella hash* (unica per il sistema) può mitigare questo problema.
-#figure(image("images/2025-08-17-17-06-09.png"))
+#figure(image("images/2025-08-17-17-06-09.png", height: 30%))
 
 == Considerazioni Generali
 Diversi fattori influenzano la gestione della memoria virtuale:
 
 === Rilocazione Dinamica degli Indirizzi
 La rilocazione dinamica rende il *context switch più costoso* perché richiede la commutazione delle informazioni nella MMU e l'invalidazione dei registri TLB. Impone anche vincoli alla condivisione delle informazioni.
-#figure(image("images/2025-08-17-17-11-32.png"))
+#figure(image("images/2025-08-17-17-11-32.png", height: 30%))
 Molti sistemi operativi moderni mappano il *kernel nello spazio degli indirizzi di ogni processo*. Questo significa che quando si invoca una system call, il kernel viene eseguito nello spazio degli indirizzi del processo chiamante.
 - *Vantaggio:* Non è necessario commutare lo stato di esecuzione e cambiare la funzione di rilocazione degli indirizzi, migliorando l'efficienza. Linux è un esempio di tale SO.
 - *Inconveniente:* Aumenta enormemente la dimensione della tabella delle pagine e della tabella dei segmenti. 
-#figure(image("images/2025-08-17-17-11-53.png"))
-L'immagine `SO nello spazio di indirizzi del processo utente` mostra il kernel residente nella parte superiore dello spazio di indirizzi di ogni processo.
+#figure(image("images/2025-08-17-17-11-53.png", height: 30%), caption: "Il kernel residente nella parte superiore dello spazio di indirizzi di ogni processo.")
 
 === Portata del TLB
 La *portata del TLB* esprime la quantità di memoria virtuale che può essere acceduta direttamente tramite il TLB senza accedere alla tabella delle pagine in memoria. Si calcola come `= elementi del TLB * dimensione pagine`. Idealmente, il TLB dovrebbe contenere i metadati relativi al working set del processo in esecuzione. Per aumentare la portata, si può aumentare il numero di elementi del TLB (costoso) o la dimensione delle pagine.
@@ -633,5 +638,5 @@ La tendenza nei sistemi moderni è verso l'*incremento della dimensione delle pa
 
 === Interazione tra Memoria Virtuale e I/O
 Un problema sorge quando una pagina che ospita un buffer per operazioni di I/O (es. lettura da file) viene selezionata come vittima da un algoritmo di sostituzione globale. Se un dispositivo I/O sta eseguendo un trasferimento in DMA (Direct Memory Access) su quella pagina, la sua rimozione potrebbe causare la scrittura parziale dei dati in posizioni errate.
-#figure(image("images/2025-08-17-17-12-57.png"))
+#figure(image("images/2025-08-17-17-12-57.png", height: 20%))
 - *Soluzioni:* Eseguire tutto l'I/O in appositi buffer del kernel del SO e poi copiare i dati nelle pagine dei processi utente. Oppure, *bloccare (pinning)* in memoria le pagine che ospitano un buffer di I/O, impedendone la rimozione tramite l'impostazione di un *bit di lock* nel descrittore di pagina.
