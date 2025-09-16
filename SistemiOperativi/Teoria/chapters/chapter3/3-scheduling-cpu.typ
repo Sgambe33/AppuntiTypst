@@ -229,7 +229,7 @@ Nella maggior parte dei SO moderni, sono i *thread a livello kernel*, e non i pr
 
 Un LightWeight Process è una sorta di processore virtuale che permette la comunicazione tra il kernel e la libreria di thread a livello utente.
 
-Il kernel fornisce a ogni applicazione uno o più LWP, ciascuno associato a un thread del kernel. Il SO esegue lo scheduling dei thread del kernel sui processori. L'applicazione esegue lo scheduling dei thread utente sui LWP disponibili. Se un thread del kernel si blocca, il LWP associato si blocca, così come il thread a livello utente associato Tramite una procedura nota come upcall, il kernel informa l'applicazione del verificarsi di determinati eventi. Le upcall sono gestite dalla libreria di thread a livello utente mediante un apposito gestore eseguito su uno dei LWP assegnati all'applicazione.
+Il kernel fornisce a ogni applicazione uno o più LWP, ciascuno associato a un thread del kernel. Il SO esegue lo scheduling dei thread del kernel sui processori. L'applicazione esegue lo scheduling dei thread utente sui LWP disponibili. Se un thread del kernel si blocca, il LWP associato si blocca, così come il thread a livello utente associato. Tramite una procedura nota come upcall, il kernel informa l'applicazione del verificarsi di determinati eventi. Le upcall sono gestite dalla libreria di thread a livello utente mediante un apposito gestore eseguito su uno dei LWP assegnati all'applicazione.
 
 #example(
   "Relazione thread utente, kernel e LWP",

@@ -14,11 +14,11 @@ Un #strong[Sistema Operativo (SO)] è un insieme di programmi che agisce come in
 
 Gli #strong[obiettivi principali] di un SO sono:
 
-+ Fornire metodi #strong[convenienti] per utilizzare il sistema di elaborazione, creando un ambiente che faciliti l'esecuzione dei programmi utente e la soluzione di problemi computazionali. Questo include rendere il software applicativo indipendente dall'hardware (trasparenza) e facilitare la portabilità dei programmi.
++ Fornire metodi #strong[convenienti] per utilizzare il sistema di elaborazione, creando un ambiente che faciliti l'esecuzione dei programmi utente e la soluzione di problemi computazionali. Questo include rendere il software applicativo indipendente dall'hardware (trasparenza) e facilitare la portabilità  dei programmi.
 
 + Assicurare un #strong[uso efficiente] delle risorse del sistema di elaborazione, monitorando l'utilizzo delle risorse, evitando conflitti di accesso e massimizzando l'uso delle risorse. Il SO stesso consuma risorse (overhead).
 
-+ #strong[Prevenire interferenze] nelle attività degli utenti, allocando risorse ad uso esclusivo e impedendo accessi illegali tramite meccanismi di autenticazione e autorizzazione.
++ #strong[Prevenire interferenze] nelle attività  degli utenti, allocando risorse ad uso esclusivo e impedendo accessi illegali tramite meccanismi di autenticazione e autorizzazione.
 
 == Organizzazione di un Sistema di Elaborazione
 
@@ -29,9 +29,13 @@ Un moderno calcolatore è composto da una o più #strong[CPU] e da diversi #stro
 === CPU (Central Processing Unit)
 Contiene #strong[registri interni] (programmabili, di stato e controllo). Esegue le istruzioni dei programmi attraverso il #strong[ciclo Fetch, Decode & Execute];.
 
-I sistemi moderni utilizzano #strong[architetture multiprocessore] (più processori che condividono memoria e clock) o #strong[multicore] (processori con più nuclei di elaborazione sullo stesso chip), che permettono una #strong[concorrenza reale] (più programmi in esecuzione simultanea) e offrono vantaggi come elevata capacità di elaborazione, basso costo e maggiore affidabilità.
+I sistemi moderni utilizzano #strong[architetture multiprocessore] (più processori che condividono memoria e clock) o #strong[multicore] (processori con più nuclei di elaborazione sullo stesso chip), che permettono una #strong[concorrenza reale] (più programmi in esecuzione simultanea) e offrono vantaggi come elevata capacità  di elaborazione, basso costo e maggiore affidabilità .
 #figure(
-  grid(columns: 2, gutter: 2mm, image("images/image 2.png", height: 25%), image("images/image 3.png", height: 25%)),
+  grid(
+    columns: 2,
+    gutter: 2mm,
+    image("images/image 2.png", height: 25%), image("images/image 3.png", height: 25%),
+  ),
   caption: "A destra un'architettura multiprocessore con 2 CPU. A sinistra un'architettura dual-core con due core sullo stesso chip.",
 )
 
@@ -49,19 +53,19 @@ Una combinazione di comportamenti hardware e software che interrompe l'esecuzion
 Le interruzioni possono essere causate da:
 - eventi esterni (es. completamento I/O)
 - fallimenti hardware
-- trap (es. divisione per 0) 
+- trap (es. divisione per 0)
 - interruzioni software (system call)
 
 La gestione delle interruzioni è guidata da un #strong[vettore delle interruzioni] (una tabella con gli indirizzi delle funzioni di gestione) e da un #strong[bit di abilitazione] nel registro PS (Program Status Word). Se posto a 1, dopo il ciclo FDE, la CPU controlla se ci sono interruzioni in attesa.
 
-Le interruzioni possono avere #strong[priorità]: quelle a priorità più alta possono sospendere la gestione di quelle a priorità più bassa (necessitando un #strong[kernel prelazionabile];). Alcune interruzioni sono #strong[mascherabili] (disattivabili) e altre no.
+Le interruzioni possono avere #strong[priorità ]: quelle a priorità  più alta possono sospendere la gestione di quelle a priorità  più bassa (necessitando un #strong[kernel prelazionabile];). Alcune interruzioni sono #strong[mascherabili] (disattivabili) e altre no.
 
 
-- #strong[Kernel non prelazionabile];: Disabilita la gestione delle interruzioni durante l'esecuzione dell'handler, semplificando il design ma potendo ritardare interruzioni ad alta priorità.
+- #strong[Kernel non prelazionabile];: Disabilita la gestione delle interruzioni durante l'esecuzione dell'handler, semplificando il design ma potendo ritardare interruzioni ad alta priorità .
 
   #figure(image("images/image 5.png"))
 
-- #strong[Kernel prelazionabile];: Permette la gestione di interruzioni più critiche anche mentre un'interruzione è già in corso, tipicamente con uno schema a priorità. 
+- #strong[Kernel prelazionabile];: Permette la gestione di interruzioni più critiche anche mentre un'interruzione è già  in corso, tipicamente con uno schema a priorità .
 
   #figure(image("images/image 6.png"))
 
@@ -72,7 +76,11 @@ Le interruzioni possono avere #strong[priorità]: quelle a priorità più alta p
 .
 
 #figure(
-  grid(columns: 2, gutter: 2mm, image("images/image 7.png", height: 25%), image("images/image 8.png", height: 25%)),
+  grid(
+    columns: 2,
+    gutter: 2mm,
+    image("images/image 7.png", height: 25%), image("images/image 8.png", height: 25%),
+  ),
 )
 
 #figure(image("images/image 9.png", height: 25%), caption: "Tabella di stato dei dispositivi")
@@ -86,14 +94,14 @@ Per tenere traccia delle richieste I/O si usa una #strong[tabella di stato dei d
   Un canale DMA è un circuito che collega un dispositivo di I/O al bus di sistema, permettendo l'accesso diretto alla memoria senza intervento della CPU.
 ]
 
-Contiene registri per l'indirizzo di memoria e la quantità di dati da trasferire. È usato per dispositivi I/O ad alta velocità, trasferendo interi blocchi di dati e generando una sola interruzione per blocco, riducendo l'overhead.
+Contiene registri per l'indirizzo di memoria e la quantità  di dati da trasferire. È usato per dispositivi I/O ad alta velocità , trasferendo interi blocchi di dati e generando una sola interruzione per blocco, riducendo l'overhead.
 
 #figure(image("images/image 10.png", height: 15%), caption: [
   Diagramma DMA
 ])
 
 === Struttura della memoria
-La memoria è un vettore di parole con indirizzi propri. Per ovviare ai costi, si usa una #strong[gerarchia di memorie] (cache, RAM, memoria secondaria, memoria non volatile) con diverse velocità e capacità. La CPU accede direttamente solo alla memoria più veloce.
+La memoria è un vettore di parole con indirizzi propri. Per ovviare ai costi, si usa una #strong[gerarchia di memorie] (cache, RAM, memoria secondaria, memoria non volatile) con diverse velocità  e capacità . La CPU accede direttamente solo alla memoria più veloce.
 
 #figure(image("images/image 11.png"))
 
@@ -110,7 +118,7 @@ I computer moderni differiscono per le gerarchie di memorie cache e per la dispo
 
 Fa eccezione la cache L1 alla quale viene inviato direttamente un indirizzo logico invece che fisico per velocizzare la ricerca in L1 (si evita traduzione). Inoltre permette di avviare, in parallelo, una traduzione in indirizzo fisico qualora si verifichi una MISS.
 
-Le unità di misura per la memoria (KB, MB, GB) sono basate su potenze di 2 (es. 1KB = 1024 byte), mentre le velocità di comunicazione (Kbps, Mbps) sono basate su potenze di 10 (es. 1Kbps = 1.000 bit/s).
+Le unità  di misura per la memoria (KB, MB, GB) sono basate su potenze di 2 (es. 1KB = 1024 byte), mentre le velocità  di comunicazione (Kbps, Mbps) sono basate su potenze di 10 (es. 1Kbps = 1.000 bit/s).
 
 #table(
   columns: (auto, auto, auto, auto, auto, auto),
@@ -122,6 +130,7 @@ Le unità di misura per la memoria (KB, MB, GB) sono basate su potenze di 2 (es.
   [*Exp.*],
   [*Explicit*],
   [*Prefix*],
+
   [
     10^-3
   ],
@@ -130,6 +139,7 @@ Le unità di misura per la memoria (KB, MB, GB) sono basate su potenze di 2 (es.
   [10^3],
   [1,000],
   [Kilo],
+
   [
     10^-6
   ],
@@ -138,6 +148,7 @@ Le unità di misura per la memoria (KB, MB, GB) sono basate su potenze di 2 (es.
   [10^6],
   [1,000,000],
   [Mega],
+
   [
     10^-9
   ],
@@ -146,6 +157,7 @@ Le unità di misura per la memoria (KB, MB, GB) sono basate su potenze di 2 (es.
   [10^9],
   [1,000,000,000],
   [Giga],
+
   [
     10^-12
   ],
@@ -154,6 +166,7 @@ Le unità di misura per la memoria (KB, MB, GB) sono basate su potenze di 2 (es.
   [10^12],
   [1,000,000,000,000],
   [Tera],
+
   [
     10^-15
   ],
@@ -162,6 +175,7 @@ Le unità di misura per la memoria (KB, MB, GB) sono basate su potenze di 2 (es.
   [10^15],
   [1,000,000,000,000,000],
   [Peta],
+
   [
     10^-18
   ],
@@ -170,18 +184,9 @@ Le unità di misura per la memoria (KB, MB, GB) sono basate su potenze di 2 (es.
   [10^18],
   [1,000,000,000,000,000,000],
   [Exa],
-  [10^-21],
-  [0.000000000000000000001],
-  [zepto],
-  [10^21],
-  [1,000,000,000,000,000,000,...],
-  [Zetta],
-  [10^-24],
-  [0.000000000000000000000001],
-  [yocto],
-  [10^24],
-  [1,000,000,000,000,000,000,...],
-  [Yotta],
+
+  [10^-21], [0.000000000000000000001], [zepto], [10^21], [1,000,000,000,000,000,000,...], [Zetta],
+  [10^-24], [0.000000000000000000000001], [yocto], [10^24], [1,000,000,000,000,000,000,...], [Yotta],
 )
 
 
@@ -193,29 +198,29 @@ Le unità di misura per la memoria (KB, MB, GB) sono basate su potenze di 2 (es.
 === Meccanismi di Protezione
 Necessari per garantire che un programma malfunzionante non influenzi altri programmi, per proteggere il SO e per salvaguardare i dati degli utenti da accessi errati o dolosi. Si basano su meccanismi hardware e software. I seguenti sono meccanismi hardware.
 
-- #strong[Duplice modalità di funzionamento del processore]
+- #strong[Duplice modalità  di funzionamento del processore]
 
-  - #strong[Modalità utente];: Per l'esecuzione normale dei programmi, con limitazioni di accesso alle risorse e istruzioni privilegiate non eseguibili.
-  - #strong[Modalità monitor (o kernel/supervisore/sistema)];: Per l'esecuzione dei servizi del SO, senza limiti alle operazioni attraverso system call.
+  - #strong[Modalità  utente];: Per l'esecuzione normale dei programmi, con limitazioni di accesso alle risorse e istruzioni privilegiate non eseguibili.
+  - #strong[Modalità  monitor (o kernel/supervisore/sistema)];: Per l'esecuzione dei servizi del SO, senza limiti alle operazioni attraverso system call.
 
 
-  Attenzione, per garantire una gestione delle risorse corretta da parte del SO è necessario garantire che un processo utente non possa mai otenere il controllo del calcolatore quando esso si trova in modalità monitor. Un #strong[bit di modalità] nel registro PS indica la modalità corrente. Il sistema passa alla modalità monitor durante le interruzioni e torna alla modalità utente prima di restituire il controllo a un processo utente.
+  Attenzione, per garantire una gestione delle risorse corretta da parte del SO è necessario garantire che un processo utente non possa mai otenere il controllo del calcolatore quando esso si trova in modalità  monitor. Un #strong[bit di modalità ] nel registro PS indica la modalità  corrente. Il sistema passa alla modalità  monitor durante le interruzioni e torna alla modalità  utente prima di restituire il controllo a un processo utente.
 
-  #figure(image("images/image 17.png"), caption: "Ciclo cambiamento modalità di funzionamento")
+  #figure(image("images/image 17.png"), caption: "Ciclo cambiamento modalità  di funzionamento")
 
-  Le system call generano una interruzione che modifica la modalità di funzionamento della CPU e invoca la funzione corrispondente.
+  Le system call generano una interruzione che modifica la modalità  di funzionamento della CPU e invoca la funzione corrispondente.
 
   #figure(image("images/image 18.png", width: 60%), caption: "Generazione di interruzioni attraverso system call")
 
 - #strong[Protezione dell' I/O]
 
-  Le istruzioni di I/O sono privilegiate; i programmi utente devono invocare una #strong[system call] affinché il SO le esegua per loro conto in modalità kernel.
+  Le istruzioni di I/O sono privilegiate; i programmi utente devono invocare una #strong[system call] affinché il SO le esegua per loro conto in modalità  kernel.
 
   #figure(image("images/image 19.png", height: 25%))
 
 - #strong[Protezione della memoria]
 
-  Impedisce accessi non autorizzati alla memoria. Si pensi, ad esempio, ad un programma utente che memorizza un nuovo indirizzo nel vettore delle interruzioni: al momento in cui una interruzione si verifica, potrebbe far richiamare se stesso ottenendo così il controllo del sistema in modalità monitor. Si usano:
+  Impedisce accessi non autorizzati alla memoria. Si pensi, ad esempio, ad un programma utente che memorizza un nuovo indirizzo nel vettore delle interruzioni: al momento in cui una interruzione si verifica, potrebbe far richiamare se stesso ottenendo così il controllo del sistema in modalità  monitor. Si usano:
   - #strong[registri base:] contiene il più piccolo indirizzo della memoria fisica destinata al processo.
   - #strong[registri limite:] contiene la lunghezza dell'area di memoria riservata al processo.
 
@@ -237,9 +242,9 @@ Necessari per garantire che un programma malfunzionante non influenzi altri prog
   Si usa un #strong[timer] per interrompere un processo dopo un periodo prefissato, impedendo cicli infiniti. L'impostazione del timer è un'istruzione privilegiata.
 
 == Gestione delle Risorse
-I moderni SO supportano la condivisione delle risorse in due modalità: #strong[condivisione nel tempo] (risorse usate a turno, es. CPU) e #strong[condivisione nello spazio] (risorse divise, es. memoria). Utilizzano #strong[multiprogrammazione] e #strong[time-sharing];.
+I moderni SO supportano la condivisione delle risorse in due modalità : #strong[condivisione nel tempo] (risorse usate a turno, es. CPU) e #strong[condivisione nello spazio] (risorse divise, es. memoria). Utilizzano #strong[multiprogrammazione] e #strong[time-sharing];.
 
-- #strong[Multiprogrammazione];: Il SO mantiene più processi contemporaneamente in memoria centrale per mantenere la CPU in attività. Quando un processo attende un evento (es. I/O), il SO passa a un altro (#strong[context switch];).
+- #strong[Multiprogrammazione];: Il SO mantiene più processi contemporaneamente in memoria centrale per mantenere la CPU in attività . Quando un processo attende un evento (es. I/O), il SO passa a un altro (#strong[context switch];).
 
   #figure(image("images/image 21.png", width: 60%), caption: [
     Esempio multiprogrammazione
@@ -255,18 +260,19 @@ I moderni SO supportano la condivisione delle risorse in due modalità: #strong[
     Esempio di time-sharing
   ])
 
-=== #strong[Funzioni principali di gestione delle risorse svolte dal SO]; <funzioni-principali-di-gestione-delle-risorse-svolte-dal-so>
+=== Funzioni principali di gestione delle risorse svolte dal SO
+
 - #strong[Gestione dei processi];: Un processo è un programma in esecuzione che necessita di risorse. Il SO è responsabile della creazione/eliminazione, sospensione/ripresa (scheduling sulla CPU), sincronizzazione, comunicazione e gestione dei deadlock.
-- #strong[Gestione della CPU];: Lo scheduler decide quale processo assegnare alla CPU, e le politiche di scheduling influenzano l'efficienza e la qualità del servizio.
+- #strong[Gestione della CPU];: Lo scheduler decide quale processo assegnare alla CPU, e le politiche di scheduling influenzano l'efficienza e la qualità  del servizio.
 - #strong[Gestione della memoria principale];: La memoria è un vettore di parole/byte. Il SO tiene traccia dell'uso della memoria, decide quali processi caricare, alloca/dealloca spazio e protegge gli accessi.
 - #strong[Gestione dei file];: Un file è un insieme di informazioni correlate. Il SO gestisce creazione/cancellazione di file e directory, supporta primitive di manipolazione, associa file ai dispositivi di memoria secondaria, esegue backup e controlla gli accessi.
 - #strong[Gestione della memoria secondaria];: Dischi (magnetici o a stato solido) fungono da backup della memoria principale. Il SO gestisce partizionamento, montaggio/smontaggio, spazio libero, allocazione, scheduling delle richieste e protezione.
-- #strong[Gestione dei dispositivi di I/O];: Effettuata dal sistema di I/O (interfaccia generale per driver e driver specifici). Il SO maschera la diversità dei dispositivi, gestisce la competizione e l'I/O (buffering, caching, spooling).
+- #strong[Gestione dei dispositivi di I/O];: Effettuata dal sistema di I/O (interfaccia generale per driver e driver specifici). Il SO maschera la diversità  dei dispositivi, gestisce la competizione e l'I/O (buffering, caching, spooling).
 
 == Virtualizzazione delle Risorse
 La #strong[virtualizzazione] si basa sul concetto di #strong[risorsa virtuale];, una risorsa fittizia che è un'astrazione di una risorsa reale, gestita dal SO in modo trasparente. Una singola risorsa reale può supportare molteplici risorse virtuali.
 
-- #strong[Vantaggi];: Le risorse virtuali sono più semplici da usare o appaiono in numero maggiore rispetto alle reali, e la loro molteplicità rimuove i vincoli di uso esclusivo, favorendo l'esecuzione concorrente di più applicazioni.
+- #strong[Vantaggi];: Le risorse virtuali sono più semplici da usare o appaiono in numero maggiore rispetto alle reali, e la loro molteplicità  rimuove i vincoli di uso esclusivo, favorendo l'esecuzione concorrente di più applicazioni.
 
 #example(
   "Server di stampa",
@@ -280,7 +286,7 @@ La virtualizzazione può essere applicata a vari livelli e tipi di risorse:
 - #strong[Macchine virtuali]: Consentono SO diversi simultaneamente o l'esecuzione di un SO all'interno di un altro.
 
 == Sicurezza e Protezione <sicurezza-e-protezione>
-La #strong[sicurezza] si occupa di preservare le risorse del computer da accessi non autorizzati, modifiche dannose e incoerenze. Si basa sull'#strong[autenticazione] (verifica dell'identità di utenti/applicazioni).
+La #strong[sicurezza] si occupa di preservare le risorse del computer da accessi non autorizzati, modifiche dannose e incoerenze. Si basa sull'#strong[autenticazione] (verifica dell'identità  di utenti/applicazioni).
 
 La #strong[protezione] è l'insieme dei meccanismi che controllano l'accesso di processi e utenti alle risorse. Si basa sull'#strong[autorizzazione] (verifica di cosa gli utenti autenticati possono fare).
 
@@ -299,13 +305,13 @@ Alcune classi di servizi comuni includono:
 - #strong[Servizi per l'efficienza del sistema];: Allocazione delle risorse, logging (tracciare l'uso delle risorse), protezione e sicurezza.
 
 == Interfacce Utente <interfacce-utente>
-I livelli di un sistema di elaborazione (hardware, SO, software applicativo) si collegano tramite interfacce che offrono funzionalità sempre più astratte.
+I livelli di un sistema di elaborazione (hardware, SO, software applicativo) si collegano tramite interfacce che offrono funzionalità  sempre più astratte.
 
 #figure(image("images/image 26.png"))
 
 - Gli #strong[utenti finali] usano il sistema tramite il software applicativo o il software di sistema (interpreti, compilatori).
 - I #strong[programmatori di applicazioni] si interfacciano tramite system call e API.
-- I #strong[programmatori di sistema] usano funzionalità del SO e direttamente dell'hardware.
+- I #strong[programmatori di sistema] usano funzionalità  del SO e direttamente dell'hardware.
 - I #strong[progettisti del SO] si interfacciano direttamente con l'hardware.
 L'#strong[Interprete di comandi] (o shell) è il software di sistema più importante, leggendo e interpretando i comandi del SO. Può essere a #strong[riga di comando (CLI)];, #strong[grafica (GUI)] o #strong[touch-screen];. Ad esempo #strong[Shell Bash è un interprete di comandi utilizzato in Linux.]
 
@@ -337,44 +343,27 @@ Le system call sono spesso scritte in linguaggio assembler, ma più comunemente 
     caption: [ Diagramma che mostra il flusso di controllo da un programma C che chiama `printf()`, che passa alla libreria C standard, che invoca la system call `write()` nel kernel, e il risultato viene restituito all'indietro. ],
   )
 
-- Lo #strong[standard POSIX] (IEEE 1003) specifica un insieme di procedure che un sistema compatibile deve fornire, garantendo la #strong[portabilità delle applicazioni];. Include chiamate per gestione processi (`fork`, `execve`), gestione file (`open`, `read`, `write`), gestione del file system (`mkdir`, `mount`), e varie (`kill`, `time`).
+- Lo #strong[standard POSIX] (IEEE 1003) specifica un insieme di procedure che un sistema compatibile deve fornire, garantendo la #strong[portabilità  delle applicazioni];. Include chiamate per gestione processi (`fork`, `execve`), gestione file (`open`, `read`, `write`), gestione del file system (`mkdir`, `mount`), e varie (`kill`, `time`).
   //TODO: Rifare tabella
   #table(
     columns: (auto, auto),
-    [*Call*],
-    [*Description*],
-    [pid=fork()],
-    [Create a child process identical to the parent],
-    [pid=waitpid(pid, &statloc, options)],
-    [Wait for a child to terminate],
-    [],
-    [Replace a process core image],
-    [],
-    [Terminate pricess execution and return status],
-    [],
-    [Open a file for reading, writing or both],
-    [],
-    [Close an open file],
-    [],
-    [Read data from a file into a buffer],
-    [],
-    [Write data froma buffer into a file],
-    [],
-    [Move the file pointer],
-    [],
-    [Get a file status information],
-    [],
-    [Create a new directory],
-    [],
-    [Remove an empty directory],
-    [],
-    [Create a new entry, name2, pointing to name1],
-    [],
-    [Remove a directory pointer],
-    [],
-    [Move the file pointer],
-    [],
-    [Get a file status information],
+    [*Call*], [*Description*],
+    [pid=fork()], [Create a child process identical to the parent],
+    [pid=waitpid(pid, &statloc, options)], [Wait for a child to terminate],
+    [], [Replace a process core image],
+    [], [Terminate pricess execution and return status],
+    [], [Open a file for reading, writing or both],
+    [], [Close an open file],
+    [], [Read data from a file into a buffer],
+    [], [Write data froma buffer into a file],
+    [], [Move the file pointer],
+    [], [Get a file status information],
+    [], [Create a new directory],
+    [], [Remove an empty directory],
+    [], [Create a new entry, name2, pointing to name1],
+    [], [Remove a directory pointer],
+    [], [Move the file pointer],
+    [], [Get a file status information],
   )
 
   #figure(image("images/image 29.png"))
@@ -387,11 +376,11 @@ Le system call sono spesso scritte in linguaggio assembler, ma più comunemente 
 
   #figure(image("images/image 32.png"))
 
-#strong[Vantaggi delle API];: #strong[Portabilità] delle applicazioni (un programma che usa una certa API girerà su qualsiasi sistema che la supporti) e #strong[facilità d'uso] (sono di più alto livello rispetto alle system call dirette).
+#strong[Vantaggi delle API];: #strong[Portabilità ] delle applicazioni (un programma che usa una certa API girerà  su qualsiasi sistema che la supporti) e #strong[facilità  d'uso] (sono di più alto livello rispetto alle system call dirette).
 
-Le applicazioni dipendono dal SO perché ogni SO fornisce un insieme univoco di chiamate di sistema. Per la compatibilità tra SO, le applicazioni possono essere scritte in linguaggi interpretati, usare macchine virtuali o API standard.
+Le applicazioni dipendono dal SO perché ogni SO fornisce un insieme univoco di chiamate di sistema. Per la compatibilità  tra SO, le applicazioni possono essere scritte in linguaggi interpretati, usare macchine virtuali o API standard.
 
-== Servizi di Sistema (Programmi di Sistema o Utilità) <servizi-di-sistema-programmi-di-sistema-o-utilità>
+== Servizi di Sistema (Programmi di Sistema o Utilità)
 I #strong[servizi di sistema] sono programmi associati al SO ma non fanno necessariamente parte del kernel. Forniscono un ambiente per lo sviluppo e l'esecuzione dei programmi utente e si trovano a un livello più astratto rispetto alle system call e alle API.
 
 - #strong[Categorie];: Gestione file e directory, informazioni sullo stato del sistema, editor, supporto per linguaggi di programmazione (compilatori, interpreti, debugger), caricamento ed esecuzione di programmi (loader, linker), supporto alle comunicazioni.
@@ -400,16 +389,16 @@ I #strong[servizi di sistema] sono programmi associati al SO ma non fanno necess
 == Progetto e Implementazione di un SO <progetto-e-implementazione-di-un-so>
 Gli scopi del progetto di un SO possono essere visti da un punto di vista #strong[utente] (conveniente, facile, affidabile, sicuro, veloce) e da un punto di vista del #strong[sistema di elaborazione] (facile da progettare/manutenere, affidabile, corretto, efficiente, flessibile, portabile, espandibile).
 
-- #strong[Flessibilità];: Un principio di progettazione chiave è separare le #strong[politiche] (cosa fare) dai #strong[meccanismi] (come farlo). Questo permette la massima flessibilità per modificare le politiche o aggiungere nuove componenti hardware/software.
-- #strong[Portabilità ed espandibilità];:
-  - La #strong[portabilità] è la facilità con cui il software può essere adattato per l'utilizzo su un altro computer, facilitata da codice dipendente dall'hardware ridotto e separato.
-  - L'#strong[espandibilità] è la facilità con cui nuove funzionalità possono essere aggiunte, ad esempio per incorporare nuovo hardware o rispondere a nuove aspettative degli utenti. I SO moderni utilizzano funzionalità #strong[plug-and-play] per aggiungere hardware anche durante l'esecuzione.
-- #strong[Implementazione];: I SO moderni sono scritti in gran parte in linguaggi di alto livello (es. C) con piccole porzioni in assembler. I linguaggi di alto livello offrono vantaggi come scrittura più rapida, codice più compatto, maggiore comprensione e manutenibilità, e facilità di porting.
+- #strong[Flessibilità ];: Un principio di progettazione chiave è separare le #strong[politiche] (cosa fare) dai #strong[meccanismi] (come farlo). Questo permette la massima flessibilità  per modificare le politiche o aggiungere nuove componenti hardware/software.
+- #strong[Portabilità  ed espandibilità ];:
+  - La #strong[portabilità ] è la facilità  con cui il software può essere adattato per l'utilizzo su un altro computer, facilitata da codice dipendente dall'hardware ridotto e separato.
+  - L'#strong[espandibilità ] è la facilità  con cui nuove funzionalità  possono essere aggiunte, ad esempio per incorporare nuovo hardware o rispondere a nuove aspettative degli utenti. I SO moderni utilizzano funzionalità  #strong[plug-and-play] per aggiungere hardware anche durante l'esecuzione.
+- #strong[Implementazione];: I SO moderni sono scritti in gran parte in linguaggi di alto livello (es. C) con piccole porzioni in assembler. I linguaggi di alto livello offrono vantaggi come scrittura più rapida, codice più compatto, maggiore comprensione e manutenibilità , e facilità  di porting.
 
 == Struttura di un SO <struttura-di-un-so>
 Un SO è un software complesso che deve essere strutturato. I principali modelli strutturali sono:
 
-- #strong[Sistemi monolitici];: Tutte le funzionalità del kernel sono collocate in un unico file binario statico eseguito in un unico spazio di indirizzi. L'interazione avviene tramite chiamate a procedura. Esempi includono MS-DOS e i primi sistemi UNIX/Linux.
+- #strong[Sistemi monolitici];: Tutte le funzionalità  del kernel sono collocate in un unico file binario statico eseguito in un unico spazio di indirizzi. L'interazione avviene tramite chiamate a procedura. Esempi includono MS-DOS e i primi sistemi UNIX/Linux.
 
   #figure(
     image("images/image 33.png"),
@@ -418,22 +407,22 @@ Un SO è un software complesso che deve essere strutturato. I principali modelli
     ],
   )
 
-  Nonostante la complessità di implementazione ed estensione, i kernel monolitici offrono #strong[vantaggi in termini di prestazioni] grazie a un overhead ridotto nelle system call e a comunicazioni interne veloci. Linux, pur essendo monolitico, ha un design modulare che consente modifiche runtime.
+  Nonostante la complessità  di implementazione ed estensione, i kernel monolitici offrono #strong[vantaggi in termini di prestazioni] grazie a un overhead ridotto nelle system call e a comunicazioni interne veloci. Linux, pur essendo monolitico, ha un design modulare che consente modifiche runtime.
 
 - #strong[Sistemi modulari];: Il kernel ha componenti principali e può collegarsi a servizi aggiuntivi tramite #strong[moduli];, sia all'avvio che durante l'esecuzione (collegamento dinamico). Questo è comune in implementazioni moderne di UNIX, Linux (Loadable Kernel Modules - LKM), macOS e Windows.
 
-- #strong[Sistemi a livelli (o strati)];: Le funzionalità del SO sono organizzate in livelli gerarchici, dove ogni livello usa solo funzionalità dei livelli sottostanti. Ogni livello definisce una nuova "macchina astratta".
+- #strong[Sistemi a livelli (o strati)];: Le funzionalità  del SO sono organizzate in livelli gerarchici, dove ogni livello usa solo funzionalità  dei livelli sottostanti. Ogni livello definisce una nuova "macchina astratta".
 
   #figure(image("images/image 34.png"))
 
-  Sono complessi da progettare a causa della difficoltà nel stratificare le funzionalità e possono avere prestazioni scarse a causa dell'overhead per attraversare i livelli. Tuttavia, una certa stratificazione è ancora comune nei SO moderni.
+  Sono complessi da progettare a causa della difficoltà  nel stratificare le funzionalità  e possono avere prestazioni scarse a causa dell'overhead per attraversare i livelli. Tuttavia, una certa stratificazione è ancora comune nei SO moderni.
 
-- #strong[Sistemi a microkernel];: Estremizzano la separazione tra politiche (implementate come processi di sistema in modalità utente) e meccanismi (kernel minimale in modalità privilegiata). Il microkernel include solo meccanismi per comunicazione tra processi (IPC), gestione minima di memoria/processi/CPU e gestione hardware di basso livello.
+- #strong[Sistemi a microkernel];: Estremizzano la separazione tra politiche (implementate come processi di sistema in modalità  utente) e meccanismi (kernel minimale in modalità  privilegiata). Il microkernel include solo meccanismi per comunicazione tra processi (IPC), gestione minima di memoria/processi/CPU e gestione hardware di basso livello.
 
   #figure(image("images/image 35.png"))
 
   - Tutto il resto è gestito da #strong[server] (processi di sistema che non terminano mai).
   - Le applicazioni interagiscono con i server tramite #strong[IPC];, il che comporta un overhead dovuto alla copia di messaggi e alla commutazione di contesto.
-  - Nonostante l'efficienza ridotta, offrono grande #strong[flessibilità] (migliore espandibilità e portabilità) e sono più #strong[affidabili e sicuri] poiché meno codice è eseguito in modalità protetta. Sono adatti per ambienti di rete ed embedded.
+  - Nonostante l'efficienza ridotta, offrono grande #strong[flessibilità ] (migliore espandibilità  e portabilità ) e sono più #strong[affidabili e sicuri] poiché meno codice è eseguito in modalità  protetta. Sono adatti per ambienti di rete ed embedded.
 
-- #strong[Sistemi ibridi];: Nella pratica, i SO combinano diverse strutture per ottenere un equilibrio tra prestazioni, sicurezza e flessibilità. Ad esempio, Linux è monolitico ma modulare, mentre Windows è in gran parte monolitico ma incorpora aspetti dei microkernel e moduli caricabili dinamicamente. Anche macOS X, iOS e Android sono ibridi.
+- #strong[Sistemi ibridi];: Nella pratica, i SO combinano diverse strutture per ottenere un equilibrio tra prestazioni, sicurezza e flessibilità . Ad esempio, Linux è monolitico ma modulare, mentre Windows è in gran parte monolitico ma incorpora aspetti dei microkernel e moduli caricabili dinamicamente. Anche macOS X, iOS e Android sono ibridi.

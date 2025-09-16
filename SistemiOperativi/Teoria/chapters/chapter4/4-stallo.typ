@@ -2,7 +2,7 @@
 #import "@preview/numbly:0.1.0": numbly
 
 #set enum(full: true, numbering: numbly("{1:1}.", "{2:a})"))
-= Capitolo 4: Stallo
+= Stalli
 == Il problema del deadlock
 
 #definition(
@@ -123,21 +123,20 @@ La *prevenzione statica* dei deadlock impone vincoli sul comportamento dei proce
 
   In un sistema che utilizza l'ordinamento delle risorse, l'assenza di circolarità nelle relazioni di attesa può essere dimostrata *per assurdo*:
 
-  #proof(
-    )[
+  #proof()[
     1. Supponiamo ci sia un'attesa circolare malgrado i processi rispettino la politica basata sull'ordinamento nell'effettuare richieste di risorse.
-    2. Sia $\{P_0, P_1, dots, P_n\}$ l'insieme dei processi coinvolti nell'attesa circolare,dove il processo $P_i$ attende una risorsa di tipo $R_(f(i))$ posseduta dal processo $P_(+1)$ (sugli indici si usa l'aritmetica modulare).
-    3. Poiché il processo $P_(i+1)$ possiede una risorsa di tipo $R_(f(i))$ mentre richiedeuna risorsa di tipo $R_(f(i+1))$ (dato che a sua volta è in attesa del processo $P_(i+2$), è necessario che per tutti gli indici $i$ valga la condizione:
+    2. Sia $\{P_0, P_1, dots, P_n\}$ l'insieme dei processi coinvolti nell'attesa circolare,dove il processo $P_i$ attende una risorsa di tipo $R_i$ posseduta dal processo $P_(i+1)$ (sugli indici si usa l'aritmetica modulare).
+    3. Poiché il processo $P_(i+1)$ possiede una risorsa di tipo $R_i$ mentre richiede una risorsa di tipo $R_(i+1)$ (dato che a sua volta è in attesa del processo $P_(i+2)$), è necessario che per tutti gli indici $i$ valga la condizione:
       $
-        F(R_(f(i))) < F(R_(f(i+1)))
+        F(R_(i)) < F(R_(i+1))
       $
     4. Ciò implica:
       $
-        F(R_(f(0))) < F(R_(f(1))) < dots < F(R_(f(n))) < F(R_(f(0)))
+        F(R_(0)) < F(R_(1)) < dots < F(R_(n)) < F(R_(0))
       $
     5. Per la proprietà transitiva dell'ordinamento risulta quindi che:
       $
-        F(R_(f(0))) < F(R_(f(0)))
+        F(R_(0)) < F(R_(0))
       $
       il che è impossibile.
     6. Quindi, non può esservi attesa circolare.
@@ -164,7 +163,7 @@ La strategia è che il SO accordi una richiesta solo se l'allocazione lascia il 
 
 #align(center, strong[La proprietà stato sicuro è una invariante del sistema])
 
-Algoritmi utilizzati:
+Dato il concetto di stato sicuro, è possibile definire algoritmi che permettano di evitare situazioni di stallo. Algoritmi utilizzati:
 
 ==== Algoritmo basato sul grafo di allocazione delle risorse
 Viene utilizzato per rilevare (e talvolta prevenire) deadlock tramite l'analisi del grafo di allocazione delle risorse.
@@ -176,26 +175,21 @@ L'esempio mostra come la richiesta di $P_2$ per $R_2$ possa portare a uno stato 
 
 #example("Esempio applicazione")[
 
-  Supponiamo che $P_2$ richieda $R_2$.
-  Se si assegna $R_2$ al processo $P_2$,
-  cioè se si trasforma
-  l'arco di prenotazione $P_2 ⇢ R_2$
-  nell'arco di assegnazione $R_2 \to P_2$.
+  Supponiamo che $P_2$ richieda $R_2$. Se si assegna $R_2$ al processo $P_2$,  cioè se si trasforma l'arco di prenotazione $P_2 ⇢ R_2$ nell'arco di assegnazione $R_2 ⇢ P_2$.
 
   #figure(grid(
     columns: 2,
     gutter: 2mm,
-    image("images/2025-08-10-17-29-49.png", height: 20%),
-    image("images/2025-08-10-17-29-57.png", height: 20%),
+    image("images/2025-08-10-17-29-49.png", height: 20%), image("images/2025-08-10-17-29-57.png", height: 20%),
   ))
 
   Si ottiene il grafo che rappresenta uno stato non sicuro (infatti, contiene un ciclo).
 ]
 
 ==== Algoritmo del banchiere (Dijkstra, 1965)
-L'algoritmo previene i deadlock perché ad ogni richiesta e ad ogni rilascio di una risorsa da parte di un processo, esso controlla se le assegnazioni delle risorse ad un processo lascia il sistema in uno stato sicuro. In caso positivo vengono assegnate altrimenti il processo attende.
-Applicabile anche per tipi di risorse con istanze multiple.
-Ogni processo deve dichiarare il numero massimo di istanze di ogni risorsa di cui avrà bisogno.
+L'algoritmo previene i deadlock perché esso controlla se le assegnazioni delle risorse ad un processo lascia il sistema in uno stato sicuro. In caso positivo vengono assegnate altrimenti il processo attende. Applicabile anche per tipi di risorse con istanze multiple.
+
+Ogni processo deve dichiarare il numero massimo di istanze di ogni risorsa di cui avrà bisogno appena entra nel sistema.
 L'algoritmo è attivato ad ogni richiesta e rilascio.
 Sia $n$ il numero dei processi e $m$ il numero di tipi di risorse.
 
@@ -203,67 +197,70 @@ Sia $n$ il numero dei processi e $m$ il numero di tipi di risorse.
 
 - `Available`: vettore di lunghezza $m$; se `Available[j] = k`, ci sono $k$ istanze di risorse di tipo $R_j$ disponibili.
 
-- `Max`: matrice $n times m$; se `Max[i, j] = k`, allora il processo $P_i$, durante la sua esecuzione, può richiedere al più $k$ istanze di risorse di tipo $R_j$.
+- `Max`: matrice $n times m$; se `Max[i][j] = k`, allora il processo $P_i$, durante la sua esecuzione, può richiedere al più $k$ istanze di risorse di tipo $R_j$.
 
 - `Allocation`: matrice $n times m$; se `Allocation[i, j] = k`, allora al processo $P_i$ sono attualmente assegnate $k$ istanze di risorse del tipo $R_j$.
 
 - `Need`: matrice $n times m$; se `Need[i, j] = k`, allora il processo $P_i$ può avere bisogno di altre $k$ istanze di risorse del tipo $R_j$ per completare la sua esecuzione.f
 #align(center, strong[Vale l'invariante: `Need [i,j] = Max[i,j] - Allocation [i,j]`])
 
-- *Algoritmo per verificare se uno stato è sicuro*:
+===== *Algoritmo di verifica della sicurezza*
 
-  Siano `Work` e `Finish` vettori rispettivamente di lunghezza $m$ e $n$. I pedici indicano una riga della matrice mentre se non sono presenti indici di vettori, le operazioni di confronto sono da interpretare su tutto il vettore.
-  1. Inizializzazione:
-    + `Work` = `Available`
-    + `Finish[i]` = `false` per `i` = $1, 2, dots, $`n`
+L'algoritmo utilizzato per scoprire se il sistema è o non è in uno stato sicuro si può descrivere come segue.
+Siano `Work` e `Finish` vettori rispettivamente di lunghezza $m$ e $n$. I pedici indicano una riga della matrice mentre se non sono presenti indici di vettori, le operazioni di confronto sono da interpretare su tutto il vettore.
+1. Inizializzazione:
+  + `Work` = `Available`
+  + `Finish[i]` = `false` per `i` = $0, 1, 2, dots,$`n`
 
-  2. Cercare un indice `i` tale che:
-    + `Finish[i]` == `false`
-    + $"Need"_i lt.eq$ `Work`
-    Se un tale `i` non esiste, passare al punto 4
+2. Cercare un indice `i` tale che:
+  + `Finish[i]` == `false`
+  + $"Need"_i lt.eq$ `Work`
+  Se un tale `i` non esiste, passare al punto 4
 
-  3. Aggiornare:
-    + $"Work" = "Work" + "Allocation"_i$
-    + $"Finish"[i] = "true"$
-    Tornare al punto 2.
+3. Aggiornare:
+  + $"Work" = "Work" + "Allocation"_i$
+  + $"Finish"[i] = "true"$
+  Tornare al punto 2.
 
-  4. Se per ogni $i$, $"Finish"[i] = "true"$, allora lo stato è sicuro; altrimenti non lo è.
+4. Se per ogni $i$, $"Finish"[i] = "true"$, allora lo stato è sicuro; altrimenti non lo è.
 
-  *Costo*: $O(m times n^2)$ operazioni per trovare una sequenza sicura.
+*Costo*: $O(m times n^2)$ operazioni per trovare una sequenza sicura.
 
-- *Algoritmo del banchiere (gestione richiesta)*:
-  Sia $"Request"_i$ il vettore (di lunghezza $m$) delle richieste di $P_i$
-  1. Se
+===== *Algoritmo di richiesta delle risorse*
+Si descrive ora l'algoritmo che determina se le richieste possano essere soddisfatte mantenendo la condizione di sicurezza.
+
+Sia $"Request"_i$ il vettore (di lunghezza $m$) delle richieste di $P_i$
+1. Se
   $
     "Request"_i lt.eq "Need"_i
   $
   passare al punto 2.
 
-  Altrimenti sollevare una condizione di errore, poichè la richiesta di $P_i$ ha ecceduto il numero massimo di risorse di cui $P_i$ ha dichiarato di aver bisogno per portare a termine la sua esecuzione
-  2. Se
-  $
-    "Request"_i lt.eq "Available"
-  $
-  passare al punto 3.
+  Altrimenti sollevare una condizione di errore, poichè la richiesta di $P_i$ ha  ecceduto il numero massimo di risorse di cui $P_i$ ha dichiarato di aver   bisogno per portare a termine la sua esecuzione
+2. Se
+$
+  "Request"_i lt.eq "Available"
+$
+passare al punto 3.
 
-  Altrimenti $P_i$ deve attendere poichè le risorse disponibili non sono sufficienti
-  3. Il sistema assegna al processo $P_i$ le risorse richieste modificando momentaneamente lo stato nel modo seguente:
-  $
-    "Available" = "Available" - "Request"_i;
-  $
-  $
-    "Allocation"_i = "Allocation"_i + "Request"_i;
-  $
-  $
-    "Need"_i = "Need"_i - "Request"_i;
-  $
-  Viene quindi invocato l'algoritmo per verificare se uno stato è sicuro
-  - Se lo stato ottenuto è sicuro ⇒ le risorse vengono realmente assegnate a $P_i$ e lo stato diventa effettivo.
-  - Se lo stato ottenuto è non sicuro ⇒ $P_i$ deve aspettare e viene ristabilito il vecchio stato di allocazione delle risorse (cioè i precedenti valori di Available, Allocation e Need).
+Altrimenti $P_i$ deve attendere poichè le risorse disponibili non sono sufficienti
+3. Il sistema assegna al processo $P_i$ le risorse richieste modificando momentaneamente lo stato nel modo seguente:
+$
+  "Available" = "Available" - "Request"_i;
+$
+$
+  "Allocation"_i = "Allocation"_i + "Request"_i;
+$
+$
+  "Need"_i = "Need"_i - "Request"_i;
+$
+Viene quindi invocato l'algoritmo per verificare se uno stato è sicuro.
+- Se lo stato ottenuto è sicuro ⇒ le risorse vengono realmente assegnate a $P_i$ e lo stato diventa effettivo.
+- Se lo stato ottenuto è non sicuro ⇒ $P_i$ deve aspettare e viene ristabilito il vecchio stato di allocazione delle risorse (cioè i precedenti valori di Available, Allocation e Need).
 
-  #example(
-    "Esempio algoritmo banchiere",
-  )[
+#example(
+  "Esempio algoritmo banchiere",
+)[
   Si consideri un sistema con 5 processi da $P_0$ a $P_4$ e 3 tipi di risorse:
   - A: 10 istanze
   - B: 5 istanze
@@ -275,23 +272,50 @@ Sia $n$ il numero dei processi e $m$ il numero di tipi di risorse.
 
   Supponiamo che lo stato corrente sia il seguente:
 
-  #grid(columns: 3, column-gutter: 3mm, align: center, table(
-    align: center,
-    columns: 1,
-    table.cell([Processes]),
-    table.cell([ ]),
-    table.footer([$P_0$], [$P_1$], [$P_2$], [$P_3$], [$P_4$]),
-  ), table(
-    align: center,
+  #grid(
     columns: 3,
-    table.cell([Allocation], colspan: 3),
-    table.footer([A], [B], [C], [0], [1], [0], [2], [0], [0], [3], [0], [2], [2], [1], [1], [0], [0], [2]),
-  ), table(
+    column-gutter: 3mm,
     align: center,
-    columns: 3,
-    table.cell([Max], colspan: 3),
-    table.footer([A], [B], [C], [7], [5], [3], [3], [2], [2], [9], [0], [2], [2], [2], [2], [4], [3], [3]),
-  ))
+    table(
+      align: center,
+      columns: 1,
+      table.cell([Processes]),
+      table.cell([ ]),
+      table.footer(
+        [$P_0$],
+        [$P_1$],
+        [$P_2$],
+        [$P_3$],
+        [$P_4$],
+      ),
+    ),
+    table(
+      align: center,
+      columns: 3,
+      table.cell([Allocation], colspan: 3),
+      table.footer(
+        [A], [B], [C],
+        [0], [1], [0],
+        [2], [0], [0],
+        [3], [0], [2],
+        [2], [1], [1],
+        [0], [0], [2],
+      ),
+    ),
+    table(
+      align: center,
+      columns: 3,
+      table.cell([Max], colspan: 3),
+      table.footer(
+        [A], [B], [C],
+        [7], [5], [3],
+        [3], [2], [2],
+        [9], [0], [2],
+        [2], [2], [2],
+        [4], [3], [3],
+      ),
+    ),
+  )
 
   Lo stato corrente è sicuro?
   La matrice `Need` definita come `Max`-`Allocation`, ed il vettore `Available` delle risorse attualmente disponibili, ricavabile sottraendo all risorse complessive del sistema quelle già allaocate, quindi `Available` = [10,5,7] - $sum_i "Allocation"_i$, sono:
@@ -305,19 +329,39 @@ Sia $n$ il numero dei processi e $m$ il numero di tipi di risorse.
       columns: 1,
       table.cell([Processes]),
       table.cell([ ]),
-      table.footer([$P_0$], [$P_1$], [$P_2$], [$P_3$], [$P_4$]),
+      table.footer(
+        [$P_0$],
+        [$P_1$],
+        [$P_2$],
+        [$P_3$],
+        [$P_4$],
+      ),
     ),
     table(
       align: center,
       columns: 3,
       table.cell([Allocation], colspan: 3),
-      table.footer([A], [B], [C], [0], [1], [0], [2], [0], [0], [3], [0], [2], [2], [1], [1], [0], [0], [2]),
+      table.footer(
+        [A], [B], [C],
+        [0], [1], [0],
+        [2], [0], [0],
+        [3], [0], [2],
+        [2], [1], [1],
+        [0], [0], [2],
+      ),
     ),
     table(
       align: center,
       columns: 3,
       table.cell([Max], colspan: 3),
-      table.footer([A], [B], [C], [7], [5], [3], [3], [2], [2], [9], [0], [2], [2], [2], [2], [4], [3], [3]),
+      table.footer(
+        [A], [B], [C],
+        [7], [5], [3],
+        [3], [2], [2],
+        [9], [0], [2],
+        [2], [2], [2],
+        [4], [3], [3],
+      ),
     ),
     // DIVIDER
     table(
@@ -325,19 +369,39 @@ Sia $n$ il numero dei processi e $m$ il numero di tipi di risorse.
       columns: 1,
       table.cell([Processes]),
       table.cell([ ]),
-      table.footer([$P_0$], [$P_1$], [$P_2$], [$P_3$], [$P_4$]),
+      table.footer(
+        [$P_0$],
+        [$P_1$],
+        [$P_2$],
+        [$P_3$],
+        [$P_4$],
+      ),
     ),
     table(
       align: center,
       columns: 3,
       table.cell([Need], colspan: 3),
-      table.footer([A], [B], [C], [7], [4], [3], [1], [2], [2], [6], [0], [0], [0], [1], [1], [4], [3], [1]),
+      table.footer(
+        [A], [B], [C],
+        [7], [4], [3],
+        [1], [2], [2],
+        [6], [0], [0],
+        [0], [1], [1],
+        [4], [3], [1],
+      ),
     ),
     table(
       align: center,
       columns: 3,
       table.cell([Available], colspan: 3),
-      table.footer([A], [B], [C], [3], [3], [2], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ]),
+      table.footer(
+        [A], [B], [C],
+        [3], [3], [2],
+        [ ], [ ], [ ],
+        [ ], [ ], [ ],
+        [ ], [ ], [ ],
+        [ ], [ ], [ ],
+      ),
     ),
   )
 
@@ -354,28 +418,64 @@ Sia $n$ il numero dei processi e $m$ il numero di tipi di risorse.
     + $"Request"_1 lt.eq "Need"_1$ cioè (1 0 2) $lt.eq$ (1 2 2)
     + $"Request"_1 lt.eq "Available"$ cioè (1 0 2) $lt.eq$ (3 3 2)
   - Aggiorniamo lo stato:
-    #grid(columns: 6, column-gutter: 3mm, align: center, table(
+    #grid(
+      columns: 6,
+      column-gutter: 3mm,
       align: center,
-      columns: 1,
-      table.cell([Processes]),
-      table.cell([ ]),
-      table.footer([$P_0$], [$P_1$], [$P_2$], [$P_3$], [$P_4$]),
-    ), table(
-      align: center,
-      columns: 3,
-      table.cell([Allocation], colspan: 3),
-      table.footer([A], [B], [C], [0], [1], [0], [2], [0], [0], [3], [0], [2], [2], [1], [1], [0], [0], [2]),
-    ), table(
-      align: center,
-      columns: 3,
-      table.cell([Need], colspan: 3),
-      table.footer([A], [B], [C], [7], [4], [3], [1], [2], [2], [6], [0], [0], [0], [1], [1], [4], [3], [1]),
-    ), table(
-      align: center,
-      columns: 3,
-      table.cell([Available], colspan: 3),
-      table.footer([A], [B], [C], [2], [3], [0], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ], [ ]),
-    ))
+      table(
+        align: center,
+        columns: 1,
+        table.cell([Processes]),
+        table.cell([ ]),
+        table.footer(
+          [$P_0$],
+          [$P_1$],
+          [$P_2$],
+          [$P_3$],
+          [$P_4$],
+        ),
+      ),
+      table(
+        align: center,
+        columns: 3,
+        table.cell([Allocation], colspan: 3),
+        table.footer(
+          [A], [B], [C],
+          [0], [1], [0],
+          [2], [0], [0],
+          [3], [0], [2],
+          [2], [1], [1],
+          [0], [0], [2],
+        ),
+      ),
+      table(
+        align: center,
+        columns: 3,
+        table.cell([Need], colspan: 3),
+        table.footer(
+          [A], [B], [C],
+          [7], [4], [3],
+          [1], [2], [2],
+          [6], [0], [0],
+          [0], [1], [1],
+          [4], [3], [1],
+        ),
+      ),
+      table(
+        align: center,
+        columns: 3,
+        table.cell([Available], colspan: 3),
+        table.footer(
+          [A], [B], [C],
+          [2], [3], [0],
+          [ ], [ ], [ ],
+          [ ], [ ], [ ],
+          [ ], [ ], [ ],
+          [ ], [ ], [ ],
+        ),
+      ),
+    )
+
   - Invochiamo l'algoritmo per la verifica dello stato sicuro che restituisce la sequenza sicura <$P_1, P_3, P_4, P_2, P_0$>.
 
   La richiesta (3,3,0) di $P_4$ può essere soddisfatta?
@@ -383,23 +483,25 @@ Sia $n$ il numero dei processi e $m$ il numero di tipi di risorse.
 
   La richiesta (0,2,0) di $P_0$ può essere soddisfatta?
   - No, perché lo stato raggiunto non sarebbe sicuro: è semplice verificarlo in questo caso perché, una volta aggiornato temporaneamente lo stato, non esiste un indice `i` tale che $"Need"_i lt.eq "Work"$ = (2 1 0).
-  ]
+]
 
 L'algoritmo del banchiere è costoso in termini di overhead e non permette di utilizzare al massimo le risorse (basandosi sul caso peggiore), riducendo la produttività. Inoltre, spesso le esigenze massime dei processi non sono note a priori, i processi variano dinamicamente e le risorse possono improvvisamente non essere disponibili, rendendo l'algoritmo poco applicabile nella pratica. Anche se teoricamente risolve il problema, pochi sistemi lo usano, anche se euristiche simili (es. limitare il traffico di rete quando l'utilizzo del buffer supera una soglia) sono impiegate.
 
 === 3. Rilevare il deadlock e ripristinare il sistema
 Rilevare i deadlock quando si verificano e recuperare il sistema. Nei sistemi che non prevengono o evitano i deadlock, è possibile fornire algoritmi per rilevarne la presenza e ripristinare il sistema.
 
-- *Singola istanza per ogni tipo di risorsa*: Si può usare un *grafo di attesa*. I nodi rappresentano solo processi, e un arco $P_i arrow P_j$ esiste se $P_i$ attende che $P_j$ rilasci una risorsa. Nel grafo di attesa, un deadlock esiste se, e solo se, c'è almeno un ciclo. Il SO mantiene questo grafo e periodicamente invoca un algoritmo di ricerca di cicli (costo $O(n^2)$).
+==== *Singola istanza per ogni tipo di risorsa*:
+Si può usare un *grafo di attesa*. I nodi rappresentano solo processi, e un arco $P_i arrow P_j$ esiste se $P_i$ attende che $P_j$ rilasci una risorsa. Nel grafo di attesa, un deadlock esiste se, e solo se, c'è almeno un ciclo. Il SO mantiene questo grafo e periodicamente invoca un algoritmo di ricerca di cicli (costo $O(n^2)$).
 
 #figure(
   image("images/2025-08-10-17-39-30.png", height: 30%),
 )
 
 
-- *Tipi di risorsa con istanze multiple*: L'algoritmo di rilevamento cerca di costruire sequenze fattibili di eventi che permettano a tutti i processi di terminare. Si basa su un'ipotesi ottimistica che i processi non richiedano risorse aggiuntive oltre a quelle specificate nella loro richiesta corrente.
+==== Tipi di risorsa con istanze multiple
+L'algoritmo di rilevamento cerca di costruire sequenze fattibili di eventi che permettano a tutti i processi di terminare. Si basa su un'ipotesi ottimistica che i processi non richiedano risorse aggiuntive oltre a quelle specificate nella loro richiesta corrente.
 
-==== Algoritmo di rilevamento
+===== Algoritmo di rilevamento
 
 *Strutture dati*:
 Sia $n$ = num. dei processi e $m$ = num. di tipi di risorse. Lo stato del sistema è rappresentato dalle seguenti strutture dati:
@@ -411,7 +513,7 @@ Sia $n$ = num. dei processi e $m$ = num. di tipi di risorse. Lo stato del sistem
 + Siano Work e Finish vettori di lunghezza m and n rispettivamente.
   Inizializzazione:
   + Work = Available
-  + Per i = 1,2, …, n, se Allocationi ≠0, allora Finish[i] = false; altrimenti, Finish[i] = true.
+  + Per i = 1,2, …, n, se $"Allocation"_i$ ≠0, allora Finish[i] = false; altrimenti, Finish[i] = true.
 + Trovare un indice i tale che valgano entrambe le seguenti condizioni:
   + $"Finish"[i] == "false"$
   + $"Request"_i ≤ "Work"$

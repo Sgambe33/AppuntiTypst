@@ -84,7 +84,7 @@ La CPU agisce sul controllore tramite comandi di I/O che indirizzano i registri 
 #figure(image("images/2025-08-18-15-26-29.png", width: 60%))
 Esistono tre metodi per la comunicazione tra CPU e controllore:
 #index[Port-mapped I/O]
-//TODO: Rivedere!
+
 1. *I/O Separato in Memoria (o port-mapped I/O)*:
   - A ogni registro di controllo è assegnato un *numero di porta di I/O* (es. un intero a 16 bit), e l'insieme di tutte le porte forma lo *spazio delle porte di I/O*.
   - La protezione dai programmi utente è garantita da *istruzioni speciali di I/O* (es. `IN R0,4`) che specificano numeri di porte dedicati e che solo il SO può eseguire. Questo rende evidente, anche a chi legge un programma assembly, che si tratta di un'operazione di I/O.
@@ -105,10 +105,10 @@ Esistono tre metodi per la comunicazione tra CPU e controllore:
 
 == Interazione tra Gestore Software e Controllore Hardware
 
-Esistono tre modalità diverse di interazione tra il gestore software di un dispositivo (driver) e il relativo controllore hardware:
-1. *I/O Programmato (o polling o a controllo di programma o a controllo diretto o programmed I/O)*.
-2. *I/O Guidato dalle Interruzioni (o interrupt-driven I/O)*.
-3. *Accesso Diretto in Memoria (o direct memory access - DMA)*.
+Esistono tre modalità diverse di interazione tra il *driver* di un dispositivo e il relativo controllore hardware:
+1. *I/O Programmato*.
+2. *I/O Guidato dalle Interruzioni*.
+3. *Accesso Diretto in Memoria (DMA)*.
 #figure(image("images/2025-08-18-15-30-08.png", width: 70%))
 
 === I/O Programmato: Processo Esterno (Hardware) e Interno (Software)
@@ -210,8 +210,7 @@ Il sottosistema di I/O è logicamente suddiviso in due componenti:
   Un problema importante in un SO è rendere tutti i dispositivi e driver di I/O simili nell'interfaccia. Se ogni driver ha un'interfaccia diversa al SO, l'introduzione di un nuovo dispositivo richiede un notevole sforzo di programmazione. Un'*interfaccia standard per i driver* evita questo problema.
 
 2. *Componente dipendente dai dispositivi*:
-  - *Nasconde le peculiarità* dei dispositivi e dei loro controllori al resto del SO.
-  - È costituita dai *gestori dei dispositivi (device driver)* che si interfacciano direttamente con i corrispondenti controllori hardware tramite i loro registri e ne controllano il comportamento.
+  - *Nasconde le caratteristiche* dei dispositivi e dei loro controllori al resto del SO. È costituita dai *driver dei dispositivi* che si interfacciano direttamente con i corrispondenti controllori hardware tramite i loro registri e ne controllano il comportamento.
 
 #figure(
   image("images/2025-08-18-15-42-09.png", width: 75%),
@@ -248,7 +247,8 @@ Questa componente offre servizi che rendono più semplice, sicuro ed efficiente 
 
 - *Sistema di spooling*:
   #index[Spooling]
-  Il *spooling* (Simultaneous Peripheral Operation On-Line) è una tecnica alternativa all'allocazione dinamica per gestire dispositivi che non possono accettare flussi di dati intercalati, come le stampanti. Il SO intercetta i dati da ogni applicazione e li memorizza in un *file di spool* su disco. Quando l'applicazione termina di produrre i dati, il file di spool viene inserito nella *coda di stampa*. I file vengono poi copiati uno alla volta dalla coda alla stampante. Si crea così una coda di file in attesa di essere elaborati, anziché una lista di richieste pendenti per l'assegnazione della risorsa. Lo spooling può essere gestito da un processo daemon di sistema o da un thread nel kernel, e il SO fornisce un'interfaccia di controllo per esaminare la coda, eliminare elementi, sospendere il servizio, ecc..
+  Lo *spooling* è una tecnica usata per gestire dispositivi che non possono   ricevere dati da più programmi contemporaneamente, come le stampanti.
+  Il sistema operativo prende i dati inviati da un'applicazione e li salva in un  file temporaneo sul disco, chiamato *file di spool*. Quando l'applicazione ha finito di inviare i dati, questo file viene messo in   una coda di stampa. La stampante poi prende i file dalla coda e li stampa uno alla volta,   nell'ordine. In questo modo, invece di avere tante richieste dirette alla stampante, c'è   una lista organizzata di file pronti da stampare. Lo spooling *è gestito da un programma in background *(daemon) o da un thread   del sistema operativo, che permette anche di controllare la coda (per esempio   eliminare file, mettere in pausa la stampa, ecc.).
 
 - *Scheduling delle richieste di I/O*:
   Consiste nel determinare un *ordine conveniente* per servire le richieste di I/O in una coda, poiché l'ordine di generazione raramente è il migliore. Viene realizzato mantenendo una coda di richieste per ciascun dispositivo. Quando un'applicazione richiede I/O, la richiesta è inserita nella coda del dispositivo. In caso di I/O asincrono, una *tabella di stato dei dispositivi* tiene traccia delle richieste attive, indicando tipo, stato (in attesa, occupato) e coda delle richieste pendenti per ogni dispositivo. Lo *scheduler dell'I/O* riorganizza l'ordine delle richieste per *migliorare le prestazioni complessive*, distribuire equamente gli accessi e ridurre il tempo di attesa medio.
@@ -259,9 +259,19 @@ Questa componente offre servizi che rendono più semplice, sicuro ed efficiente 
 
 Il processo di trasformazione delle richieste di I/O permette di *associare i nomi simbolici dei file* usati dalle applicazioni ai dispositivi hardware corrispondenti. Questo processo passa attraverso diversi stadi: dalla stringa di caratteri del nome logico a un driver specifico, all'indirizzo di un dispositivo, fino all'indirizzo fisico delle porte di I/O o all'indirizzo mappato in memoria del controllore del dispositivo.
 
-Il *file system* ha il compito di fornire il modo per raggiungere la regione del disco dove i dati del file sono fisicamente residenti tramite la struttura delle directory.
-- Nel *file system FAT*, il nome del file è associato a un numero che indica una voce nella tabella di allocazione dei file, e quella voce permette di individuare i blocchi del disco. Lo spazio dei nomi dei dispositivi è distinto dallo spazio dei nomi del file system, usando i due punti come separatore (es. `C:` come identificatore del disco rigido principale).
-- In *UNIX*, il nome del dispositivo non è presente esplicitamente. UNIX usa una *tabella di montaggio* che associa prefissi di pathname ai nomi dei dispositivi corrispondenti. Nella struttura della directory, un nome di dispositivo è associato a una coppia di numeri `<principale, secondario>`: il *numero principale* identifica il driver, mentre il *numero secondario* è passato come parametro al driver per determinare l'indirizzo fisico della porta di I/O o l'indirizzo mappato in memoria del controllore.
+Il file system serve per collegare i nomi dei file alla posizione reale dei dati sul disco, usando la struttura delle directory.
+
+- Nel file system FAT:
+  Il nome del file è collegato a un numero che punta a una voce nella tabella di  allocazione dei file (FAT).
+  Da lì si risale ai blocchi del disco dove si trovano i dati.
+  I dispositivi hanno uno spazio di nomi separato da quello dei file, e vengono   indicati con i due punti, ad esempio C: per il disco principale.
+
+- In UNIX:
+  I nomi dei dispositivi non compaiono direttamente.
+  UNIX usa una tabella di montaggio, che associa un prefisso di percorso  (pathname) al dispositivo corrispondente.
+  Ogni dispositivo è identificato da una coppia di numeri `<principale, secondario>`:
+  + il numero principale indica il driver da usare
+  + il numero secondario serve al driver per capire l'indirizzo fisico del dispositivo o del controllore.
 
 I SO moderni ottengono notevole flessibilità grazie all'uso di diverse tabelle di ricerca a vari livelli, permettendo di *introdurre nuovi dispositivi e driver senza ricompilare il kernel*. Alcuni SO sono in grado di caricare i driver su richiesta: all'avvio controllano i bus HW per determinare i dispositivi presenti e caricano i driver necessari immediatamente o quando servono. Dopo l'avvio, i dispositivi aggiunti possono essere rilevati da un errore dovuto a un'interruzione senza gestore associato, che richiede al kernel di ispezionare il dispositivo e caricare dinamicamente un driver appropriato.
 
@@ -283,7 +293,7 @@ I SO moderni ottengono notevole flessibilità grazie all'uso di diverse tabelle 
   10. Il driver riceve l'ACK, determina quale richiesta è stata completata e il suo stato, e lo segnala al sottosistema di I/O del kernel.
   11. Il kernel trasferisce i dati e/o i codici di ritorno nello spazio di memoria dell'invocante, cambia lo stato del processo in "ready" e sposta il suo PCB dalla coda di attesa alla coda dei processi pronti.
   12. Quando lo scheduler riassegnerà la CPU, il processo invocante potrà riprendere la sua esecuzione.
-  #figure(image("images/2025-08-18-15-47-03.png", width: 80%))
+  #figure(image("images/2025-08-18-15-47-03.png", height: 30%))
 ]
 == Memoria Secondaria
 
@@ -399,11 +409,9 @@ Le prestazioni di un disco sono caratterizzate da due fattori principali:
 La formattazione a basso livello influisce sulla densità e quindi sul tempo di trasferimento.
 #example("Dipendenza delle prestazioni dalla densità")[
   Un disco da 10.000 RPM impiega 6ms ad effettuare una rotazione
-  - Se ci sono 300 blocchi per traccia di 512 byte ciascuno, ci sono allora
-  153.600 byte = 150 KB in una traccia, che verranno letti in 6ms
-  - Quindi procede a una velocità di 24,4MB/s (= 153.600 byte / 6 s =
-  25.600 byte/s), a prescindere dall'interfaccia (anche con SCSI a
-  640MB/s)
+  - Se ci sono 300 blocchi per traccia di 512 byte ciascuno, ci sono allora 153.600 byte = 150 KB in una traccia, che verranno letti in 6ms
+  - Quindi procede a una velocità di 24,4MB/s (= 153.600 byte / 6 ms =
+  25.600 byte/s), a prescindere dall'interfaccia (anche con SCSI a  640MB/s)
   - Il tempo di trasferimento di 1 blocco è 512 byte / (150 KB / 6 ms) = 6 / 300 ms = 1 / 50 ms = 0,02 ms (o, alternativamente, 1 / (300 / 6 ms))
 ]
 

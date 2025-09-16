@@ -176,9 +176,9 @@ Il caricamento a domanda è legato al concetto di collegamento dinamico.
 
 #figure(image("images/2025-08-14-18-50-20.png", height: 25%))
 
-- Con il *collegamento statico*, le librerie di sistema sono combinate dal loader nell'immagine binaria del programma, aumentando la dimensione del file eseguibile e potenzialmente sprecando spazio in memoria. L'immagine `SENZA COLLEGAMENTO DINAMICO (COLLEGAMENTO STATICO)` mostra la ripetizione del codice di libreria per ogni chiamata.
+- Con il *collegamento statico*, le librerie di sistema sono combinate dal loader nell'immagine binaria del programma, aumentando la dimensione del file eseguibile e potenzialmente sprecando spazio in memoria. L'immagine mostra la ripetizione del codice di libreria per ogni chiamata.
 
-- Con il *collegamento dinamico*, il collegamento di una libreria è differito fino al momento dell'esecuzione. Il linker inserisce informazioni di rilocazione che consentono alla libreria di essere collegata e caricata in memoria solo se richiesta. Si usa soprattutto per librerie di sistema condivise (es. Dynamic-Link Library in Windows).
+- Con il *collegamento dinamico*, il collegamento di una libreria è differito fino al momento dell'esecuzione. Il linker inserisce informazioni di rilocazione che consentono alla libreria di essere collegata e caricata in memoria solo se richiesta. Si usa soprattutto per librerie di sistema condivise (es. DLL in Windows).
 #figure(
   image("images/2025-08-14-18-49-05.png", height: 30%),
   caption: "La libreria sarà collegata dinamicamente e caricata in memoria quando il programma è già caricato.",
@@ -203,11 +203,11 @@ Nella gestione della memoria partizionata, la memoria fisica è divisa in due pa
 Il SO cerca un'area contigua di memoria sufficiente a contenere l'immagine del processo. L'area rimane assegnata fino alla terminazione del processo. Se il processo viene scambiato, deve essere ricaricato nella stessa area a causa della rilocazione statica. Si hanno due schemi di gestione:
 
 - *Partizioni Fisse:* La memoria utente è divisa in un numero fisso di partizioni di dimensioni predefinite. Il SO mantiene una tabella delle partizioni. Un processo occupa una partizione fino alla sua terminazione o swap-out. Possono esserci code di processi per ogni partizione.
-#figure(
-  image("images/2025-08-14-19-33-21.png", height: 30%),
-  caption: "L'immagine mostra una memoria divisa in partizioni D0-D5, con processi P1-P5 che le occupano, lasciando memoria inutilizzata. Questa tecnica è inefficiente. ",
-)
-Il principale svantaggio è la *frammentazione interna*, dove la memoria allocata è maggiore di quella utilizzata all'interno di una partizione. Inoltre, vi è una mancanza di flessibilità, poiché numero e dimensioni sono fissi, limitando il grado di multiprogrammazione e la dimensione massima dei processi.
+  #figure(
+    image("images/2025-08-14-19-33-21.png", height: 30%),
+    caption: "L'immagine mostra una memoria divisa in partizioni D0-D5,   con processi P1-P5 che le occupano, lasciando memoria inutilizzata.   Questa tecnica è inefficiente. ",
+  )
+  Il principale svantaggio è la *frammentazione interna*, dove la   memoria allocata è maggiore di quella utilizzata all'interno di una   partizione. Inoltre, vi è una mancanza di flessibilità, poiché numero   e dimensioni sono fissi, limitando il grado di multiprogrammazione e  la dimensione massima dei processi.
 
 - *Partizioni Variabili:* Generalizza lo schema precedente, con caratteristiche delle partizioni definite dinamicamente in base alle esigenze dei processi. Inizialmente, tutta la memoria utente è una singola partizione che viene dinamicamente suddivisa.
   - *Compiti del SO:* Quando un processo richiede memoria, il SO cerca una partizione disponibile sufficientemente grande. Se la trova, assegna la memoria necessaria e trasforma la parte restante in una nuova partizione disponibile. Se non c'è spazio, il SO può attendere o cercare altri processi. Quando un processo termina, la sua partizione diventa disponibile e viene accorpata a partizioni adiacenti libere, e il SO controlla se può caricare processi dalla coda d'ingresso.
@@ -262,9 +262,11 @@ Il TLB è una piccola *cache hardware* che contiene informazioni sulle traduzion
 - L'*hit rate* tipico di un TLB è superiore al 99%, e il suo tempo di accesso è solitamente inferiore al 10% del tempo di accesso alla memoria principale.
 - *Complicazioni:* Il *context switch* richiede l'invalidazione del TLB (TLB flush) poiché le informazioni non sono valide per il nuovo processo. Alcuni sistemi usano un *Address-Space Identifier (ASID)* per mantenere nel TLB informazioni relative a processi diversi, evitando il flush completo. Anche lo spostamento di un segmento richiede l'invalidazione di registri TLB.
 - Il *Tempo Effettivo di Accesso alla Memoria (EMAT)* con TLB si calcola come:
-Sia p, con 0<=p<=1, la probabilità che la ricerca in TLB abbia successo.
-1-p è la probabilità che ci sia un TLB miss.
-$"EMAT" = p times ("Tempoaccesso TLB" + "Tempo accesso memoria") + (1 - p) times (2 times "Tempo accesso memoria" [+ "Tempo accesso TLB"])$. Il secondo tempo di accesso al TLB è omesso se l'architettura permette la ricerca in parallelo nel TLB e nalla memoria.
+Sia p, con 0<=p<=1, la probabilità che la ricerca in TLB abbia successo. 1-p è la probabilità che ci sia un TLB miss.
+
+$"EMAT" = p times ("Tempoaccesso TLB" + "Tempo accesso memoria") + (1 - p) times (2 times "Tempo accesso memoria" [+ "Tempo accesso TLB"])$.
+
+Il secondo tempo di accesso al TLB è omesso se l'architettura permette la ricerca in parallelo nel TLB e nalla memoria.
 
 Le informazioni relative alla gestione della memoria, come l'indirizzo e il numero di segmenti della tabella, sono contenute nel *PCB (Process Control Block)* di ogni processo e usate per inizializzare i registri STBR e STLR durante il context switch.
 
@@ -309,11 +311,9 @@ Alternativamente, quando PTLR non è disponibile e quindi le tabelle delle pagin
 
 Un indirizzo logico `x` viene scomposto in due componenti: *`pg` (numero di pagina)* e *`of` (scostamento dall'inizio della pagina)*. Se la dimensione delle pagine `d` è una potenza di 2 ($2^y$), `of` è il *resto* della divisione di `x` per `d` e `pg` è il *quoziente* delle divisione di `x` per `d`.
 La traduzione (`x = pg • of`) avviene usando `pg` come indice nella tabella delle pagine per selezionare il descrittore che contiene l'indice del frame `fr` che ospita la pagina. L'indirizzo fisico corrispondente `y` è ottenuto concatenando l'indice del frame `fr` con lo scostamento `of` (`fr • of` ovvero *concatenazione*). A differenza della segmentazione, non sono necessari confronti o somme esplicite per ottenere l'indirizzo fisico.
-#figure(image("images/2025-08-15-23-54-20.png"))
 #figure(image("images/2025-08-15-23-54-35.png"))
 
 Analogamente alla segmentazione, la traduzione richiede *due accessi alla memoria* per ogni indirizzo generato dalla CPU. La soluzione è l'uso del *TLB*.
-#figure(image("images/2025-08-15-23-55-19.png"))
 #figure(image("images/2025-08-15-23-55-43.png"))
 Le CPU moderne possono avere più livelli di TLB, rendendo il calcolo dell'EMAT più complesso. Il design del SO deve essere ottimizzato per l'architettura dei TLB.
 Le informazioni relative all'indirizzo e al numero di pagine della tabella sono memorizzate nel PCB del processo e utilizzate per inizializzare i registri PTPR e PTLR durante il context switch.
@@ -335,7 +335,7 @@ La maggior parte dei processi è piccola o utilizza il proprio spazio di indiriz
 - *Protezione:* Ogni elemento della tabella delle pagine può contenere bit di protezione (es. R, W, X).
 - *Condivisione:* Possibile, ma problematico in quanto le pagine condivise devono avere gli stessi indici negli spazi virtuali.
 #figure(
-  image("images/2025-08-15-23-59-32.png"),
+  image("images/2025-08-15-23-59-32.png", height: 40%),
   caption: "L'immagine mostra come le pagine fisiche di una libreria possono essere condivise pur apparendo in spazi virtuali diversi.",
 )
 
@@ -345,15 +345,14 @@ La maggior parte dei processi è piccola o utilizza il proprio spazio di indiriz
 La *paginazione a domanda* ha rilocazione dinamica, allocazione non contigua, spazio virtuale unico e *caricamento a domanda*. Il suo spazio virtuale può essere parzialmente caricato in memoria fisica.
 Vengono utilizzati gli stessi bit di controllo della segmentazione a domanda: *P (presenza), M (modifica), U (uso)*. Alla creazione di un processo, il suo spazio virtuale è interamente nell'area di swap, e la tabella delle pagine ha tutti i bit P a 0. Il processo può essere schedulato anche senza pagine in memoria.
 Quando l'esecuzione inizia, solo una pagina è caricata inizialmente; le altre vengono caricate a seguito di *page fault*. Un page fault è un'interruzione generata dall'hardware di traduzione degli indirizzi quando la CPU cerca una pagina non in memoria (P=0). La routine di gestione del page fault carica la pagina dalla swap area, eventualmente dopo aver richiamato un algoritmo di sostituzione, e l'istruzione che ha causato il fault viene rieseguita.
-#figure(image("images/2025-08-16-00-04-43.png"), caption: "Descrittore di pagina")
+#figure(image("images/2025-08-16-00-04-43.png", height: 30%), caption: "Descrittore di pagina")
 #figure(
-  image("images/2025-08-16-00-05-12.png"),
-  caption: "Esempio di tabella delle pagine in cui alcuna pagine non sono in memoria principale",
+  image("images/2025-08-16-00-05-12.png", height: 30%),
 )
-#figure(image("images/2025-08-16-00-06-12.png"), caption: "Traduzione di un indirizzo")
+
 #figure(image("images/2025-08-16-00-07-25.png"), caption: "Schema di traduzione degli indirizzi con TLB e page fault.")
-#figure(image("images/2025-08-16-00-07-31.png"), caption: "Traduzione di un indirizzo con page fault.")
-#figure(image("images/2025-08-16-00-07-42.png"), caption: "Sostituzione di pagine.")
+#figure(image("images/2025-08-16-00-07-31.png", height: 40%), caption: "Traduzione di un indirizzo con page fault.")
+#figure(image("images/2025-08-16-00-07-42.png", height: 40%), caption: "Sostituzione di pagine.")
 
 ==== Sostituzione di Pagine
 Quando non ci sono frame liberi per caricare una pagina in seguito a un page fault, è necessaria la *sostituzione di pagine*.
@@ -383,32 +382,27 @@ Il tempo di accesso alla memoria è dell'ordine dei nanosecondi, mentre la gesti
 #example(
   "Esempito EMATpf",
 )[
-Ad esempio, con un accesso alla memoria di 200 nanosecondi e un tempo di gestione del page fault di 8 millisecondi, l'EMATpf è dominato dal costo del page fault. Per tollerare un rallentamento del 10%, `p` deve essere estremamente basso (es. al più una pagina mancante ogni 400.000 accessi).
-#figure(image("images/2025-08-16-00-15-23.png"))
+  Ad esempio, con un accesso alla memoria di 200 nanosecondi e un tempo di gestione del page fault di 8 millisecondi, l'EMATpf è dominato dal costo del page fault. Per tollerare un rallentamento del 10%, `p` deve essere estremamente basso (es. al più una pagina mancante ogni 400.000 accessi).
+  #figure(image("images/2025-08-16-00-15-23.png", height: 30%))
 ]
-
-
-==== Gestione Software del TLB
-Mentre si è assunto che il TLB sia gestito dall'hardware, molte macchine RISC moderne (SPARC, MIPS) non hanno un TLB hardware, e la gestione è svolta dal SO via software. Questo deve avvenire molto rapidamente, poiché i TLB miss sono più frequenti dei page fault.
 
 == Segmentazione con Paginazione
 #figure(image("images/2025-08-16-00-16-23.png"))
 #figure(image("images/2025-08-16-00-16-35.png"))
-Questa tecnica combina la strutturazione dello spazio virtuale in segmenti con l'allocazione della memoria a ogni segmento tramite paginazione. Ha rilocazione dinamica, allocazione non contigua, spazio virtuale segmentato e caricamento a domanda. È usata quando i segmenti sono grandi e non è conveniente mantenerli per intero in memoria principale.
+Questa tecnica combina la segmentazione dello spazio virtuale con  l'allocazione della memoria a ogni segmento tramite paginazione. È usata quando i segmenti sono grandi e non è conveniente mantenerli per intero in memoria principale. Ogni segmento è suddiviso in più pagine.
 - *Vantaggi:* Preserva i vantaggi di concepire lo spazio virtuale organizzato in unità logiche (segmenti, per modularità, protezione e condivisione) e di allocare la memoria fisica in maniera non contigua (pagine di uguali dimensioni, riduce la frammentazione).
 - *Traduzione degli Indirizzi:* Gli elementi della tabella dei segmenti non contengono l'indirizzo base di un segmento, ma l'*indirizzo base della tabella delle pagine* per quel segmento. L'indirizzo virtuale è della forma `<sg, sc>`, dove `sc` è a sua volta strutturato come `<pg, of>`.
 #figure(
   image("images/2025-08-16-00-17-39.png"),
-  caption: "L'immagine `Schema di traduzione degli indirizzi` mostra un doppio livello di traduzione: prima la tabella dei segmenti, poi la tabella delle pagine del segmento specifico.",
+  caption: "L'immagine mostra un doppio livello di traduzione: prima la tabella dei segmenti, poi la tabella delle pagine del segmento specifico.",
 )
-- La traduzione può generare *segment fault* (se la tabella delle pagine del segmento non è in memoria) o *page fault* (se la pagina riferita non è in memoria).
-- *Intel x86:* I processori Intel x86-32 supportavano entrambi i meccanismi (segmentazione e paginazione), simile a MULTICS. Tuttavia, a partire dall'x86-64, la segmentazione è stata considerata obsoleta e non è più supportata (se non in modalità legacy), principalmente perché gli sviluppatori di sistemi UNIX o Windows non la utilizzavano per questioni di portabilità.
+La traduzione può generare *segment fault* (se la tabella delle pagine del segmento non è in memoria) o *page fault* (se la pagina riferita non è in memoria).
 
 == Copiatura su Scrittura (Copy-on-Write, COW)
 Nella paginazione a domanda, un processo può essere schedulato anche senza pagine in memoria principale, caricandole via via tramite page fault. La generazione di processi tramite la system call `fork()` può migliorare le prestazioni usando la condivisione della memoria e una tecnica nota come *copiatura su scrittura (COW)*.
 - *Funzionamento:* Prevede la *condivisione iniziale delle pagine* tra processo genitore e figlio. Una *copia della pagina* viene creata solo nel momento in cui uno dei processi (genitore o figlio) tenta di scrivere nella pagina condivisa. In questo modo, si copiano solo le pagine effettivamente modificate, mentre le altre rimangono condivise.
 #figure(
-  image("images/2025-08-16-00-20-38.png"),
+  image("images/2025-08-16-00-20-38.png", height: 30%),
   caption: "L'immagine illustra il passaggio da una pagina condivisa a due pagine separate dopo una modifica da parte di un processo.",
 );
 
@@ -416,6 +410,7 @@ Nella paginazione a domanda, un processo può essere schedulato anche senza pagi
 In caso di page fault e memoria principale non disponibile, gli algoritmi di sostituzione delle pagine scelgono una pagina logica "vittima" da rimpiazzare. La loro qualità è cruciale per le prestazioni del SO dato che un page fault ritarda i tempi di esecuzione di un processo. Le prestazioni sono misurate dal numero di page fault risultanti per una data quantità di frame e una sequenza di riferimenti. Negli esempi successivi, gli algoritmi verranno valutati effettuandone l'esecuzione sulla seguente successione dei riferimenti alla memoria: `7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1` con 3 frame disponibili messi a disposizione dalla memoria fisica. In generale, all'aumentare dei frame, ci si aspetta che il numero di page fault diminuisca.
 #figure(image("images/2025-08-17-15-35-32.png"))
 
+//TODO: Riordinare come sul libro (discorso migliore)
 === Algoritmo Ottimo
 Sceglie come pagina da rimpiazzare quella che *sicuramente non sarà più riferita in futuro o che sarà riferita più tardi nel tempo*.
 #figure(image("images/2025-08-17-15-37-34.png"))
@@ -455,8 +450,7 @@ Associa a ogni pagina l'istante di tempo in cui è stata acceduta per l'ultima v
 #figure(image("images/2025-08-17-15-59-16.png"))
 #figure(
   image("images/2025-08-17-15-59-40.png"),
-  caption: "
-                                L'immagine compara Ottimo (6 fault), FIFO (10 fault) e LRU (8 fault) per una sequenza di riferimento diversa, mostrando che LRU si avvicina all'ottimo.",
+  caption: "L'immagine compara Ottimo (6 fault), FIFO (10 fault) e LRU (8 fault) per una sequenza di riferimento diversa, mostrando che LRU si avvicina all'ottimo.",
 )
 
 ==== Implementazione di LRU
@@ -471,8 +465,7 @@ Implementare l'LRU esatto è costoso. Molte architetture offrono un *bit di rife
 - *Algoritmo con bit supplementari di riferimento (Aging):* Campiona periodicamente i bit di riferimento e ne salva lo stato in un contatore (es. un byte) per ogni pagina. A intervalli regolari, il SO legge il bit di riferimento, lo sposta come bit più significativo del contatore dopo uno shift a destra (scartando il bit meno significativo), e azzera il bit di riferimento. I contatori contengono la storia dell'utilizzo delle pagine. La pagina con il valore di contatore più piccolo è la LRU.
 #figure(image("images/2025-08-17-16-15-21.png"))
 
-- *Algoritmo con seconda chance:* Mantiene le pagine in una lista FIFO. Quando invocato, controlla il bit di riferimento della pagina in testa alla lista. Se R=0, la seleziona come vittima. Se R=1, pone R=0, sposta la pagina in fondo alla lista (dandole una "seconda chance") e ripete. È una variante di FIFO che sceglie la pagina più vecchia non riferita di recente.Nel caso più sfavorevole (tutte le pagine hanno R = 1), l'algoritmo seleziona la pagina da cui è iniziata la ricerca e a cui aveva dato una seconda chance. Usa solo il bit di riferimento R, senza bit supplementari, quindi l'ordine esatto con cui le pagine sono state usate non
-è noto.
+- *Algoritmo con seconda chance:* Mantiene le pagine in una lista FIFO. Quando invocato, controlla il bit di riferimento della pagina in testa alla lista. Se R=0, la seleziona come vittima. Se R=1, pone R=0, sposta la pagina in fondo alla lista (dandole una "seconda chance") e ripete. È una variante di FIFO che sceglie la pagina più vecchia non riferita di recente.Nel caso più sfavorevole (tutte le pagine hanno R = 1), l'algoritmo seleziona la pagina da cui è iniziata la ricerca e a cui aveva dato una seconda chance. Usa solo il bit di riferimento R, senza bit supplementari, quindi l'ordine esatto con cui le pagine sono state usate non è noto.
 - *Algoritmo dell'orologio:* Implementazione efficiente della seconda chance, dove le pagine sono gestite come una lista circolare e un puntatore `vittima` indica la prossima pagina da esaminare. Funziona in modo simile alla seconda chance ma con operazioni di incremento modulare più semplici.
   Quando viene invocato, l'algoritmo:
   1. Considera la pagina il cui indice è in vittima
@@ -487,7 +480,6 @@ Implementare l'LRU esatto è costoso. Molte architetture offrono un *bit di rife
   - (0,1) (modificata ma non usata di recente)
   - (1,0) (usata di recente ma pulita)
   - (1,1) (usata di recente e modificata).
-  L'algoritmo cerca prima (0,0), poi (0,1) azzerando i bit R, e poi ripete.
 
   Quando viene invocato, l'algoritmo:
   + Scorre la lista a partire da vittima alla ricerca di una pagina etichettata (0,0); se ne trova una, la utilizza e termina dopo aver incrementato vittima
@@ -558,62 +550,93 @@ Per controllare il thrashing, oltre a usare algoritmi di sostituzione più effic
 Nei sistemi moderni, il thrashing è meno problematico poiché gli utenti possono gestirlo manualmente (controllando i processi attivi) o, più comunemente, acquistando più memoria. La memoria è diventata così economica che non ha senso affrontare una memoria continuamente sovrallocata.
 
 == Organizzazione delle Tabelle delle Pagine
-Un problema critico nei sistemi moderni è la *dimensione enorme delle tabelle delle pagine*. Ad esempio, un sistema con indirizzi virtuali a 32 bit e pagine da 4KB avrebbe bisogno di $2^20$ pagine, il che si traduce in una tabella delle pagine da 4MB (1024 frame contigui). Per risolvere questo, le tabelle delle pagine sono strutturate.
 
-=== Tabelle delle Pagine Gerarchiche (Multilivello)
-Una tecnica comune è la *paginazione gerarchica a 2 livelli*.
-- La tabella delle pagine è suddivisa in porzioni consecutive (es. $2^10$ porzioni, ciascuna di 4KB), che costituiscono le *tabelle delle pagine di 2° livello*. Queste possono essere allocate in memoria fisica in modo non contiguo e solo se necessario.
-- Una *tabella di 1° livello (page directory)*, con un elemento per ogni porzione, è mantenuta in memoria fisica quando il processo è in esecuzione. L'indirizzo della page directory è nel registro *PDAR (Page Directory Address Register)*.
-- L'indirizzo di pagina `pg` (di 20 bit nell'esempio) è suddiviso in un indice di pagina `dr` (10 bit per la page directory) e uno scostamento di pagina `stp` (10 bit per la tabella di 2° livello).
+Un problema critico nei sistemi moderni è la *dimensione enorme delle tabelle delle pagine*. Ad esempio, un sistema con indirizzi virtuali a 32 bit e pagine da 4KB ($2^12$) avrebbe bisogno di $2^32 / 2^12$ pagine, il che si traduce in una tabella delle pagine da 4MB (se consideriamo che usualmente un elemento della tabella occupa 4 byte e quindi $2^20 times 4 "B" = 4"MB"$ ). Per risolvere questo, le tabelle delle pagine sono strutturate.
 
-#figure(image("images/2025-08-17-16-39-56.png", height: 30%))
-#figure(
-  image("images/2025-08-17-16-40-16.png", height: 40%),
-  caption: "Schema di una tabella delle pagine a 2 livelli",
-)
-#figure(
-  image("images/2025-08-17-16-40-44.png", height: 30%),
-  caption: "Schema di traduzione con tabella delle pagine a 2 livelli",
-)
-L'immagine mostra questo processo: prima si accede alla page directory per trovare l'indirizzo della tabella di 2° livello, poi si usa `stp` per trovare il frame. Questo metodo è noto come *tabella delle pagine ad associazione diretta (forward-mapped page table)*.
-- *Vantaggio:* Mantenere in memoria solo le tabelle delle pagine necessarie.
-#figure(image("images/2025-08-17-16-41-21.png", height: 25%), caption: "Schema di traduzione degli indirizzi")
+Una tecnica comune per ridurre la dimensione delle tabelle delle pagine è la *paginazione gerarchica a 2 livelli*. In questo schema:
+- *Tabella di 1° livello*: anche chiamata *Page Directory* contiene puntatori alle tabelle delle pagine di 2° livello. È sempre presente in memoria quando il processo è in esecuzione. L'indirizzo di *questa* è memorizzato in un registro speciale chiamato *PDAR* (Page Directory Address Register).
+
+- *Indirizzo virtuale*: consideriamo un indirizzo virtuale a 32 bit con pagine da 4 KB. Gli ultimi 12 bit rappresentano l'offset all'interno della pagina. I 20 bit rimanenti identificano la pagina virtuale. Con la paginazione a 2 livelli, i 20 bit della pagina virtuale vengono divisi in due parti:
+  + 10 bit `dr` → indice nella page directory (1° livello)
+  + 10 bit `stp` → indice nella page table di 2° livello
+
+  #figure(table(
+    align: center,
+    columns: 4,
+    table.cell([numero di pagina], colspan: 2, stroke: (top: 0pt, left: 0pt)),
+    table.cell([offset di pagina], colspan: 2, stroke: (top: 0pt, right: 0pt)),
+    table.cell([$p_1$]),
+    table.cell([$p_2$]),
+    table.cell([$d$], colspan: 2),
+    table.cell([10], stroke: none),
+    table.cell([10], stroke: none),
+    table.cell([12], colspan: 2, stroke: none),
+  ))
+
+  #figure(image("images/2025-08-17-16-39-56.png", height: 30%))
+  #figure(
+    image("images/2025-08-17-16-40-16.png", height: 30%),
+    caption: "Schema di una tabella delle pagine a 2 livelli",
+  )
+  La traduzione dell'indirizzo funziona così:
+  + I 10 bit `dr` selezionano la voce corrispondente nella page directory.  Questa voce punta a una page table di 2° livello.
+  + I 10 bit `stp` selezionano la voce all'interno di quella tabella, ottenendo il  numero del frame fisico.
+  + Infine, si aggiungono i 12 bit di offset per ottenere l'indirizzo fisico  finale.
+
+  *Vantaggio*: non è più necessario allocare in memoria una tabella enorme   (4 MB nel caso di pagine da 4 KB e indirizzi a 32 bit). Si allocano solo le   pagine di 2° livello effettivamente necessarie, riducendo drasticamente lo  spreco di memoria.
+
+  #figure(
+    image("images/2025-08-17-16-40-44.png", height: 30%),
+    caption: "Schema di traduzione con tabella delle pagine a 2 livelli",
+  )
+  #figure(image("images/2025-08-17-16-41-21.png", height: 40%), caption: "Schema di traduzione degli indirizzi")
 
 ==== Paginazione a Livelli e Indirizzi Virtuali a 64 Bit
-Con spazi di indirizzi virtuali a 64 bit (anche se spesso solo 48 bit sono effettivamente usati), una singola tabella delle pagine con pagine da 4KB sarebbe enorme. Con descrittori di pagina a 8 byte avremmo che la tabella delle pagine di ogni processo occuperebbe $8times 252$ byte = 255 byte = 32PB!
-- Sono necessari schemi di paginazione a *più di due livelli*. L'architettura Intel x86-64 usa *4 livelli di tabelle delle pagine*, ciascuno indicizzato con 9 bit dell'indirizzo virtuale.
+Con spazi di indirizzi virtuali a 64 bit (anche se spesso solo 48 bit sono effettivamente usati). Riprendendo lo stesso esempio dei 32 bit: date pagine di 4KB di dimensione ($2^12$) servirebbero $2^64 / 2^12 = 2^52$ elementi in una sola tabella (enorme). Potremmo essere tentati di riutilizzare le tabelle a due livelli, vediamo:
+
+#figure(table(
+  align: center,
+  columns: 6,
+  table.cell([pagina 1° livello], colspan: 2, stroke: (top: 0pt, left: 0pt)),
+  table.cell([pagina 2° livello], colspan: 2, stroke: (top: 0pt)),
+  table.cell([offset], colspan: 2, stroke: (top: 0pt, right: 0pt)),
+  table.cell([$p_1$], colspan: 2),
+  table.cell([$p_2$], colspan: 2),
+  table.cell([$d$], colspan: 2),
+  table.cell([42], stroke: none, colspan: 2),
+  table.cell([10], stroke: none, colspan: 2),
+  table.cell([12], colspan: 2, stroke: none),
+))
+
+La tabella di primo livello conterrebbe comunque $2^42$ elementi, ancora troppi (se si pensa ad elementi di 4 byte essa occuperà circa 16TB). Sono necessari schemi di paginazione a *più di due livelli*. L'architettura Intel x86-64 usa *4 livelli di tabelle delle pagine*, ciascuno indicizzato con 9 bit dell'indirizzo virtuale.
 #figure(image("images/2025-08-17-16-46-52.png"))
 #figure(image("images/2025-08-17-16-48-13.png", height: 30%), caption: "Traduzione degli indirizzi in x86-64")
-L'immagine mostra i 4 livelli (PML4, PML3, PML2, Page Table) che portano all'offset del frame. Questo significa che sono necessari *4 accessi alla memoria* per tradurre un indirizzo logico in fisico (senza TLB).
+L'immagine mostra annhe i 4 livelli (PML4, PML3, PML2, Page Table) che portano all'offset del frame. Questo significa che sono necessari *4 accessi alla memoria* per tradurre un indirizzo logico in fisico (senza TLB).
 
 
-#example(
-  )[
+#example()[
   Per esempio, con paginazione a 4 livelli, indicando con $p$, con $0 lt.eq p lt.eq 1$ la probabilità che la ricerca in TLB abbia successo, la formula per il calcolo del Tempo Effettivo di Accesso in Memoria (EMAT) diventa:
 
-  $"EMAT" = p times ("tempo accesso TLB" + "tempo accesso memoria") + (1-p) times (5 times "tempo accesso memoria" [+ "tempo acesso TLB"]) $
+  $"EMAT" = p times ("tempo accesso TLB" + "tempo accesso memoria") + (1-p) times (5 times "tempo accesso memoria" [+ "tempo acesso TLB"])$
 ]
 
-
-- Il *TLB è fondamentale* per ridurre l'impatto degli accessi multipli. Tuttavia, per architetture a 64 bit "vere" (es. UltraSPARC con 7 livelli di paginazione), le tabelle multilivello sono considerate inappropriate a causa del numero proibitivo di accessi alla memoria.
+Il *TLB è fondamentale* per ridurre l'impatto degli accessi multipli. Tuttavia, per architetture a 64 bit "*vere*" (es. UltraSPARC con 7 livelli di paginazione), *le tabelle multilivello* sono considerate *inappropriate* a causa del numero proibitivo di *accessi alla memoria*. Proprio per questo motivo andare oltre i 4 livelli è sconsigliato. Al contrario è possibile organizzare le tabelle in altri modi.
 
 === Tabelle delle Pagine di Tipo Hash
-Questa organizzazione è spesso usata per gestire spazi di indirizzi maggiori di 32 bit.
-- Ogni voce della tabella hash contiene una *lista concatenata di elementi* che hanno lo stesso valore della funzione hash.
-- Ciascun elemento della lista contiene: il numero della pagina virtuale (o descrittore), l'indice del frame che ospita la pagina, e un puntatore all'elemento successivo.
+Il numero della pagina virtuale corrisponde con l'input della funzione hash. Ogni voce della tabella contiene una *lista concatenata di elementi* che hanno lo stesso valore dell'output della funzione hash.
+- Ciascun elemento della lista contiene: il numero della pagina virtuale (o descrittore), l'indice del frame che ospita la pagina e un puntatore all'elemento successivo.
 - Quando un indirizzo virtuale è generato, il suo numero di pagina è passato a una *funzione hash*, il cui output è usato come indice nella tabella hash. La lista associata a quell'indice viene scandita per trovare l'elemento corrispondente alla pagina virtuale, e da lì si estrae l'indice del frame.
 #figure(image("images/2025-08-17-16-52-27.png", height: 30%))
-- Una variante per spazi a 64 bit è la *tabella delle pagine a gruppi (clustered page table)*, dove ogni elemento della lista non è un singolo descrittore ma un gruppo (cluster) di descrittori di pagine virtuali contigue. È utile per spazi di indirizzi sparsi.
-#figure(image("images/2025-08-17-16-57-30.png",height: 30%))
+Una variante per spazi a 64 bit è la *tabella delle pagine a gruppi (clustered page table)*, dove ogni elemento della lista non è un singolo descrittore ma un gruppo (cluster) di descrittori di pagine virtuali contigue. È utile per spazi di indirizzi sparsi.
+#figure(image("images/2025-08-17-16-57-30.png", height: 30%))
 
 === Tabella delle Pagine Invertita
-Si usa una *sola tabella delle pagine per tutto il sistema*, non una per processo.
-- La tabella ha un elemento per ogni pagina fisica della memoria. Ciascun elemento contiene: l'*identificativo dello spazio virtuale (ASID)* del processo a cui la pagina virtuale ospitata appartiene, e l'*indirizzo virtuale* della pagina logica memorizzata in quella posizione fisica.
-- Usata su diversi RISC a 64 bit dove le tabelle delle pagine per processo sarebbero enormi (es. petabyte).
-- L'indirizzo logico include il *pid del processo*, il numero di pagina `p` e uno scostamento `d`. La coppia `(pid, p)` è usata per cercare nella tabella invertita, e l'indirizzo fisico è ottenuto concatenando l'indice `i` dell'elemento trovato con lo scostamento `d`.
+Si usa una *sola tabella delle pagine per tutto il sistema*, non una per processo. La tabella ha un elemento per ogni frame della memoria. Ciascun elemento contiene l'*indirizzo virtuale* della pagina logica memorizzata in quella posizione fisica insieme a informazioni sul processo a cui appartiene.
+
+L'indirizzo logico include il *pid del processo*, il numero di pagina `p` e uno scostamento `d`. La coppia `(pid, p)` è usata per cercare nella tabella invertita, e l'indirizzo fisico è ottenuto concatenando l'indice `i` dell'elemento trovato con lo scostamento `d`.
 #figure(image("images/2025-08-17-17-05-42.png"))
 - *Vantaggio:* Diminuisce la quantità di memoria principale necessaria per le tabelle delle pagine.
-- *Svantaggi:* Non contiene le informazioni necessarie per i page fault (richiede una tabella separata del SO per le locazioni su disco). La *condivisione della memoria è più costosa*: ogni pagina fisica è mappata a una sola pagina virtuale alla volta, quindi un riferimento da un altro processo che condivide la memoria causerà un page fault. La *traduzione è più difficile e lenta* perché la ricerca avviene per indirizzo virtuale in una tabella ordinata per indirizzi fisici. L'uso di un *TLB* o di una *tabella hash* (unica per il sistema) può mitigare questo problema.
+- *Svantaggi:* La *traduzione è più difficile e lenta* perché la ricerca avviene per indirizzo virtuale in una tabella ordinata per indirizzi fisici. L'uso di un *TLB* o di una *tabella hash* (unica per il sistema) può mitigare questo problema.
 #figure(image("images/2025-08-17-17-06-09.png", height: 30%))
 
 == Considerazioni Generali
@@ -624,8 +647,11 @@ La rilocazione dinamica rende il *context switch più costoso* perché richiede 
 #figure(image("images/2025-08-17-17-11-32.png", height: 30%))
 Molti sistemi operativi moderni mappano il *kernel nello spazio degli indirizzi di ogni processo*. Questo significa che quando si invoca una system call, il kernel viene eseguito nello spazio degli indirizzi del processo chiamante.
 - *Vantaggio:* Non è necessario commutare lo stato di esecuzione e cambiare la funzione di rilocazione degli indirizzi, migliorando l'efficienza. Linux è un esempio di tale SO.
-- *Inconveniente:* Aumenta enormemente la dimensione della tabella delle pagine e della tabella dei segmenti. 
-#figure(image("images/2025-08-17-17-11-53.png", height: 30%), caption: "Il kernel residente nella parte superiore dello spazio di indirizzi di ogni processo.")
+- *Inconveniente:* Aumenta enormemente la dimensione della tabella delle pagine e della tabella dei segmenti.
+#figure(
+  image("images/2025-08-17-17-11-53.png", height: 30%),
+  caption: "Il kernel residente nella parte superiore dello spazio di indirizzi di ogni processo.",
+)
 
 === Portata del TLB
 La *portata del TLB* esprime la quantità di memoria virtuale che può essere acceduta direttamente tramite il TLB senza accedere alla tabella delle pagine in memoria. Si calcola come `= elementi del TLB * dimensione pagine`. Idealmente, il TLB dovrebbe contenere i metadati relativi al working set del processo in esecuzione. Per aumentare la portata, si può aumentare il numero di elementi del TLB (costoso) o la dimensione delle pagine.
