@@ -1,4 +1,4 @@
-#import "../../../../dvd.typ": *
+#import "../../../dvd.typ": *
 #import "@preview/numbly:0.1.0": numbly
 
 #set enum(full: true, numbering: numbly("{1:1}.", "{2:a})"))

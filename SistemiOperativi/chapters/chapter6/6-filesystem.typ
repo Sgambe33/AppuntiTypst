@@ -1,4 +1,4 @@
-#import "../../../../dvd.typ": *
+#import "../../../dvd.typ": *
 
 
 = Il File System: Concetti, Interfaccia e Realizzazione
@@ -299,14 +299,6 @@ Operazioni di livello superiore come copia o ridenominazione sono realizzate com
 === 9.3. Matrice di Protezione
 
 La *matrice di protezione* specifica le politiche di protezione dei file/directory e, in generale, delle risorse. Concettualmente, ogni riga corrisponde a un *dominio di protezione (utente)*, e ogni colonna rappresenta una *risorsa del sistema*. Le celle contengono i diritti di accesso.
-La Figura mostra un esempio di matrice di protezione:
-*File A* | *File B* | *File C* | *Printer 1*
-:---|:---|:---|:---
-*Alice* | RW | RW | RW | OK
-*Bob* | R | R | RW | OK
-*Carol* | RW | | |
-*David* | | | RW | OK
-*Faculty* | RW | RW | | OK
 
 L'uso della matrice di protezione è solo concettuale, poiché in pratica comporterebbe costi elevati per lo spreco di memoria, essendo solitamente enorme e sparsa. I due approcci più comuni per rappresentare concretamente le politiche di protezione sono le *Liste di Capability (C-list)* e le *Liste di Controllo degli Accessi (ACL)*.
 
@@ -453,7 +445,18 @@ In generale, una system call sui file attraversa i diversi livelli del file syst
 
 La funzione principale della struttura della directory è mappare il nome ASCII di un file nelle informazioni necessarie per localizzare i dati. Ogni directory necessita di un collegamento con i descrittori dei file che contiene, e il problema è dove memorizzare questi descrittori.
 Alcuni SO (es. Windows) realizzano le directory come file speciali con contenuto strutturato: una tabella i cui elementi contengono nome, attributi e informazioni sull'allocazione dei blocchi del file su disco.
-#figure(image("images/2025-08-18-00-11-40.png")) //TODO: Converti in tabella
+#figure(table(
+  columns: (auto, auto, auto),
+
+  [#strong("Nome")], [#strong("Attributi")], [#strong("Allocazione file su disco")],
+  [d1], [...], [inizio = Blocco 30],
+  [d2], [...], [inizio = Blocco 43],
+  [f1], [...], [inizio = Blocco 110],
+  [...], [...], [...],
+  stroke: 1pt,
+  inset: 5pt,
+  align: center,
+))
 Tuttavia, memorizzare direttamente i descrittori (FCB) negli elementi della directory crea problemi per l'implementazione dei link e la condivisione dei file.
 
 Per implementare più convenientemente i link, è preferibile tenere attributi e informazioni sull'allocazione in una struttura separata (es. *inode UNIX*). In questo modello, ogni elemento di directory punta all'inode (unico) del file/sottodirectory. L'uso di un *contatore (inserito nell'inode)* facilita la cancellazione di un file con più pathname: la cancellazione effettiva avviene solo quando il contatore si azzera; altrimenti, viene solo eliminato il pathname e decrementato il contatore.

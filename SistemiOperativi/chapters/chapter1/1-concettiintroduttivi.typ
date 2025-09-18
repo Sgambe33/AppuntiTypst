@@ -1,4 +1,4 @@
-#import "../../../../dvd.typ": *
+#import "../../../dvd.typ": *
 
 = Concetti introduttivi
 == Concetti Introduttivi e Obiettivi di un Sistema Operativo (SO)
@@ -19,6 +19,8 @@ Gli #strong[obiettivi principali] di un SO sono:
 + Assicurare un #strong[uso efficiente] delle risorse del sistema di elaborazione, monitorando l'utilizzo delle risorse, evitando conflitti di accesso e massimizzando l'uso delle risorse. Il SO stesso consuma risorse (overhead).
 
 + #strong[Prevenire interferenze] nelle attività  degli utenti, allocando risorse ad uso esclusivo e impedendo accessi illegali tramite meccanismi di autenticazione e autorizzazione.
+
+#pagebreak()
 
 == Organizzazione di un Sistema di Elaborazione
 
@@ -43,6 +45,7 @@ I sistemi moderni utilizzano #strong[architetture multiprocessore] (più process
 
 Ciascun controllore è responsabile di un tipo specifico di dispositivo e ha un #strong[buffer locale] e registri per comunicare con la CPU. L'I/O avviene tra il dispositivo e il buffer locale del controllore. Quando un'operazione è completata, il controllore informa la CPU tramite un #strong[segnale di interruzione];.
 
+#pagebreak()
 === Meccanismo delle interruzioni
 Una combinazione di comportamenti hardware e software che interrompe l'esecuzione del processo corrente, assegna la CPU a una #strong[funzione di gestione dell'interruzione] e poi riprende il processo sospeso.
 
@@ -72,8 +75,7 @@ Le interruzioni possono avere #strong[priorità ]: quelle a priorità  più alta
 === I/O sincrono e asincrono:
 - #strong[I/O sincrono];: avviata un'operazione di I/O il processo utente si mette in attesa fino al completamento e la CPU resta inattiva. In un dato istante, al massimo una richiesta di I/O è in sospeso.
 
-- #strong[I/O asincrono];: il processo utente, inviata la richiesta di I/O al kernel, continua la propria esecuzione senza attendere il completamento
-.
+- #strong[I/O asincrono];: il processo utente, inviata la richiesta di I/O al kernel, continua la propria esecuzione senza attendere il completamento.
 
 #figure(
   grid(
@@ -344,37 +346,58 @@ Le system call sono spesso scritte in linguaggio assembler, ma più comunemente 
   )
 
 - Lo #strong[standard POSIX] (IEEE 1003) specifica un insieme di procedure che un sistema compatibile deve fornire, garantendo la #strong[portabilità  delle applicazioni];. Include chiamate per gestione processi (`fork`, `execve`), gestione file (`open`, `read`, `write`), gestione del file system (`mkdir`, `mount`), e varie (`kill`, `time`).
-  //TODO: Rifare tabella
-  #table(
+
+  #figure(table(
+    align: left,
     columns: (auto, auto),
     [*Call*], [*Description*],
-    [pid=fork()], [Create a child process identical to the parent],
-    [pid=waitpid(pid, &statloc, options)], [Wait for a child to terminate],
-    [], [Replace a process core image],
-    [], [Terminate pricess execution and return status],
-    [], [Open a file for reading, writing or both],
-    [], [Close an open file],
-    [], [Read data from a file into a buffer],
-    [], [Write data froma buffer into a file],
-    [], [Move the file pointer],
-    [], [Get a file status information],
-    [], [Create a new directory],
-    [], [Remove an empty directory],
-    [], [Create a new entry, name2, pointing to name1],
-    [], [Remove a directory pointer],
-    [], [Move the file pointer],
-    [], [Get a file status information],
-  )
-
-  #figure(image("images/image 29.png"))
-
-  #figure(image("images/image 30.png"))
-
-  #figure(image("images/image 31.png"))
+    [pid = fork()], [Create a child process identical to the parent],
+    [pid = waitpid(pid, &statloc, options)], [Wait for a child to terminate],
+    [s = execve(name, argv, environp)], [Replace a process core image],
+    [exit(status)], [Terminate pricess execution and return status],
+    [fd = open(file, how, ...)], [Open a file for reading, writing or both],
+    [s = close(fd)], [Close an open file],
+    [n = read(fd, buffer, nbytes)], [Read data from a file into a buffer],
+    [n = write(fd, buffer, nbytes)], [Write data froma buffer into a file],
+    [position = lseek(fd, offset, whence)], [Move the file pointer],
+    [s = stat(name, &buf)], [Get a file status information],
+    [s = mkdir(name, mode)], [Create a new directory],
+    [s = rmdir(name)], [Remove an empty directory],
+    [s = ling(name1, name2)], [Create a new entry, name2, pointing to name1],
+    [s = unlink(name)], [Remove a directory pointer],
+    [s = mount(special, name, flag)], [Move the file pointer],
+    [s = umount(special)], [Get a file status information],
+  ))
 
 - La #strong[Win32 API] è la libreria di Windows per accedere alle system call.
+  #table(
+    align: left + horizon,
+    columns: (auto, auto, auto),
+    [*Descrizione*], [*Windows*], [*UNIX*],
+    table.cell(rowspan: 3, [Controllo dei processi]),
+    table.cell(rowspan: 3, [CreateProcess()\ ExitProcess()\ WaitForSingleObject()]),
+    table.cell(rowspan: 3, [fork()\ exit()\ wait()]),
 
-  #figure(image("images/image 32.png"))
+    table.cell(rowspan: 3, [Gestione dei file]),
+    table.cell(rowspan: 3, [CreateFile()\ ReadFile()\ WriteFile() \ CloseHandle()]),
+    table.cell(rowspan: 3, [open()\ read()\ write()\ close()]),
+
+    table.cell(rowspan: 3, [Gestione dei dispositivi]),
+    table.cell(rowspan: 3, [SetConsoleMode()\ ReadConsole()\ WriteConsole()]),
+    table.cell(rowspan: 3, [ioctl()\ read()\ write()]),
+
+    table.cell(rowspan: 3, [Gestione delle informazioni]),
+    table.cell(rowspan: 3, [GetCurrentProcessID()\ SetTimer()\ Sleep()]),
+    table.cell(rowspan: 3, [getpid()\ alarm()\ sleep()]),
+
+    table.cell(rowspan: 3, [Comunicazione]),
+    table.cell(rowspan: 3, [CreatePipe()\ CreateFileMapping()\ MapViewOfFile()]),
+    table.cell(rowspan: 3, [pipe()\ shm_open()\ mmap()]),
+
+    table.cell(rowspan: 3, [Protezione]),
+    table.cell(rowspan: 3, [SetFileSecurity()\ InitializeSecurityDescriptor()\ SetSecurityDescriptorGroup()]),
+    table.cell(rowspan: 3, [chmod()\ umask()\ chown()]),
+  )
 
 #strong[Vantaggi delle API];: #strong[Portabilità ] delle applicazioni (un programma che usa una certa API girerà  su qualsiasi sistema che la supporti) e #strong[facilità  d'uso] (sono di più alto livello rispetto alle system call dirette).
 

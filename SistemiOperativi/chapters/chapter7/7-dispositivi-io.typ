@@ -1,4 +1,4 @@
-#import "../../../../dvd.typ": *
+#import "../../../dvd.typ": *
 #import "@preview/in-dexter:0.7.2": *
 
 #pagebreak()

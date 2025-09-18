@@ -1,4 +1,4 @@
-#import "../../../../dvd.typ": *
+#import "../../../dvd.typ": *
 #import "@preview/in-dexter:0.7.2": *
 
 = Scheduling della CPU
@@ -217,7 +217,7 @@ Ad esempio, un processo interrotto per scadenza del quanto può essere spostato 
 #example(
   "Un sistema con tre code RR (Q0 con 8ms, Q1 con 16ms, Q2 senza quanto",
 )[
-  #image("images/2025-08-07-17-30-27.png")
+  #image("images/2025-08-07-17-30-27.png", width: 70%)
   - Lo scheduling interno sposta un processo da Q0 a Q1 se non termina in 8ms, e da Q1 a Q2 se non termina in 16ms.
   - Lo scheduling tra le code esegue prima Q0, poi Q1, poi Q2. Un nuovo processo va in Q0 e può prelazionare processi in Q1 o Q2. L'aging sposta processi che attendono troppo a lungo a priorità più alta.
 ]
@@ -231,12 +231,10 @@ Un LightWeight Process è una sorta di processore virtuale che permette la comun
 
 Il kernel fornisce a ogni applicazione uno o più LWP, ciascuno associato a un thread del kernel. Il SO esegue lo scheduling dei thread del kernel sui processori. L'applicazione esegue lo scheduling dei thread utente sui LWP disponibili. Se un thread del kernel si blocca, il LWP associato si blocca, così come il thread a livello utente associato. Tramite una procedura nota come upcall, il kernel informa l'applicazione del verificarsi di determinati eventi. Le upcall sono gestite dalla libreria di thread a livello utente mediante un apposito gestore eseguito su uno dei LWP assegnati all'applicazione.
 
-#example(
-  "Relazione thread utente, kernel e LWP",
-)[
-  #image("images/2025-08-07-17-46-45.png")
-  L'immagine illustra la relazione tra thread utente, LWP e thread kernel. Il kernel schedula i thread kernel sui processori fisici, mentre l'applicazione schedula i thread utente sui LWP disponibili. Eventi importanti vengono comunicati dal kernel all'applicazione tramite *upcall*.
-]
+
+#figure(image("images/2025-08-07-17-46-45.png", height: 30%), caption: [
+  L'immagine illustra la relazione tra thread utente, LWP e thread kernel. Il kernel schedula i thread kernel sui processori fisici, mentre l'applicazione schedula i thread utente sui LWP disponibili. Eventi importanti vengono comunicati dal kernel all'applicazione tramite *upcall*.])
+
 
 #index[SCS-System Contemption Scope]
 Esistono due ambiti di contesa per lo scheduling dei thread:
@@ -274,11 +272,11 @@ Due o più thread hardware (HW) sono assegnati a ogni core, permettendo al core 
 
 Dal punto di vista del SO, ogni thread HW è una *CPU logica* (nota come *Chip MultiThreading - CMT* o *hyperthreading* di Intel).
 
-#image("images/2025-08-08-17-20-34.png")
+#image("images/2025-08-08-17-20-34.png", height: 40%)
 
 *Un core multithread richiede due livelli di scheduling*: il livello 1 (thread SW) è responsabilità del SO, mentre il livello 2 (thread HW) è gestito dal core stesso (spesso con Round Robin o priorità). Le risorse del core sono condivise tra i suoi thread HW, quindi può eseguire solo un thread HW alla volta. Il SO può migliorare le prestazioni schedulando i thread SW su thread HW che non condividono risorse.
 
-#image("images/2025-08-08-17-20-45.png")
+#image("images/2025-08-08-17-20-45.png", height: 40%)
 
 Il *bilanciamento del carico* è cruciale nei sistemi multiprocessore per un uso efficiente. Nei sistemi con una coda ready comune, il bilanciamento del carico non è necessario, poiché quando un processore diventa inattivo, estrae immediatamente un thread eseguibile dalla coda pronta condivisa. Nei sistemi con code ready private, esistono due strategie:
 - *Migrazione push*: un processore monitora i carichi e sposta i thread dai processori sovraccarichi.
@@ -288,7 +286,7 @@ Queste strategie spesso convivono nello stesso sistema.
 #index[Processor Affinity]
 La *predilezione per il processore (processor affinity)* si riferisce al fatto che un thread tende a rimanere sul processore su cui è in esecuzione, a causa del costo di invalidare e ripopolare la cache su un altro processore. Può essere *debole (soft affinity)*, dove il SO cerca di mantenere il thread sullo stesso processore ma il load balancer può spostarlo, o *forte (hard affinity)*, dove il SO permette di specificare un sottoinsieme di processori utilizzabili. L'affinity può essere influenzata dalle architetture di memoria, come nei sistemi *NUMA (Non Uniform Memory Access)*, dove l'accesso di una CPU alla propria memoria locale è più veloce. L'immagine mostra un'architettura NUMA con due chip e memoria locale.
 
-#image("images/2025-08-08-17-22-28.png")
+#image("images/2025-08-08-17-22-28.png", width: 70%)
 
 #index[Multiprocessore eterogenei]
 I *sistemi multiprocessore eterogenei (HMP)*, come l'architettura ARM big.LITTLE o i processori Intel ibridi (P-core e E-core), combinano core con diverse velocità e gestioni energetiche. L'obiettivo è gestire il consumo energetico, allocando task a lungo termine o a basso consumo sui core LITTLE/E-core, e task interattivi sui core big/P-core. Windows 10 supporta lo scheduling HMP permettendo ai thread di selezionare la politica di scheduling per le proprie esigenze energetiche.
