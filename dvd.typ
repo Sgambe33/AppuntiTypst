@@ -248,7 +248,7 @@
 #let example = example-style("example", "Example").with(numbering: none)
 
 #let proof(body, name: none) = {
-  thmtitle[Proof]
+  thmtitle[Dimostrazione]
   if name != none {
     [ #thmname[#name] ]
   }

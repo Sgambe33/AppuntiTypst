@@ -1,16 +1,19 @@
+#import "../../../dvd.typ": *
+
 = Dipendenze funzionali e forme normali <dipendenze-funzionali-e-forme-normali>
 = Ridondanze e anomalie <ridondanze-e-anomalie>
+//TODO: Trasformare in tabella
 #figure(image("images/image 33.png"), caption: [
   image.png
 ])
 
 - Ridondanza: il valore di indirizzo \`e ripetuto in tutte le tuple che riguardano un ordine e in tutti gli ordini dello stesso fornitore;
-- Anomalie di aggiornamento: se modiﬁchiamo l’indirizzo di un fornitore o la data di un ordine in una tupla, dobbiamo modiﬁcare contemporaneamente anche le altre;
+- Anomalie di aggiornamento: se modiﬁchiamo l'indirizzo di un fornitore o la data di un ordine in una tupla, dobbiamo modiﬁcare contemporaneamente anche le altre;
 - Anomalie di inserzione: non possiamo inserire le caratteristiche di un nuovo fornitore senza che gli sia stato ordinato qualcosa;
-- Anomalia di cancellazione: se cancelliamo le informazioni relative all’ordine 351, cancelliamo anche le informazioni che riguardano il fornitore Bianchi.
+- Anomalia di cancellazione: se cancelliamo le informazioni relative all'ordine 351, cancelliamo anche le informazioni che riguardano il fornitore Bianchi.
 
 = Dipendenze funzionali <dipendenze-funzionali>
-Una dipendenza funzionale è un vincolo di integrità che lega fra loro i valori degli attributi di una relazione. Prendendo l’esempio precedente: in una istanza di ORDINE, se abbiamo due valori uguali per l’attributo fornitore, quelle due tuple hanno valori uguali anche per l’attributo indirizzo.
+Una dipendenza funzionale è un vincolo di integrità che lega fra loro i valori degli attributi di una relazione. Prendendo l'esempio precedente: in una istanza di ORDINE, se abbiamo due valori uguali per l'attributo fornitore, quelle due tuple hanno valori uguali anche per l'attributo indirizzo.
 
 Ad ogni schema di relazione sono in genere associate più dipendenze funzionali (individuabili solo considerando il significato degli attributi).
 
@@ -25,7 +28,7 @@ t\_1\[X\]=t\_2\[X\]\\rArr t\_1\[Y\]=t\_2\[Y\]
 In ogni istanza non ci possono essere due tuple con valori uguali per X e valori diversi per Y.
 
 - Se $Y subset.eq X$ la dipendenza è #strong[BANALE]
-- Se $Y = X$ la dipendenza #strong[BANALE] si dice anche #strong[IDENTITA’]
+- Se $Y = X$ la dipendenza #strong[BANALE] si dice anche #strong[IDENTITA']
 - Esempio precedente
   - num→fornitore
   - fornitore→indirizzo
@@ -37,9 +40,9 @@ In ogni istanza non ci possono essere due tuple con valori uguali per X e valori
 )[
   + Una dipendenza funzionale è un vincolo di integrità associato ad una relazione.
   + Ad ogni schema viene associato un insieme di dipendenze funzionali.
-  + Ad ogni schema e sempre associato l’insieme delle dipendenze ovvie (anche se in genere si tralasciano perché prive di interesse pratico).
-  + L’insieme delle dip. funzionali può essere determinato solo conoscendo il signiﬁcato degli attributi nel contesto che stiamo considerando
-  + Una particolare tabella che verifica l’insieme dei vincoli associati allo schema (e quindi anche le dip. funz. associate) si dice corretta.
+  + Ad ogni schema e sempre associato l'insieme delle dipendenze ovvie (anche se in genere si tralasciano perché prive di interesse pratico).
+  + L'insieme delle dip. funzionali può essere determinato solo conoscendo il signiﬁcato degli attributi nel contesto che stiamo considerando
+  + Una particolare tabella che verifica l'insieme dei vincoli associati allo schema (e quindi anche le dip. funz. associate) si dice corretta.
 ]
 
 == Implicazione <implicazione>
@@ -51,7 +54,7 @@ Dato un insieme di dipendenze funzionali F
 F \\space \\text{implica} \\space X \\rarr Y
 \$\$
 
-se ogni relazione $r$ che soddisfa F soddisfa anche X → Y. L’insieme $F^(+)$ delle dipendenze implicate da F viene detto #strong[chiusura di F]
+se ogni relazione $r$ che soddisfa F soddisfa anche X → Y. L'insieme $F^(+)$ delle dipendenze implicate da F viene detto #strong[chiusura di F]
 
 \$\$
 F^+ = \\{X \\rarr Y | F\\space \\text{implica} \\space X \\rarr Y \\}, \\space F\\subseteq F^+
@@ -105,12 +108,24 @@ Dagli assiomi di Armstrong derivano anche altre regole di inferenza:
 
   Transitivit\`a: se codimp → progetto e progetto → data ﬁnale allora codimp → data ﬁnale.
 
-=== Problemi dell’implicazione <problemi-dellimplicazione>
+=== Problemi dell'implicazione <problemi-dellimplicazione>
 Un problema frequente è quello di decidere se una dipendenza funzionale appartiene a $F^(+)$. Per risolverlo possiamo usare un algoritmo che applica ripetutamente gli assiomi di Armstrong ma che ha una complessità esponenziale. (se n è il numero di attributi, $F^(+)$ contiene almeno $2^n - 1$ dip. funz. banali.
 
 Altrimenti possiamo usare un metodo con complessità minore: per decidere se \$X \\rarr Y \\in F^+\$ si può controllare se $Y subset.eq X_F^(+)$
 
 == Chiusura di un insieme di attributi <chiusura-di-un-insieme-di-attributi>
+
+#theorem()[
+  F implica $X arrow Y$ se e solo se $Y subset.eq X_F^+$
+]
+#proof()[
+  - $arrow.r.double$:
+    + Sia $Y = A_1,A_2 ... A_k$ quindi $X arrow A_1,A_2 ... A_k$
+    + Per la regola di decomposizione si ha $X arrow A_i$, quindi $A_i in X_F^+$ per definizione di $X_F^+$ con $1 lt.eq i lt.eq k$
+    + pertanto $Y subset.eq X_F^+$
+]
+
+
 #figure(image("images/image 34.png"), caption: [
   image.png
 ])
@@ -164,7 +179,7 @@ Sottoinsieme proprio significa: sottoinsieme non coincidente
   ])
 
 == Equivalenze <equivalenze>
-Per operare su insiemi di dipendenze fa comodo ridurli in forme minimali. Per fare ciò si introducono i concetti di equivalenza e copertura. L’equivalenza tra due schemi di relazione permette di determinare quando essi rappresentano gli stessi fatti.
+Per operare su insiemi di dipendenze fa comodo ridurli in forme minimali. Per fare ciò si introducono i concetti di equivalenza e copertura. L'equivalenza tra due schemi di relazione permette di determinare quando essi rappresentano gli stessi fatti.
 
 #figure(image("images/image 45.png"), caption: [
   image.png
@@ -304,7 +319,7 @@ Relazione non in 2FN
 === Decomposizione in terza forma normale <decomposizione-in-terza-forma-normale>
 Una relazione non in terza forma normale presenta ridondanze e anomalie. Consideriamo ad esempio la relazione IMP vista sopra, se ci sono 10 impiegati ufficio progettazione, il nome del capo ufficio viene ripetuto 10 volte. In realtà forme di ridondanza tollerate possono essere presenti anche in 3NF
 
-Una relazione non in terza forma normale può sempre essere decomposta, senza perdita e conservando le dipendenze, in relazioni in terza forma normale. La decomposizione di cui sopra può essere ottenuta con l’algoritmo di sintesi.
+Una relazione non in terza forma normale può sempre essere decomposta, senza perdita e conservando le dipendenze, in relazioni in terza forma normale. La decomposizione di cui sopra può essere ottenuta con l'algoritmo di sintesi.
 
 === Algoritmo di sintesi per 3NF <algoritmo-di-sintesi-per-3nf>
 #figure(image("images/image 69.png"), caption: [
