@@ -1,10 +1,10 @@
 #import "../dvd.typ": *
 
-#dvdtyp(title: "Appunti Basi di Dati", author: "Cosimo Sgambelluri")[
+#dvdtyp(title: "Appunti Parallel Computing", author: "Cosimo Sgambelluri")[
 
   #outline(title: "Contenuti")
 
   #pagebreak()
 
-  #include "chapters/chapter1/1-dipendenze-funzionali.typ"
+  #include "chapters/chapter1/1-introduzione.typ"
 ]
