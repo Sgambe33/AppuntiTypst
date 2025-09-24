@@ -32,21 +32,15 @@ In realtà nella compilazione di un programma il compilatore è solo uno dei div
   edge-stroke: 1pt,
   edge-corner-radius: 5pt,
   mark-scale: 70%,
-
   node((0, 0), [sorgente], width: auto),
   node((1, 0), rect([Preprocessore], fill: teal.lighten(90%), stroke: teal), width: auto),
   node((2, 0), [sorgente\ modificato], width: auto),
-
   node((3, 0), rect([Compilatore], fill: teal.lighten(90%), stroke: teal), width: auto),
   node((4, 0), [programma\ assembly], width: auto),
-
   node((4, 1), rect([Assembler], fill: teal.lighten(90%), stroke: teal), width: auto),
   node((3, 1), [codice macchina \ rilocabile], width: auto),
-
   node((2, 1), rect([Linker \ Loader], fill: teal.lighten(90%), stroke: teal), width: auto),
   node((1, 1), [codice macchina \ assoluto], width: auto),
-
-
   edge((0, 0), (1, 0), "->"),
   edge((1, 0), (2, 0), "->"),
   edge((2, 0), (3, 0), "->"),
@@ -87,8 +81,141 @@ La sequenza di token viene ricevuta in input e viene restituito un albero sintat
 
 === Analisi semantica
 
-Dato l'albero sintattico in input, si restituisce un altro albero sintattico a cui sono state aggiunte delle informazioni. Da qui viene poi  generato un *codice sorgente intermedio*.
+Dato l'albero sintattico in input, si restituisce un altro albero sintattico a cui sono state aggiunte delle informazioni. Da qui viene poi generato un *codice sorgente intermedio*.
 
 #example()[
-  #align(center,image("images/2025-09-22-21-11-15.png"))
+  #align(center, image("images/2025-09-22-21-11-15.png"))
+]
+
+== Alfabeti e Stringhe
+
+Un *alfabeto* è un insieme finito di *simboli* non vuoto. Ogni simbolo è un'entità indivisibile. Un alfabeto si indica con $Sigma$:
+$
+  Sigma = {a,b,c} space "oppure" space Sigma = {"if", "else", "then"}
+$
+Una *stringa* è invece una sequenza di simboli appartenenti ad un alfabeto $Sigma$:
+$
+  w = s_1, s_2, ..., s_n space "con" space s_i in Sigma, n<infinity
+$
+Una stringa vuota (non contiene simboli) si indica con $epsilon$?. Il numero dei simboli che compongono una stringa rappresenta la *lunghezza* e si indica con $abs(w)$, di conseguenza vale $abs(epsilon)=0$.
+
+L'insieme di tutte le stringhe di lunghezza $k$ con $k gt.eq 0$ si indica con $Sigma^k$. $Sigma^0 = {epsilon}$.
+
+L'insieme di tutte le stringhe di qualsiasi lunghezza è $Sigma^*$ che per definizione può essere riscritto come:
+$
+  Sigma^* = Sigma^0 union Sigma^1 union Sigma^2 union ...
+$
+Si può anche indicare l'insieme delle stringhe di lunghezza almeno 1:
+$
+  Sigma^+ = Sigma^1 union Sigma^2 union ...
+$
+
+#definition()[
+  Due stringhe sono uguali ($u$ = $v$) se:
+  $n = k$ e $x_i = y_i$ per $i=1,2,3,...,n$.
+]
+
+#definition("Sottostringa")[
+  Una stringa $v$ è detta *sottostringa* di $u$ se:
+  $u= u v z$, dove $w$ e $z$ sono stringhe, eventualmente vuote.
+]
+
+#definition("Suffisso e Prefisso")[
+  $v$ è prefisso di $u$ se $u = v z$
+
+  $v$ è suffisso di $u$ se $u=w v$
+]
+
+
+=== Operazioni su stringhe
+
+Date due stringhe $u$ e $v$ definite come:
+$
+  u = x_1 x_2 ... x_n space space v = y_1 y_2 ... y_k
+$
+Sulle stringhe si possono effettuare alcune operazioni come:
+- Concatenazione
+- Potenza
+- Reverse
+
+==== Concatenazione
+La concatenazione di $u$ e $v$ restituisce una nuova stringa $"uv"$ definita come:
+$
+  "uv" = x_1 x_2 ... x_n y_1 y_2 ... y_k
+$
+
+- Non è commutativa
+- E' associativa
+
+Ovviamente la concatenazione può essere applicata a più di due stringhe.
+
+==== Potenza
+
+La potenza $u^n$ con $n gt 0$ indica la concatenazione della stringa con se stessa $n$ volte.
+$
+  u^0 = epsilon space space space abs(u^n) = n times abs(u)
+$
+
+==== Reverse
+
+Semplicemente consiste nell'invertire l'ordine dei simboli nella stringa:
+$
+  u^R = x_n ... x_2 x_1
+$
+
+== Linguaggi
+
+Un linguaggio $L$ è un insieme di stringhe su $Sigma$:
+$
+  L subset.eq Sigma^*
+$
+//TODO: Lunghezza di un linguaggio.... 
+
+=== Operazioni sui linguaggi
+
+//TODO
+
+- Concatenazione
+- Unione
+- Intersezione
+- Potenza
+
+=== "chiusura di un linguaggio"
+
+$L^*$ è la chiusura di un linguaggio L. E' definita come l'unione di tutte le potenze n-esime di L con n gt.eq 0 
+
+$
+  L^* = union_(i gt.eq 0) L^i
+$
+Non c'è stringa vuota
+
+
+L^+ è la chiusura positiva
+$
+  L^+ = union_(i gt 0) L^i
+$
+Potrebbe esserci la stringa vuota
+
+L^+ = LL^+ = L^+L
+
+$Sigma^*$ =$ L(Sigma*)$ (linguaggio universale)
+
+Sigma^+ = L(SImga+) (linguaggio universale positivo)
+
+Linguaggio complementare:
+L con barra sopra = $Sigma^*$ - L
+
+I linguaggi possono essere definiti ricorsivamente.
+- passo base:date k stringhe in L
+- passo ricorsivo: se j stringhe stanno in L, allora f(v1,v2, ..., vj) in L
+
+(chiusura?)
+Una stringa w sta in L solo se può essere ottenuta dagli elementi di base con un numero finito di applicazioni del passo ricorsivo.
+
+#example()[
+  Stringhe su {a,b} che iniziano con a e hanno lunghezza pari.
+  $L= w in {a,b}^* bar w = a u, abs(w) = 2n "con" n > 0$
+
+  - aa, ab in L
+  - se u in L allora uaa, uab, uba, ubb stanno in L
 ]
