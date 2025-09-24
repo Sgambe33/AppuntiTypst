@@ -3,7 +3,7 @@
 
 #let colors = (
   rgb("#9E9E9E"),
-  rgb("#F44336"),
+  rgb("#ff0000"),
   rgb("#E91E63"),
   rgb("#9C27B0"),
   rgb("#673AB7"),
@@ -113,14 +113,21 @@
   pagebreak()
 
   // Reset page settings for content pages
-  set page(background: none, margin: auto, number-align: center, numbering: "1", header: context {
-    if here().page() == 1 {
-      return none
-    }
-    box(stroke: (bottom: 0.7pt), inset: 0.4em)[
-      #text(font: "New Computer Modern Sans")[#h(1fr)#title]
-    ]
-  }, footer: none)
+  set page(
+    background: none,
+    margin: auto,
+    number-align: center,
+    numbering: "1",
+    header: context {
+      if here().page() == 1 {
+        return none
+      }
+      box(stroke: (bottom: 0.7pt), inset: 0.4em)[
+        #text(font: "New Computer Modern Sans")[#h(1fr)#title]
+      ]
+    },
+    footer: none,
+  )
 
   set outline(indent: 1em)
   show outline: set heading(numbering: none)
@@ -207,7 +214,13 @@
   titlefmt: thmtitle.with(color: color.darken(30%)),
   bodyfmt: thmtext.with(color: color.darken(70%)),
   namefmt: thmname.with(color: color.darken(30%)),
-  frame: (body-color: color.lighten(92%), border-color: color.darken(10%), thickness: 1.5pt, inset: 1.2em, radius: 0.3em),
+  frame: (
+    body-color: color.lighten(92%),
+    border-color: color.darken(10%),
+    thickness: 1.5pt,
+    inset: 1.2em,
+    radius: 0.3em,
+  ),
   ..builderargs,
 )
 
@@ -229,7 +242,7 @@
 
 #let problem = problem-style("problem", "Problem")
 
-#let theorem-style = builder-thmbox(color: colors.at(6), shadow: (offset: (x: 3pt, y: 3pt), color: luma(70%)))
+#let theorem-style = builder-thmbox(color: colors.at(1), shadow: (offset: (x: 3pt, y: 3pt), color: luma(70%)))
 
 #let theorem = theorem-style("theorem", "Theorem")
 
@@ -237,12 +250,12 @@
 #let corollary = theorem-style("corollary", "Corollary")
 
 #let definition-style = builder-thmline(color: colors.at(8))
+#let observation-style = builder-thmline(color: colors.at(11))
 
 #let definition = definition-style("definition", "Definizione")
 #let proposition = definition-style("proposition", "Proposizione")
 #let remark = definition-style("remark", "Nota")
-#let observation = definition-style("observation", "Osservazione")
-
+#let observation = observation-style("observation", "Osservazione").with(numbering: none)
 #let example-style = builder-thmline(color: colors.at(16))
 
 #let example = example-style("example", "Example").with(numbering: none)
