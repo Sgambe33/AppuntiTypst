@@ -258,7 +258,7 @@
 #let observation = observation-style("observation", "Osservazione").with(numbering: none)
 #let example-style = builder-thmline(color: colors.at(16))
 
-#let example = example-style("example", "Example").with(numbering: none)
+#let example = example-style("example", "Esempio").with(numbering: none)
 
 #let proof(body, name: none) = {
   thmtitle[Dimostrazione]

@@ -216,6 +216,122 @@ Una stringa w sta in L solo se può essere ottenuta dagli elementi di base con u
   Stringhe su {a,b} che iniziano con a e hanno lunghezza pari.
   $L= w in {a,b}^* bar w = a u, abs(w) = 2n "con" n > 0$
 
-  - aa, ab in L
-  - se u in L allora uaa, uab, uba, ubb stanno in L
+  - aa, ab $in$ L
+  - se u $in$ L allora uaa, uab, uba, ubb stanno $in$ L
+]
+
+#example()[
+  Stringhe su {a,b} in cui ogni occorenza di b è precedente di a.\
+  - $underline(text("Base")): epsilon in L$
+  - $underline(text("Passo ricorsivo")): text("se") u in L, quad u a, u a b$
+  - $underline(text("Passo ricorsivo")): text("se") u in L, quad a u, a b u $
+]
+
+#example()[
+  Espressioni con $n$, +, -, \*, ), (, /
+  - $underline(text("Base")): n in L$
+  - $underline(text("Passo ricorsivo")): $ se $u,v in L ==> (u),u+v,u-v,u*v,u/v in L quad quad quad $5?
+]
+
+#example()[
+  $L={a^n b^(2n) bar n > 0}$
+  - $underline(text("Base")): a b b in L$ 
+  - $underline(text("Passo ricorsivo")):$ se $u in L ==> a u b b in L$
+]
+
+#example()[
+  $L={a^n b^n bar n>=0}$
+  - $underline(text("Base")): epsilon in L$
+  - $underline(text("Passo ricorsivo")):$ se $ u in L ==> a u b in L$
+]
+
+#example()[
+  Stringhe su {a,b} che contengono lo stesso numero di $a$ e di $b$.\
+  $L={w in {a,b}^* bar |w|_a = |w|_b}$
+  - $underline(text("Base")): epsilon in L$ 
+  - $underline(text("Passo ricorsivo")):$ se $u, v in L ==> a u b v, b u a v in L$
+  Passi ricorsivi errati:
+  - $underline(text("Passo ricorsivo")):$ se $u in L ==> u a b in L$
+  - $underline(text("Passo ricorsivo")):$ se $u in L ==> b u a, a u b in L$
+]
+
+#example()[
+  L={a^i b^j bar 0 < i < j}
+  - $underline(text("Base")): a b b in L$
+  - $underline(text("Passo ricorsivo")):$ se $u in L ==> u b, a u b in L$
+  Supponiamo di voler ottenrere $a^5 b^8$\
+  Diventa: abb $=>$ aabbb $=>$ aaabbbb $=>$ aaaabbbbb $=>$ aaaaabbbbbb\
+  aaaaabbbbbbbb
+
+  $L'={a^i b^j bar i > j > 0}$
+  - $underline(text("Base")): a a b in L'$
+  - $underline(text("Passo ricorsivo")):$ se $u in L' ==> a u, a u b in L'$
+
+
+  $L''={a^i b^j bar i != j; quad i, j > 0}$\
+  $L'' = L union L'$
+  - $underline(text("Base")): a a b, a b b in L$
+  NON ESISTE MA vv
+  - #underline("Passo ricorsivo"): se $u in L ==> a u b in L$
+]
+
+=== Linguaggi (insiemi) regolari
+
+I lingaggi regolari su un alfabeto $Sigma$ sono definiti ricorsivamente a partire dagli elementi di base usando le operazioni di unione, concatenazione e chiusura.
+
+- #underline("Base"): $cases(emptyset "è un insieme regolare",
+                            {epsilon} "è un insieme regolare",
+                            forall t in Sigma\,space {t} "è un insieme regolare")$
+- #underline("Passo ricorsivo"): se $x$ e $y$ sono insiemi regolari, allora $x union y, x y, x^*, x^+$ sono regolari.
+- #underline("Chiusura"): un insieme è regolare se può essere ottenuto dagli elementi di base con appplicazioni del passo ricorsivo.
+
+#example()[
+  $L$ su ${a,b}$ in cui ogni b è preceduta da a.\
+  + ${a}$ è regolare
+  + ${b}$ è regolare
+  + ${a}^+$ è regolare
+  + ${a}^*$ è regolare
+  + ${a}^+{b}$ è regolare
+  + ${a}^+{b}{a}^*$ è regolare
+  + $({a}^+{b}{a}^*)^*$ è regolare
+]
+
+=== Espressioni regolari
+Notazione sintetica per i linguaggi regolari che operano sui singoli dell'alfabeto.
+- Un imbolo $t$ rappresenta il linguaggio composto dal simbolo stesso: ${t}$;
+- $epsilon$ rappresenta ${epsilon}$
+- $emptyset$ rappresennta $emptyset$
+
+se $x$ e $y$ sono due espressioni regolari e $L_x$ e $L_y$ i linguaggi corrispondenti, gli operatori applicabili in ordine di priorità decrescente sono:\
+\
+#set math.cases(reverse: true)
+$display(cases("1. chiusura di " x\, x^*\, "indica" (L_x)^*,
+       "2. chiusura di " x\, x^+\, "indica" (L_x)^+))
+x^+=x x^* =x^* x$
+
+#set math.cases(reverse: false)
+
+3. concatenazione di x e y, $x y$, indica $L_x L_y$
++ unione di x e y, $x + y$ oppure $x | y$, indica $L_x union L_y$
++ opzionalità di x, $[x]$ oppure $x?$, indica $L_x union {epsilon} ==> x? = x | epsilon$
+
+==== Proprietà
+
+- #text(red)[Unione]:
+  + Commutativa: $x | y = y | x$;
+  + Associativa: $x | (y | z) = (x | y) | z$.
+- #text(red)[Concatenazione]:
+  + Distributiva rispetto all'unione: $x(y | z) = x y | x z$;
+  + Associativa: $x (y z) = (x y) z$;
+  + Elemento neutro: $epsilon x = x epsilon = x$;
+- #text(red)[Chiusura]:
+  + $epsilon in x^* quad x^*=(x | epsilon)^*$
+  + Idempotenza: $(x^*)^* = x^*$
+\
+#example()[
+  + $(a a)^*$: corrisponde a una stringa con $n space a$, dove $n>=0$ è pari\
+  + $(a a)^+$: uguale alla precedente, però stavolta niente stringa vuota. $(n>0)$
+  + $(a | b)^*$: una qualsiasi sequenza di $a$, $b$ o stringa vuota
+  + $(b | a b)^*$: non ci sono $a$ consecutive
+  + $((a | b)(a | b))^* => (a(a | b) | b(a | b))^* => (a a | a b | b a | b b)^*$: tutte stringhe di lunghezza pari 
 ]
