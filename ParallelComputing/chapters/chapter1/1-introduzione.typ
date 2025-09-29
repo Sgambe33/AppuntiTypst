@@ -159,17 +159,16 @@ A un livello più alto, framework come *TensorFlow/PyTorch* (per il machine lear
 - *PRAM (Parallel Random Access Machine)*: estensione del RAM per computer paralleli, con più unità di esecuzione che accedono a una memoria globale condivisa. Questo modello è irrealistico perché non rappresenta correttamente il comportamento della memoria, portando a previsioni di performance errate.
 - *CTA (Candidate Type Architecture)*: un modello più realistico che distingue esplicitamente tra riferimenti a memoria locale (economici) e non locale (costosi). Questo modello descrive correttamente sia le architetture a memoria condivisa che quelle a memoria distribuita.
 
-=== 4.2 Gerarchia della Memoria e Latenza
+=== Gerarchia della Memoria e Latenza
 
 La *latenza di memoria (λ)*, ovvero il ritardo per accedere a una memoria non locale, può essere da 2 a 5 ordini di grandezza superiore a quella della memoria locale. La gerarchia della memoria (L1, L2, L3 Cache, Main Memory, SSD) presenta velocità di accesso molto diverse.
 
 Sfruttare i *principi di località* (temporale, spaziale, sequenziale) è fondamentale: una buona località può migliorare le prestazioni di 10-100 volte, indipendentemente dal parallelismo. La gestione corretta della gerarchia di memoria, come nel modello CUDA che distingue tra *global memory* (lenta) e *shared memory* (veloce), è essenziale per nascondere la latenza e ottenere speedup significativi.
 
-== Capitolo 5: Metriche di Valutazione delle Prestazioni
+== Metriche di Valutazione delle Prestazioni
 
-=== 5.1 Metriche Fondamentali
-
-Per valutare le prestazioni, si usano diverse metriche:
+=== Metriche Fondamentali
+Un'applicazione può operare su valori organizzati come *stream* o come valori singoli. Per valutare le prestazioni, si usano diverse metriche:
 
 - *Latenza (Latency)*: tempo medio per elaborare un singolo elemento.
 - *Tempo di servizio (Service time)*: intervallo medio tra l'inizio dell'elaborazione di due elementi consecutivi di un flusso.
@@ -178,7 +177,7 @@ Per valutare le prestazioni, si usano diverse metriche:
 
 Mentre in un sistema sequenziale latenza e tempo di servizio coincidono, in un sistema parallelo possono differire: il tempo di servizio è la metrica più importante perché influenza direttamente il tempo di completamento.
 
-=== 5.2 Speedup ed Efficienza
+=== Speedup ed Efficienza
 
 Lo *Speedup (SP)* misura il miglioramento delle prestazioni di un algoritmo parallelo rispetto alla sua versione sequenziale, calcolato come *SP = ts / tP*, dove *ts* è il tempo di esecuzione sequenziale e *tP* è il tempo di esecuzione parallelo con *P* processori.
 - Uno speedup è *ideale o lineare* se *SP ≈ P*.
@@ -186,36 +185,32 @@ Lo *Speedup (SP)* misura il miglioramento delle prestazioni di un algoritmo para
 
 L'*Efficienza (EP)* misura quanto bene vengono utilizzati i processori, calcolata come *EP = SP / P*. Un'efficienza del 100% (*EP = 1*) corrisponde a uno speedup ideale.
 
-=== 5.3 Legge di Amdahl e Legge di Gustafson
+=== Legge di Amdahl e Legge di Gustafson
 
 La *Legge di Amdahl* (1967) afferma che lo speedup è limitato dalla frazione di codice che deve essere eseguita sequenzialmente (*f*). Lo speedup massimo ottenibile è *1/f*, indipendentemente dal numero di processori. Ad esempio, se il 95% di un programma è parallelizzabile (f=0.05), lo speedup non potrà mai superare 20 volte. Questa legge si applica quando la dimensione del problema è fissa (*strong scaling*).
 
 La *Legge di Gustafson* osserva che, in pratica, all'aumentare delle risorse computazionali, si tende ad aumentare anche la dimensione del problema. In questo scenario (*weak scaling*), la frazione sequenziale del lavoro spesso diminuisce in proporzione, permettendo uno speedup quasi lineare.
 La figura seguente mostra come lo speedup, secondo Gustafson, cambi in funzione della frazione parallelizzabile del codice.
 
-![Grafico dello speedup secondo la legge di Gustafson](https://i.imgur.com/k2e4xLg.png)
 *(Immagine basata sulla Figura 1.4 delle fonti)*
 
 In sintesi, la legge di Amdahl è rilevante quando l'obiettivo è ridurre il tempo di esecuzione per un carico di lavoro fisso, mentre quella di Gustafson si applica quando si vuole risolvere un problema più grande nello stesso tempo.
 
-=== 5.4 Scalabilità della Memoria
+=== Scalabilità della Memoria
 
 Oltre alla scalabilità del tempo di esecuzione, è cruciale la *scalabilità della memoria*. Se un'applicazione ha una parte dei dati che deve essere replicata su ogni processore, all'aumentare del numero di processori la memoria richiesta su ciascuno può crescere rapidamente fino a diventare un limite insormontabile. Una scalabilità della memoria limitata può impedire l'esecuzione di un programma, a differenza di una scalabilità del tempo di esecuzione limitata che lo rende solo più lento.
 La figura sottostante illustra questo concetto, mostrando come gli array replicati (R) crescano con il numero di processori, a differenza di quelli distribuiti (D).
 
-![Scalabilità della memoria con array distribuiti e replicati](https://i.imgur.com/gK9dY9N.png)
-*(Immagine basata sulla Figura 1.6 delle fonti)*
+== Creazione e Ottimizzazione di un Programma Parallelo
 
-== Capitolo 6: Creazione e Ottimizzazione di un Programma Parallelo
-
-=== 6.1 Processo di Parallelizzazione
+=== Processo di Parallelizzazione
 
 La creazione di un programma parallelo segue tipicamente tre passaggi:
 1. *Decomposizione*: suddividere il problema in task che possono essere eseguiti in parallelo, identificando le dipendenze tra di essi.
 2. *Assegnazione (Assignment)*: assegnare i task ai "lavoratori" (thread, processi) cercando di bilanciare il carico e ridurre la comunicazione.
 3. *Orchestrazione*: gestire la comunicazione, la sincronizzazione, la schedulazione dei task e l'organizzazione delle strutture dati per ridurre i costi e preservare la località dei dati.
 
-=== 6.2 Fonti di Perdita di Performance e Ottimizzazione
+=== Fonti di Perdita di Performance e Ottimizzazione
 
 Le principali cause di perdita di performance in un programma parallelo sono:
 - *Overhead*: costi aggiuntivi come la creazione e la distruzione di thread.
