@@ -7,4 +7,5 @@
   #pagebreak()
 
   #include "chapters/chapter1/1-introduzione.typ"
+  #include "chapters/chapter2/2-design-models.typ"
 ]
