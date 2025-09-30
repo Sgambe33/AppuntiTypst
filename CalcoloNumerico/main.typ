@@ -14,4 +14,5 @@
 
   #include "chapters/chapter1/1-introduzione.typ"
   #include "chapters/chapter2/2-sorgenti-errori.typ"
+  #include "chapters/chapter 3/3-chapter3.typ"
 ]

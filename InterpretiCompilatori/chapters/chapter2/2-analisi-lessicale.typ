@@ -1,15 +1,20 @@
 #import "../../../dvd.typ": *
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
+#import "@preview/cetz:0.4.2" as cetz: canvas, draw
 
+#pagebreak()
 = Analisi Lessicale
 
-=== Espressioni regolari
-Notazione sintetica per i linguaggi regolari che operano sui singoli dell'alfabeto.
-- Un imbolo $t$ rappresenta il linguaggio composto dal simbolo stesso: ${t}$;
-- $epsilon$ rappresenta ${epsilon}$
-- $emptyset$ rappresennta $emptyset$
+== Espressioni regolari
+#definition()[
+  Le espressioni regolari sono una notazione sintetica oer i linguaggi regolari ed operano sui simboli dell'alfabeto.
+  - Un simbolo $t$ rappresenta il linguaggio composto dal simbolo stesso: ${t}$;
+  - $epsilon$ rappresenta ${epsilon}$;
+  - $emptyset$ rappresennta $emptyset$;
+]
 
-se $x$ e $y$ sono due espressioni regolari e $L_x$ e $L_y$ i linguaggi corrispondenti, gli operatori applicabili in ordine di priorità decrescente sono:\
-\
+Se $x$ e $y$ sono due espressioni regolari e $L_x$ e $L_y$ i linguaggi corrispondenti, gli operatori applicabili in ordine di priorità decrescente sono:
+
 #set math.cases(reverse: true)
 $display(
   cases(
@@ -25,7 +30,7 @@ x^+=x x^* =x^* x$
 + unione di x e y, $x + y$ oppure $x | y$, indica $L_x union L_y$
 + opzionalità di x, $[x]$ oppure $x?$, indica $L_x union {epsilon} ==> x? = x | epsilon$
 
-==== Proprietà
+=== Proprietà
 
 - #text(red)[Unione]:
   + Commutativa: $x | y = y | x$;
@@ -37,7 +42,6 @@ x^+=x x^* =x^* x$
 - #text(red)[Chiusura]:
   + $epsilon in x^* quad x^*=(x | epsilon)^*$
   + Idempotenza: $(x^*)^* = x^*$
-#pagebreak()
 #example()[
   + $(a a)^*$: corrisponde a una stringa con $n space a$, dove $n>=0$ è pari\
   + $(a a)^+$: uguale alla precedente, però stavolta niente stringa vuota. $(n>0)$
@@ -45,8 +49,6 @@ x^+=x x^* =x^* x$
   + $(b | a b)^*$: non ci sono $a$ consecutive
   + $((a | b)(a | b))^* => (a(a | b) | b(a | b))^* => (a a | a b | b a | b b)^*$: tutte stringhe di lunghezza pari
 ]
-
-#line(length: 100%)
 
 #example()[
   + ${a, b}$, contengono $a b a quad ==> (a bar b)^* a b a (a bar b)^*$
@@ -71,32 +73,34 @@ x^+=x x^* =x^* x$
   $
 ]
 
-==== Espressioni regolari per gli identificatori di variabili
+=== Definizioni regolari
 
-$Sigma={A,B,dots,Z,a,b,dots,z,,0,1,dots,9,\_}$\
-$(A|B|dots|Z|a|b|dots|z|0|1|dots|9|\_)(A|B|dots|Z|a|b|dots|z|\_|0|1|dots|9)^*$
+Sia $Sigma={A,B,dots,Z,a,b,dots,z,,0,1,dots,9,\_}$ l'alfabeto di tutti i caratteri che possono essere contenuti in un identificatore di variabile. L'espressione regolare necessaria per verificare la correttezza di un identificatore è la seguente.
+$
+  (A|B|dots|Z|a|b|dots|z|0|1|dots|9|\_)(A|B|dots|Z|a|b|dots|z|\_|0|1|dots|9)^*
+$
 
 #definition()[
   Una *definizione regolare* è una sequenza finita di definizioni come segue:
   $
     d_1 -> r_1 \
     d_2 -> r_2 \
-    dots -> dots \
+    dots.v \
     d_8 -> r_8 \
     d_9 -> r_9 \
-    dots -> dots \
+    dots.v \
     d_n -> r_n \
   $
-  dove $d_i$ è un simbolo nuovo rispetto a $overline(Z) (d_i in.not overline(Z))$ e ogni $r_i$ è un'espressione regolare su $overline(Z) union {d_1, dots, d_(i-1)}$ con $i = 1,dots,n$
+  dove $d_i$ è un simbolo nuovo rispetto a $Sigma (d_i in.not Sigma)$ e ogni $r_i$ è un'espressione regolare su $Sigma union {d_1, dots, d_(i-1)}$ con $i = 1,dots,n$
 ]
 
-Tornando all'esempio precedente, si può fare:
+Tornando all'esempio precedente, si può ottimizzare:
 - letter $=> A|B|dots|Z|a|b|dots|z|\_$
 - digit  $=> 0|1|dots|9$
 - $id =>$ $"letter"("letter"|"digit")^*$
 
 #example()[
-  *Costanti numeriche senza segno*\
+  Per validare le *costanti numeriche senza segno* possiamo usare:\
   $Sigma={0|1|dots|9|.|+|-|"E"}$\
   $"digit" -> 0|1|dots|9$\
   $"digits" -> cancel("digit digit"^*) space space "digit"^+$\
@@ -104,17 +108,31 @@ Tornando all'esempio precedente, si può fare:
   $"optionalExponent" -> epsilon | "E"(epsilon,+,-)"digits"$\
   $"number" -> "digits optionalFraction optionalExponent"$
 ]
-===== Convenzioni su definizioni regolari
 
-$
-  [a b c] "sta per" a|b|c
-$
-Se i caratteri formano una sequenza logica:
-$
-  "allora: "[A-Z] "sta per" A|B|dots|Z\
-  "es." [0-9] "sta per" [0 1 2 dots 9] "che sta per" 0|1|dots|9\
-  "es." [a-z] "sta per" [a b c dots z] "che sta per" a|b|dots|z
-$
+=== Estensioni delle espressioni regolari
+
+Dopo l'introduzione delle espressione regolari sono state proposte ed introdotte estensioni utili a migliorare la capacità espressiva delle espressioni regolari.
+Alcune delle estensioni introdotte da alcuni programmi UNIX sono:
++ *Una o più occorrenze*: l'operatore unitario post-fisso '+' indica la chiusura positiva di un'espressione regolare e del linguaggio ad essa associato $(r: "regex", r^+ " denota "L(r)^+)$. Si può anche vedere com'è legata alla chiusura di Kleene dalle leggi algebriche:
+  - $r^* = r^+ | epsilon$
+  - $r^+=r r^* = r^* r$
+  L'operatore '$+$' ha la stessa precedenza e associatività dell'operatore '$*$';
+
++ *Zero o una occorrenza*: l'operatore unitario post-fisso '?' indica l'opzionale presenza dell'operando a cui viene applicato (Quindi: $r? " equivale a " r|epsilon " oppure " L(r)?=L(r) union L(epsilon)$). Come il precedente, ha la stesa precedenza e associatività dell'operatore '$*$';
++ *Classi di caratteri*: un'espressione regolare come $a_1 bar a_2 bar ... bar a_n$ in cui i simboli $a_i$ appratengono all'alfabeto $Sigma$ può essere sostituita dalla forma compatta $[a_1, a_2, ..., a_n]$. Inoltre, quando i simboli formano una sequenza logica, per esempio lettere maiuscole, lettere minuscole o cifre, si può ulteriormente sintetizzare l'espressione scrivendola come $a_1 - a_n$.
+
+#example()[
+  $
+    [a b c] "sta per" a|b|c
+  $
+  Se i caratteri formano una sequenza logica:
+  $
+    "allora: "[A-Z] "sta per" A|B|dots|Z\
+    "es." [0-9] "sta per" [0 1 2 dots 9] "che sta per" 0|1|dots|9\
+    "es." [a-z] "sta per" [a b c dots z] "che sta per" a|b|dots|z
+  $
+]
+
 Adesso possiamo allora ridefinire digit, digits e number
 $
   "digit" => [0-9]\
@@ -123,6 +141,12 @@ $
 $
 #pagebreak()
 == Definizione della grammatica
+
+Una grammatica ha quattro componenti ($G (V,Sigma,P,S)$):
++ Un insieme di *simboli terminali* ($Sigma$): Questo corrisponde quindi all'alfabeto usato dalla grammatic per definire un lingaggio. I simboli terminali vengono anche definiti *token*;
++ Un insieme di *simboli non-terminali* ($V$): o "variabili sintattiche".
++ Un insieme di *produzioni* ($P$): o regole. L'obiettivo di base di una produzione 
++ Un *simbolo iniziale*, scelto tra i non-terminali della grammatica
 
 #definition()[
   G - grammatica\
@@ -175,5 +199,79 @@ $
 W è una frase di G se:
 $
   S =>^* W quad "e" quad W in Sigma^+\
-  L("G")={W in Sigma^* bar S =>^+ W}
+  L("G")={W in Sigma^bar S =>^+ W}
 $
+
+
+== Buffering dell'ingresso
+
+Siccome il codice sorgente di ogni programma risiede in memoria secondaria, e di conseguenza anche tutti i suoi simboli/token, risulta costoso accervi per l'analisi. Per questo motivo si usano dei buffer nella RAM.
+
+Uno dei sistemi più utilizzati si basa su due buffer di dimensione $N$, dove $N$ di solito ha la stessa dimensione di un blocco del disco, per esempio 4096 byte. Con una singola operazione di lettura è possibile leggere un intero blocco di $N$ caratteri (molto meglio di $N$ letture di singoli caratteri). Quando meno di $N$ caratteri rimangono nel file, il carattere *eof* segnala la fine del file.
+
+Per la gestione del buffer si usano due puntatori:
+- _*lexemeBegin*_: indica l'indirizzo del lessema corrente, la cui lunghezza deve essere determinata.
+- _*forward*_: si sposta in avanti finché non si riconosce un lessema corrispondente a un pattern.0-9
+
+Una volta individuato il lessema, si sposta il puntatore _forward_ sul carattere immediatamente alla destra del lessema stesso. Quindi, dopo che tale lessema è stato memorizzato come attributo di token, il puntatore _lexemeBegin_ viene spostato immediatamente dopo il lessema appena trovato.
+
+//TODO: Copiare immagini da PDF
+
+Per poter spostare avanti il puntatore _forward_ è necessario prima verificare se si è raggiunta la fine di uno dei due buffer. In questo caso si deve ricaricare l'altro buffer con i caratteri letti dal file sorgente e spostare _forward_ all'inizio del buffer appena riempito. Affinché ciò avvenga senza problemi è necessario che la lunghezza di un lessema più il numero di caratteri letti in anticipo non superi la dimensione $N$ di ogni buffer, in caso contrario si sovrascriverebbe l'inizio di un lessema prima di avere finito di riconoscerlo.
+
+
+
+$
+  #let elements = ("A", none, none, none, "E", none, "=", none, "M", $"*"$, "C", $"*"$, $"*"$, "2", "eof", none, none, none, none, none)
+
+  #cetz.canvas(length: 25pt, {
+    import draw: line, content, rect
+    draw.rect((-0.5,0.5), (19.5, 1.5))
+    for i in range(1, elements.len()) {
+      if (i != 10) {
+        draw.line((i - 0.5, 0.5), (i - 0.5, 1.5), stroke: (dash: "dotted"))
+      } else {
+        draw.line((i - 0.5, 0.5), (i - 0.5, 1.5))
+      }
+    }
+
+    for i in range(0, elements.len()) {
+      content((i, 1), elements.at(i))
+    }
+  })
+  #linebreak()
+  #let elements = ("A", none, none, none, "E", none, "=", none, "M", $"*"$, "eof", "C", $"*"$, $"*"$, "2", "eof", none, none, none, none, none, "eof")
+
+  #cetz.canvas(length: 25pt, {
+    import draw: line, content, rect
+    draw.rect((-0.5,0.5), (21.5, 1.5))
+    for i in range(1, elements.len()) {
+      if (i != 11) {
+        draw.line((i - 0.5, 0.5), (i - 0.5, 1.5), stroke: (dash: "dotted"))
+      } else {
+        draw.line((i - 0.5, 0.5), (i - 0.5, 1.5))
+      }
+    }
+
+    for i in range(0, elements.len()) {
+      content((i, 1), elements.at(i))
+    }
+  })
+$
+
+
+=== Sentinelle
+
+Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo _forward_ in avanti dovremmo verificare che non vada oltre la fine di uno dei due buffer. Quindi per ogni carattere dobbiamo effettuare due controlli: il primo per verificare se il puntatore ha raggiunto la fine del buffer e il secondo per verificare quale carattere è stato letto. Possiamo combinare i due test estendendo il buffer in modo da contenere un carattere che non può main comparire come parte di un programma sorgente: *eof* è perfetto. 
+
+```c
+  switch( *forward++){
+    case eof:
+      if(_forward_ è alla fine del primo buffer){
+        ricarica il secondo buffer
+        forward = 
+      }
+  }
+```
+
+

@@ -22,6 +22,7 @@ Sebbe i programmi compilati siano più veloci, gli interpreti sono più efficien
 
   #align(center, [Test.java $arrow.double$ Test.class])
 ]
+
 == Compilatori
 
 In realtà nella compilazione di un programma il compilatore è solo uno dei diversi software necessari ed utilizzati:
@@ -93,11 +94,11 @@ Un *alfabeto* è un insieme finito di *simboli* non vuoto. Ogni simbolo è un'en
 $
   Sigma = {a,b,c} space "oppure" space Sigma = {"if", "else", "then"}
 $
-Una *stringa* è invece una sequenza di simboli appartenenti ad un alfabeto $Sigma$:
+Una *stringa* di un dato alfabeto è definita come una sequenza di simboli presi da quell'alfabeto:
 $
   w = s_1, s_2, ..., s_n space "con" space s_i in Sigma, n<infinity
 $
-Una stringa vuota (non contiene simboli) si indica con $epsilon$?. Il numero dei simboli che compongono una stringa rappresenta la *lunghezza* e si indica con $abs(w)$, di conseguenza vale $abs(epsilon)=0$.
+Una stringa vuota, che non contiene simboli, si indica con $epsilon$. Il numero dei simboli che compongono una stringa rappresenta la sua *lunghezza* e si indica con $abs(w)$, di conseguenza vale $abs(epsilon)=0$.
 
 L'insieme di tutte le stringhe di lunghezza $k$ con $k gt.eq 0$ si indica con $Sigma^k$. $Sigma^0 = {epsilon}$.
 
@@ -143,11 +144,7 @@ La concatenazione di $u$ e $v$ restituisce una nuova stringa $"uv"$ definita com
 $
   "uv" = x_1 x_2 ... x_n y_1 y_2 ... y_k
 $
-
-- Non è commutativa
-- E' associativa
-
-Ovviamente la concatenazione può essere applicata a più di due stringhe.
+La stringa vuota ($epsilon$) è l'elemento neutro rispetto all'operazione di concatenamento, cioè $epsilon s = s epsilon = s$, per qualsiasi stringa $s$. Gode solo della proprietà associativa. Ovviamente la concatenazione può essere applicata a più di due stringhe.
 
 ==== Potenza
 
@@ -158,59 +155,81 @@ $
 
 ==== Reverse
 
-Semplicemente consiste nell'invertire l'ordine dei simboli nella stringa:
+L'operazione di _reverse_ consiste nell'invertire l'ordine dei simboli nella stringa:
 $
   u^R = x_n ... x_2 x_1
 $
 
 == Linguaggi
 
-Un linguaggio $L$ è un insieme di stringhe su $Sigma$:
+Un linguaggio $L$ è un insieme numerabile di stringhe di un dato alfabeto $Sigma$:
 $
   L subset.eq Sigma^*
 $
-//TODO: Lunghezza di un linguaggio....
 
-=== Operazioni sui linguaggi
-
-//TODO
-
+Essendo quindi i linguaggi degli insiemi, è possibile applicare le operazioni insiemistiche su di essi:
 - Concatenazione
 - Unione
 - Intersezione
-- Potenza
+- Differenza
 
-=== "chiusura di un linguaggio"
+==== Concatenazione
 
-$L^*$ è la chiusura di un linguaggio L. E' definita come l'unione di tutte le potenze n-esime di L con n gt.eq 0
+Dati due linguaggi $L_x$ e $L_y$, la loro concantenazione $L_x L_y$ è definita come:
+$
+  L_x L_y = {x y bar x in L_x and y in L_y }
+$
 
+==== Unione
+
+Dati due linguaggi $L_x$ e $L_y$, la loro unione $L_x union L_y$ è definita come:
+$
+  L_x union L_y = {z in Sigma^* bar z in L_x or z in L_y }
+$
+
+==== Intersezione
+
+Dati due linguaggi $L_x$ e $L_y$, la loro intersezione $L_x inter L_y$ è definita come:
+$
+  L_x inter L_y = {z bar z in L_x and z in L_y }
+$
+
+==== Differenza
+
+Dati due linguaggi $L_x$ e $L_y$, la loro differenza $L_x - L_y$ è definita come:
+$
+  L_x - L_y = {z in Sigma^* bar z in L_x and z in.not L_y }
+$
+
+=== Chiusura di un linguaggio
+
+$L^*$ è la chiusura di Kleene di un linguaggio $L$. E' l'insieme delle stringhe ottenute concatenando $L$ con se stesso zero o più volte:
 $
   L^* = union_(i gt.eq 0) L^i
 $
-Non c'è stringa vuota
 
-
-L^+ è la chiusura positiva
+$L^+$ è la chiusura positiva e coincide con la chiusura di Kleene a meno del termine $L^0$:
 $
   L^+ = union_(i gt 0) L^i
 $
-Potrebbe esserci la stringa vuota
+Questo significa che la stringa vuota $epsilon$ non appartiene a $L^+$ a meno che essa non appertenga a $L$ stesso.
 
-L^+ = LL^+ = L^+L
+#observation()[
+  $L^+ = LL^+ = L^+L$
+]
 
-$Sigma^*$ =$L(Sigma*)$ (linguaggio universale)
+Si definiscono inoltre:
+- $Sigma^* = L(Sigma*)$ (*linguaggio universale*)
+- $Sigma^+ = L(Sigma+)$ (*linguaggio universale positivo*)
+- $overline(L) = Sigma^* - L$ (*linguaggio complementare*)
 
-Sigma^+ = L(SImga+) (linguaggio universale positivo)
-
-Linguaggio complementare:
-L con barra sopra = $Sigma^*$ - L
+=== Definizione ricorsiva di linguaggio
 
 I linguaggi possono essere definiti ricorsivamente.
-- passo base:date k stringhe in L
-- passo ricorsivo: se j stringhe stanno in L, allora f(v1,v2, ..., vj) in L
+- #underline("Base"): date $k$ stringhe in $L$
+- #underline("Passo ricorsivo"): se $j$ stringhe stanno in $L$, allora $f(v_1,v_2, ..., v_j) in L$
 
-(chiusura?)
-Una stringa w sta in L solo se può essere ottenuta dagli elementi di base con un numero finito di applicazioni del passo ricorsivo.
+Una stringa $w$ sta in $L$ solo se può essere ottenuta dagli elementi di base con un numero finito di applicazioni del passo ricorsivo.
 
 #example()[
   Stringhe su {a,b} che iniziano con a e hanno lunghezza pari.

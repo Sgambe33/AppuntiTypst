@@ -221,3 +221,146 @@ $
     "overflow, se" abs(x) > r_2
   )
 $
+
+// Lezione del 30/09/2025
+= Standard IEEE-754
+
+Base binaria (b = 2).\
+Viene utilizzata una rappresentazione con arrotondamento "#text(red)[*round to even*]", ovvero, l'ultima cifra della mantissa rappresentata dalla funzione $f l$ è 0. Tuttavia, la maggiorazione dell'errore relativo di rappresentazione continua a valere.\
+Viene implementato un *gradual underflow*.\
+Pertanto, essendo la base binaria, la mantissa di un numero *normalizzato* sarà del tipo:
+$
+  1.bold(f), quad quad "con " f " la parte frazionaria"
+$
+Similmente, la mantissa di un numero *denormalizzato* sarà del tipo:
+$
+  0.bold(f), quad quad "con " f " la parte frazionaria"
+$
+Questi argomenti ci dicono che, sapendo se il numero è normalizzato o meno, non ne abbiamo bisogno di memorizzare la sua parte intera, ma è sufficiente memorizzare la sola *frazione $f$*, risparmiando quindi 1 bit.
+Lo standard prevede due tipi di numeri reali:
+- Singola precisione: 32 bit
+- Doppia precisione: 64 bit
+
+== Singola precisione
+
+In questo caso vengono allocati un totale di 4 byte (o 32 bit ripartiti nel seguente modo):
+- 1 bit per il segno dell mantissa;
+- 8 bit per l'esponente (s = 8);
+- 23 bit per la frazione $f$ (m = 24).
+$
+  #let colors = (yellow, gray, black, green)
+  #let tiles
+  #for value in (1, 8, 23) {
+    //rect(width: 3.125% * value, height: 20pt, fill: colors.at(calc.rem-euclid(value, 4)).transparentize(75%), stroke: black)
+    //rect(width: 3.125% * value, height: 20pt, fill: tiling(size: auto)[
+    //#place(line(start: (3.125% * value, 0pt), end: (3.125% * value, 20pt)))
+  //], stroke: black)
+  }
+$
+Da questo segue che la precisione di macchina (singola precisione IEEE-754) vale:
+$
+  u=1/2b^(1-m)=1/2 dot 2^(1-24)= 2^(-23) approx 10^(-7.5)
+$
+Il che vuole dire che lavoriamo con circa 7 cifre decimali significative.\
+Vediamo riguardo all'esponente. Con 8 cifre binarie, si possono rappresentare tutti gl interi in ${0, 1, dots, 255}$. Pertanto, $0 <= e <= 255$. In particolare, se:
+
+- Se $0 < e < 255$, allora il numero è *normalizzato* e lo *shift* vale $nu=123$;
+- Se $e=f=0$, allora abbiamo la rappresentazione dello *0*;
+- Se $e=0 and f eq.not 0$, allora il numero è *denormalizzato* e lo *shift* vale $nu=122$.
+
+#pagebreak()
+
+#observation()[
+  La variazione di shift, quando is denormalizza, si spiega osservando che il più piccolo numero denormalizzato (positivo) è:
+  $
+    1.0dots 0 dot 2^(1-123)=2^(-122)
+  $
+  Invece, il più grande numero denormalizzato (positivo) è:
+  $
+    1.1dots 1 dot 2^(1-123)=2^(-122)
+  $
+  Pertanto, i due numeri sono *contigui*.
+]
+
+Se $e=255$ e $f=0$, allora abbiamo:
+$
+  + space infinity, "se " alpha_0=0\
+  - space infinity, "se " alpha_0=1
+$
+Se $e=255$ e $f eq.not 0$, allora abbiamo: NaN (Not a Number).\
+Questo è, ad esempio, originato da forme indeterminate del tipo:
+- $infinity - infinity$
+- $0 dot infinity$
+- $infinity / infinity$
+- $0/0$
+
+== Doppia precisione
+
+In quesoto caso vengono utilizzati 8 byte (64 bit) per rappresentare un numero in doppia precisione. Questi sono così ripartiti:
+- 1 bit per il segno della mantissa $space space $ (grigio);
+- 11 bit per l'esponente (2 = 11 ------ giallo);
+- 52 bit per la frazione $f$ (m = 53 --- verde).
+
+$
+  #let colors = (green, gray, black, yellow)
+  #for value in (1, 11, 52) {
+    rect(width: 1.5625% * value, height: 20pt, fill: colors.at(calc.rem-euclid(value, 4)).transparentize(75%), stroke: black)
+  }
+$
+
+#observation()[
+  In questo caso la precisione di macchina vale: $u=1/2b^(1-m)=1/2 dot 2^(1-53) = 2^(-53) approx 10^(-16)$\
+  Il che vuole dire che lavoriamo con circa 16 cifre decimali significative.\
+  Da quanto esposto, $e in {0, 1, dots, 2047}$.
+]
+
+In modo sostanzialmente analogoal caso della singola precisione, si ha che:
+- Se $0< e < 2047$, allora il numero è normalizzto e lo shift vale $nu=1023$.
+- Se $e=f=0$, allora abbiamo la rappresentazione dello *0*;
+- Se $e=0 and f eq.not 0$, allora il numero è *denormalizzato* e lo *shift* vale $nu=1022$.
+
+Se $e=2047$ e $f=0$, allora abbiamo:
+$
+  + space infinity, "se " alpha_0=0\
+  - space infinity, "se " alpha_0=1
+$
+Se $e=2047$ e $f eq.not 0$, allora abbiamo: NaN (Not a Number).\
+
+#pagebreak()
+
+= Aritmetica finita
+
+Se esguiamo operazioni algebrice $(+, -, *, \/) in.rev plus.circle$, allora:
+$
+  forall x, y in RR: quad x plus.circle y quad = quad f l(f l (x) plus.circle f l(y))
+$
+Questo implica che, di norma, le proprietà algebriche delle operazioni (associatività, distributività, etc...) non valgono più.
+
+= Conversione fra tipi diversi
+
+$x$ variabile in doppia precisione;\
+$y$ variabile in singola precisione.\
+$pi$ doppia precisione (3.141592653)\
+$
+  cases(
+    x=pi,
+    y=x
+  )
+$
+allora $y$ conterrà $pi$ con la massima accuratezza consentita alla singola precisione.
+Viceversa:
+$
+  cases(
+    y=pi,
+    x=y
+  )
+$
+allora $x$ conterrà $pi$ con l'accuratezza della singola precisione.
+Inoltre:
+  - $x=1"E "308, quad quad quad x "dà " 9.99dots 9E space 308$
+  - $y=1"E "308, quad quad quad y "dà " infinity$
+
+Talora è necessario convertire anche tra numeri di tipo reale e tipo intero.\
+La conversione intero $-->$ reale, in genere, è innocua, a parte il fatto che in genere non si ha più un intero. Questo è dovuta dal fatto che il range di rappresentazione dei numeri interi è più ristretto di quello dei numeri reali ($cal(I)$).\
+Il *viceversa non è vero*, perché $cal(I)$ è generalmente molto più ampio dell'insieme di rappresentabilità del tipo intero.\
+Nel caso del filmato di Ariane V, il problema è stato originato dalla assegnazione di una variabile in doppia precisionee, legata alla componente tangenziale della velocità, ad una variabile intera di 2 byte!!! Quindi, se il numero è maggiore di 32767, si ha un errore.
