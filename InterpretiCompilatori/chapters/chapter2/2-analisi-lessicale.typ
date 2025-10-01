@@ -202,6 +202,67 @@ $
   L("G")={W in Sigma^bar S =>^+ W}
 $
 
+==== Derivazione destra/sinistra
+#definition()[
+  $S=>^*beta$ è una *derivazione destra/sinistra* se ad ogni passo viene applicata una regola alla variabile più a destra/sinistra:
+  $
+    S=>^*w in Sigma^+
+  $
+]
+
+#set math.cases(reverse: true)
+#example()[
+  $
+    &V &&Sigma \
+    G=({E&, I}, {+, *, (, )&&, a, b, 0, 1}, E, P) quad quad space space 
+  $
+  $
+    "Produzioni":cases(
+      &E->I | &&E+E | E*E | (E)\
+      &I->a | &&b | I a | I b | I 0 | I 1
+    ) "Costruzione di espressioni"
+  $
+  Ad esempio, per derivare 
+  $
+    &underbracket("ab")* &&underbracket(("b01"+ "ab"))\
+    & E && quad space space space E
+  $ come si fa?
+  $
+    #let end = "ab*b01+ab"
+   &E = E*E => I*E => I"b" * E => "ab"*E => "ab" * (E) => "ab"*(E+E) =>\
+   => & "ab"*(I+E) =>"ab"*(I"1"+E) =>"ab"*(I"01"+E) => "ab"*("b01"+E) =>\
+   => & "ab"*("b01"+I) => "ab"*("b01"+I"b") => "ab"*"b01"+"ab"
+  $
+]
+#set math.cases(reverse: false)
+
+#definition("Completezza")[
+  Sia $w in L$ (palindromo), allora $w in L(G)$, cioè esiste $S=>^*w$
+]
+- *#underline("Dimostrazione")*: Induzione su $|w|$
+- *#underline("Base")*: se $|w|=0, |w|=1, quad $allora $w=epsilon, w=0, w=1$
+- *#underline("Ipotesi induttiva")*: Supponiamo che se $|w| <= n$, allora esiste $S=>^+w (n>1)$\ 
+  $|w|=n+1$\
+  $w=0 x 0, $oppure $w=1 x 1$, con $x$ che è palindromo ($in L; |x| = |w| - 2$)
+  $S=> 0 S 0 =>^+ 0 x 0 = w$
+  Esiste quindi la derivazione da $S$ a $w$.
+
+#text(size:12pt, stroke: 0.5pt)[Correttezza]\
+Per induzione sul numero di passi della derivazione
+- *#underline("Base")*: Se $|"deriv"|=1$ allora otteno $epsilon, 0, 1 in L$
+- *#underline("Ipotesi induttiva")*: Se $|"deriv"|=n$ allora $S=+w, space w in L$\ 
+
+  $S=>0 S 0=>^+ 0 "x" 0$
+
+#example()[
+  + Stringhe su ${a,b}$ che *iniziano con $a$* e hanno *lunghezza pari*\
+    $S->"ab"|"aa"|S"aa"|S"ab"|S"ba"|"Sbb"$\
+    aa, ab $ in L$\
+    se $u in L$, allora uaa, uab, uba, ubb $in L$
+  + Ogni *$b$* è *preceduta da $a$*\
+    $Sigma in L quad quad quad quad quad quad u in L$ allora ua, uab $in L$\
+    $S -> epsilon | "Sa" | "Sab"$
+]
 
 == Buffering dell'ingresso
 
@@ -220,7 +281,7 @@ Una volta individuato il lessema, si sposta il puntatore _forward_ sul carattere
 Per poter spostare avanti il puntatore _forward_ è necessario prima verificare se si è raggiunta la fine di uno dei due buffer. In questo caso si deve ricaricare l'altro buffer con i caratteri letti dal file sorgente e spostare _forward_ all'inizio del buffer appena riempito. Affinché ciò avvenga senza problemi è necessario che la lunghezza di un lessema più il numero di caratteri letti in anticipo non superi la dimensione $N$ di ogni buffer, in caso contrario si sovrascriverebbe l'inizio di un lessema prima di avere finito di riconoscerlo.
 
 
-
+1
 $
   #let elements = ("A", none, none, none, "E", none, "=", none, "M", $"*"$, "C", $"*"$, $"*"$, "2", "eof", none, none, none, none, none)
 
@@ -259,7 +320,6 @@ $
   })
 $
 
-
 === Sentinelle
 
 Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo _forward_ in avanti dovremmo verificare che non vada oltre la fine di uno dei due buffer. Quindi per ogni carattere dobbiamo effettuare due controlli: il primo per verificare se il puntatore ha raggiunto la fine del buffer e il secondo per verificare quale carattere è stato letto. Possiamo combinare i due test estendendo il buffer in modo da contenere un carattere che non può main comparire come parte di un programma sorgente: *eof* è perfetto. 
@@ -273,5 +333,3 @@ Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo 
       }
   }
 ```
-
-

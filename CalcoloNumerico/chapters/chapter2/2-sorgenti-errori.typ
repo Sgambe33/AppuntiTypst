@@ -1,4 +1,5 @@
 #import "../../../dvd.typ": *
+#import "@preview/cetz:0.4.2" as cetz: canvas, draw
 
 = Sorgenti di errore
 
@@ -364,3 +365,121 @@ Talora è necessario convertire anche tra numeri di tipo reale e tipo intero.\
 La conversione intero $-->$ reale, in genere, è innocua, a parte il fatto che in genere non si ha più un intero. Questo è dovuta dal fatto che il range di rappresentazione dei numeri interi è più ristretto di quello dei numeri reali ($cal(I)$).\
 Il *viceversa non è vero*, perché $cal(I)$ è generalmente molto più ampio dell'insieme di rappresentabilità del tipo intero.\
 Nel caso del filmato di Ariane V, il problema è stato originato dalla assegnazione di una variabile in doppia precisionee, legata alla componente tangenziale della velocità, ad una variabile intera di 2 byte!!! Quindi, se il numero è maggiore di 32767, si ha un errore.
+
+= Condizionamento di un problema
+
+Supponiamo di voler calcolare la soluzione di un problema che, formalmente, poniamo essere descritto da:
+$
+  y=f(x)
+$
+dove:
+- $x$ contiene i dati in ingresso;
+- $y$ contiene il risultato atteso;
+- $f$ contiene la descrizione formale del problema
+
+Assumiamo inoltre che $x,y in RR " e " f:RR ->RR$.
+
+$
+  #canvas({
+    import draw: circle, content
+    content((-1.75,1.5), $X$)
+    circle((0,0), radius:2)
+    circle((8,0), radius:2)
+    content((9.75,1.5), $Y$)
+    content((0,0.5), $x$, name: "x")
+    content((0,-0.5), $tilde(x)$, name: "xt")
+    content((9.75,1.5), $y$, name: "y")
+    content((9.75,1.5), $tilde(y)$, name: "yt1")
+    content((9.75,1.5), $tilde(y)$, name: "yt2")
+  })
+$
+
+In generale, al posto di *x*, avremo un dato perturbato *$tilde(x)$* e, se usiamo un calcolatore, per via dell'utilizzo dell'aritmetica finita, avremo una funzione perturbata, *$tilde(f)$*, invece di *f*. Questo fornirà un risultato perturbato:
+$
+  tilde(y)=tilde(f)(tilde(x))
+$
+
+#observation()[
+  Tuttavia, analizzare la differenza tra il risultato fornito dalla precedente, rispetto alla iniziale, è in generale complesso. Pertanto, ci limiteremo a studiare il problema, assai più semplice, $tilde(y)=f(tilde(x))$
+]
+Ovvero, studiamo le amplificazioni di perturbazionisui dati in ingresso, utilizzando un'*aritmetica esatta*. Lo studio della differenza tra il risultato fornito da (3), invece che dalla (1), costituisce l'*analisi del conzionamento del problema* (1). Se $y eq.not 0$, l'analisi è più efficace se fatta rispetto agli errori relativi.\
+Pertanto, porremo
+$
+  tilde(y)=y(1+epsilon_y), quad "con "epsilon_y "l'errore relativo sul risultato"\
+  tilde(x)=x(1+epsilon_x), quad "con "epsilon_x "l'errore relativo sul dato in ingresso"
+$
+e, supponendo *$epsilon_x approx 0$*, vogliamo stabilire in che modo *$epsilon_x $ si propaga su $epsilon_y$*.
+
+Sostituendo le (4) nella (3), otteniamo che:
+$
+  tilde(y)=underbracket((1+epsilon_y))&=f(tilde(x))=f(x(1+epsilon_x))\
+  cancel(y)+y epsilon_x&= cancel(f(x))+f'(x)x epsilon_x+ O(epsilon_x^2)\
+
+  &=>epsilon_y approx f'(x)x/y epsilon_x\
+  =>|epsilon_y| <=K dot |epsilon_x|, quad quad "con "K=bar &(f'(x))/y x bar "detto nunmero di condizione del problema"
+$
+Diremo, pertanto, che il problema (1) è:
+- *ben condizionato*, se $K approx 1$;
+- *mal condizionato*, se $K >> 1$;
+
+#observation()[
+  Se utilizziamo un'aritmetica finita con precisione di macchina $u$, allora avremo che $|epsilon_x|>=u ==> K approx u^(-1)$, allora non ho speranza id ottenere risultati con una qualche accuratezza, poiché $|epsilon_y| approx 1$
+]
+
+== Condizionamento delle operazioni algebriche elementari
+
+=== Moltiplicazione
+$
+  & quad quad quad space y         &&= x_1 dot x_2 quad quad "esatta, mentre perturbando"\
+  &y(1+epsilon_y) &&=x_1(1+epsilon_1) dot x_2(1+epsilon_2)\
+  & space space y+y epsilon_y  &&=x_1 dot x_2(1+epsilon_1+epsilon_2+epsilon_1 dot epsilon_2)\
+  &               &&approx x_1 dot x_2(1+epsilon_1 + epsilon_2)\
+  =>& quad space  1 + epsilon_y &&approx 1+epsilon_1+epsilon_2\
+  =>& quad quad space |epsilon_y| &&<= 2 max{|epsilon_1|, |epsilon_2|}
+$
+Concludiamo che la moltiplicazione è sempre *ben condizionato*, poiché il numero di conizionamento è 2.
+
+=== Divisione
+#observation()[
+  Se $|gamma|<1 => Sigma_(i>=0) gamma^i = 1/(1-gamma)$\
+  Pertanto $gamma -> - epsilon => 1/(1+epsilon)=Sigma_(i>=0) (-epsilon)^i = 1 - epsilon+O(epsilon^2)$
+]
+
+$
+   &y &&= x_1/x_2 quad quad "e la perturbazione"\
+   & y(1+epsilon_y) &&=  (x_1(1+epsilon_1))/(x_2(1+epsilon_2)) = x_1/x_2 (1+epsilon_1)(1-epsilon_2 + O(epsilon_2^2))\
+   & &&approx x_1/x_2(1+epsilon_1-epsilon_2)\
+   =>&1+epsilon_y &&approx 1+epsilon_1-epsilon_2=>|epsilon_y|<=2 max{|epsilon_1|, |epsilon_2|} 
+$
+Anche la divisione è *ben condizionata* (quindi è al pari della moltiplicazione), avendo numero di condizione 2.
+
+=== Somma algebrica
+
+$
+  &y &&= x_1+x_2 quad quad "che, perturbato, dà"\
+  &y(1+epsilon_y) &&=x_1(1+epsilon_1)+x_2(1+epsilon_2)\
+  &cancel(y)+y epsilon_y &&=cancel(x_1+x_2)+x_1epsilon_1+x_2epsilon_2\
+  &"Divideno membro a membro per "y&&=x_1+x_2 "otteniamo:"\
+  &epsilon_y &&= (x_1epsilon_1x_2epsilon_2)/(x_1+x_2)\
+  &"da cui:"\
+  &|epsilon_y| &&<= (|x_1|+|x_2|)/(|x_1+x_2|) dot max{|epsilon_1|,|epsilon_2|}
+$
+Pertanto, il numero di condizione del problema è
+$
+  k=(|x_1|+|x_2|)/(|x_1+x_2|)
+$
+#pagebreak()
+Quindi:
+- se *$x_1 dot x_2 >0$ (addendi concordi)* => $|x_1+x_2|=|x_1|+|x_2| =>k=1$\ da cui si conclude che la *somma di numeri concordi* è *sempre ben condizionata*;
+- se *$x_1 dot x_2 <0$ (addendi discordi)* => in questo caso il denominatore di k non è limitato superiormente e, quando $x_2 approx -x_1$, k può essere arbitrariamente grande. La somma di numeri discordi è, perciò, *mal condizionata*. Questo malcondizionamento si conretizza nel fenomeno della cosidetta *cancellazione numerica*, in cui anche avendo addendi completamente accurati, il risultato può essere del tutto inaccurato.
+
+Come esempio di cancellazione numerica:
+$
+  & #text(size:10pt)[err. di troncamento]\
+  f'(x)=(f(x+epsilon)-f(x))/epsilon + &overbrace((epsilon))
+$
+Ad esempio:
+$
+  f(x)=x^10, quad quad x=1 => f'(1)=10
+  //TODO: finire l'esempio quando carica il suo poema di pertanto (tabella con eps)
+$
