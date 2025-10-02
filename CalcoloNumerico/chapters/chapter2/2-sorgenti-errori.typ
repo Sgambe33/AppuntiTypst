@@ -255,7 +255,7 @@ $
     //rect(width: 3.125% * value, height: 20pt, fill: colors.at(calc.rem-euclid(value, 4)).transparentize(75%), stroke: black)
     //rect(width: 3.125% * value, height: 20pt, fill: tiling(size: auto)[
     //#place(line(start: (3.125% * value, 0pt), end: (3.125% * value, 20pt)))
-  //], stroke: black)
+    //], stroke: black)
   }
 $
 Da questo segue che la precisione di macchina (singola precisione IEEE-754) vale:
@@ -298,7 +298,7 @@ Questo è, ad esempio, originato da forme indeterminate del tipo:
 == Doppia precisione
 
 In quesoto caso vengono utilizzati 8 byte (64 bit) per rappresentare un numero in doppia precisione. Questi sono così ripartiti:
-- 1 bit per il segno della mantissa $space space $ (grigio);
+- 1 bit per il segno della mantissa $space space$ (grigio);
 - 11 bit per l'esponente (2 = 11 ------ giallo);
 - 52 bit per la frazione $f$ (m = 53 --- verde).
 
@@ -339,9 +339,7 @@ Questo implica che, di norma, le proprietà algebriche delle operazioni (associa
 
 = Conversione fra tipi diversi
 
-$x$ variabile in doppia precisione;\
-$y$ variabile in singola precisione.\
-$pi$ doppia precisione (3.141592653)\
+Siano $x$, $pi$ (3.141592653) e $y$ variabili rispettivamente in doppia precisione, in doppia precisione e in singola precisione:
 $
   cases(
     x=pi,
@@ -358,13 +356,13 @@ $
 $
 allora $x$ conterrà $pi$ con l'accuratezza della singola precisione.
 Inoltre:
-  - $x=1"E "308, quad quad quad x "dà " 9.99dots 9E space 308$
-  - $y=1"E "308, quad quad quad y "dà " infinity$
+- $x=1"E "308, quad quad quad x "dà " 9.99dots 9E space 308$
+- $y=1"E "308, quad quad quad y "dà " infinity$
 
 Talora è necessario convertire anche tra numeri di tipo reale e tipo intero.\
 La conversione intero $-->$ reale, in genere, è innocua, a parte il fatto che in genere non si ha più un intero. Questo è dovuta dal fatto che il range di rappresentazione dei numeri interi è più ristretto di quello dei numeri reali ($cal(I)$).\
 Il *viceversa non è vero*, perché $cal(I)$ è generalmente molto più ampio dell'insieme di rappresentabilità del tipo intero.\
-Nel caso del filmato di Ariane V, il problema è stato originato dalla assegnazione di una variabile in doppia precisionee, legata alla componente tangenziale della velocità, ad una variabile intera di 2 byte!!! Quindi, se il numero è maggiore di 32767, si ha un errore.
+Nel caso del filmato di Ariane V, il problema è stato originato dalla assegnazione di una variabile in doppia precisionee, legata alla componente tangenziale della velocità, ad una variabile intera di 2 byte. Quindi, se il numero è maggiore di 32767, si ha un errore.
 
 = Condizionamento di un problema
 
@@ -379,18 +377,27 @@ dove:
 
 Assumiamo inoltre che $x,y in RR " e " f:RR ->RR$.
 
+//TODO: Finire grafico
 $
   #canvas({
-    import draw: circle, content
-    content((-1.75,1.5), $X$)
-    circle((0,0), radius:2)
-    circle((8,0), radius:2)
-    content((9.75,1.5), $Y$)
-    content((0,0.5), $x$, name: "x")
-    content((0,-0.5), $tilde(x)$, name: "xt")
-    content((9.75,1.5), $y$, name: "y")
-    content((9.75,1.5), $tilde(y)$, name: "yt1")
-    content((9.75,1.5), $tilde(y)$, name: "yt2")
+    import draw: arc, circle, content
+    let dark-blue = rgb("#4040d9")
+    let arrow-style = (
+      mark: (end: "stealth", fill: dark-blue, scale: .5),
+      stroke: (paint: dark-blue, thickness: 0.75pt),
+    )
+
+    content((-1.75, 1.5), $X$)
+    circle((0, 0), radius: 2)
+    circle((8, 0), radius: 2)
+    content((9.75, 1.5), $Y$)
+    content((0, 0.5), $x$, name: "x")
+    content((0, -0.5), $tilde(x)$, name: "xt")
+    content((8.0, 0.5), $y$, name: "y")
+    content((8.0, -0.5), $tilde(y)$, name: "yt")
+
+    arc((rel: (1, 0.2), to: "x"), radius: 0.85 * 4, start: 145deg, stop: 40deg, ..arrow-style, name: "momentum-arrow")
+    content("momentum-arrow.mid", text(fill: dark-blue)[$f$], anchor: "south")
   })
 $
 
@@ -408,15 +415,14 @@ $
   tilde(y)=y(1+epsilon_y), quad "con "epsilon_y "l'errore relativo sul risultato"\
   tilde(x)=x(1+epsilon_x), quad "con "epsilon_x "l'errore relativo sul dato in ingresso"
 $
-e, supponendo *$epsilon_x approx 0$*, vogliamo stabilire in che modo *$epsilon_x $ si propaga su $epsilon_y$*.
+e, supponendo *$epsilon_x approx 0$*, vogliamo stabilire in che modo *$epsilon_x$ si propaga su $epsilon_y$*.
 
 Sostituendo le (4) nella (3), otteniamo che:
 $
-  tilde(y)=underbracket((1+epsilon_y))&=f(tilde(x))=f(x(1+epsilon_x))\
-  cancel(y)+y epsilon_x&= cancel(f(x))+f'(x)x epsilon_x+ O(epsilon_x^2)\
-
-  &=>epsilon_y approx f'(x)x/y epsilon_x\
-  =>|epsilon_y| <=K dot |epsilon_x|, quad quad "con "K=bar &(f'(x))/y x bar "detto nunmero di condizione del problema"
+                      tilde(y)=underbracket((1+epsilon_y)) & =f(tilde(x))=f(x(1+epsilon_x)) \
+                                     cancel(y)+y epsilon_x & = cancel(f(x))+f'(x)x epsilon_x+ O(epsilon_x^2) \
+                                                           & =>epsilon_y approx f'(x)x/y epsilon_x \
+  =>|epsilon_y| <=K dot |epsilon_x|, quad quad "con "K=bar & (f'(x))/y x bar "detto nunmero di condizione del problema"
 $
 Diremo, pertanto, che il problema (1) è:
 - *ben condizionato*, se $K approx 1$;
@@ -430,12 +436,12 @@ Diremo, pertanto, che il problema (1) è:
 
 === Moltiplicazione
 $
-  & quad quad quad space y         &&= x_1 dot x_2 quad quad "esatta, mentre perturbando"\
-  &y(1+epsilon_y) &&=x_1(1+epsilon_1) dot x_2(1+epsilon_2)\
-  & space space y+y epsilon_y  &&=x_1 dot x_2(1+epsilon_1+epsilon_2+epsilon_1 dot epsilon_2)\
-  &               &&approx x_1 dot x_2(1+epsilon_1 + epsilon_2)\
-  =>& quad space  1 + epsilon_y &&approx 1+epsilon_1+epsilon_2\
-  =>& quad quad space |epsilon_y| &&<= 2 max{|epsilon_1|, |epsilon_2|}
+     & quad quad quad space y      && = x_1 dot x_2 quad quad "esatta, mentre perturbando" \
+     & y(1+epsilon_y)              && =x_1(1+epsilon_1) dot x_2(1+epsilon_2) \
+     & space space y+y epsilon_y   && =x_1 dot x_2(1+epsilon_1+epsilon_2+epsilon_1 dot epsilon_2) \
+     &                             && approx x_1 dot x_2(1+epsilon_1 + epsilon_2) \
+  => & quad space 1 + epsilon_y    && approx 1+epsilon_1+epsilon_2 \
+  => & quad quad space |epsilon_y| && <= 2 max{|epsilon_1|, |epsilon_2|}
 $
 Concludiamo che la moltiplicazione è sempre *ben condizionato*, poiché il numero di conizionamento è 2.
 
@@ -446,23 +452,23 @@ Concludiamo che la moltiplicazione è sempre *ben condizionato*, poiché il nume
 ]
 
 $
-   &y &&= x_1/x_2 quad quad "e la perturbazione"\
-   & y(1+epsilon_y) &&=  (x_1(1+epsilon_1))/(x_2(1+epsilon_2)) = x_1/x_2 (1+epsilon_1)(1-epsilon_2 + O(epsilon_2^2))\
-   & &&approx x_1/x_2(1+epsilon_1-epsilon_2)\
-   =>&1+epsilon_y &&approx 1+epsilon_1-epsilon_2=>|epsilon_y|<=2 max{|epsilon_1|, |epsilon_2|} 
+     & y              && = x_1/x_2 quad quad "e la perturbazione" \
+     & y(1+epsilon_y) && = (x_1(1+epsilon_1))/(x_2(1+epsilon_2)) = x_1/x_2 (1+epsilon_1)(1-epsilon_2 + O(epsilon_2^2)) \
+     &                && approx x_1/x_2(1+epsilon_1-epsilon_2) \
+  => & 1+epsilon_y    && approx 1+epsilon_1-epsilon_2=>|epsilon_y|<=2 max{|epsilon_1|, |epsilon_2|}
 $
 Anche la divisione è *ben condizionata* (quindi è al pari della moltiplicazione), avendo numero di condizione 2.
 
 === Somma algebrica
 
 $
-  &y &&= x_1+x_2 quad quad "che, perturbato, dà"\
-  &y(1+epsilon_y) &&=x_1(1+epsilon_1)+x_2(1+epsilon_2)\
-  &cancel(y)+y epsilon_y &&=cancel(x_1+x_2)+x_1epsilon_1+x_2epsilon_2\
-  &"Divideno membro a membro per "y&&=x_1+x_2 "otteniamo:"\
-  &epsilon_y &&= (x_1epsilon_1x_2epsilon_2)/(x_1+x_2)\
-  &"da cui:"\
-  &|epsilon_y| &&<= (|x_1|+|x_2|)/(|x_1+x_2|) dot max{|epsilon_1|,|epsilon_2|}
+  & y                                && = x_1+x_2 quad quad "che, perturbato, dà" \
+  & y(1+epsilon_y)                   && =x_1(1+epsilon_1)+x_2(1+epsilon_2) \
+  & cancel(y)+y epsilon_y            && =cancel(x_1+x_2)+x_1epsilon_1+x_2epsilon_2 \
+  & "Divideno membro a membro per "y && =x_1+x_2 "otteniamo:" \
+  & epsilon_y                        && = (x_1epsilon_1x_2epsilon_2)/(x_1+x_2) \
+  & "da cui:" \
+  & |epsilon_y|                      && <= (|x_1|+|x_2|)/(|x_1+x_2|) dot max{|epsilon_1|,|epsilon_2|}
 $
 Pertanto, il numero di condizione del problema è
 $
@@ -473,13 +479,15 @@ Quindi:
 - se *$x_1 dot x_2 >0$ (addendi concordi)* => $|x_1+x_2|=|x_1|+|x_2| =>k=1$\ da cui si conclude che la *somma di numeri concordi* è *sempre ben condizionata*;
 - se *$x_1 dot x_2 <0$ (addendi discordi)* => in questo caso il denominatore di k non è limitato superiormente e, quando $x_2 approx -x_1$, k può essere arbitrariamente grande. La somma di numeri discordi è, perciò, *mal condizionata*. Questo malcondizionamento si conretizza nel fenomeno della cosidetta *cancellazione numerica*, in cui anche avendo addendi completamente accurati, il risultato può essere del tutto inaccurato.
 
-Come esempio di cancellazione numerica:
-$
-  & #text(size:10pt)[err. di troncamento]\
-  f'(x)=(f(x+epsilon)-f(x))/epsilon + &overbrace((epsilon))
-$
-Ad esempio:
-$
-  f(x)=x^10, quad quad x=1 => f'(1)=10
-  //TODO: finire l'esempio quando carica il suo poema di pertanto (tabella con eps)
-$
+#example("Cancellazione numerica")[
+  Come esempio di cancellazione numerica:
+  $
+    f'(x)=(f(x+epsilon)-f(x))/epsilon + & overbrace((epsilon), "err. di troncamento")
+  $
+  Ad esempio:
+  $
+    f(x)=x^10, quad quad x=1 => f'(1)=10
+    //TODO: finire l'esempio quando carica il suo poema di pertanto (tabella con eps)
+  $
+]
+
