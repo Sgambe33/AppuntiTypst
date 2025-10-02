@@ -303,6 +303,15 @@ $alpha ==>^*gamma$
   + Ogni *$b$* è *preceduta da $a$*\
     $Sigma in L quad quad quad quad quad quad u in L$ allora ua, uab $in L$\
     $S -> epsilon | "Sa" | "Sab"$
+
+  + Stringhe su {a,b} di lunghezze dispari in cui il primo carattere e quello centrale sono uguale:
+    $
+      & L = {w in {"a,b"}^* |w = "axay"  && or w="bxby con" |y|=|x|+1} \
+      & S->"aA | bB " quad quad "oppure" && S-> "aAX" | "bBX" \
+      & A-> "XAX" | "aX"                 && A-> "XAX" | "a" \
+      & A-> "XBX" | "bX"                 && B-> "XBX" | "b" \
+      & X-> "a | b"                      && X-> "a | b"
+    $
 ]
 
 == Buffering dell'ingresso
@@ -360,7 +369,101 @@ Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo 
     case eof:
       if(forward è alla fine del primo buffer){
         ricarica il secondo buffer
-        forward =
+        forward = inizio del secondo buffer;
+      }else if (forward è alla fine del secondo buffer) {
+        ricarica il primo buffer;
+        forward = inizio del primo buffer;
       }
+      else { /* eof nel mezzo di un buffer indica la fine del file */
+        termina l analisi;
+      }
+      break;
+    /* casi per gli altri caratteri */
   }
 ```
+
+
+= Grammatiche regolari
+
+Così chiamate perché i linguaggi generati sono rappresentabili tramite espressioni regolari. La differenza con le grammatiche context-free è il come sono definite le produzioni. Qui possono avere la seguente forma:
+$
+  & X --> a Y                       && (X->Y a) \
+  & X --> a \
+  & X --> epsilon \
+  & "con "X,Y in V " e " a in Sigma
+$
+
+Le forme di frase saranno del tipo:
+$
+  S=>^*w X quad "con" quad w in Sigma^*, space X in V
+$
+ovvero con quanti terminali voglio (anche zero) e poi una variabile.
+
+#example(multiple: true)[
+  + Stringhe su {a,b} di lunghezza pari. Se io volessi usare una grammatica regolare:
+    $
+      & |w|= "pari": S \
+      & |w|= "dispari": D
+    $
+    Assegno delle variabili alle due condizioni.
+    - Se la derivazione produce $S$ abbiamo finito.
+    - Se produce $D$, devo aggiungere $a$ o $b$.
+    $
+      & S->epsilon | a D | b D \
+      & D->a S | b S
+    $
+  2. Stringhe su {a,b} che contengono tre *$a$* consecutive:
+    - $w$ non contiene "aaa" e termina con b: $S$\
+    - $w$ non contiene "aaa" e termina con a: $A$\
+    - $w$ non contiene "aaa" e termina con baa: $B$\
+    - $w$ contiene "aaa": $C$
+    $
+      & S->b S | a A \
+      & A -> a B | b S \
+      & B -> a C | b S \
+      & C -> epsilon | a C | b C
+    $
+  3. Stringhe su {a,b} che non contengono tre *$a$* consecutive:
+  4. Stringhe su {a,b} che non cominciano con "aaa":
+  5. Stringhe su {a,b} che non contengono "aba" usando una grammatica regolare:
+  6. Stringhe su {a,b} in cui ogni $a$ è preceduta o seguita da $b$:
+  7. Stringhe su {a,b} con un numero pari di $a$ e $b$:
+  8. Stringhe su {a,b} con un numero pari di $a$ o un numero dispari di $b$:
+  9. Stringhe su {a,b} di lunghezza dispari che contengono esattamente due $b$:
+  10. Stringhe su {a,b} in cui "aa" occorre esattamente una volta:
+  11. Stringhe su {a,b} in cui "aa" occorre almeno due volte:
+]
+
+= Gerarchie di Chomsky (classificazione delle grammatiche)
+
+0. *Grammatiche senza restrizioni (a struttura di frase)*
++ *Grammatiche contestuali*
++ *Grammatiche non contestuali (context-free)*
++ *Grammatiche regolari*
+
+#align(center, [Le grammatiche si differenziano in base alla forma delle loro produzioni.])
+
+== Grammatiche senza restrizioni (a struttura di frase)
+
+In questo tipo di grammatica, le produzioni hanno la seguente forma:
+$
+  alpha -> beta, quad alpha in (V union Sigma)^+ space " e " space beta in (V union Sigma)^*
+$
+Ovvero $alpha$ non può essere una stringa nulla. Ha senso chiedere che $alpha$ abbia almeno un non terminale:
+$
+  & alpha in (Sigma union V)^+ ?V (union?, "concatenato????")? (Sigma union V)^* \
+  & alpha, beta, gamma, S in (Sigma union V)^*, quad quad alpha in.not Sigma \
+  & gamma alpha S --> gamma beta S
+$
+
+== Grammatiche contestuali
+Hanno due possibili definizioni:
++ $alpha -> beta, quad alpha, beta in (Sigma union V)^+ space space (alpha in (Sigma union V)^* #text(stroke: .75pt)[?V?] (Sigma union V)^*) space " e " space |alpha|<=|beta|$
++ $alpha_1A alpha_2 --> alpha_1 beta alpha_2, quad quad "con " A in V, alpha_1,alpha_2,beta in (Sigma union V)^* space " e " space beta eq.not epsilon$
+
+== Grammatiche non contestuali e regolari
+Queste due sono state già precedentemente definite.
+#observation()[
+  Ogni grammatica di tipo $i$ è anche grammatica di tipo $i-1$.
+]
+
