@@ -56,28 +56,19 @@ jobs:
       run: |
         echo "Compiled PDFs:"
         ls -la compiled-pdfs/
-        
-    - name: Upload PDF artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: compiled-pdfs
-        path: compiled-pdfs/
-        retention-days: 30
-        
-    - name: Delete existing 'latest' release
-      run: |
-        gh release delete latest --yes || true
-        git tag -d latest || true
-        git push --delete origin latest || true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Create 'latest' release with PDFs
-      run: |
-        git tag latest || true
-        git push origin latest --force
-        gh release create latest compiled-pdfs/*.pdf \
-          --title "Latest Compiled PDFs" \
-          --notes "This release always contains the newest compiled Typst PDFs."
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  publish:
+    permissions: write-all
+    needs: compile-typst
+    name: Publish
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Publish build artifacts
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        automatic_release_tag: latest
+        title: latest
+        prerelease: false
+        files: compiled-pdfs/*.pdf
