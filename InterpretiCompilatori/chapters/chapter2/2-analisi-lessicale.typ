@@ -75,11 +75,6 @@ x^+=x x^* =x^* x$
 
 === Definizioni regolari
 
-Sia $Sigma={A,B,dots,Z,a,b,dots,z,,0,1,dots,9,\_}$ l'alfabeto di tutti i caratteri che possono essere contenuti in un identificatore di variabile. L'espressione regolare necessaria per verificare la correttezza di un identificatore è la seguente.
-$
-  (A|B|dots|Z|a|b|dots|z|0|1|dots|9|\_)(A|B|dots|Z|a|b|dots|z|\_|0|1|dots|9)^*
-$
-
 #definition()[
   Una *definizione regolare* è una sequenza finita di definizioni come segue:
   $
@@ -94,7 +89,12 @@ $
   dove $d_i$ è un simbolo nuovo rispetto a $Sigma (d_i in.not Sigma)$ e ogni $r_i$ è un'espressione regolare su $Sigma union {d_1, dots, d_(i-1)}$ con $i = 1,dots,n$
 ]
 
-Tornando all'esempio precedente, si può ottimizzare:
+Sia $Sigma={A,B,dots,Z,a,b,dots,z,0,1,dots,9,\_}$ l'alfabeto di tutti i caratteri che possono essere contenuti in un identificatore di variabile. L'espressione regolare necessaria per verificare la correttezza di un identificatore è la seguente.
+$
+  (A|B|dots|Z|a|b|dots|z|0|1|dots|9|\_)(A|B|dots|Z|a|b|dots|z|\_|0|1|dots|9)^*
+$
+
+Usando le definizioni regolari si può ottimizzare:
 - letter $=> A|B|dots|Z|a|b|dots|z|\_$
 - digit  $=> 0|1|dots|9$
 - $id =>$ $"letter"("letter"|"digit")^*$
@@ -113,10 +113,25 @@ Tornando all'esempio precedente, si può ottimizzare:
 
 Dopo l'introduzione delle espressione regolari sono state proposte ed introdotte estensioni utili a migliorare la capacità espressiva delle espressioni regolari.
 Alcune delle estensioni introdotte da alcuni programmi UNIX sono:
-+ *Una o più occorrenze*: l'operatore unitario post-fisso '+' indica la chiusura positiva di un'espressione regolare e del linguaggio ad essa associato $(r: "regex", r^+ " denota "L(r)^+)$. Si può anche vedere com'è legata alla chiusura di Kleene dalle leggi algebriche:
++ *Una o più occorrenze*: l'operatore unitario post-fisso '+' indica la chiusura positiva di un'espressione regolare e del linguaggio ad essa associato $(r: "espressione regolare", r^+ " denota "L(r)^+)$. Si può anche vedere com'è legata alla chiusura di Kleene dalle leggi algebriche:
   - $r^* = r^+ | epsilon$
   - $r^+=r r^* = r^* r$
   L'operatore '$+$' ha la stessa precedenza e associatività dell'operatore '$*$';
+
+  #observation()[
+    $r^+=r r^* = r^* r$ è una propietà importante delle espressioni regolari che può essere dimostrata.
+
+    #proof()[
+      Ricordando le definizioni di chiusura di Kleene e chiusura positiva:
+      $
+        r^* = {epsilon} union r union r r union r r r union ...= union.big_(n gt.eq 0) r^n \
+        r^+ = r union r r union r r r union ...= union.big_(n gt 0) r^n
+      $
+      + $r r^* = r dot union.big_(n gt.eq 0) r^n = union.big_(n gt.eq 0) r dot r^n = union.big_(n gt.eq 0) r^(n+1) = union.big_(m gt 0) r^m = r^+$
+      + $r^*r = (union.big_(n gt.eq 0) r^n) r= union.big_(n gt.eq 0) r^n dot r = union.big_(n gt.eq 0) r^(n+1) = union.big_(m gt 0) r^m = r^+$
+    ]
+  ]
+
 
 + *Zero o una occorrenza*: l'operatore unitario post-fisso '?' indica l'opzionale presenza dell'operando a cui viene applicato (Quindi: $r? " equivale a " r|epsilon " oppure " L(r)?=L(r) union L(epsilon)$). Come il precedente, ha la stesa precedenza e associatività dell'operatore '$*$';
 + *Classi di caratteri*: un'espressione regolare come $a_1 bar a_2 bar ... bar a_n$ in cui i simboli $a_i$ appratengono all'alfabeto $Sigma$ può essere sostituita dalla forma compatta $[a_1, a_2, ..., a_n]$. Inoltre, quando i simboli formano una sequenza logica, per esempio lettere maiuscole, lettere minuscole o cifre, si può ulteriormente sintetizzare l'espressione scrivendola come $a_1 - a_n$.
@@ -133,7 +148,7 @@ Alcune delle estensioni introdotte da alcuni programmi UNIX sono:
   $
 ]
 
-Adesso possiamo allora ridefinire digit, digits e number
+Adesso possiamo allora ridefinire digit, digits e number:
 $
   "digit" => [0-9]\
   "digits" => "digit"^+\
@@ -142,34 +157,41 @@ $
 #pagebreak()
 == Definizione della grammatica
 
-Una grammatica ha quattro componenti ($G (V,Sigma,P,S)$):
-+ Un insieme di *simboli terminali* ($Sigma$): Questo corrisponde quindi all'alfabeto usato dalla grammatic per definire un lingaggio. I simboli terminali vengono anche definiti *token*;
-+ Un insieme di *simboli non-terminali* ($V$): o "variabili sintattiche".
-+ Un insieme di *produzioni* ($P$): o regole. L'obiettivo di base di una produzione 
-+ Un *simbolo iniziale*, scelto tra i non-terminali della grammatica
-
 #definition()[
-  G - grammatica\
-  $(V,Sigma,P,S)$
+  $G=(V,Sigma,P,S)$ grammatica *context free*:
   - $Sigma$, alfabeto dei simboli terminali
   - $V$, l'insieme dei simboli non terminali ($V inter Sigma=nothing$)
-  - $P$,  l'insieme delle regole (produzioni)
+  - $P$,  l'insieme delle regole (produzioni) di tipo:
+    $A --> alpha$ dove $A in V$ e $alpha in (V union Sigma)^*$
   - $S in V$, simbolo iniziale
 ]
 
-#set math.cases(reverse: true)
-$
-  display(
-    cases(
-      A->alpha_1,
-      A->alpha_2,
-      dots->dots,
-      A->alpha_n
+Una grammatica ha quattro componenti ($G (V,Sigma,P,S)$):
++ Un insieme di *simboli terminali* ($Sigma$): Questo corrisponde quindi all'alfabeto usato dalla grammatic per definire un lingaggio. I simboli terminali vengono anche definiti *token*;
++ Un insieme di *simboli non-terminali* ($V$): o "variabili sintattiche".
++ Un insieme di *produzioni* ($P$): o regole. L'obiettivo di base di una produzione
++ Un *simbolo iniziale* ($S$): scelto tra i non-terminali della grammatica
+
+#observation()[
+  La parte sinistra di una produzione è sempre un singolo *non* terminale, da cui il nome *context-free*: la sostituzione non dipende dal contesto circostante.
+]
+
+#observation()[
+  Se ho più produzioni/regole, le posso scrivere in forma compatta:
+  $
+    display(
+      cases(
+        reverse: #true,
+        A->alpha_1,
+        A->alpha_2,
+        dots->dots,
+        A->alpha_n
+      )
     )
-  )
-  A-->alpha_1|alpha_2|dots|alpha_n
-$
-#set math.cases(reverse: false)
+    A-->alpha_1|alpha_2|dots|alpha_n
+  $
+]
+
 
 === Derivazione
 
@@ -185,22 +207,32 @@ $alpha => beta_1 =>beta_2=>dots=>beta_n=gamma$\
 $alpha ==>^+gamma$\
 $alpha ==>^*gamma$
 
-#example()[
+#observation("Transitività derivazione")[
+  L'operazione di derivazione gode della proprietà transitiva:
   - $underline("Base"): alpha=>^*alpha$
-  - $underline("Induzione"): alpha =>^* beta quad "e" beta => gamma$
-  allora $alpha =>^* gamma$
+  - $underline("Induzione"): alpha =>^* beta " e " beta => gamma$ allora $alpha =>^* gamma$
 ]
-#line(length: 100%)
-G grammatica\
-$beta$ è una #underline("forma di frases") di G se e solo se:
-$
-  S =>^* beta quad quad quad quad (beta in (Sigma union V)^*)
-$
-W è una frase di G se:
-$
-  S =>^* W quad "e" quad W in Sigma^+\
-  L("G")={W in Sigma^bar S =>^+ W}
-$
+
+#definition()[
+  Una *forma di frase* è una qualsiasi stringa di simboli (cioè una sequenza di terminali e/o non terminali) che si può ottenere a partire dal simbolo iniziale $S$ applicando zero o più regole di produzione. Data $G$ grammatica:
+  $
+    beta "è una forma di frase di" G <==> S=>^* beta " e " beta in (V union Sigma)^*
+  $
+]
+
+#definition()[
+  Una *frase* è una forma di frase che contiene solo terminali.
+  $
+    W "è una di frase di" G <==> S=>^* W " e " W in Sigma^* "OPPURE " Sigma^+ "?????"
+  $
+]
+
+#definition()[
+  Il linguaggio generato da $G$ è l'insieme di tutte le frasi (stringhe di soli terminali) derivabili da $S$:
+  $
+    L("G")={W in Sigma^* bar S =>^+ W} "BOOOOH RIGUARDA SIMBOLI"
+  $
+]
 
 ==== Derivazione destra/sinistra
 #definition()[
@@ -210,54 +242,63 @@ $
   $
 ]
 
-#set math.cases(reverse: true)
 #example()[
   $
-    &V &&Sigma \
-    G=({E&, I}, {+, *, (, )&&, a, b, 0, 1}, E, P) quad quad space space 
+          & V                 && Sigma \
+    G=({E & , I}, {+, *, (, ) && , a, b, 0, 1}, E, P) quad quad space space
   $
   $
     "Produzioni":cases(
-      &E->I | &&E+E | E*E | (E)\
-      &I->a | &&b | I a | I b | I 0 | I 1
+      reverse: #true,
+      & E->I | && E+E | E*E | (E) \
+      & I->a | && b | I a | I b | I 0 | I 1
     ) "Costruzione di espressioni"
   $
-  Ad esempio, per derivare 
+  Ad esempio possiamo risalire alla sequenza di derivazioni per ottenere la seguente espressione:
   $
-    &underbracket("ab")* &&underbracket(("b01"+ "ab"))\
-    & E && quad space space space E
-  $ come si fa?
+    & underbracket("ab")* && underbracket(("b01"+ "ab")) \
+    & E                   && quad space space space E
   $
-    #let end = "ab*b01+ab"
-   &E = E*E => I*E => I"b" * E => "ab"*E => "ab" * (E) => "ab"*(E+E) =>\
-   => & "ab"*(I+E) =>"ab"*(I"1"+E) =>"ab"*(I"01"+E) => "ab"*("b01"+E) =>\
-   => & "ab"*("b01"+I) => "ab"*("b01"+I"b") => "ab"*"b01"+"ab"
   $
+    #let end = "ab*b01+ab"; & E = E*E => I*E => I"b" * E => "ab"*E => "ab" * (E) => "ab"*(E+E) => \
+                         => & "ab"*(I+E) =>"ab"*(I"1"+E) =>"ab"*(I"01"+E) => "ab"*("b01"+E) => \
+                         => & "ab"*("b01"+I) => "ab"*("b01"+I"b") => "ab"*"b01"+"ab"
+  $
+
+  //TODO: manca l'albero di parsing
 ]
-#set math.cases(reverse: false)
 
 #definition("Completezza")[
   Sia $w in L$ (palindromo), allora $w in L(G)$, cioè esiste $S=>^*w$
 ]
-- *#underline("Dimostrazione")*: Induzione su $|w|$
-- *#underline("Base")*: se $|w|=0, |w|=1, quad $allora $w=epsilon, w=0, w=1$
-- *#underline("Ipotesi induttiva")*: Supponiamo che se $|w| <= n$, allora esiste $S=>^+w (n>1)$\ 
-  $|w|=n+1$\
-  $w=0 x 0, $oppure $w=1 x 1$, con $x$ che è palindromo ($in L; |x| = |w| - 2$)
-  $S=> 0 S 0 =>^+ 0 x 0 = w$
-  Esiste quindi la derivazione da $S$ a $w$.
 
-#text(size:12pt, stroke: 0.5pt)[Correttezza]\
-Per induzione sul numero di passi della derivazione
-- *#underline("Base")*: Se $|"deriv"|=1$ allora otteno $epsilon, 0, 1 in L$
-- *#underline("Ipotesi induttiva")*: Se $|"deriv"|=n$ allora $S=+w, space w in L$\ 
+#proof()[
+  Induzione su $|w|$
+  - *#underline("Base")*: se $|w|=0, |w|=1, quad$allora $w=epsilon, w=0, w=1$
+  - *#underline("Ipotesi induttiva")*: Supponiamo che se $|w| <= n$, allora esiste $S=>^+w (n>1)$\
+    $|w|=n+1$\
+    $w=0 x 0,$oppure $w=1 x 1$, con $x$ che è palindromo ($in L; |x| = |w| - 2$)
+    $S=> 0 S 0 =>^+ 0 x 0 = w$
+    Esiste quindi la derivazione da $S$ a $w$.
+]
 
-  $S=>0 S 0=>^+ 0 "x" 0$
+#definition("Correttezza")[
+  MANCANTE
+]
+
+#proof()[
+  Per induzione sul numero di passi della derivazione
+  - *#underline("Base")*: Se $|"deriv"|=1$ allora otteno $epsilon, 0, 1 in L$
+  - *#underline("Ipotesi induttiva")*: Se $|"deriv"|=n$ allora $S=+w, space w in L$\
+
+    $S=>0 S 0=>^+ 0 "x" 0$
+]
+
 
 #example()[
   + Stringhe su ${a,b}$ che *iniziano con $a$* e hanno *lunghezza pari*\
     $S->"ab"|"aa"|S"aa"|S"ab"|S"ba"|"Sbb"$\
-    aa, ab $ in L$\
+    aa, ab $in L$\
     se $u in L$, allora uaa, uab, uba, ubb $in L$
   + Ogni *$b$* è *preceduta da $a$*\
     $Sigma in L quad quad quad quad quad quad u in L$ allora ua, uab $in L$\
@@ -276,60 +317,50 @@ Per la gestione del buffer si usano due puntatori:
 
 Una volta individuato il lessema, si sposta il puntatore _forward_ sul carattere immediatamente alla destra del lessema stesso. Quindi, dopo che tale lessema è stato memorizzato come attributo di token, il puntatore _lexemeBegin_ viene spostato immediatamente dopo il lessema appena trovato.
 
-//TODO: Copiare immagini da PDF
+//TODO: Aggiungere frecce o copiare immagini da libro
+$
+  #let elements = ("A", none, none, none, "E", none, "=", none, "M", $"*"$, "C", $"*"$, $"*"$, "2", "eof", none, none, none, none, none)
+  #cetz.canvas(length: 25pt, {
+    import draw: content, line, rect
+    draw.rect((-0.5, 0.5), (19.5, 1.5))
+    for i in range(1, elements.len()) {
+      if (i != 10) { draw.line((i - 0.5, 0.5), (i - 0.5, 1.5), stroke: (dash: "dotted")) } else {
+        draw.line((i - 0.5, 0.5), (i - 0.5, 1.5))
+      }
+    }
+
+    for i in range(0, elements.len()) { content((i, 1), elements.at(i)) }
+  })
+  #linebreak()
+  #let elements = ("A", none, none, none, "E", none, "=", none, "M", $"*"$, "eof", "C", $"*"$, $"*"$, "2", "eof", none, none, none, none, none, "eof")
+  #cetz.canvas(length: 25pt, {
+    import draw: content, line, rect
+    draw.rect((-0.5, 0.5), (21.5, 1.5))
+    for i in range(1, elements.len()) {
+      if (i != 11) { draw.line((i - 0.5, 0.5), (i - 0.5, 1.5), stroke: (dash: "dotted")) } else {
+        draw.line((i - 0.5, 0.5), (i - 0.5, 1.5))
+      }
+    }
+
+    for i in range(0, elements.len()) { content((i, 1), elements.at(i)) }
+  })
+$
 
 Per poter spostare avanti il puntatore _forward_ è necessario prima verificare se si è raggiunta la fine di uno dei due buffer. In questo caso si deve ricaricare l'altro buffer con i caratteri letti dal file sorgente e spostare _forward_ all'inizio del buffer appena riempito. Affinché ciò avvenga senza problemi è necessario che la lunghezza di un lessema più il numero di caratteri letti in anticipo non superi la dimensione $N$ di ogni buffer, in caso contrario si sovrascriverebbe l'inizio di un lessema prima di avere finito di riconoscerlo.
 
 
-1
-$
-  #let elements = ("A", none, none, none, "E", none, "=", none, "M", $"*"$, "C", $"*"$, $"*"$, "2", "eof", none, none, none, none, none)
 
-  #cetz.canvas(length: 25pt, {
-    import draw: line, content, rect
-    draw.rect((-0.5,0.5), (19.5, 1.5))
-    for i in range(1, elements.len()) {
-      if (i != 10) {
-        draw.line((i - 0.5, 0.5), (i - 0.5, 1.5), stroke: (dash: "dotted"))
-      } else {
-        draw.line((i - 0.5, 0.5), (i - 0.5, 1.5))
-      }
-    }
-
-    for i in range(0, elements.len()) {
-      content((i, 1), elements.at(i))
-    }
-  })
-  #linebreak()
-  #let elements = ("A", none, none, none, "E", none, "=", none, "M", $"*"$, "eof", "C", $"*"$, $"*"$, "2", "eof", none, none, none, none, none, "eof")
-
-  #cetz.canvas(length: 25pt, {
-    import draw: line, content, rect
-    draw.rect((-0.5,0.5), (21.5, 1.5))
-    for i in range(1, elements.len()) {
-      if (i != 11) {
-        draw.line((i - 0.5, 0.5), (i - 0.5, 1.5), stroke: (dash: "dotted"))
-      } else {
-        draw.line((i - 0.5, 0.5), (i - 0.5, 1.5))
-      }
-    }
-
-    for i in range(0, elements.len()) {
-      content((i, 1), elements.at(i))
-    }
-  })
-$
 
 === Sentinelle
 
-Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo _forward_ in avanti dovremmo verificare che non vada oltre la fine di uno dei due buffer. Quindi per ogni carattere dobbiamo effettuare due controlli: il primo per verificare se il puntatore ha raggiunto la fine del buffer e il secondo per verificare quale carattere è stato letto. Possiamo combinare i due test estendendo il buffer in modo da contenere un carattere che non può main comparire come parte di un programma sorgente: *eof* è perfetto. 
+Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo _forward_ in avanti dovremmo verificare che non vada oltre la fine di uno dei due buffer. Quindi per ogni carattere dobbiamo effettuare due controlli: il primo per verificare se il puntatore ha raggiunto la fine del buffer e il secondo per verificare quale carattere è stato letto. Possiamo combinare i due test estendendo il buffer in modo da contenere un carattere che non può main comparire come parte di un programma sorgente: *eof* è perfetto.
 
 ```c
-  switch( *forward++){
+  switch(*forward++){
     case eof:
-      if(_forward_ è alla fine del primo buffer){
+      if(forward è alla fine del primo buffer){
         ricarica il secondo buffer
-        forward = 
+        forward =
       }
   }
 ```

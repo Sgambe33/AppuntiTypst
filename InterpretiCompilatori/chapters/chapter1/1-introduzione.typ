@@ -173,28 +173,28 @@ Essendo quindi i linguaggi degli insiemi, è possibile applicare le operazioni i
 - Intersezione
 - Differenza
 
-==== Concatenazione
+=== Concatenazione
 
 Dati due linguaggi $L_x$ e $L_y$, la loro concantenazione $L_x L_y$ è definita come:
 $
   L_x L_y = {x y bar x in L_x and y in L_y }
 $
 
-==== Unione
+=== Unione
 
 Dati due linguaggi $L_x$ e $L_y$, la loro unione $L_x union L_y$ è definita come:
 $
   L_x union L_y = {z in Sigma^* bar z in L_x or z in L_y }
 $
 
-==== Intersezione
+=== Intersezione
 
 Dati due linguaggi $L_x$ e $L_y$, la loro intersezione $L_x inter L_y$ è definita come:
 $
   L_x inter L_y = {z bar z in L_x and z in L_y }
 $
 
-==== Differenza
+=== Differenza
 
 Dati due linguaggi $L_x$ e $L_y$, la loro differenza $L_x - L_y$ è definita come:
 $
