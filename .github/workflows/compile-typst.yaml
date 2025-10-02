@@ -8,6 +8,7 @@ on:
 
 jobs:
   compile-typst:
+    permissions: write-all
     runs-on: ubuntu-latest
     
     steps:
@@ -57,13 +58,6 @@ jobs:
         echo "Compiled PDFs:"
         ls -la compiled-pdfs/
 
-  publish:
-    permissions: write-all
-    needs: compile-typst
-    name: Publish
-    runs-on: ubuntu-latest
-
-    steps:
     - name: Publish build artifacts
       uses: marvinpinto/action-automatic-releases@latest
       with:
@@ -71,4 +65,5 @@ jobs:
         automatic_release_tag: latest
         title: latest
         prerelease: false
-        files: compiled-pdfs/*.pdf
+        files: |
+          compiled-pdfs/*.pdf
