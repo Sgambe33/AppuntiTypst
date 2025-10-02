@@ -171,7 +171,7 @@
   namefmt: x => [(#x)],
   titlefmt: strong,
   bodyfmt: x => x,
-  separator: [#h(0.1em).#h(0.2em) \ ],
+  separator: [#h(0.1em)#h(0.2em) \ ], //Opzione per il separatore dopo il titolo della sezione
   base: "heading",
   base-level: none,
 ) = {
@@ -258,7 +258,10 @@
 #let observation = observation-style("observation", "Osservazione").with(numbering: none)
 #let example-style = builder-thmline(color: colors.at(16))
 
-#let example = example-style("example", "Esempio").with(numbering: none)
+#let example(identifier: "example", multiple: false, ..args) = {
+  let name = if multiple { "Esempi" } else { "Esempio" }
+  example-style(identifier, name, ..args).with(numbering: none)(..args)
+}
 
 #let proof(body, name: none) = {
   thmtitle[Dimostrazione]
