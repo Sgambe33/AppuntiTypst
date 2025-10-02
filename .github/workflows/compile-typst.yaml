@@ -1,12 +1,9 @@
 name: Compile Typst Documents
 
 on:
-  # push:
-  #   branches: [ main, master ]
-  #   paths: [ '**/*.typ' ]
-  # pull_request:
-  #   branches: [ main, master ]
-  #   paths: [ '**/*.typ' ]
+  push:
+    branches: [ main, master ]
+    paths: [ '**/*.typ' ]
   workflow_dispatch:
 
 jobs:
@@ -67,10 +64,20 @@ jobs:
         path: compiled-pdfs/
         retention-days: 30
         
-    - name: Upload to release (on tags)
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
-      with:
-        files: compiled-pdfs/*.pdf
+    - name: Delete existing 'latest' release
+      run: |
+        gh release delete latest --yes || true
+        git tag -d latest || true
+        git push --delete origin latest || true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create 'latest' release with PDFs
+      run: |
+        git tag latest || true
+        git push origin latest --force
+        gh release create latest compiled-pdfs/*.pdf \
+          --title "Latest Compiled PDFs" \
+          --notes "This release always contains the newest compiled Typst PDFs."
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
