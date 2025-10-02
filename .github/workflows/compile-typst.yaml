@@ -1,62 +1,71 @@
 name: Compile Typst Documents
 
 on:
-  push:
-    branches: [ main, master ]
-    paths: [ '**/*.typ' ]
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 */2 * *"
 
 jobs:
   compile-typst:
     permissions: write-all
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
+      with:
+        fetch-depth: 0
+
+    - name: Check for new commits since last run
+      id: check-commits
+      run: |
+        # Find last successful run (if any)
+        last_run=$(gh run list --workflow "Compile Typst Documents" --json createdAt,status,conclusion \
+          --jq '[.[] | select(.status=="completed" and .conclusion=="success")][0].createdAt' || echo "")
+
+        if [ -z "$last_run" ]; then
+          echo "No previous successful run found. Proceeding..."
+          echo "new_commits=true" >> $GITHUB_OUTPUT
+        else
+          echo "Last successful run was at: $last_run"
+          # Check for new commits in default branch since last run
+          if git log --since="$last_run" --oneline | grep .; then
+            echo "New commits found."
+            echo "new_commits=true" >> $GITHUB_OUTPUT
+          else
+            echo "No new commits since last run. Skipping build."
+            echo "new_commits=false" >> $GITHUB_OUTPUT
+          fi
+        fi
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Stop if no new commits
+      if: steps.check-commits.outputs.new_commits == 'false'
+      run: |
+        echo "Skipping workflow — no new commits since last run."
+        exit 0
+
     - name: Install Typst
       run: |
         wget https://github.com/typst/typst/releases/latest/download/typst-x86_64-unknown-linux-musl.tar.xz
         tar -xf typst-x86_64-unknown-linux-musl.tar.xz
         sudo mv typst-x86_64-unknown-linux-musl/typst /usr/local/bin/
         typst --version
-        
+
     - name: Find and compile Typst documents
       run: |
-        # Create output directory
         mkdir -p compiled-pdfs
-        
-        # Find all main.typ files
         find . -name "main.typ" -type f | while read -r file; do
           echo "Processing: $file"
-          
-          # Get the directory path without ./
           dir_path=$(dirname "$file" | sed 's|^\./||')
-          
-          # Convert path to PDF name: replace spaces and slashes with underscores
           pdf_name=$(echo "$dir_path" | sed 's|/|_|g' | sed 's| |_|g')
-          
-          # Handle root directory case
-          if [ "$pdf_name" = "." ] || [ -z "$pdf_name" ]; then
-            pdf_name="main"
-          fi
-          
-          # Compile the document
+          [ -z "$pdf_name" ] || [ "$pdf_name" = "." ] && pdf_name="main"
           typst compile --root . "$file" "compiled-pdfs/${pdf_name}.pdf"
-          
-          if [ $? -eq 0 ]; then
-            echo "✓ Successfully compiled: $file -> compiled-pdfs/${pdf_name}.pdf"
-          else
-            echo "✗ Failed to compile: $file"
-            exit 1
-          fi
         done
-        
+
     - name: List compiled PDFs
-      run: |
-        echo "Compiled PDFs:"
-        ls -la compiled-pdfs/
+      run: ls -la compiled-pdfs/
 
     - name: Publish build artifacts
       uses: marvinpinto/action-automatic-releases@latest
