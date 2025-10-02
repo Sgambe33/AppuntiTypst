@@ -42,7 +42,7 @@ jobs:
           fi
           
           # Compile the document
-          typst compile "$file" "compiled-pdfs/${pdf_name}.pdf"
+          typst compile --root . "$file" "compiled-pdfs/${pdf_name}.pdf"
           
           if [ $? -eq 0 ]; then
             echo "✓ Successfully compiled: $file -> compiled-pdfs/${pdf_name}.pdf"
