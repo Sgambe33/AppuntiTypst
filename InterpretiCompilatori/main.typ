@@ -13,5 +13,4 @@
 
   #include "chapters/chapter1/1-introduzione.typ"
   #include "chapters/chapter2/2-analisi-lessicale.typ"
-  #include "chapters/chapter2/sgambePusha.typ"
 ]
