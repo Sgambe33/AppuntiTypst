@@ -14,4 +14,5 @@
   #include "chapters/chapter1/1-introduzione.typ"
   #include "chapters/chapter2/2-analisi-lessicale.typ"
   #include "chapters/chapter3/3-analisi-sintattica.typ"
+  #include "chapters/chapter4/4-automi.typ"
 ]

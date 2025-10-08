@@ -45,7 +45,7 @@ $
 Oltre alle regole ci sono anche delle convenzioni:
 + I seguenti simboli sono terminali\
   #set enum(numbering: "a)")
-  + Le lettere minuscole all'inizip dell'alfabeto, come: a, b, c, etc...;
+  + Le lettere minuscole all'inizio dell'alfabeto, come: a, b, c, etc...;
   + I simboli degli operatori, come: +, \*, etc...;
   + I simboli di interpunzione, come: parentesi, virgola, etc...;
   + Le cifre 0, 1, $dots$, 9;
@@ -53,11 +53,11 @@ Oltre alle regole ci sono anche delle convenzioni:
 + I seguenti simboli sono non terminali:
   #set enum(numbering: "a)")
   + Le lettere maiuscole all'inizio dell'alfabeto, come: A, B, C, etc...;
-  + La lettere S che, se presente, indica il simbolo iniziale;
+  + La lettera S che, se presente, indica il simbolo iniziale;
   + I nomi in corsivo minuscolo, come _expr_ o _stmt_
   + Le lettere maiuscole dell'alfabeto, quando usate per descrivere i costrutti della programmazione, possono indicare i non-terminali del costrutto.
 + Le lettere maiuscole alla fine dell'alfabeto indicano i _simboli grammaticali_, quindi sia terminali che non.
-+ Le lettere minuuscole alla fine dell'alfabeto rappresentano _stringhe di terminali_, anche vuote
++ Le lettere minuscole alla fine dell'alfabeto rappresentano _stringhe di terminali_, anche vuote
 + Le lettere minuscole dell'alfabeto greco ($alpha, beta, gamma $) indicando stringhe di simboli della grammatica, anche vuote.
 + Quando non specificato il simbolo iniziale, si considera la testa della prima produzione come tale.
 
@@ -115,7 +115,7 @@ $
 Sapendo tutto questo possiamo dire:
 
 #definition()[
-  Il *linguaggio generato da una grammatiga G*, L(G), corrisponde all'insieme formato da tutte le frasi di G:
+  Il *linguaggio generato da una grammatica G*, L(G), corrisponde all'insieme formato da tutte le frasi di G:
   $
     L(G)={w | S der(+)w " e " w in Sigma^*}
   $
