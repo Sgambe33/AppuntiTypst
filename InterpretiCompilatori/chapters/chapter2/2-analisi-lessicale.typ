@@ -8,7 +8,7 @@
 
 == Espressioni regolari
 #definition()[
-  Le espressioni regolari sono una notazione sintetica oer i linguaggi regolari ed operano sui simboli dell'alfabeto.
+  Le espressioni regolari sono una notazione sintetica per i linguaggi regolari ed operano sui simboli dell'alfabeto.
   - Un simbolo $t$ rappresenta il linguaggio composto dal simbolo stesso: ${t}$;
   - $epsilon$ rappresenta ${epsilon}$;
   - $emptyset$ rappresennta $emptyset$;
@@ -155,11 +155,11 @@ $
   "digits" => "digit"^+\
   "number" => "digits"(."digits")?(E[+-]?"digits")?
 $
-#pagebreak()  
+#pagebreak()
 
 == Buffering dell'ingresso
 
-Siccome il codice sorgente di ogni programma risiede in memoria secondaria, e di conseguenza anche tutti i suoi simboli/token, risulta costoso accervi per l'analisi. Per questo motivo si usano dei buffer nella RAM.
+Siccome il codice sorgente di ogni programma risiede in memoria secondaria, e di conseguenza anche tutti i suoi simboli/token, risulta costoso accedervi per l'analisi. Per questo motivo si usano dei buffer nella RAM.
 
 Uno dei sistemi più utilizzati si basa su due buffer di dimensione $N$, dove $N$ di solito ha la stessa dimensione di un blocco del disco, per esempio 4096 byte. Con una singola operazione di lettura è possibile leggere un intero blocco di $N$ caratteri (molto meglio di $N$ letture di singoli caratteri). Quando meno di $N$ caratteri rimangono nel file, il carattere *eof* segnala la fine del file.
 
@@ -183,17 +183,14 @@ $
 
     for i in range(0, elements.len()) { content((i, 1), elements.at(i)) }
   })
-
   #pinit-point-from(1, pin-dx: -2pt, pin-dy: 12pt, body-dy: -10pt, offset-dx: -2pt, offset-dy: 50pt)[#text(font: "Libertinus Serif", style: "italic")[lexemeBegin]]
   #pinit-point-from(2, pin-dx: -2pt, pin-dy: 12pt, body-dy: -10pt, offset-dx: -2pt, offset-dy: 35pt)[#text(font: "Libertinus Serif", style: "italic")[forward]]
-
   #linebreak()
   #linebreak()
   #linebreak()
   #linebreak()
   #linebreak()
   #linebreak()
-  
   #let elements = ("A", none, none, none, "E", none, "=", none, "M", $"*"$, "eof", "C", [$"*"$#pin(3)], $"*"$, [2#pin(4)], "eof", none, none, none, none, none, "eof")
   #cetz.canvas(length: 25pt, {
     import draw: content, line, rect
@@ -206,18 +203,14 @@ $
 
     for i in range(0, elements.len()) { content((i, 1), elements.at(i)) }
   })
-
   #pinit-point-from(3, pin-dx: -2pt, pin-dy: 12pt, body-dy: -10pt, offset-dx: -2pt, offset-dy: 50pt)[#text(font: "Libertinus Serif", style: "italic")[lexemeBegin]]
   #pinit-point-from(4, pin-dx: -2pt, pin-dy: 12pt, body-dy: -10pt, offset-dx: -2pt, offset-dy: 35pt)[#text(font: "Libertinus Serif", style: "italic")[forward]]
-
-  
   #linebreak()
   #linebreak()
   #linebreak()
   #linebreak()
   #linebreak()
   #linebreak()
-
 $
 
 Per poter spostare avanti il puntatore _forward_ è necessario prima verificare se si è raggiunta la fine di uno dei due buffer. In questo caso si deve ricaricare l'altro buffer con i caratteri letti dal file sorgente e spostare _forward_ all'inizio del buffer appena riempito. Affinché ciò avvenga senza problemi è necessario che la lunghezza di un lessema più il numero di caratteri letti in anticipo non superi la dimensione $N$ di ogni buffer, in caso contrario si sovrascriverebbe l'inizio di un lessema prima di avere finito di riconoscerlo.

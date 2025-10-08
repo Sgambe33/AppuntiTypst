@@ -233,7 +233,7 @@ Una stringa $w$ sta in $L$ solo se può essere ottenuta dagli elementi di base c
 
 #example()[
   Stringhe su {a,b} che iniziano con a e hanno lunghezza pari.
-  $L= w in {a,b}^* bar w = a u, abs(w) = 2n "con" n > 0$
+  $L= {w in {a,b}^* bar w = a u, abs(w) = 2n "con" n > 0}$
 
   - aa, ab $in$ L
   - se u $in$ L allora uaa, uab, uba, ubb stanno $in$ L
