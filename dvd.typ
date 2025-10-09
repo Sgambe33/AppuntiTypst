@@ -208,17 +208,6 @@
   return auxthmenv.with(numbering: "1.1")
 }
 
-#let der(
-  ..args
-) = {
-  $
-    #let sym = args.pos().join("", last: "")
-    attach(=>, tr: #sym)
-  $
-}
-#let derplus = $attach(=>, tr: +)$
-#let dertimes = $attach(=>, tr: *)$
-
 #let styled-thmbase = thmbase.with(titlefmt: thmtitle, namefmt: thmname, bodyfmt: thmtext)
 
 #let builder-thmbox(color: rgb("#000000"), ..builderargs) = styled-thmbase.with(
@@ -284,3 +273,18 @@
   h(1fr)
   $square$
 }
+
+
+
+//CUSTOM FUNCTIONS
+
+#let der(
+  ..args
+) = {
+  $
+    #let sym = args.pos().join("", last: "")
+    attach(=>, tr: #sym)
+  $
+}
+#let derplus = $attach(=>, tr: +)$
+#let dertimes = $attach(=>, tr: *)$

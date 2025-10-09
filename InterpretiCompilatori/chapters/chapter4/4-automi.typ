@@ -482,48 +482,89 @@ Per poter convertire un NFA in un DFA esiste un algoritmo specifico che però ne
   [Insieme degli stati del NFA verso cui vi è una transizione con simbolo d'ingresso $a$, da un qualsiasi stato $s$ in $T$.],
 )
 
-Se ripredendiamo l'esempio di conversione da espressione regolare a NFA, possiamo vedere a che cosa corrispondono le $epsilon$-closures:
-- $epsilon$-cl(6)={6,7,1,2,4}
-- $epsilon$-cl(8)={8}
+Se ripredendiamo l'esempio di conversione da espressione regolare a NFA, possiamo vedere a che cosa corrispondono le operazioni appena introdotte:
+- $epsilon"-cl(6)"={6,7,1,2,4}$
+- $epsilon"-cl(8)"={8}$
+- _move_$({2,3},a)={3}$
 
-#example()[
-  Continuiamo la conversione da espressione regolare a DFA, ricordando `(a|b)*abb`. Lo stato iniziale $A$ del DFA equivalente si ottiene con $epsilon$-closure(0), cioè $A={0,1,2,3,4,7}$ poiché questi sono tutti e soli gli stati raggiungibili dallo statoa 0 seguende un percorso formato unicamente da archi etichettati con $epsilon$.
-  #figure(diagram(
-    node-stroke: 0.9pt,
-    cell-size: 5mm,
-    spacing: 3mm,
-    node((-4.0, 0), [0]), // start state (0)
-    node((-2.0, 0), [1]),
-    node((-0.5, 1.0), [2]),
-    node((1.0, 1.0), [3]),
-    node((2.0, 0.0), [6]),
-    node((1.0, -1.0), [5]),
-    node((-0.5, -1.0), [4]),
-    node((3.5, 0.0), [7]),
-    node((5.0, 0.0), [8]),
-    node((6.5, 0.0), [9]),
-    // final state: use `extrude` to create a double-stroke (double circle)
-    node((8.5, 0.0), [10], extrude: (-2, 0)),
-    // Edges (labels in square brackets). `bend` controls curvature.
-    edge((-5.2, 0.0), (-4.0, 0.0), "-|>", [start]), // external incoming "start" arrow
-    edge((-4.0, 0.0), (-2.0, 0.0), "-|>", [ε]), // 0 -> 1
-    edge((-2.0, 0.0), (-0.5, 1.0), "-|>", [ε]), // 1 -> 2 (upper)
-    edge((-0.5, 1.0), (1.0, 1.0), "-|>", [a]), // 2 -> 3 (a)
-    edge((1.0, 1.0), (2.0, 0.0), "-|>", [ε]), // 3 -> 6
-    edge((-2.0, 0.0), (-0.5, -1.0), "-|>", [ε]), // 1 -> 4 (lower)
-    edge((-0.5, -1.0), (1.0, -1.0), "-|>", [b]), // 4 -> 5 (b)
-    edge((1.0, -1.0), (2.0, 0.0), "-|>", [ε], label-sep: 1pt), // 5 -> 6
-    // loop from 6 back to 1 (top arc)
-    edge((2.0, 0.0), (-2.0, 0.0), "-|>", [ε], bend: -90deg, label-pos: 0.4),
-    // small ε-edge from 6 to 7
-    edge((2.0, 0.0), (3.5, 0.0), "-|>", [ε]),
-    // linear path to final
-    edge((3.5, 0.0), (5.0, 0.0), "-|>", [a]),
-    edge((5.0, 0.0), (6.5, 0.0), "-|>", [b]),
-    edge((6.5, 0.0), (8.5, 0.0), "-|>", [b]),
-    // long outer ε-arc from state 0 sweeping under into state 7 (like in the picture)
-    edge((-4.0, 0.0), (3.5, 0.0), "-|>", [ε], bend: -60deg, label-pos: 0.5),
-  ))
+#example(
+  )[
+Continuiamo la conversione da espressione regolare a DFA, ricordando `(a|b)*abb`. Lo stato iniziale $A$ del DFA equivalente si ottiene con $epsilon$-closure(0), cioè $A={0,1,2,3,4,7}$ poiché questi sono tutti e soli gli stati raggiungibili dallo stato 0 seguende un percorso formato unicamente da archi etichettati con $epsilon$.
+#figure(diagram(
+  node-stroke: 0.9pt,
+  cell-size: 5mm,
+  spacing: 3mm,
+  node((-4.0, 0), [0]), // start state (0)
+  node((-2.0, 0), [1]),
+  node((-0.5, 1.0), [2]),
+  node((1.0, 1.0), [3]),
+  node((2.0, 0.0), [6]),
+  node((1.0, -1.0), [5]),
+  node((-0.5, -1.0), [4]),
+  node((3.5, 0.0), [7]),
+  node((5.0, 0.0), [8]),
+  node((6.5, 0.0), [9]),
+  // final state: use `extrude` to create a double-stroke (double circle)
+  node((8.5, 0.0), [10], extrude: (-2, 0)),
+  // Edges (labels in square brackets). `bend` controls curvature.
+  edge((-5.2, 0.0), (-4.0, 0.0), "-|>", [start]), // external incoming "start" arrow
+  edge((-4.0, 0.0), (-2.0, 0.0), "-|>", [ε]), // 0 -> 1
+  edge((-2.0, 0.0), (-0.5, 1.0), "-|>", [ε]), // 1 -> 2 (upper)
+  edge((-0.5, 1.0), (1.0, 1.0), "-|>", [a]), // 2 -> 3 (a)
+  edge((1.0, 1.0), (2.0, 0.0), "-|>", [ε]), // 3 -> 6
+  edge((-2.0, 0.0), (-0.5, -1.0), "-|>", [ε]), // 1 -> 4 (lower)
+  edge((-0.5, -1.0), (1.0, -1.0), "-|>", [b]), // 4 -> 5 (b)
+  edge((1.0, -1.0), (2.0, 0.0), "-|>", [ε], label-sep: 1pt), // 5 -> 6
+  // loop from 6 back to 1 (top arc)
+  edge((2.0, 0.0), (-2.0, 0.0), "-|>", [ε], bend: -90deg, label-pos: 0.4),
+  // small ε-edge from 6 to 7
+  edge((2.0, 0.0), (3.5, 0.0), "-|>", [ε]),
+  // linear path to final
+  edge((3.5, 0.0), (5.0, 0.0), "-|>", [a]),
+  edge((5.0, 0.0), (6.5, 0.0), "-|>", [b]),
+  edge((6.5, 0.0), (8.5, 0.0), "-|>", [b]),
+  // long outer ε-arc from state 0 sweeping under into state 7 (like in the picture)
+  edge((-4.0, 0.0), (3.5, 0.0), "-|>", [ε], bend: -60deg, label-pos: 0.5),
+))
+Cominciamo costruendo delle tabelle di transizione:
+$
+  "Dtran"[A,a]=epsilon"-cl(move("A,a"))"=epsilon"-cl("{3,8}")"={3,6,7,1,2,4,8} = B quad quad (B eq.not A) \
+  "Dtran"[A,b]=epsilon"-cl("{5}")"={1,2,4,5,6,7} = C quad quad (C eq.not A,B) \
+  "Dtran"[B,a]=epsilon"-cl(move("B,a"))"=epsilon"-cl("{3,8}")"={3,6,7,1,2,4,8} = B
+$
+Alla fine, continuando così, si ottengono cinque stati:
+#table(
+  columns: 4,
+  rows: 6,
+  align: center,
+  [Stato NFA],
+  [Stato DFA],
+  [$a$],
+  [$b$],
+  [${0,1,2,4,7}$],
+  [$A$],
+  [$B$],
+  [$C$],
+  [${1,2,3,4,6,7,8}$],
+  [$B$],
+  [$B$],
+  [$D$],
+  [${1,2,4,5,6,7}$],
+  [$C$],
+  [$B$],
+  [$C$],
+  [${1,2,4,5,6,7,9}$],
+  [$D$],
+  [$B$],
+  [$E$],
+  [${1,2,4,5,6,7,10}$],
+  [$E$],
+  [$B$],
+  [$C$],
+)
+Gli stati finali del DFA sono quelli che contengono gli stati finali del NFA: in questo caso solo $E$ (contiene infatti 10). Attenzione, c'è sempre uno stato finale, altrimenti vi è un errore. Il DFA finale è quindi:
+#figure(image("images/2025-10-09-09-28-35.png"))
 ]
 
 //TODO: Aggiungere esempio extra da foto
+#figure(image("images/2025-10-09-09-29-31.png"))
