@@ -51,6 +51,8 @@ $
 ]
 Per adesso considereremo solo automi in cui $delta$ è *totale* ovvero ad ogni simbolo in input è associato uno stato.
 
+#pagebreak()
+
 #example(
   )[
   Data l'espressione regolare $"(a|b)*aaa(a|b)*"$ si ottiene il seguente automa:
@@ -124,101 +126,164 @@ Per adesso considereremo solo automi in cui $delta$ è *totale* ovvero ad ogni s
     ))
 
   + Stringhe su {a,b} che non iniziano "aba":
-    #figure(image("images/2025-10-08-16-35-25.png"))
     #figure(diagram(
       node-stroke: 0.9pt,
       cell-size: 5mm,
       spacing: 3mm,
-      node((-4, 0), [S], extrude: (-2, 0)),
-      node((-2, 0), [A], extrude: (-2, 0)),
-      node((0, 0), [B], extrude: (-2, 0)),
-      node((2, 0), [C]),
+      node((-4, 0), [S], extrude: (-2, 0), name: <s>),
+      node((-2, 0), [A], extrude: (-2, 0), name: <a>),
+      node((0, 0), [B], extrude: (-2, 0), name: <b>),
+      node((2, 0), [C], name: <c>),
       edge((-5.2, 0), (-4.0, 0), "-|>", []),
-      edge((-4, 0), (-2, 0), "-|>", [a]),
-      edge((-2, 0), (0, 0), "-|>", [a]),
-      edge((0, 0), (2, 0), "-|>", [a]),
-      edge((-4, 0), (-4, 0), "-|>", [b], bend: 130deg),
-      edge((-2, 0), (-4, 0), "-|>", [b], bend: 50deg),
-      edge((0, 0), (-4.3, 0), "-|>", [b], bend: 60deg),
-      edge((2, 0), (2, 0), "-|>", [a,b], bend: 130deg),
+      edge(<s>, <s>, "-|>", [b], bend: 130deg),
+      edge(<s>, <a>, "-|>", [a]),
+      edge(<a>, <a>, "-|>", [a], bend: 130deg),
+      edge(<a>, <b>, "-|>", [b]),
+      edge(<b>, <s>, "-|>", [b], bend: 45deg),
+      edge(<b>, <c>, "-|>", [a]),
+      edge(<c>, <c>, "-|>", [a,b], bend: 130deg),
+      
     ))
   + Stringhe su {a,b} in cui ogni "a" è preceduta o seguita da "b":
-    #figure(image("images/2025-10-08-16-35-34.png"))
     #figure(diagram(
       node-stroke: 0.9pt,
       cell-size: 5mm,
       spacing: 3mm,
-      node((-4, 0), [S], extrude: (-2, 0)),
-      node((-2, 0), [A], extrude: (-2, 0)),
-      node((0, 0), [B], extrude: (-2, 0)),
-      node((2, 0), [C]),
-      edge((-5.2, 0), (-4.0, 0), "-|>", []),
-      edge((-4, 0), (-2, 0), "-|>", [a]),
-      edge((-2, 0), (0, 0), "-|>", [a]),
-      edge((0, 0), (2, 0), "-|>", [a]),
-      edge((-4, 0), (-4, 0), "-|>", [b], bend: 130deg),
-      edge((-2, 0), (-4, 0), "-|>", [b], bend: 50deg),
-      edge((0, 0), (-4.3, 0), "-|>", [b], bend: 60deg),
-      edge((2, 0), (2, 0), "-|>", [a,b], bend: 130deg),
+      node((-2, 0), [S], extrude: (-2, 0), name: <s>),
+      node((0, 0), [A], name: <a>),
+      node((-2, 2), [B], extrude: (-2, 0), name: <b>),
+      node((2, 0), [C], name: <c>),
+      edge((-3.2, 0), (-2.0, 0), "-|>"),
+      edge(<s>, <a>, "-|>", [a]),
+      edge(<s>, <b>, "-|>", [b]),
+      edge(<a>, <c>, "-|>", [a]),
+      edge(<a>, <b>, "-|>", [b]),
+      edge(<b>, <b>, "-|>", [b], bend: -130deg),
+      edge(<b>, <s>, "-|>", [a], bend: 60deg),
+      edge(<c>, <c>, "-|>", [a,b], bend: 130deg),
     ))
   + Stringhe su {a,b} dove $abs(w)_a$ e $abs(w)_b$ sono pari:
-    #figure(image("images/2025-10-08-16-35-41.png"))
-    #figure(diagram(
-      node-stroke: 0.9pt,
-      cell-size: 5mm,
-      spacing: 3mm,
-      node((-4, 0), [S], extrude: (-2, 0)),
-      node((-2, 0), [A], extrude: (-2, 0)),
-      node((0, 0), [B], extrude: (-2, 0)),
-      node((2, 0), [C]),
-      edge((-5.2, 0), (-4.0, 0), "-|>", []),
-      edge((-4, 0), (-2, 0), "-|>", [a]),
-      edge((-2, 0), (0, 0), "-|>", [a]),
-      edge((0, 0), (2, 0), "-|>", [a]),
-      edge((-4, 0), (-4, 0), "-|>", [b], bend: 130deg),
-      edge((-2, 0), (-4, 0), "-|>", [b], bend: 50deg),
-      edge((0, 0), (-4.3, 0), "-|>", [b], bend: 60deg),
-      edge((2, 0), (2, 0), "-|>", [a,b], bend: 130deg),
-    ))
-  + Stringhe su {a,b} di lunghezza dispari che contengono esattamente due "b":
-    #figure(image("images/2025-10-08-16-35-48.png"))
-    #figure(diagram(
-      node-stroke: 0.9pt,
-      cell-size: 5mm,
-      spacing: 3mm,
-      node((-4, 0), [S], extrude: (-2, 0)),
-      node((-2, 0), [A], extrude: (-2, 0)),
-      node((0, 0), [B], extrude: (-2, 0)),
-      node((2, 0), [C]),
-      edge((-5.2, 0), (-4.0, 0), "-|>", []),
-      edge((-4, 0), (-2, 0), "-|>", [a]),
-      edge((-2, 0), (0, 0), "-|>", [a]),
-      edge((0, 0), (2, 0), "-|>", [a]),
-      edge((-4, 0), (-4, 0), "-|>", [b], bend: 130deg),
-      edge((-2, 0), (-4, 0), "-|>", [b], bend: 50deg),
-      edge((0, 0), (-4.3, 0), "-|>", [b], bend: 60deg),
-      edge((2, 0), (2, 0), "-|>", [a,b], bend: 130deg),
-    ))
+    #grid(columns: (.5fr, 1fr),
+      align(center)[
+        #table(
+          columns: (auto, auto, auto),
+          align: center,
 
-  + Stringhe su {a,b} in cui "aa" occorre solo una volta:
-    #figure(image("images/2025-10-08-16-35-55.png"))
-    #figure(diagram(
-      node-stroke: 0.9pt,
-      cell-size: 5mm,
-      spacing: 3mm,
-      node((-4, 0), [S], extrude: (-2, 0)),
-      node((-2, 0), [A], extrude: (-2, 0)),
-      node((0, 0), [B], extrude: (-2, 0)),
-      node((2, 0), [C]),
-      edge((-5.2, 0), (-4.0, 0), "-|>", []),
-      edge((-4, 0), (-2, 0), "-|>", [a]),
-      edge((-2, 0), (0, 0), "-|>", [a]),
-      edge((0, 0), (2, 0), "-|>", [a]),
-      edge((-4, 0), (-4, 0), "-|>", [b], bend: 130deg),
-      edge((-2, 0), (-4, 0), "-|>", [b], bend: 50deg),
-      edge((0, 0), (-4.3, 0), "-|>", [b], bend: 60deg),
-      edge((2, 0), (2, 0), "-|>", [a,b], bend: 130deg),
-    ))
+          [], [$abs(w)_a$], [$abs(w)_b$],
+          table.cell(fill: rgb("#68e86680"), "S"), [*_pari_*], [*_pari_*],
+          [A], [_dispari_], [_pari_],
+          [B], [_pari_], [_dispari_],
+          [C], [_dispari_], [_dispari_],
+        )
+      ],
+      align(center)[
+        #diagram(
+          node-stroke: 0.9pt,
+          cell-size: 5mm,
+          spacing: 3mm,
+          node((-2.5, 0), [S], extrude: (-2, 0), name: <s>),
+          node((0, 0), [A], name: <a>),
+          node((-2.5, 2.5), [B], name: <b>),
+          node((0, 2.5), [C], name: <c>),
+          edge((-3.7,0), <s>, "-|>"),
+          edge(<s>, <a>, "-|>", [a], bend: 15deg),
+          edge(<s>, <b>, "-|>", [b], bend: 15deg),
+          edge(<a>, <s>, "-|>", [a], bend: 15deg),
+          edge(<a>, <c>, "-|>", [b], bend: 15deg),
+          edge(<b>, <s>, "-|>", [b], bend: 15deg),
+          edge(<b>, <c>, "-|>", [a], bend: 15deg),
+          edge(<c>, <a>, "-|>", [b], bend: 15deg),
+          edge(<c>, <b>, "-|>", [a], bend: 15deg),
+        )
+      ]
+    )
+    
+  + Stringhe su {a,b} di lunghezza dispari che contengono esattamente due "b":
+    #grid(columns: (.5fr, 1fr),
+      align(center)[
+        #table(
+          columns: (auto, auto, auto),
+          align: center,
+
+          [], [$abs(w)$], [$abs(w)_b$],
+          [S], [_pari_], [0],
+          [A], [_dispari_], [0],
+          [B], [_dispari_], [1],
+          [C], [_pari_], [1],
+          [D], [_pari_], [2],
+          table.cell(fill: rgb("#68e86680"), "E"), [*_dispari_*], [*2*],
+          [F], [_pari,#linebreak()dispari_], [>2],
+        )
+      ],
+      align(center)[
+        #diagram(
+          node-stroke: 0.9pt,
+          cell-size: 5mm,
+          spacing: 3mm,
+          node((-2.5, 0), [S], name: <s>),
+          node((0, 0), [A], name: <a>),
+          node((-2.5, 2), [B], name: <b>),
+          node((0, 2), [C], name: <c>),
+          node((-2.5, 4), [D], name: <d>),
+          node((0, 4), [E], extrude: (-2, 0), name: <e>),
+          node((-1.25, 6), [F], name: <f>),
+          edge((-3.7,0), <s>, "-|>"),
+          edge(<s>, <a>, "-|>", [a], bend: 15deg),
+          edge(<s>, <b>, "-|>", [b]),
+          edge(<a>, <s>, "-|>", [a], bend: 15deg),
+          edge(<a>, <c>, "-|>", [b]),
+          edge(<b>, <d>, "-|>", [b]),
+          edge(<b>, <c>, "-|>", [a], bend: 15deg),
+          edge(<c>, <e>, "-|>", [b]),
+          edge(<c>, <b>, "-|>", [a], bend: 15deg),
+          edge(<d>, <f>, "-|>", [b], label-sep: -15pt),
+          edge(<d>, <e>, "-|>", [a], bend: 15deg),
+          edge(<e>, <f>, "-|>", [b], label-sep: -15pt),
+          edge(<e>, <d>, "-|>", [a], bend: 15deg),
+          edge(<f>, <f>, "-|>", [a,b], label-pos: 80%, bend: -130deg),
+        )
+      ]
+    )
+  #colbreak()
+
+  6. Stringhe su {a,b} in cui "aa" occorre solo una volta:
+    #grid(columns: (.5fr, 1fr),
+      align(center)[
+        #table(
+          columns: (auto, auto, auto),
+          align: center,
+
+          [], [_aa_], [u.c.],
+          [S], [0], [$b(epsilon)$],
+          [A], [0], [_a_],
+          table.cell(fill: rgb("#68e86680"), "B"), [*1*], [_a_],
+          table.cell(fill: rgb("#68e86680"), "C"), [*1*], [_b_],
+          [D], [$>=2$], [_a,b_],
+        )
+      ],
+      align(center)[
+        #diagram(
+          node-stroke: 0.9pt,
+          cell-size: 5mm,
+          spacing: 3mm,
+          node((-3, 0), [S], extrude: (-2, 0), name: <s>),
+          node((-1, 0), [A], name: <a>),
+          node((1, 0), [B], name: <b>),
+          node((3, 0), [C], name: <c>),
+          node((1, 2), [D], name: <d>),
+          edge((-4.2,0), <s>, "-|>"),
+          edge(<s>, <a>, "-|>", [a], bend: 15deg),
+          edge(<s>, <s>, "-|>", [b], bend: 130deg),
+          edge(<a>, <b>, "-|>", [a], bend: 15deg),
+          edge(<a>, <s>, "-|>", [b], bend: 15deg),
+          edge(<b>, <d>, "-|>", [a], bend: 15deg),
+          edge(<b>, <c>, "-|>", [b], bend: 15deg),
+          edge(<c>, <b>, "-|>", [a], bend: 15deg),
+          edge(<c>, <c>, "-|>", [b], bend: 130deg),
+          edge(<d>, <d>, "-|>", [a,b], label-pos: 80%, bend: -130deg),
+        )
+      ]
+    )
 ]
 
 In alcuni casi la *non appartenenza* di una stringa al linguaggio di un automa piò essere determinata anche prima di terminare la scansione della stringa, ad esempio quando si chiede che le stringhe non contengano una particolare sottostringa e questa viene indidividuata. In questi automi mancano alcune combinazioni di stato-simbolo perché corrispondono all'arresto.
