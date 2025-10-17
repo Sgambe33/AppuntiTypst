@@ -142,7 +142,6 @@ Per adesso considereremo solo automi in cui $delta$ è *totale* ovvero ad ogni s
       edge(<b>, <s>, "-|>", [b], bend: 45deg),
       edge(<b>, <c>, "-|>", [a]),
       edge(<c>, <c>, "-|>", [a,b], bend: 130deg),
-      
     ))
   + Stringhe su {a,b} in cui ogni "a" è preceduta o seguita da "b":
     #figure(diagram(
@@ -163,127 +162,153 @@ Per adesso considereremo solo automi in cui $delta$ è *totale* ovvero ad ogni s
       edge(<c>, <c>, "-|>", [a,b], bend: 130deg),
     ))
   + Stringhe su {a,b} dove $abs(w)_a$ e $abs(w)_b$ sono pari:
-    #grid(columns: (.5fr, 1fr),
-      align(center)[
-        #table(
-          columns: (auto, auto, auto),
-          align: center,
+    #grid(columns: (.5fr, 1fr), align(center)[
+      #table(
+        columns: (auto, auto, auto),
+        align: center,
+        [],
+        [$abs(w)_a$],
+        [$abs(w)_b$],
+        table.cell(fill: rgb("#68e86680"), "S"),
+        [*_pari_*],
+        [*_pari_*],
+        [A],
+        [_dispari_],
+        [_pari_],
+        [B],
+        [_pari_],
+        [_dispari_],
+        [C],
+        [_dispari_],
+        [_dispari_],
+      )
+    ], align(center)[
+      #diagram(
+        node-stroke: 0.9pt,
+        cell-size: 5mm,
+        spacing: 3mm,
+        node((-2.5, 0), [S], extrude: (-2, 0), name: <s>),
+        node((0, 0), [A], name: <a>),
+        node((-2.5, 2.5), [B], name: <b>),
+        node((0, 2.5), [C], name: <c>),
+        edge((-3.7, 0), <s>, "-|>"),
+        edge(<s>, <a>, "-|>", [a], bend: 15deg),
+        edge(<s>, <b>, "-|>", [b], bend: 15deg),
+        edge(<a>, <s>, "-|>", [a], bend: 15deg),
+        edge(<a>, <c>, "-|>", [b], bend: 15deg),
+        edge(<b>, <s>, "-|>", [b], bend: 15deg),
+        edge(<b>, <c>, "-|>", [a], bend: 15deg),
+        edge(<c>, <a>, "-|>", [b], bend: 15deg),
+        edge(<c>, <b>, "-|>", [a], bend: 15deg),
+      )
+    ])
 
-          [], [$abs(w)_a$], [$abs(w)_b$],
-          table.cell(fill: rgb("#68e86680"), "S"), [*_pari_*], [*_pari_*],
-          [A], [_dispari_], [_pari_],
-          [B], [_pari_], [_dispari_],
-          [C], [_dispari_], [_dispari_],
-        )
-      ],
-      align(center)[
-        #diagram(
-          node-stroke: 0.9pt,
-          cell-size: 5mm,
-          spacing: 3mm,
-          node((-2.5, 0), [S], extrude: (-2, 0), name: <s>),
-          node((0, 0), [A], name: <a>),
-          node((-2.5, 2.5), [B], name: <b>),
-          node((0, 2.5), [C], name: <c>),
-          edge((-3.7,0), <s>, "-|>"),
-          edge(<s>, <a>, "-|>", [a], bend: 15deg),
-          edge(<s>, <b>, "-|>", [b], bend: 15deg),
-          edge(<a>, <s>, "-|>", [a], bend: 15deg),
-          edge(<a>, <c>, "-|>", [b], bend: 15deg),
-          edge(<b>, <s>, "-|>", [b], bend: 15deg),
-          edge(<b>, <c>, "-|>", [a], bend: 15deg),
-          edge(<c>, <a>, "-|>", [b], bend: 15deg),
-          edge(<c>, <b>, "-|>", [a], bend: 15deg),
-        )
-      ]
-    )
-    
   + Stringhe su {a,b} di lunghezza dispari che contengono esattamente due "b":
-    #grid(columns: (.5fr, 1fr),
-      align(center)[
-        #table(
-          columns: (auto, auto, auto),
-          align: center,
-
-          [], [$abs(w)$], [$abs(w)_b$],
-          [S], [_pari_], [0],
-          [A], [_dispari_], [0],
-          [B], [_dispari_], [1],
-          [C], [_pari_], [1],
-          [D], [_pari_], [2],
-          table.cell(fill: rgb("#68e86680"), "E"), [*_dispari_*], [*2*],
-          [F], [_pari,#linebreak()dispari_], [>2],
-        )
-      ],
-      align(center)[
-        #diagram(
-          node-stroke: 0.9pt,
-          cell-size: 5mm,
-          spacing: 3mm,
-          node((-2.5, 0), [S], name: <s>),
-          node((0, 0), [A], name: <a>),
-          node((-2.5, 2), [B], name: <b>),
-          node((0, 2), [C], name: <c>),
-          node((-2.5, 4), [D], name: <d>),
-          node((0, 4), [E], extrude: (-2, 0), name: <e>),
-          node((-1.25, 6), [F], name: <f>),
-          edge((-3.7,0), <s>, "-|>"),
-          edge(<s>, <a>, "-|>", [a], bend: 15deg),
-          edge(<s>, <b>, "-|>", [b]),
-          edge(<a>, <s>, "-|>", [a], bend: 15deg),
-          edge(<a>, <c>, "-|>", [b]),
-          edge(<b>, <d>, "-|>", [b]),
-          edge(<b>, <c>, "-|>", [a], bend: 15deg),
-          edge(<c>, <e>, "-|>", [b]),
-          edge(<c>, <b>, "-|>", [a], bend: 15deg),
-          edge(<d>, <f>, "-|>", [b], label-sep: -15pt),
-          edge(<d>, <e>, "-|>", [a], bend: 15deg),
-          edge(<e>, <f>, "-|>", [b], label-sep: -15pt),
-          edge(<e>, <d>, "-|>", [a], bend: 15deg),
-          edge(<f>, <f>, "-|>", [a,b], label-pos: 80%, bend: -130deg),
-        )
-      ]
-    )
+    #grid(columns: (.5fr, 1fr), align(center)[
+      #table(
+        columns: (auto, auto, auto),
+        align: center,
+        [],
+        [$abs(w)$],
+        [$abs(w)_b$],
+        [S],
+        [_pari_],
+        [0],
+        [A],
+        [_dispari_],
+        [0],
+        [B],
+        [_dispari_],
+        [1],
+        [C],
+        [_pari_],
+        [1],
+        [D],
+        [_pari_],
+        [2],
+        table.cell(fill: rgb("#68e86680"), "E"),
+        [*_dispari_*],
+        [*2*],
+        [F],
+        [_pari,#linebreak()dispari_],
+        [>2],
+      )
+    ], align(center)[
+      #diagram(
+        node-stroke: 0.9pt,
+        cell-size: 5mm,
+        spacing: 3mm,
+        node((-2.5, 0), [S], name: <s>),
+        node((0, 0), [A], name: <a>),
+        node((-2.5, 2), [B], name: <b>),
+        node((0, 2), [C], name: <c>),
+        node((-2.5, 4), [D], name: <d>),
+        node((0, 4), [E], extrude: (-2, 0), name: <e>),
+        node((-1.25, 6), [F], name: <f>),
+        edge((-3.7, 0), <s>, "-|>"),
+        edge(<s>, <a>, "-|>", [a], bend: 15deg),
+        edge(<s>, <b>, "-|>", [b]),
+        edge(<a>, <s>, "-|>", [a], bend: 15deg),
+        edge(<a>, <c>, "-|>", [b]),
+        edge(<b>, <d>, "-|>", [b]),
+        edge(<b>, <c>, "-|>", [a], bend: 15deg),
+        edge(<c>, <e>, "-|>", [b]),
+        edge(<c>, <b>, "-|>", [a], bend: 15deg),
+        edge(<d>, <f>, "-|>", [b], label-sep: -15pt),
+        edge(<d>, <e>, "-|>", [a], bend: 15deg),
+        edge(<e>, <f>, "-|>", [b], label-sep: -15pt),
+        edge(<e>, <d>, "-|>", [a], bend: 15deg),
+        edge(<f>, <f>, "-|>", [a,b], label-pos: 80%, bend: -130deg),
+      )
+    ])
   #colbreak()
 
   6. Stringhe su {a,b} in cui "aa" occorre solo una volta:
-    #grid(columns: (.5fr, 1fr),
-      align(center)[
-        #table(
-          columns: (auto, auto, auto),
-          align: center,
-
-          [], [_aa_], [u.c.],
-          [S], [0], [$b(epsilon)$],
-          [A], [0], [_a_],
-          table.cell(fill: rgb("#68e86680"), "B"), [*1*], [_a_],
-          table.cell(fill: rgb("#68e86680"), "C"), [*1*], [_b_],
-          [D], [$>=2$], [_a,b_],
-        )
-      ],
-      align(center)[
-        #diagram(
-          node-stroke: 0.9pt,
-          cell-size: 5mm,
-          spacing: 3mm,
-          node((-3, 0), [S], extrude: (-2, 0), name: <s>),
-          node((-1, 0), [A], name: <a>),
-          node((1, 0), [B], name: <b>),
-          node((3, 0), [C], name: <c>),
-          node((1, 2), [D], name: <d>),
-          edge((-4.2,0), <s>, "-|>"),
-          edge(<s>, <a>, "-|>", [a], bend: 15deg),
-          edge(<s>, <s>, "-|>", [b], bend: 130deg),
-          edge(<a>, <b>, "-|>", [a], bend: 15deg),
-          edge(<a>, <s>, "-|>", [b], bend: 15deg),
-          edge(<b>, <d>, "-|>", [a], bend: 15deg),
-          edge(<b>, <c>, "-|>", [b], bend: 15deg),
-          edge(<c>, <b>, "-|>", [a], bend: 15deg),
-          edge(<c>, <c>, "-|>", [b], bend: 130deg),
-          edge(<d>, <d>, "-|>", [a,b], label-pos: 80%, bend: -130deg),
-        )
-      ]
-    )
+    #grid(columns: (.5fr, 1fr), align(center)[
+      #table(
+        columns: (auto, auto, auto),
+        align: center,
+        [],
+        [_aa_],
+        [u.c.],
+        [S],
+        [0],
+        [$b(epsilon)$],
+        [A],
+        [0],
+        [_a_],
+        table.cell(fill: rgb("#68e86680"), "B"),
+        [*1*],
+        [_a_],
+        table.cell(fill: rgb("#68e86680"), "C"),
+        [*1*],
+        [_b_],
+        [D],
+        [$>=2$],
+        [_a,b_],
+      )
+    ], align(center)[
+      #diagram(
+        node-stroke: 0.9pt,
+        cell-size: 5mm,
+        spacing: 3mm,
+        node((-3, 0), [S], extrude: (-2, 0), name: <s>),
+        node((-1, 0), [A], name: <a>),
+        node((1, 0), [B], name: <b>),
+        node((3, 0), [C], name: <c>),
+        node((1, 2), [D], name: <d>),
+        edge((-4.2, 0), <s>, "-|>"),
+        edge(<s>, <a>, "-|>", [a], bend: 15deg),
+        edge(<s>, <s>, "-|>", [b], bend: 130deg),
+        edge(<a>, <b>, "-|>", [a], bend: 15deg),
+        edge(<a>, <s>, "-|>", [b], bend: 15deg),
+        edge(<b>, <d>, "-|>", [a], bend: 15deg),
+        edge(<b>, <c>, "-|>", [b], bend: 15deg),
+        edge(<c>, <b>, "-|>", [a], bend: 15deg),
+        edge(<c>, <c>, "-|>", [b], bend: 130deg),
+        edge(<d>, <d>, "-|>", [a,b], label-pos: 80%, bend: -130deg),
+      )
+    ])
 ]
 
 In alcuni casi la *non appartenenza* di una stringa al linguaggio di un automa piò essere determinata anche prima di terminare la scansione della stringa, ad esempio quando si chiede che le stringhe non contengano una particolare sottostringa e questa viene indidividuata. In questi automi mancano alcune combinazioni di stato-simbolo perché corrispondono all'arresto.
@@ -628,8 +653,117 @@ Alla fine, continuando così, si ottengono cinque stati:
   [$C$],
 )
 Gli stati finali del DFA sono quelli che contengono gli stati finali del NFA: in questo caso solo $E$ (contiene infatti 10). Attenzione, c'è sempre uno stato finale, altrimenti vi è un errore. Il DFA finale è quindi:
-#figure(image("images/2025-10-09-09-28-35.png"))
+#figure(diagram(
+  node-stroke: 0.9pt,
+  cell-size: 2mm,
+  spacing: 3mm,
+  node((-4.0, 0), [A]),
+  node((0.0, 0), [B]),
+  node((0, -4.0), [C]),
+  node((4.0, 0.0), [D]),
+  node((8, 0.0), [E], extrude: (-2, 0)),
+  // EDGES //
+  edge((-6, 0.0), (-4.0, 0), "-|>", [start]),
+  edge((-4.0, 0.0), (0.0, 0.0), "-|>", [a]),
+  edge((-4.0, 0.0), (0.0, -4.0), "-|>", [b]),
+  edge((0.0, 0.0), (0.0, 0.0), "<|-", [a], bend: -130deg),
+  edge((0.0, 0.0), (4.0, 0.0), "-|>", [b]),
+  edge((0.0, -4.0), (0.0, 0.0), "-|>", [a]),
+  edge((0.0, -4.0), (0.0, -4.0), "<|-", [b], bend: 130deg),
+  edge((4.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 20deg, label-sep: -2pt),
+  edge((4.0, 0.0), (8.0, 0.0), "-|>", [b]),
+  edge((8.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 35deg),
+  edge((8.0, 0.0), (0.0, -4.0), "-|>", [b]),
+))
 ]
 
 //TODO: Aggiungere esempio extra da foto
 #figure(image("images/2025-10-09-09-29-31.png"))
+
+=== Simulazione di un NFA
+
+Una strategia utilizzata per esempio in molti programmi di elaborazione di testo consiste nel costruire un NFA a partire da un'espressione regolare e quindi procedere alla sua simulazione mediante costruzione per sottoinsiemi effettuata al momento.
+
+L'algoritmo riceve in input una stringa $x$, un NFA con stato iniziale $s_0$, gli stati di accettazione $F$ e una funzione di transizione _move_(). Successivamente, viene mantenuto un insieme di stati correnti $S$, costituito dagli stati raggiungibili a partire da $s_0$ seguendo un percorso etichettato con i simboli d'ingresso letti finora. Se $c$ è il prossimo carattere, letto dalla funzione _nextChar_(), per prima cosa calcola _move_(S, c), quindi calcola la chiusura mediante la funzione $epsilon$-closure().
+
+```
+//TODO: algoritmo mancante
+```
+
+== Minimizzazione di un DFA
+
+Possono esistere molti automi deterministici che riconoscono lo stesso linguaggio. Tali automi non solo hanno stati con nomi diversi, ma addirittura possono avere un numero diverso di stati. Se implemntiamo un analizzatore lessicale basandoci su un DFA, preferiremo un DFA con il minimo numero possibile di stati, poiché ogni stato richiede elementi aggiuntivi nella tabella che descrive l'analizzatore lessicale stesso.
+
+Il problema del nome degli stati si risolve facilmente. Diremo infatti che due automi sono *uguali a meno dei nomi* se uno può essere trasformato nell'altro modificando solamente i nomi degli stati.
+
+Si può anche dimostrare ch eper ogni linguaggio regolare esiste un DFA con un numero di stati minimo e tale DFA è unico a meno dei nomi. Inoltre tale DFA minimo può essre costruito a partire da un qualsiasi DFA, raggruppando insiemi di stati equivalenti
+
+#definition(
+  "Stati distinguibili",
+)[
+  Diciamo che una stringa $x$ *distingue* o *rende distinguibile* lo stato $s$ dallo stato $t$ se esattamente uno degli stati raggiungibili da $s$ e da $t$mediante un percorso etichettato con la stringa $s$ è di accettazione. Si dice inoltre che lo stato $s$ è *distinguibile* $t$ se esiste almeno una stringa che li distingue.
+]
+
+L'algoritmo di minimizzazione degli stati si basa sul partizionamento degli stati del DFA in gruppi di stati non distinguibili. Ogni gruppo è infine fuso in un unico stato del nuovo DFA minimo. L'algoritmo modifica progressivamente una partizione i cui gruppi sono insiemi di stati non acnora identificati come distinguibili; due stati qualsiasi, appartenenti a insiemi diversi della prtizione, sono invece giò stati identificato come distinguibili. Quando la partizione non può essere ulteriormente modificata spezzando un gruppo in gruppi più piccoli, allora essa rappresenta il DFA minimo.
+
+Inizialmente la partizione contiene due gruppi di stati: stati d'accettazione e di non accettazione. Il procedimento fondamentale consiste nel considerare un generico gruppo $A={s_1,s_2,...,s_k}$ della partizione corrente e un generico simbolo d'ingresso $a$ e verificare se il simbolo $a$ può essere utilizzato per distinguere alcuni degli stati del gruppo $A$. A tale scopo si esaminano le transizioni da ognuno degli stati $s_1,s_2,...,s_k$ relative al simbolo d'ingresso $a$; se gli stati raggiunti da tali transioni ricadono in due o più geuppi della partizione corrente, si suddivide $A$ in un insieme di gruppi in modo tale che due stati $s_i$ e $s_j$ siano nello stesso gruppo se e solo se, in corrispondenza del simbolo d'ingresso $a$ le transizioni da ognuno di essi portano a stati di uno stesso gruppo. Si ripete quindi questo procedimento finché nessun gruppo possa essere ulteriormente suddiviso per nessun simbolo d'ingresso.
+
+#example(
+  )[
+  Consideriamo ancora il seguente DFA:
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    cell-size: 2mm,
+    spacing: 3mm,
+    node((-4.0, 0), [A]),
+    node((0.0, 0), [B]),
+    node((0, -4.0), [C]),
+    node((4.0, 0.0), [D]),
+    node((8, 0.0), [E], extrude: (-2, 0)),
+    // EDGES //
+    edge((-6, 0.0), (-4.0, 0), "-|>", [start]),
+    edge((-4.0, 0.0), (0.0, 0.0), "-|>", [a]),
+    edge((-4.0, 0.0), (0.0, -4.0), "-|>", [b]),
+    edge((0.0, 0.0), (0.0, 0.0), "<|-", [a], bend: -130deg),
+    edge((0.0, 0.0), (4.0, 0.0), "-|>", [b]),
+    edge((0.0, -4.0), (0.0, 0.0), "-|>", [a]),
+    edge((0.0, -4.0), (0.0, -4.0), "<|-", [b], bend: 130deg),
+    edge((4.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 20deg),
+    edge((4.0, 0.0), (8.0, 0.0), "-|>", [b]),
+    edge((8.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 35deg),
+    edge((8.0, 0.0), (0.0, -4.0), "-|>", [b]),
+  ))
+  La partizione iniziale consiste dei due gruppi ${A,B,C,D}{E}$ ch e contengono rispettivamente gli stait di non accettazione e quelli d'accettazione. Ora:
+  - ${E}$ non può essere spezzato ulteriormente e quindi rimane invariato.
+  - ${A,B,C,D}$ può essere spezzato e per fare ciò dobbiamo considerare l'effetto di ogni simbolo d'ingresso.
+  *Analizziamo "a"*: ognuno degli stati del gruppo, in corrispondenza del simbolo $a$, prevede una transizione verso lo stato $B$ e quindi non si possono distinguere gli stati.
+
+  *Analizziamo "b"*: con ingresso $b$ dagli stati $A,B,C$ si passa agli stati ${A,B,C,D}$ ma dallo stato $D$ si passa allo stato $E$ che non appartiene allo stesso gruppo di $D$ e pertanto viene inserito in un nuovo gruppo.
+  $
+    {A,B,C}{D}{E}
+  $
+  Ripetiamo iterativamente sul gruppo o gruppi che possono essere ancora spezzati e otteniamo:
+  $
+    {A,C}{B}{D}{E}
+  $
+  Da questa situazione non possiamo andare avanti in quanto ogni transizione fa rimanere nello stesso gruppo. L'automa DFA minimo equivalente sarà quindi composto da quattro stati, uno per ogni gruppo rimasto. Il suo stato iniziale sarà $A$ e il finale $E$:
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    cell-size: 5mm,
+    spacing: 3mm,
+    node((0.0, 0), [A]),
+    node((3.0, 0), [B]),
+    node((3.0, 3.0), [D]),
+    node((0, 3.0), [E], extrude: (-2, 0)),
+    // EDGES //
+    edge((-1.5, 0.0), (0.0, 0), "-|>", [start]),
+    edge((0.0, 0.0), (3.0, 0.0), "-|>", [a]),
+    edge((0.0, 0.0), (0.0, 0.0), "<|-", [b], bend: 130deg),
+    edge((3.0, 0.0), (3.0, 0.0), "<|-", [a], bend: 130deg),
+    edge((3.0, 0.0), (3.0, 3.0), "-|>", [b]),
+    edge((3.0, 3.0), (3.0, 0.0), "-|>", [a], bend: -30deg),
+    edge((3.0, 3.0), (0.0, 3.0), "-|>", [b]),
+    edge((0.0, 3.0), (3.0, 0.0), "-|>", [a]),
+    edge((0.0, 3.0), (0.0, 0.0), "-|>", [b]),
+  ))
+]
