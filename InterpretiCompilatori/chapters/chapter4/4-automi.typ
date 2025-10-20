@@ -686,9 +686,16 @@ Una strategia utilizzata per esempio in molti programmi di elaborazione di testo
 
 L'algoritmo riceve in input una stringa $x$, un NFA con stato iniziale $s_0$, gli stati di accettazione $F$ e una funzione di transizione _move_(). Successivamente, viene mantenuto un insieme di stati correnti $S$, costituito dagli stati raggiungibili a partire da $s_0$ seguendo un percorso etichettato con i simboli d'ingresso letti finora. Se $c$ è il prossimo carattere, letto dalla funzione _nextChar_(), per prima cosa calcola _move_(S, c), quindi calcola la chiusura mediante la funzione $epsilon$-closure().
 
-```
-//TODO: algoritmo mancante
-```
+#figure(```c
+S = ε-closure(s0); 
+c = nextChar();
+while ( c != eof ) { 
+  S = ε-closure(move(S,c)); 
+  c = nextChar();
+} 
+if ( S ∩ F != Ø) return "yes "; 
+else return "no"; 
+```)
 
 == Minimizzazione di un DFA
 
@@ -767,3 +774,221 @@ Inizialmente la partizione contiene due gruppi di stati: stati d'accettazione e 
     edge((0.0, 3.0), (0.0, 0.0), "-|>", [b]),
   ))
 ]
+
+//TODO: volendo ci sono altri 2 esempi da trascrivere
+
+== Costruzione di un analizzatore lessicale
+=== Riconoscimento dei token
+//TODO: manca questo capitolo
+
+=== Diagrammi di transizione
+Il riconoscimento dei token è il processo attraverso il quale l'analizzatore lessicale esamina la sequenza di caratteri in ingresso per trovare il prefisso più lungo che corrisponda al pattern di un token. A tale scopo, le espressioni regolari (introdotte precedentemente) vengono convertite in *diagrammi di transizione*.
+
+#definition(
+  )[Un *diagramma di transizione* è essenzialmente un grafo composto da stati (nodi, rappresentati da cerchi) che riflettono le condizioni possibili durante l'analisi dell'input. Gli stati sono collegati da archi orientati etichettati con simboli (o insiemi di simboli). 
+]
+
+Valgono alcune convenzioni come per i DFA e NFA:
+1. Lo stato iniziale (o di partenza) è indicato da un arco entrante non proveniente da altri stati.
+2. Gli stati finali (o di accettazione) sono indicati con un doppio cerchio e associati a un'azione, tipicamente la restituzione di un token e del suo attributo al parser.
+3. Se il carattere che ha portato allo stato finale non fa parte del lessema riconosciuto, lo stato finale è annotato con un asterisco (\*), che indica la necessità di arretrare (retract) di una posizione il puntatore forward d'ingresso.
+
+#example(
+  )[
+Il seguente diagramma di transizione riconosce i lessemi relativi al token *relop*
+//TODO: Convertire diagramma
+#figure(image("images/2025-10-19-17-50-11.png"))
+Se l'analisi inizia nello stato 0 e legge <, si passa allo stato 1.
+- Dallo stato 1, se si legge `=` si riconosce `<=` e si passa allo stato finale 2 (restituendo relop, LE).
+- Dallo stato 1, se si legge `>` si riconosce `<>` e si passa allo stato 3 (restituendo relop, NE).
+- Dallo stato 1, se si legge qualsiasi altro carattere (other), si riconosce `<` e si passa allo stato 4, che richiede un arretramento (\*) poiché il carattere letto non fa parte del lessema.
+]
+
+L'analizzatore lessicale deve anche gestire l'eliminazione degli *spazi bianchi* (token ws), definiti da caratteri come spazi, tabulazioni e ritorni a capo. Quando il token ws viene riconosciuto, non viene restituito al parser; l'analizzatore *ricomincia* immediatamente l'analisi a partire dal carattere successivo.
+
+=== Riconoscimento di Identificatori e Parole Chiave
+#figure(image("images/2025-10-19-17-54-47.png"))
+Il diagramma di transizione per gli identificatori (Figura 3.12) riconosce anche i lessemi delle *parole chiave* (come if, then, else) se queste hanno una struttura simile agli identificatori.
+Due metodi principali sono usati per gestire il conflitto tra identificatori e parole chiave riservate:
+
++ *Installazione Preventiva nella Tabella dei Simboli*: Le parole chiave sono pre-caricate nella tabella dei simboli con un'indicazione del token che rappresentano. Quando il diagramma id riconosce un lessema (stato 11), la funzione `getToken()` consulta la tabella dei simboli: se il lessema è una parola chiave, restituisce il token specifico (es. IF); altrimenti, restituisce il token ID.
+
++ *Diagrammi Separati e Priorità*: Si possono usare diagrammi specifici per ogni parola chiave (come quello ipotetico per then in Figura 3.13). Questo approccio richiede di imporre una priorità in modo che, se un lessema corrisponde sia a una parola chiave sia a un id, venga data la precedenza alla parola chiave.
+  #figure(image("images/2025-10-19-17-56-42.png"))
+
+
+=== Completamento dell'esempio
+Il diagramma per gli identificatori (Figura 3.12) inizia leggendo una lettera (stato 9) e procede nello stato 10, dove accetta qualsiasi sequenza di lettere o cifre. Quando incontra un simbolo che non fa parte del lessema, passa allo stato 11, accetta, e arretra il puntatore.
+#figure(image("images/2025-10-19-17-58-24.png"))
+Il diagramma per il token number (Figura 3.14) è più complesso, gestendo interi, parti frazionarie (opzionali, introdotte da un punto) ed esponenti (opzionali, introdotti da E). L'identificazione di un numero intero avviene uscendo dallo stato 13 nello stato 20, mentre il riconoscimento di un numero con parte frazionaria senza esponente termina nello stato 21.
+#figure(image("images/2025-10-19-17-58-53.png"))
+Il diagramma degli spazi bianchi (Figura 3.15) riconosce caratteri delimitatori (delim). Lo stato finale 24 accetta il lessema di separazione e arretra il puntatore (\*), ma l'azione associata non restituisce un token al parser, bensì induce l'analizzatore lessicale a ricominciare l'analisi dall'input successivo.
+
+=== Architettura di un analizzatore lessicale basato su diagrammi di transizione
+L'implementazione di un analizzatore lessicale basato su diagrammi si traduce in codice in cui ogni stato corrisponde a una porzione di logica, spesso gestita tramite un costrutto di scelta multipla (switch) sulla variabile `state`.
+
+#example(
+  )[
+```cpp
+  TOKEN getRelop() 
+  { 
+    TOKEN retToken = new(RELOP); 
+    while(1) {/*repeat character processing until a return or failure occurs*/  
+      switch(state) { 
+        case 0:  
+          c = nextChar(); 
+          if (c == '<') state = 1; 
+          else if (c == '=') state = 5;  
+          else if (c == '>') state = 6;  
+          else fail(); /*lexeme is not a relop*/ 
+          break; 
+        case 1: 
+        ...
+        case 8:  
+          retract(); 
+          retToken.attribute = GT;  
+          return(retToken); 
+      } 
+    } 
+  } 
+  ```
+La funzione schematica `getRelop()` simula il diagramma per gli operatori relazionali. Il `switch(state)` gestisce le transizioni. Se un carattere non atteso viene letto, viene chiamata la funzione `fail()`, che ripristina il puntatore `forward` a `lexemeBegin` e passa il controllo a un nuovo diagramma di transizione o avvia la procedura di recupero dagli errori. Gli stati finali con arretramento (come lo stato 8) invocano la funzione `retract()` prima di restituire il token.
+]
+Per gestire tutti i token, si possono usare diversi approcci:
++ *Sequenziale*: Provare i diagrammi uno dopo l'altro.
++ *In Parallelo*: Eseguire tutti i diagrammi contemporaneamente, scegliendo il lessema più lungo riconosciuto.
++ *Diagramma Unico (Preferito)*: Combinare tutti i diagrammi in uno solo. Il diagramma combinato legge l'input finché non può più progredire, e poi sceglie il lessema più lungo accettato. Nel caso in cui il primo carattere identifichi univocamente il token (come nell'esempio), gli stati iniziali dei singoli diagrammi vengono semplicemente uniti in un unico stato iniziale.
+
+=== Il generatore di analizzatori lessicali Lex
+*Lex (o Flex)* è uno strumento che automatizza la creazione di analizzatori lessicali. Il programmatore fornisce una specifica ad alto livello (i pattern in espressioni regolari) e *Lex* genera il codice sorgente (in C, salvato in lex.yy.c) che simula il diagramma di transizione combinato.
+
+#figure(image("images/2025-10-19-18-08-06.png"))
+
+Il file `lex.l` (programma sorgente Lex) viene elaborato dal compilatore Lex per produrre `lex.yy.c`. Questo file viene poi compilato per ottenere un eseguibile (spesso a.out), che funge da analizzatore lessicale. L'analizzatore generato è tipicamente richiamato come subroutine dal parser, restituendo il nome del token (un intero) e utilizzando la variabile globale `yylval` per passare eventuali attributi.
+
+#observation(
+  )[
+Un *programma Lex* è diviso in tre sezioni principali:
++ *Dichiarazioni*: Contiene definizioni di variabili, costanti simboliche per i nomi dei token, e definizioni regolari (nomi simbolici che abbreviano espressioni regolari complesse, come {delim} o {ws}). Le sezioni racchiuse tra `%{` e `%}` vengono copiate direttamente nel file `lex.yy.c`.
++ *Regole di Traduzione*: Hanno la forma `Pattern { Action }`, dove `Pattern` è un'espressione regolare e `Action` è un frammento di codice C.
++ *Funzioni Ausiliarie*: Codice C per funzioni come `installID()` o `installNum()`.
+]
+//TODO: aggiungere il mega script mancante come esempio?
+
+
+== Progettazione di un generatore di analizzatori lessicali
+Un generatore come Lex opera *trasformando le espressioni regolari in automi finiti*. L'architettura dell'analizzatore lessicale generato (Figura 3.42) consiste in una *parte fissa di simulazione* dell'automa e *componenti generati* come la tabella di transizione e le azioni (frammenti di codice C).
+
+Per costruire automa, Lex per prima cosa prende *ogni espressione regolare* del programma e la trasforma mediante l'algoritmo apposito in un NFA $N_i$. Dato che si vuole ottenere un singolo automa che riconosca lessemi corrispondenti a un qualsiasi pattern del programma, Lex combina gli NFA cosi costruiti in un unico automa non-deterministico aggiungendo un nuovo stato iniziale con transizioni $epsilon$ verso ognuno degli stati iniziali degli automi $N_i$ relativi ai pattern $p_i$. 
+
+#figure(image("images/2025-10-19-18-21-13.png"))
+
+=== Riconoscimento dei pattern basato su NFA
+Se l'analizzatore lessicale simula il comportamento di un NFA combinato, la sua simulazione segue l'input, mantenendo traccia dell'insieme di stati raggiungibili in ogni momento. Quando l'analisi non può più proseguire, l'analizzatore lessicale torna indietro nella sequenza degli insiemi di stati per trovare l'insieme contenente uno stato di accettazione (NFA) che corrisponde al prefisso più lungo. In caso di conflitti tra pattern, viene applicata la regola di priorità (scegliendo il pattern elencato per primo nel programma Lex).
+
+=== Riconoscimento dei pattern basato su DFA
+L'approccio implementato da Lex si basa sulla conversione dell'NFA combinato in un DFA equivalente tramite l'algoritmo già visto. Ogni stato del DFA corrisponde a un insieme di stati NFA. Se uno stato DFA include più stati di accettazione NFA, viene etichettato con il pattern avente la massima priorità (quello elencato per primo in Lex). 
+
+
+#example(
+  )[
+  #figure(image("images/2025-10-19-18-25-02.png"))
+  Ad esempio, il DFA per i pattern a, abb e $a^* b^+$ combina i possibili stati di accettazione, garantendo la regola del prefisso più lungo e della priorità.
+  La simulazione del DFA prosegue fino a raggiungere uno stato pozzo (dead state, ∅) o quando non vi sono più transizioni possibili. A quel punto, si arretra fino all'ultimo stato DFA di accettazione visitato per determinare il lessema riconosciuto.
+  L'operatore di lookahead (/) nei DFA richiede un'attenzione particolare: la fine del lessema è identificata dalla posizione nell'input in cui si entrava nello stato NFA precedente la ϵ-transizione associata all'operatore /, massimizzando la lunghezza della parte r
+  1
+  ​
+  del pattern r
+  1
+  ​
+  /r
+  2
+  ​
+  .
+
+]
+
+//TODO: manca diversa roba del paragrafo 3.8, vedi PDF evidenziato.
+
+//Ormai l'oridine degli argomenti è andato a farsi friggere
+
+= Analisi Sintattica
+
+
+
+
+// Paragrafo 4.4
+// Esempio 4.14
+// Paragrafo 4.5 (solo evidenziato) + Figura 4.23 [accenno ad argomento futuro]
+// Inciso sulla classificazione dei parser
+
+//             Parser
+//       top-down              bottom-up
+// backtracking     no-backtracking
+// discesa ricorsiva    discesa ricorsiva
+//             tabellari
+//             LL(k)
+ 
+// Paragrafo 4.4.1 + FIgura(4.12)
+
+La seguente tabella è necessaria per applicare l'algoritmo che seguirà: ci permette di rispondere al passo 2, ovvero scegliere una produzione adatta. La sua costruzione è complessa e verrà vista più avanti.
+#figure(image("images/2025-10-20-22-32-35.png"))
+
+#figure(image("images/2025-10-20-22-34-05.png"))
+
+#example()[
+  Esempio applicazione 1 TODO
+]
+
+#example()[
+  Esempio applicazione 2 da Esempio 4.15 TODO
+  #figure(image("images/2025-10-20-22-35-16.png"))
+]
+
+Vediamo un esempio più complesso e spieghiamolo passo passo.
+
+#figure(image("images/2025-10-20-22-36-24.png"))
+//TODO: magari spiegare meglio
+
+Come stringa in ingresso consideriamo: `for(;expr;expr) other`
+#figure(image("images/2025-10-20-22-37-15.png"))
+
+//TODO: Suddividere in sezioni e alternare spiegazione a diagrammi
+#figure(image("images/2025-10-20-22-37-37.png"))
+
+Lo scopo é quello di costruire il resto dell’albero 
+di parsing in modo che la stringa da questo generata coincida con la stringa d’ingresso. 
+Affinché ci sia una corrispondenza, il non-terminale stmt nella Figura 2.18(a) deve 
+poter generare una stringa che inizia con il simbolo di lookahead for. Nella gram- 
+matica della Figura 2.16 c’é un’unica produzione per stmt che permette di derivare 
+una tale stringa: quindi la selezioniamo e costruiamo i nuovi nodi, figli della radice, 
+etichettandoli con i simboli nel corpo della produzione. Questa espansione dell’albero 
+di parsing é mostrata nella Figura 2.18(b). 
+
+Una volta costruiti i figli di un dato nodo, si passa al figlio pil a sinistra. Nella 
+Figura 2.18(b) i figli sono stati appena aggiunti alla radice e si sta considerando il 
+nodo etichettato con for. 
+
+Nella Figura 2.18(c) la freccia nell’albero di parsing si spostata sul secondo figlio 
+e la freccia nella stringa d’ingresso si spostata sul terminale successivo, cio® (. Il 
+successivo passo porta la freccia nell’albero sul nodo etichettato con optexpr e quella 
+nella stringa d’ingresso sul terminale ;. 
+
+Considerando il nodo relativo al non-terminale opteapr, ripetiamo la ricerca e la 
+selezione di una produzione per quel simbolo. Le produzioni aventi € come corpo 
+(dette €-produzioni o produzioni nulle) richiedono un trattamento speciale. Per il 
+momento le consideriamo come scelta di default quando nessun’altra produzione pud 
+essere utilizzata; ritorneremo su questo aspetto nel Paragrafo 4.9.3. Con optexpr come 
+nodo corrente e ; come simbolo di lookahead é@ necessario selezionare la ¢-produzione 
+poiché il terminale ; non permette di utilizzare l’altra produzione per opteapr che ha 
+il terminale expr come corpo. 
+
+#observation()[
+  Il backtracking non è sempre necessario. Data una tabella di parsing costruita bene (una sola produzione in una cella) allora non ci sarà mai bisogno di backtracking. Grammatiche di questo tipo si dicono LL(1).
+]
+
+== Ricorsione sinistra
+
+== Algoritmo eliminazione ricorsione sinistra
+
+== Fattorizzazione sinistra
