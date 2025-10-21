@@ -54,8 +54,7 @@ end
 Il criterio di arresta sopra commentato rende l'intera implementazione _naive_ e poco efficiente:
 - non sempre è richiesto un calcolo *esatto* della radice ma solo quello di una sua approssimazione entro una tolleranza `tol`;
 - la condizione `fx == 0` potrebbe non essere mai soddisfatta a causa dell'aritmetica finita. 
-  #example(
-    )[Considerando il polinomio
+  #example()[Considerando il polinomio
   $
     p(x) = (x-1.1)^20 (x-pi)
   $
@@ -322,3 +321,137 @@ $
   = (m-1)/m
 $
 ovvero, l'ordine di convergenza del metodo di Newton diventa *lineare*, come conseguenza del malcondizionamento del problema.
+
+
+== Convergenza locale
+
+Facciamo prima un riepilogo dei metodi appena visti per la ricerca degli zeri di una funzione. 
+- Metodo di bisezione:
+  - applicabile se $f in C[a,b] and f(a)f(b)<0$;
+  - ordine di convergenza lineare;
+  - numero massimo di iterazioni, per soddisfare un prescritto requisito di accuratezza, noto.
+
+- Metodo di Newton:
+  - $f(x)$ sia derivabile con continuità;
+  - se $f in C^2$ in un intorno di una *radice semplice*, allora si ha, se convergente alla radice, *convergenza quadratica* (ordine 2);
+  - se convergente ad una *radice multipla*, l'ordine diviene *lineare*, rispecchiando, così, il malcondizionamento del problema.
+
+Tuttavia, al contrario del metodo di bisezione, per il metodo di Newton
+$
+  x_(i+1) = x_i - f(x_i)/(f'(x_i)), space i=0,1,...
+$
+non è in generale possibile garantire la convergenza da un generico punto iniziale $x_0$.
+
+#example(
+  )[
+  Ad esempio, se consideriamo
+  $
+    f(x) = x^3 -5x = x(x^2-5)
+  $
+  che ha 3 radici, $0$, $plus.minus sqrt(5)$, tutte semplici. Se consideriamo $x_0=1$, allora generiamo la successione di approssimazioni
+  $
+    1,-1,1,-1,...
+  $
+  che, evidentemente, non converge.
+  #figure(image("images/2025-10-21-16-37-32.png"))
+]
+
+La conclusione di questo esempio è che la convergenza ad una radice è garantita, per il metodo di Newton, solo in un opportuno intorno della radice. Si parla in questo caso, di *convergenza di tipo locale* mente, per il metodo di bisezione, la *convergenza è globale*, ovvero, avviene sempre, se il metodo è applicabile.
+
+Cerchiamo di formalizzare questo concetto, per un generico metodo iterativo che denoteremo con
+$
+  x_(i+1) = Phi(x_i), space i=0,1,... space space space (1)\
+  x_0 -> x_1 = Phi(x_0) -> x_2 = Phi(x_1) -> ...
+$
+in cui $Phi(x)$ è detta *funzione di iterazione*. Ad esempio, per il metodo di Newton
+$
+  Phi(x) = x-f(x)/(f'(x))
+$
+Se il metodo iterativo (1) serve per determinare la radice $x^*$ di $f(x)$, allora $Phi(x)$ deve soddisfare la *proprietà di consistenza*:
+$
+  x^* = Phi(x^*) space space space (2)
+$
+che garantisce che, se raggiungiamo la radice, ci fermiamo. Questo significa che il problema di determinare lo zero di $f(x)$ equivale a trovare un *punto fisso* della funzione di iterazione $Phi(x)$. Pertanto, vogliamo vedere sotto quali condizioni per $Phi(x)$, partendo da un intorno del suo punto fisso (2), la successione di approssimazioni (1) converge a $x^*$. Vale il seguente risultato.
+
+#theorem(
+  )[
+  Se $exists delta > 0 : forall x,y in overbrace([x^*-delta, x^*+delta], =I(x^*))$ allora $Phi$ è *Lipschitziana* con costante $L<1$, cioè
+  $
+    abs(Phi(x)-Phi(y)) lt.eq L abs(x-y) space space forall x,y in I
+  $
+  Allora:
+  - $x^*$ è l'unico punto fisso di $Phi(x)$ in $I$.
+  - se $x_0 in I$, allora $x_i in I, space i=0,1,...$
+  - $lim_(i->infinity) x_i = x^*$
+]
+#proof()[
+  TODO
+]
+
+#corollary(
+  )[
+  Se $exists delta > 0 : forall x in overbrace([x^*-delta, x^*+delta], =I(x^*))$, $abs(Phi'(x)) lt.eq L<1$, allora $x_(i+1)=Phi(x_i)$ converge a $x^*$, per $i-> infinity$.
+]
+#proof(
+  )[
+  $forall x,y in I(x^*)$ e callo sviluppo di Taylor con resto al primo ordine segue dunque:
+  $
+    abs(Phi(x)-Phi(y)) = abs(cancel(Phi(x)) - cancel(Phi(x)) - Phi'(epsilon)(x-y)) = abs(Phi'(epsilon)) dot abs(x-y) < L abs(x-y), space "con " L<1
+  $
+  Pertanto vale il precedente teorema.
+]
+
+Vediamo come si applica questo risultato al metodo di Newton:
+$
+  Phi(x) = x-f(x)/(f'(x))\
+  Phi(x^*) = x^*-overparen(f(x^*), = 0)/(f'(x^*)) = x^*
+$
+Se $x^*$ è una radice semplice, allora $f'(x^*) eq.not 0 and $
+//TODO: come fare bar più grande?
+$
+  Phi'(x^*) = [ 1-(f'(x)^2 - f''(x)f(x))/(f'(x)^2) ] bar_(x=x^*) = [ (f''(x)overparen(f(x), =0))/(f'(x)^2) ] bar_(x=x^*) = (f''(x^*)overparen(f(x^*), =0))/(f'(x^*)^2) = 0
+$
+#figure(image("images/2025-10-21-17-07-50.png"))
+Nel caso di una radice multipla di molteplicità $m$, si può dimostrare che
+$
+  Phi'(x^*) = (m-1)/m
+$
+che comunque, è ancora $<1$, sebbene la convergenza diventi meno favorevole.
+
+== Ancora sul criterio d'arresto
+
+Se abbiamo il metodo iterativo
+$
+  x_(i+1) = Phi(x_i), space i=0,1,...
+$
+per determinare uno zero di $f(x)$, cerchiamo un criterio di arresto idoneo per l'iterazione. Esaminiamo, in particolare, il metodo id Newton:
+$ $
+Come abbiamo precedentemente visto per il metodo di bisezione, il valore di $f(x)$ nell'approssimazione, è da considerarsi "piccolo" se
+$
+  abs(f(x_i)) lt.eq "tol" dot abs(f'(x^*)) approx "tol" dot abs(f'(x_i))
+$
+ovvero se
+$
+  abs(f(x_i))/abs(f'(x_i)) lt.eq "tol"
+$
+e quindi, per il metodo di Newton, questo equivale a richiedere che 
+$
+  abs(x_(i+1) - x_i) lt.eq "tol"
+$
+che è un controllo sull'errore assoluto. Tuttavia, se $x_i -> x^*$, con $abs(x^*) >> 1$, sarebbe più efficace effetuare un controllo sull'errore relativo, ovvero
+$
+  abs(x^*-x_i)/abs(x^*) lt.eq "tol"
+$ 
+Per rendere la scelta del criterio d'arresto "automatica", potremmo passare a un criterio del tipo:
+$
+  abs(x_(i+1) - x_i) lt.eq (1+abs(x_i)) dot "tol"
+$
+ovvero
+$
+  abs(x_(i+1)-x_i)/(1+abs(x_i)) lt.eq "tol"
+$
+Pertanto, si ottiene approssimativamente un criterio di arresto basato sull'errore assoluto, se $x_i approx 0$, ovvero, sull'errore relativo se $abs(x_i) >> 1$. Questo criterio di arresto, pertanto, si autoscala in base alla radice a cui si sta convergendo.
+
+#observation()[
+  Questo criterio _deve_ essere usato negli elaborati finali.
+]
