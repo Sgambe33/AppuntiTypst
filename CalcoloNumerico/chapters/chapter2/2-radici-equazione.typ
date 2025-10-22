@@ -455,3 +455,107 @@ Pertanto, si ottiene approssimativamente un criterio di arresto basato sull'erro
 #observation()[
   Questo criterio _deve_ essere usato negli elaborati finali.
 ]
+
+== Il caso di radici multiple
+Vediamo come ovviare al degrado dell'ordine di convergenza del metodo di Newton verso radici multiple (è un problema malcondizionato). Si distinguono, a riguardo, i seguenti due casi significativi:
+- Molteplicità radice nota.
+- Molteplicità radice incognita.
+
+#[
+  #set heading(numbering: none, outlined: false)
+  === La molteplicità della radice è nota
+]
+Se $f(x)$ ha una radice $x^*$ di molteplicità $m>1$, ciò significa che $f(x^*)=f'(x^*)=...=f^(m-1)(x^*)=0 and f^m (x^*)eq.not 0$. In questo caso si può vedere che :
+$
+  f(x) = (x-x^*)^m g(x)
+$
+con $g(x)$ una funzione tale che $g(x^*)eq.not 0$. Nel caso più semplice, $g(x)=c="costante"$, vediamo cosa succede se applichiamo il metodo di Newton a $f(x)=c dot (x-x^*)^m$:
+$
+  x_(i+1) = x_i - overparen(c dot (x_i-x^*)^m, =f(x_i))/underparen(m dot c dot (x_i - x^*)^(m-1), =f'(x_i)) = x_i - m dot (x_i - x^*)/m = x^*
+$
+Invece, se utilizzassimo l'iterazione:
+$
+  x_(i+1)=x_i - m dot (f(x_i))/(f'(x_i)) =x_i - m dot (x_i - x^*)/m = x^*
+$
+Nel caso generale, si dimostra che l'iterazione (primi due passaggi del blocco precedente) ripristina la convergenza quadratica del metodo di Newton. Essa è quella del *metodo di Newton modificato*. Osserviamo che il costo di iterazione rimane lo stesso di quello del metodo di Newton (ovvero 1 valutazione di $f(x)$ + 1 di $f'(x)$).
+
+#[
+  #set heading(numbering: none, outlined: false)
+  === La molteplicità della radice è incognita
+]
+In questo caso, se definiamo l'errore al passo $i$, $e_i=x^*-x_i$, che
+$
+  lim_(i->infinity) (e_(i+1))/e_i = (m-1)/m " con " m " molteplicità (incognita di "x^*")"
+$
+Pertanto, anche se $m$ non è nota, sappiamo che per $i>>1$:
+$
+  (e_(i+1))/e_i approx c => e_(i+1) = c dot e_i " e " e_i = c dot e_(i-1)
+$
+da cui otteniamo, dividendo membro a membro, che:
+$
+  (e_(i+1))/e_i approx (e_i)/e_(i-1)
+$
+ovvero $e_(i+1) dot e_(i-1) approx e_i^2$ che significa che:
+$
+  (x_i^* - x_(i+1))(x_i^* -x_(i-1)) = (x_i^* - x_i)^2
+$
+da cui otteniamo:
+$
+  (x_i^*)^2 -(x_(i+1)+x_(i-1)) dot x_i^* + x_(i+1) dot x_(i-1) = (x_i^*)^2 - 2x_i x_i^* + x_i^2\
+
+  x_i^*=frac(x_(i+1)-x_(i-1)-x_i^2, x_(i+1)-2x_i+x_(i-1))
+$
+Questa iterazione definisce una procedura a 2 livelli: 
+$
+  x_0 overshell(-->, "Newton") x_i overshell(-->, "Newton") x_i => x_1^* " da cui ripeto i due passi di Newton"
+$
+Quindi, il costo per iterazione è doppio rispetto al metodo di Newton _standard_. Il vantaggio è che si può dimostrare che la successione ${x_i^*}$ converge quadraticamente a $x^*$ (anche se la convergenza rimane di tipo locale). Questa procedura a 2 livelli definisce il *metodo di accelerazione di Aitken*.
+#figure(
+  image("images/2025-10-22-16-00-39.png"),
+  caption: "Esempio di come Newton modificato e Aitken portino ad ottenere il valore della radice più velocemente del metodo di Newton standard.",
+)
+
+== Metodi quasi Newton
+Ricordiamo che nel metodo di Newton $x_(i+1) = x_i - (f(x_i))/(f'(x_i))$ con un costo di valutazione pari a 2. Questo risultato può essere migliorato lavorando sulla derivata prima al denominatore.
+#figure(image("images/2025-10-22-16-34-46.png"))
+Ricordiamo la definizione di derivata prima:
+$
+  f'(x_i) = lim_(h->infinity) frac(f(x_i+h)-f(x_i), h)
+$
+Se approssimiamo $f'(x_i)$ con frac(f(x_i+h)-f(x_i), h) con $h$ fissato, otterremo un'approssimazione del metodo di Newton: si parla, in questo caso, di un metodo *"quasi" Newton*. Nello specifico, otterremmo un metodo "quasi" Newton che ha un costo di 2 valutazioni funzionali per iterazione. Per migliorare questo approccio, procediamo come segue.
+#[
+  #set heading(numbering: none, outlined: false)
+  === Metodo delle secanti
+]
+#figure(image("images/2025-10-22-16-37-49.png"))
+Consideriamo la retta secante il grafico di $f(x)$ nei due punti $(x_i, f(x_i))$ e $(x_(i-1), f(x_(i-1)))$, il cui coefficiente angolare è dato dal seguente rapporto incrementale:
+$
+  frac(f(x_i)-f(x_(i-1)), x_i - x_(i-1)) approx f'(x_i)
+$
+Questa approssimazione della derivata prima definisce il *metodo delle secanti*:
+$
+  x_(i+1) = x_i - frac(f(x_i), f(x_i)-f(x_(i+1))) (x_i - x_(i+1)), space i=1,2,...
+$
+
+#observation(
+  )[
+  + Il metodo richiede due approssimazioni iniziali per essere innescato (metodo a due passi).
+  + Il costo per iterazione è di 1 valutazione funzionale eccetto la valutazione iniziale in cui ne facciamo 2.
+  + L'ordine di convergenza verso radici semplici è:
+    $
+      p=frac(sqrt(5)+1, 2) approx 1,618
+    $
+    La convergenza verso radici multiple è, al pari del metodo di Newton, *solo lineare*. Trattandosi di un approssimazione del metodo di Newton, la sua convergenza è, generalmente, locale.
+]
+
+
+#[
+  #set heading(numbering: none, outlined: false)
+  === Metodo delle corde
+]
+#figure(image("images/2025-10-22-16-43-55.png"))
+Per i passi successivi si utilizza l'approssimazione $f'(x_i) approx f'(x_0)$. L'espressione del metodo delle corde è pertanto:
+$
+  x_(i+1) = x_i - frac(f(x_i), f'(x_i)) space i=1,2,...
+$ 
+e richiede una valutazione per iterazione. La sua convergenza è ovviamente locale e l'ordine di convergenza si vede essere 1 (convergenza lineare). E' spesso utilizzato in problemi per cui è nota un'approssimazione iniziale $x_0$ molto vicina alla soluzione $x^*$.
