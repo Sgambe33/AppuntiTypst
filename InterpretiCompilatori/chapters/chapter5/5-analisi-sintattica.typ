@@ -2,77 +2,75 @@
 #pagebreak()
 
 = Analisi Sintattica
+I *parser* vengono classificati come segue:
+- Top-down
+  - Con backtracking
+    + A discesa ricorsiva
+  - Senza backtracking
+    + A discesa ricorsiva
+    + Tabellari
+    + LL(K)
+- Bottom-up
+  - ...
 
+== Parsing top-down
+Il parsing top-down può essere visto come il problema della costruzione di un albero di parsing corrispondente a una stringa d'ingresso partendo dalla radice dell'albero. A ogni passo del parsing top-down, il problema cruciale sta nel determinare la produzione corretta da applicare a un determinato non-terminale $A$. Una volta scelta una produzione per $A$, il resto del processo consiste nel verificare la corrispondenza tra i simboli terminali nle corpo della produzione e la stringa d'ingresso.
 
-// Paragrafo 4.4
-// Esempio 4.14
-// Paragrafo 4.5 (solo evidenziato) + Figura 4.23 [accenno ad argomento futuro]
-// Inciso sulla classificazione dei parser
+Una forma generale di parsing top-down, detta anche parsing a discesa ricorsiva, può richiedere _backtracking_ per trovare la produzione corretta da applicare per un non-terminale.
 
-//             Parser
-//       top-down              bottom-up
-// backtracking     no-backtracking
-// discesa ricorsiva    discesa ricorsiva
-//             tabellari
-//             LL(k)
- 
-// Paragrafo 4.4.1 + FIgura(4.12)
+#observation(
+  )[La seguente tabella è necessaria per applicare più facilmente (risponde immediatamente al passo 2) l'algoritmo che seguirà: ci permette di rispondere al passo 2, ovvero scegliere una produzione adatta. La sua costruzione è complessa e verrà vista più avanti.
+  #figure(table(
+    columns: 7,
+    stroke: 1pt,
+    align: center,
+    table.cell(rowspan: 2)[*Non\ terminale*],
+    table.cell(colspan: 6)[*Simbolo d'ingresso*],
+    [id],
+    [+],
+    [\*],
+    [(],
+    [)],
+    [\$],
+    [$E$],
+    [$E->T E'$],
+    [$$],
+    [$$],
+    [$E->T E'$],
+    [$$],
+    [$$],
+    [$E'$],
+    [$$],
+    [$E'->+T E'$],
+    [$$],
+    [$$],
+    [$E'->epsilon$],
+    [$E'->epsilon$],
+    [$T$],
+    [$T->F T'$],
+    [$$],
+    [$$],
+    [$T->F T'$],
+    [$$],
+    [$$],
+    [$T'$],
+    [$$],
+    [$T'->epsilon$],
+    [$T'->*F T'$],
+    [$$],
+    [$T'->epsilon$],
+    [$T'->epsilon$],
+    [$F$],
+    [$F->"id"$],
+    [$$],
+    [$$],
+    [$F->(E)$],
+    [$$],
+    [$$],
+  ))]
 
-La seguente tabella è necessaria per applicare l'algoritmo che seguirà: ci permette di rispondere al passo 2, ovvero scegliere una produzione adatta. La sua costruzione è complessa e verrà vista più avanti.
-#figure(table(
-  columns: 7,
-  stroke: 1pt,
-  align: center,
-  table.cell(rowspan: 2)[*Non\ terminale*],
-  table.cell(colspan: 6)[*Simbolo d'ingresso*],
-  [id],
-  [+],
-  [\*],
-  [(],
-  [)],
-  [\$],
-  [$E$],
-  [$E->T E'$],
-  [$$],
-  [$$],
-  [$E->T E'$],
-  [$$],
-  [$$],
-  [$E'$],
-  [$$],
-  [$E'->+T E'$],
-  [$$],
-  [$$],
-  [$E'->epsilon$],
-  [$E'->epsilon$],
-  [$T$],
-  [$T->F T'$],
-  [$$],
-  [$$],
-  [$T->F T'$],
-  [$$],
-  [$$],
-  [$T'$],
-  [$$],
-  [$T'->epsilon$],
-  [$T'->*F T'$],
-  [$$],
-  [$T'->epsilon$],
-  [$T'->epsilon$],
-  [$F$],
-  [$F->"id"$],
-  [$$],
-  [$$],
-  [$F->(E)$],
-  [$$],
-  [$$],
-))
-
+Il seguente algoritmo pemette di esaminare una stringa in ingresso applicando la discesa ricorsiva.
 #figure(image("images/2025-10-20-22-34-05.png"))
-
-#example()[
-  Esempio applicazione 1 TODO
-]
 
 #example()[
   Consideriamo la grammatica seguente:
@@ -93,7 +91,7 @@ La seguente tabella è necessaria per applicare l'algoritmo che seguirà: ci per
   $)
 ]
 
-Vediamo un esempio più complesso e spieghiamolo passo passo.
+Vediamo un esempio più complesso e spieghiamolo passo passo. Data questa grammatica:
 
 $
   italic("stmt")    &--> &&bold("expr");\
@@ -114,30 +112,12 @@ Come stringa in ingresso consideriamo: `for(;expr;expr) other`
 
 Lo scopo è quello di costruire il resto dell'albero 
 di parsing in modo che la stringa da questo generata coincida con la stringa d'ingresso. 
-Affinché ci sia una corrispondenza, il non-terminale stmt nella Figura 2.18(a) deve 
-poter generare una stringa che inizia con il simbolo di lookahead for. Nella gram- 
-matica della Figura 2.16 c'è un'unica produzione per stmt che permette di derivare 
-una tale stringa: quindi la selezioniamo e costruiamo i nuovi nodi, figli della radice, 
-etichettandoli con i simboli nel corpo della produzione. Questa espansione dell'albero 
-di parsing è mostrata nella Figura 2.18(b). 
-
-Una volta costruiti i figli di un dato nodo, si passa al figlio pil a sinistra. Nella 
-Figura 2.18(b) i figli sono stati appena aggiunti alla radice e si sta considerando il 
-nodo etichettato con for. 
-
-Nella Figura 2.18(c) la freccia nell'albero di parsing si spostata sul secondo figlio 
-e la freccia nella stringa d'ingresso si spostata sul terminale successivo, cio® (. Il 
-successivo passo porta la freccia nell'albero sul nodo etichettato con optexpr e quella 
-nella stringa d'ingresso sul terminale ;. 
-
-Considerando il nodo relativo al non-terminale opteapr, ripetiamo la ricerca e la 
-selezione di una produzione per quel simbolo. Le produzioni aventi € come corpo 
-(dette €-produzioni o produzioni nulle) richiedono un trattamento speciale. Per il 
-momento le consideriamo come scelta di default quando nessun'altra produzione pud 
-essere utilizzata; ritorneremo su questo aspetto nel Paragrafo 4.9.3. Con optexpr come 
-nodo corrente e ; come simbolo di lookahead è@ necessario selezionare la ¢-produzione 
-poiché il terminale ; non permette di utilizzare l'altra produzione per opteapr che ha 
-il terminale expr come corpo. 
+Affinché ci sia una corrispondenza, il non-terminale _stmt_ nella Figura 2.18(a) deve poter generare una stringa che inizia con il simbolo di lookahead *for*. Nella grammatica precedentemente descritta, c'è un'unica produzione per _stmt_ che permette di derivare una tale stringa: quindi la selezioniamo e costruiamo i nuovi nodi, figli della radice, etichettandoli con i simboli nel corpo della produzione. Questa espansione dell'albero di parsing è mostrata nella Figura 2.18(b). 
+Una volta costruiti i figli di un dato nodo, si passa al figlio più a sinistra. Nella Figura 2.18(b) i figli sono stati appena aggiunti alla radice e si sta considerando il nodo etichettato con *for*. 
+Nella Figura 2.18(c) la freccia nell'albero di parsing si spostata sul secondo figlio e la freccia nella stringa d'ingresso si spostata sul terminale successivo, cioè *(*. Il successivo passo porta la freccia nell'albero sul nodo etichettato con _optexpr_ e quella nella stringa d'ingresso sul terminale *;*. 
+Considerando il nodo relativo al non-terminale _optexpr_, ripetiamo la ricerca e la 
+selezione di una produzione per quel simbolo. Le produzioni aventi $epsilon$ come corpo (dette $epsilon$-produzioni o produzioni nulle) richiedono un trattamento speciale. Per il momento le consideriamo come scelta di default quando nessun'altra produzione può essere utilizzata. Con _optexpr_ come nodo corrente e *;* come simbolo di lookahead è necessario selezionare la $epsilon$-produzione poiché il terminale *;* non permette di utilizzare l'altra produzione per _optexpr_ che ha 
+il terminale _expr_ come corpo. 
 
 #observation(
   )[
@@ -169,10 +149,23 @@ $
     & A -> beta_1 A' bar beta_2 A' bar ... bar beta_n A'\
     & A-> alpha_1 A' bar alpha_2 A' bar ... bar alpha_m A' bar epsilon
 $
-Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta pià ricorsione a sinistra. Questo metodo elimina la ricorsione sinistra da tutte le produzioni per $A$ e $A'$ (a patto che nessuno degli $alpha_i$ coincida con $epsilon$), ma non è in grado di eliminarla nel caso di derivazionei che richiedono due più passi.
+Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta pià ricorsione a sinistra. Questo metodo elimina la ricorsione sinistra da tutte le produzioni per $A$ e $A'$ (a patto che nessuno degli $alpha_i$ coincida con $epsilon$), ma non è in grado di eliminarla nel caso di derivazionei che richiedono due o più passi.
 
 #example()[
-  TODO E->E+T ...
+  Consideriamo questa grammatica:
+  $
+      &E-> E+T bar E-T bar T space "(due ricorsioni)"\
+      &T-> T*F bar F space "(una ricorsione)"\
+      &F->(E) bar "id"
+  $
+  Applicando il metodo appena visto si ottiene quest'altra grammatica equivalente:
+  $
+      &E->T E'\
+      &E'->+T E' bar - T E' bar epsilon\
+      &T-> F T'\
+      &T'-> * F T' bar epsilon\
+      &F->(E) bar "id"
+  $
 ]
 
 === Algoritmo di eliminazione della ricorsione sinistra
@@ -201,6 +194,8 @@ Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta pià ri
   Questa nuova grammatica è priva di ricorsione sinistra.
 ]
 
+//TODO: mancano due esempi qui ma non si comprende la grafia, cercare altre fonti.
+
 == Fattorizzazione sinistra
 #definition(
   )[
@@ -227,7 +222,8 @@ $
 $
 in cui $A'$ è un nuovo non-terminale. Si ripeta questo procedimento finché non esistono più produzioni alternative per uno stesso non-terminale aventi un prefisso comune.
 
-#example()[
+#example(
+  )[
   Data la produzione:
   $
     A-> a b c d bar a b c e bar a b f
@@ -249,5 +245,26 @@ in cui $A'$ è un nuovo non-terminale. Si ripeta questo procedimento finché non
     [$A'-> d bar e$],
   ))
 
+  Rivediamolo ma con una piccola variazione:
+  $
+    A-> A b c d bar A b c e bar a b f
+  $
+  Adesso la grammatica è affetta sia da ricorsione che da fattorizzazione. Per ottenerne una equivalente semplificata possiamo agire prima sulla fattorizzazione o sulla ricorsione. L'ordine con cui si agisce sui due problemi non ha importanza.
 
+  #figure(grid(
+    align: left,
+    rows: 4,
+    columns: 3,
+    row-gutter: 8pt,
+    [1) Fattorizzo:],[],[2) Rimuovo la ricorsione:],
+    [$A-> a b c A' bar a b f$],
+    [],
+    [$ A-> a b A''$],
+    [$A'-> d bar c$],
+    [$quad => quad$],
+    [$A''-> c A' bar f$],
+    [],
+    [],
+    [$A'-> d bar e$],
+  ))
 ]
