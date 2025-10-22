@@ -1,7 +1,7 @@
 #import "../dvd.typ": *
 
 #dvdtyp(
-  title: "Appunti Calcolo Numerico", 
+  title: "Appunti Calcolo Numerico",
   author: none,
   subtitle: "Teoria\nCorso 2025/2026",
   cover-image: image("cover.jpg", height: 100%, width: 100%),
@@ -12,7 +12,6 @@
 
   #pagebreak()
 
-  #include "chapters/chapter1/1-introduzione.typ"
-  #include "chapters/chapter2/2-sorgenti-errori.typ"
-  #include "chapters/chapter3/3-chapter3.typ"
+  #include "chapters/chapter1/1-errori-aritmetica.typ"
+  #include "chapters/chapter2/2-radici-equazione.typ"
 ]
