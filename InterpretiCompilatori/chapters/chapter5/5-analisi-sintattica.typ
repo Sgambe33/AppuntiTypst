@@ -256,7 +256,9 @@ in cui $A'$ è un nuovo non-terminale. Si ripeta questo procedimento finché non
     rows: 4,
     columns: 3,
     row-gutter: 8pt,
-    [1) Fattorizzo:],[],[2) Rimuovo la ricorsione:],
+    [1) Fattorizzo:],
+    [],
+    [2) Rimuovo la ricorsione:],
     [$A-> a b c A' bar a b f$],
     [],
     [$ A-> a b A''$],
@@ -267,4 +269,106 @@ in cui $A'$ è un nuovo non-terminale. Si ripeta questo procedimento finché non
     [],
     [$A'-> d bar e$],
   ))
+]
+
+== Funzioni FIRST e FOLLOW
+
+La costruzione dei parser bottom-up e top-down utilizza due funzioni, *FIRST* e *FOLLOW*, associate a una grammatica G. In particolare, nel parsing top-down queste funzioni ci permettono di scegliere quale produzione applicare basandoci sul simbolo d'ingresso successivo. 
+
+#[
+  #set heading(numbering: none, outlined: false)
+  === FIRST
+]
+#definition()[
+  Data G grammatica e $alpha$ forma di frase, si definisce FIRST($alpha$) come:
+  $
+    "FIRST("alpha")"= {a in Sigma bar alpha der(*) a beta} union {epsilon}
+  $
+  Ovvero l'insieme dei terminali che costituiscono l'inizio delle stringhe derivabili da $a$.
+]
+
+Per calcolare *FIRST* si seguono queste indicazioni:
+- Se $x$ è un terminale:
+  $
+    "FIRST("x")"= {x}
+  $
+- Se $X$ è una variabile. Se esiste in G una regola $X->Y_1 Y_2 ... Y_k$ con $k gt.eq 1$.
+  + Se $Y_1 Y_2 ... Y_(i-1) der(*) epsilon$ e $Y_1 der(*) epsilon$, allora:
+    $
+      "FIRST("X")" #box(scale(x: -100%, [$subset.eq$])) union.big_(j=1)^k "FIRST("Y_j")" \\ {epsilon}
+    $
+  + Se $Y_1 Y_2 ... Y_k der(*) epsilon$, allora:
+    $
+      "FIRST("X")" #box(scale(x: -100%, [$subset.eq$])) union.big_(j=1)^k "FIRST("Y_j")"
+    $
+- Se $X-> epsilon$:
+  $
+    epsilon in "FIRST("X")"
+  $
+
+Allo stesso modo, se si vuole calcolare FIRST su un insieme di variabili:
++ Se $X_1 X_2 ... X_(i-1) der(*) epsilon$ e $X_i cancel(der(*)) epsilon$, allora:
+  $
+    "FIRST("X_1 X_2 ... X_n")" = union.big_(j=1)^k "FIRST("X_j")" \\ {epsilon}
+  $
++ Se $X_1 X_2 ... X_n der(*) epsilon$, allora:
+  $
+    "FIRST("X_1 X_2 ... X_n")" = union.big_(j=1)^k "FIRST("X_j")"
+  $
+
+#example(
+  )[
+  $
+      &A-> B C a\
+      &B-> b bar epsilon\
+      &C-> c bar epsilon
+  $
+  FIRST($A$) = FIRST($B$) $union$ FIRST($C$) $union$ FIRST($a$) = ${b} union {c} union {a} = {a b c}$
+  #observation()[
+    Attenzione, $epsilon$ non è presente perché $A$ non può dare origine ad una stringa vuota (c'è per forza "a").
+  ]
+]
+
+#example(
+  )[
+  $
+      &S->A x bar y B quad quad quad && "FIRST("S")"=overshell({y,x,z,a}, "Non c'è" epsilon \ "perché non"\ "generabile")\
+      & B-> epsilon bar z B          && "FIRST("B")" = {epsilon, z}\
+      & A-> epsilon bar B a S        && "FIRST("A")" = {epsilon, z, a}
+  $
+]
+
+#[
+  #set heading(numbering: none, outlined: false)
+  === FOLLOW
+]
+
+#definition(
+  )[
+  Data G grammatica e $A in V$, si definisce FOLLOW($A$) come:
+  $
+    "FOLLOW("A")"= {a in Sigma bar S der(*) alpha A a beta}
+  $
+  Ovvero l'insieme dei simboli terminali che possono apparire immediatamente alla destra di $A$ in una qualche forma sentenziale.
+  #observation(
+    )[
+    Se $A$ appare come simbolo più a destra
+    di una qualche forma sentenziale, allora \$ appartiene all'insieme FOLLOW($A$). Ricordiamo che il simbolo \$ è uno speciale “marcatore di fine” e non appartenente ad alcuna grammatica.
+  ]
+]
+
+Per calcolare FOLLOW($A$) per tutti i non-terminali $A$ si proceda applicando le regole seguenti finché non sia più possibile aggiungere nulla all'insieme FOLLOW. 
++ Si aggiunga \$ a FOLLOW($S$), ricordando che $S$ è il simbolo iniziale e \$ è il marcatore di fine della stringa d'ingresso. 
++ Se esiste una produzione del tipo $A -> a B beta$, allora si aggiunga a FOLLOW($B$) ogni elemento di FIRST($beta$) eccetto $epsilon$. 
++ Se esiste una produzione del tipo $A -> alpha B$ oppure del tipo $A -> alpha B beta$ per cui FIRST($beta$) contiene $epsilon$, allora tutti i simboli in FOLLOW($A$) appartengono anche a FOLLOW($B$). 
+
+#example(
+  )[
+  $
+      & S-> A C B bar C b b bar B a quad quad quad && "FOLLOW("S")"={\$}\
+      & A-> d a bar B C                            && "FOLLOW("A")" #box(scale(x: -100%, [$subset.eq$])) "FIRST("C B")" \\ {epsilon}\
+      & B-> g bar epsilon\
+      & C-> h bar epsilon
+  $
+  //TODO: manca altro in sto esempio?
 ]
