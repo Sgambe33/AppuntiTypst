@@ -372,3 +372,327 @@ Per calcolare FOLLOW($A$) per tutti i non-terminali $A$ si proceda applicando le
   $
   //TODO: manca altro in sto esempio?
 ]
+
+/// 23 Ottobre 2025: Definizione di grammatica LL(1) (paragrafo 4.4.3 e dispensa "Sulle grammatiche LL(1))". Costruzione della tabella di parsing predittivo (paragrafo 4.4.3 e dispensa "Tabelle di parsing predittivo"). Parsing predittivo non ricorsivo (paragrafo 4.4.4 e dispensa "Tabelle di parsing predittivo"). 
+
+== Grammatiche LL(1)
+
+E' sempre possibile costruire un parser predittivo - cioè un parser a discesa ricorsiva senza backtracking - a partire da una grammatica della classe LL(1). La prima “L” indica che la sequenza d'ingresso viene analizzata da sinistra (left, appunto) verso destra, la seconda “L” specifica che si costruisce una derivazione sinistra e infine l'“1” fra parentesi indica che le decisioni durante il parsing vengono prese analizzando un solo simbolo di lookahead cioè guardando il prossimo simbolo della stringa in ingresso. La classe LL(1) è sufficientemente ricca da coprire la maggior parte dei linguaggi di programmazione. 
+- Una grammatica che presenta *ricorsione sinistra non è LL(1)*. 
+- Una grammatica in cui *le produzioni per una variabile hanno
+  prefissi comuni non è LL(1)*.
+
+#definition(
+  )[
+  Una grammatica $G$ è LL(1) se e solo se soddisga le seguenti condizioni per ogni variabile $A$.
+  Se $A -> alpha_1 bar alpha_2 bar ... bar alpha_k$ sono le produzioni per $A$, allora
+  - FIRST($alpha_i$) $inter$ FIRST($alpha_j$) $= emptyset quad forall i eq.not j$
+  - se $exists i$ tale che $alpha_i der(*) epsilon$ allora
+    - $alpha_j cancel(der(*)) epsilon quad forall j eq.not i$ e
+    - FOLLOW($A$) $inter$ FIRST($A$) $= emptyset$
+  Per ogni variabile:
+  - gli insiemi FIRST relativi alle parti destre delle produzioni sono due a due disgiunti
+  - esiste al più una parte destra che può derivare $epsilon$ in questo caso l'insieme FOLLOW della variabile deve essere disgiunto dagli insiemi FIRST di tutte le parti destre, cioè dal FIRST della variabile.
+]
+
+=== Parsing a discesa ricorsiva per grammatiche LL(1)
+Se le regole per la variabile $A$ sono $A-> alpha_1 bar alpha_2 bar ... bar alpha_k$ allora:
+#grid(
+  columns: 2,
+  figure(image("images/2025-10-30-19-22-15.png", width: 63%)),
+  figure(image("images/2025-10-30-19-22-26.png", width: 50%)),
+)
+//TODO: manca esempio da slide "Sulle LL(1).pptx"
+
+== Tabelle di parsing predittivo
+Le informazioni fornite dagli insiemi FIRST e FOLLOW possono essere raccolte in una tabella di parsing predittivo, $M$, in cui le righe corrispondono alle variabili e le colonne ai terminali e al marcatore di fine stringa \$. Il contenuto di $M[A, a]$ indica la regola da utilizzare per espandere la variabile $A$ quando il prossimo simbolo in ingresso è $a$.
+
+La costruzione della tabella si basa sul fatto che la regola $A-> alpha$ viene scelta soltanto se il simbolo in ingresso $a in$ FIRST($alpha$), oppure $alpha der(*) epsilon$ e $a in$ FOLLOW($A$) (in questo caso può essere $a = \$$).
+
+=== Costruzione di una tabella di parsing predittivo
+Per ogni produzione $A-> alpha$ della grammatica $G$:
++ per ogni terminale $a in$ FIRST($alpha$) si aggiunge $A-> alpha$ a $M[A,a]$
++ se $epsilon in$ FIRST($alpha$), allora per ogni simbolo $b in$ FOLLOW($A$) (incluso eventualmente \$) si aggiunge $A-> alpha$ a $M[A,b]$
+
+Se in $M[A, a]$ non c'è nessuna regola si ha una condizione di errore: il simbolo a non può essere ottenuto applicando nessuna delle regole per $A$.
+Se $M[A, a]$ contiene più di una regola allora la grammatica non è LL(1) perché a appartiene agli insiemi FIRST di due regole distinte oppure $A der(*) epsilon$ e $a$ appartiene al FOLLOW($A$) e al FIRST di una regola per $A$.
+
+#example()[
+  #figure(image("images/2025-11-01-12-53-32.png"))
+  #figure(image("images/2025-11-01-12-53-46.png"))
+  //TODO: convertire immagini
+]
+
+== Parsing predittivo non ricorsivo
+Un parser predittivo non ricorsivo può essere costruito gestendo uno stack esplicitamente, piuttosto che facendo affidamento sullo stack (implicito) dovuto alle chiamate ricorsive. Il parser riproduce il processo di derivazione sinistra. Se $w$ è la porzione dell'ingresso riconosciuta a un certo momento, allora lo stack contiene una sequenza di simboli grammaticali a tali che 
+$
+  S der(*) w alpha
+$
+Il parser è dotato di
+- un buffer di ingresso (contiene la stringa in esame seguita da \$)
+- uno stack contenente simboli in $V union Sigma union {\$}$
+- una tabella di parsing
+- uno stream di uscita
+
+Inizialmente lo stack contiene il simbolo \$ (in fondo) e il simbolo distinto della grammatica. Ad ogni passo, il parser considera il simbolo $X$ in cima allo stack e il simbolo d'ingresso corrente $a$.
+- Se $X$ è una variabile, il parser esamina l'elemento $M[X, a]$
+  - se contiene una regola $X -> alpha$ allora, nello stack, $X$ viene sostituito da $alpha$ (il primo simbolo in testa), ed eventualmente costruiti i nodi corrispondenti nell'albero di parsing;
+  - se è vuoto si ha una situazione di errore che può essere segnalata.
+- Se $X$ è un terminale, viene confrontato col simbolo in ingresso a
+  - se sono uguali $X$ viene rimosso dallo stack e si avanza al prossimo simbolo in ingresso
+  - se sono diversi si ha una situazione di errore.
+
+Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la stringa in esame è stata scandita completamente, la stringa viene accettata. Il comportamento del parser è descritto dalle sue configurazioni che sono costituite dal contenuto dello stack e dalla parte di input ancora da esaminare.
+
+#figure(image("images/2025-11-01-15-44-17.png"))
+
+Inizialmente $w\$$ nel buffer $S\$$ nello stack ($S$ in cima), _ip_ punta al primo simbolo $a$ di $w$.
+
+Assegna a $X$ il simbolo in cima allo stack $PP(X="pop"(PP))$
+#figure(image("images/2025-11-01-15-45-45.png"))
+#figure(image("images/2025-11-01-15-45-52.png"))
+#figure(image("images/2025-11-01-15-45-58.png"))
+#figure(image("images/2025-11-01-15-46-02.png"))
+
+/// 27 Ottobre 2025: Parsing bottom-up. Riduzioni, metodo di potatura nel parsing shift - reduce, il concetto di handle e sue proprietà (paragrafi 4.5, 4.5.1, 4.5.2, 4.5.3, 4.5.4  e dispensa "Analisi bottom-up").
+
+== Parsing bottom-up
+Il parsing bottom-up procede alla costruzione di un albero di parsing per una data stringa d'ingresso cominciando dalle foglie (bottom) e procedendo verso I'alto (up) fino alla radice. 
+
+#example(multiple: true)[
+  #figure(image("images/2025-11-01-15-55-43.png"))
+  #figure(image("images/2025-11-01-15-55-49.png"))
+]
+
+=== Riduzioni
+
+Gli analizzatori bottom-up partono da una stringa w e procedono a ritroso, effettuando una progressiva riduzione, fino ad ottenere il simbolo distinto S.
+
+I parser bottom-up si basano sul meccanismo di riduzione che consiste nel sostituire la parte destra di una regola con la parte sinistra.
+
+Per definizione, una riduzione é l'esatto opposto di un passo di derivazione (si ricordi che in una derivazione un non-terminale in una forma sentenziale viene sostituito dal corpo di una delle sue produzioni). Lo scopo del parsing bottom-up è quindi quello di costruire una derivazione al rovescio.
+
+Per gli esempi precedenti, considerando le radici dei sottoalberi, si hanno le sequenze di stringhe:
+id \* id, F \* id, T \* id, T \* F, T, E e
+id + id, F + id, T + id, E + id, E + F, E + T, E
+che corrispondono alle derivazioni destre
+E ⇒ T ⇒ T \* F ⇒ T \* id ⇒ F \* id ⇒ id \* id e
+E ⇒ E + T ⇒ E + F ⇒ E + id ⇒ T + id ⇒ F + id ⇒ id + id
+
+Ad ogni passo dell'analisi, i parser bottom-up effettuano una riduzione oppure scandiscono un simbolo in ingresso. Per questo sono detti anche parser shift-reduce, impila-riduci, sposta-riduci.
+Le decisioni fondamentali ad ogni passo sono se effettuare una riduzione e quale regola utilizzare.
+
+=== Potatura?
+
+Il parsing bottom-up della sequenza da sinistra a destra dei simboli di una stringa d'ingresso costruisce una derivazione destra al contrario.
+
+#definition(
+  )[
+  Una *maniglia* o *handle* è una sottostringa corrispondente alla parte dx di una regola e la cui riduzione rappresenta un passo nella derivazione destra a ritroso.
+]
+
+
+//TODO: scegliere tra le immagini
+#figure(image("images/2025-11-01-15-58-18.png"))
+#figure(image("images/2025-11-01-16-12-02.png"))
+
+Nel primo esempio nella stringa T \* id, T non viene ridotta
+anche se è parte dx della regola E → T .
+Nel secondo esempio, invece, nella stringa T + id, T viene
+ridotta con la regola E → T .
+Una sottostringa sinistra corrispondente alla parte dx di una
+regola non è necessariamente un handle.
+
+oppure
+
+Per esempio, aggiungendo i pedici ai token per chiarezza, gli handle durante il 
+parsing di id; \*idz secondo la grammatica 4.1 sono riportati nella Figura 4.24. Benché 
+T sia il corpo della produzione E — T, il simbolo T non é\@ un handle per la forma 
+sentenziale T' \*idg. Se infatti T fosse sostituito da E otterremmo la forma FE \* id, che 
+non puo essere derivata dal simbolo iniziale E. Pertanto si conclude che la sottostringa 
+sinistra corrispondente al corpo di una qualche produzione non deve necessariamente 
+essere un handle.
+
+
+
+Formalmente, se $S der(*) alpha A w => alpha beta w$ la produzione $A -> beta$ nella posizione che segue $alpha$ è un handle di $alpha beta w$.
+#figure(
+  image("images/2025-11-01-15-58-57.png", width: 30%),
+  caption: [Un handle $A->beta$ nell'albero di parsing relativo alla stringa $alpha beta w$],
+)
+
+Alternativamente, un handle per una 
+forma sentenziale destra y é costituito dalla produzione A — f e da una posizione 
+in 7 in cui si trova la stringa £ tale che la sostituzione di tale occorrenza di 8 con A 
+produce la forma sentenziale destra precedente in una derivazione destra di 7. 
+Si noti che la stringa w a destra dell'handle deve contenere solo simboli terminali. 
+Per semplicita parlando di handle ci riferiremo al corpo 7 di una produzione A — B 
+piuttosto che alla produzione stessa. Se una grammatica è non ambigua, allora ogni orma 
+sentenziale destra della grammatica ammette uno e un solo handle. 
+
+
+Una derivazione destra a rovescio può essere ottenuta mediante un processo noto 
+come _potatura_. Si comincia dalla stringa $w$ costituita dai simboli terminali da analizzare.
+$
+  S=gamma_0 => gamma_1 => gamma_2 => ... => gamma_(n-1) => gamma_n = w
+$
+Per ricostruire questa derivazione in ordine inverso, si individua l'handle $beta_n$ in $gamma_n$ e si sostituisce con la parte sinistra della regola $A_n -> beta_n$, in modo da ottenere la forma di frase destra precedente $gamma_(n-1)$.
+Poi si individua l'handle $beta_(n-1)$ in $gamma_(n-1)$ e si sostituisce con la parte sinistra della regola $A_(n-1)->beta_(n-1)$, in modo da ottenere la forma di frase destra precedente $gamma_(n-1)$. Se, procedendo in questo modo, otteniamo una forma di frase destra costituita unicamente dal simbolo iniziale $S$ della grammatica significa che il parsing è stato completato con successo.
+
+=== Parsing shift-reduce
+Nel parsing _impila-riduci_ o _shift-reduce_ si usa uno stack che mantiene i simboli grammaticali, oltre al marcatore di fine stringa \$ e un buffer di ingresso che contiene la parte di input ancora da analizzare.
+Un handle, subito prima di essere individuato come tale, si trova
+sempre in cima allo stack.
+Il simbolo \$ viene utilizzato come marcatore di fine stringa e per
+indicare il fondo dello stack. Inizialmente lo stack contiene \$ e in
+ingresso si ha $w\$$.
+
+
+La stringa in ingresso viene scandita da sinistra a destra. Il parser inserisce nello stack (shift) zero o più simboli finché in cima non si trova un handle $beta$. A questo punto viene effettuata una riduzione (reduce) sostituendo $beta$ con la parte sinistra della regola opportuna. Il parser ripete questo procedimento finché non rileva un errore oppure lo stack contiene $\$S$ e in ingresso è rimasto solo \$.
+
+Benché le operazioni principalei siano shift e reduce, vi sono in realtà quattro azione che uno parser shift-reduce può compiere:
++ Shift. Inserisce il prossimo simbolo in ingresso in cima allo stack.
++ Reduce. Il simbolo più a destra della stringa da ridurre si trova in cima allo stack. Si effettua una riduzione sostituendo la parte dx della regola con la parte sx.
++ Accept. Indica il corretto completamento dell'analisi.
++ Error. Si è verificata una situazione di errore.
+
+Negli esempi lo stack viene rappresentato con l'elemento di testa
+a destra (così contenuto dello stack e input da scandire, letti di
+seguito, corrispondono alle fdf dx.
+
+#figure(image("images/2025-11-01-16-00-47.png"))
+#figure(image("images/2025-11-01-16-00-52.png"))
+#figure(image("images/2025-11-01-16-00-57.png"))
+
+//TODO: le problematiche le ha fatte? (4.5.4)
+
+== Parser LR
+Il tipo pi comune di parsing oggi adottato si basa su un concetto noto come parsing LR(k); la “L” significa che la stringa di input viene scorsa da sinistra a destra, la “R” indica che si costruisce una derivazione destra in ordine inverso e infine la k indica il numero di simboli di lookahead utilizzati per prendere le decisioni durante il parsing.
+
+I parser LR, come i parser LL non-ricorsivi visti prima, si basano sull'utilizzo di tabelle. Una grammatica per la quale si può costruire una tabella di parsing (con i metodi che seguiranno) viene detta grammatica LR. Perché una grammatica sia LR è sufficiente che un parser shift-reduce sia in grado di riconoscere gli handle delle fdf dx quando compaiono in cima allo stack.
+
+Il parsing LR è importante per le seguenti ragioni:
+- È idoneo per riconoscere i costrutti dei linguaggi di programmazione descritti da grammatiche context-free
+- È il metodo più generale di parsing shift-reduce senza backtracking
+- Individua errori sintattici appena possibile
+- La classe delle grammatiche riconosciute da un parser LR è un sovrainsieme proprio di quelle riconosciute dai parser LL.
+
+Un parser LR prende le decisioni shift/reduce mantenendo memorizzate informa- 
+zioni di stato che gli permettono di tenere traccia di dove si trova durante l'analisi. 
+Gli stati rappresentano insiemi di “item”. Un item LR(0), 0 pit brevemente un item, 
+di una grammatica G è una produzione di G con un punto in una qualche posizione 
+del corpo. Un item indica quale prefisso di una regola abbiamo già analizzato
+ad un certo punto durante il parsing.
+
+#example(
+  multiple: true,
+)[
+  Per esempio, la produzione $A -> X Y Z$ ammette quattro item:
+  $
+      &A-> dot X Y Z\
+      &A-> X dot Y Z\
+      &A-> X Y dot Z\
+      &A-> X Y Z dot
+  $
+  - L'item $A-> dot X Y Z$ indica che ci aspettiamo in ingresso una stringa derivabile da $X Y Z$.
+  - L'item $A-> X dot Y Z$ indica che abbiamo appena riconosciuto una stringa derivabile da X e ci aspettiamo in ingresso una stringa derivabile da $Y Z$.
+  - L'item $A-> X Y Z dot$ indica che abbiamo appena riconosciuto una stringa derivabile da $X Y Z$ e che si potrebbe fare una riduzione con questa regola (sostituire $X Y Z$ con $A$).
+
+  La produzione $A -> epsilon$, invece, genera il solo item $A -> dot$ .
+]
+
+#definition()[
+  La collezione canonica LR(0) è una collezione di insiemi di item
+  LR(0) che permette di costruire un automa a stati finiti
+  deterministico (incompleto), detto automa LR(0), utilizzabile per
+  prendere le decisioni durante il parsing.
+  Ogni stato dell'automa LR(0) rappresenta un insieme di item della
+  collezione canonica LR(0).
+]
+
+Per costruire la collezione canonica LR(0) per una grammatica $G$
+(con simbolo iniziale $S$) consideriamo la grammatica aumentata $G'$,
+ottenuta da $G$ aggiungendo un nuovo simbolo iniziale $S'$ e la regola
+$S' → S$. Questa serve per l'accettazione che avviene solo quando il
+parser può effettuare la riduzione con la regola $S' → S$. Introduciamo anche due nuove funzioni: CLOSURE e GOTO.
+
+=== Chiusura degli insiemi di item
+Se $I$ è un insieme di item di G, CLOSURE($I$) è un insieme di item costruito a partire da $I$ seguendo queste regole:
++ $I$nizialmente CLOSURE($I$) contiene tutti gli item di $I$
++ Se $A -> alpha dot B beta$ appartiene a CLOSURE($I$) e $B -> gamma$ è una produzione in $G$, allora si aggiunge $B -> dot gamma$ a CLOSURE($I$), se non è già presente. Si ripete questa regola finché non è più possibile aggiungere nuovi item a CLOSURE($I$).
+
+Se $A -> alpha dot B beta$ appartiene a CLOSURE($I$), a un certo punto durante il parsing, ci si aspetta di riconoscere una stringa prodotta da $B beta$. Questa avrà un prefisso derivabile da $B$ applicando una delle regole per $B$. Si aggiungono quindi tutti gli item relativi alle regole per $B$, cioè se $B ->gamma$ è una regola in $G$, aggiungiamo $B -> dot gamma$ a CLOSURE($I$).
+
+#example()[
+  #figure(image("images/2025-11-01-17-10-16.png"))
+]
+
+Per calcolare la chiusura di un insieme di item si può definire una
+funzione:
+
+SetOfItems *CLOSURE*($I$) {\
+#h(0.5cm)J = I\
+#h(0.5cm)*repeat*\
+#h(1.5cm)*for* ( ogni item A → α⋅Bβ in J )\
+#h(1.5cm)*for* ( ogni regola B → γ in G )\
+#h(2cm)*if* (B → ⋅γ non appartiene già a J )\
+#h(2.5cm)aggiungi B → ⋅γ a J;\
+#h(0.5cm)*until* nessun nuovo item è aggiunto a J;\
+#h(0.5cm)*return* J;\
+}\
+
+=== Funzione GOTO
+
+#definition(
+  )[
+  GOTO($I, X$), con $I$ insieme di item e $X$ simbolo della grammatica, è definita come chiusura dell'insieme di tutti gli item [$A -> alpha X dot beta$] tali che [$A -> alpha dot X beta$] appartiene ad $I$.
+  $
+    "GOTO("I, X")" = "CLOSURE("{[A -> alpha X dot beta] | [A → alpha dot X beta] in I }")"
+  $
+]
+
+Viene usata per definire le transizioni dell'automa LR(0). Gli stati dell'automa corrispondono a insiemi di item e GOTO($I$, X)definisce la transizione dallo stato $I$ col simbolo $X$.
+
+#example()[
+  Se $I = {[E' -> E dot], [E -> E dot + T ]}$ allora:
+  $
+    "GOTO"(I, +) = "CLOSURE"({[E → E + dot T ]}) =\
+    = {[E → E + dot T ], [T → dot T \* F], [T → dot F], [F → dot (E)], [F → dot id] }
+  $
+]
+
+Per calcolare la collezione canonica degli insiemi di item LR(0) si può definire una funzione:
+
+void *items*($G'$) {\
+#h(0.5cm)C = CLOSURE(${[S' → dot S ]}$);\
+#h(0.5cm)*repeat*\
+#h(1cm)*for* ( ogni insieme di item $I$ in $C$ )\
+#h(1.5cm)*for* ( ogni simbolo $X$ in $G$ )\
+#h(2cm)*if* (GOTO($I, X$) non è vuoto e non appartiene a $C$ )\
+#h(2.5cm)aggiungi GOTO($I, X$) a $C$;\
+#h(0.5cm)*until* nessun nuovo insieme di item è aggiunto a $C$;\
+}\
+
+//TODO: manca immagine 4.29? vedi esempio 4.28
+
+=== Automa LR(0)
+Il parsing LR semplice o SLR si basa sulla costruzione dell'automa LR(0) a partire da una grammatica.
+- gli stati dell'automa sono gli insiemi di item della collezione canonica, indichiamo con stato j lo stato corrispondente all'insieme di item Ij,
+- lo stato iniziale è CLOSURE(${[S' → dot S ]}$) dove $S'$ è il simbolo iniziale della grammatica aumentata,
+- tutti gli stati sono finali,
+- la funzione di transizione è data dalla funzione GOTO.
+
+L'automa LR(0) fornisce un supporto per le decisioni durante il parsing. Per l'analisi si utilizza uno schema in cui si trova una colonna che simula una pila contenente gli stati che si incontrano durante l'analisi, una colonna per che simula una pila contenente i simboli grammaticali, una colonna che visualizza l'input via via che viene analizzato e una colonna dove si indicano le azioni da fare (Shift o Reduce).
+Supponiamo che con la stringa $gamma$, nell'automa si passi dallo stato iniziale 0 ad uno stato j:
+- se dallo stato j c'è una transizione etichettata con il prossimo simbolo in ingresso a, allora si sceglie di impilare a, altrimenti
+- si effettua una riduzione utilizzando la produzione indicata dagli item nello stato j.
+L'algoritmo di parsing utilizza lo stack per tenere traccia degli stati
+e dei simboli grammaticali. 
+
+Se scegliamo di impilare il simbolo di ingresso, si impila anche lo stato verso cui avviene lo shift.
+Quando si applica una riduzione A - > X1 X2 … Xn (e questo può avvenire se lo stato in cui siamo contiene l'item A - > X1 X2 … Xn . , allora dalla pila degli dobbiamo togliere n stati e dallo stato j che rimane in cima alla pila guardare l'automa LR(0) per vedere qual è lo stato in cui j va con simbolo A. Ciò è coerente con il significato di item. 
+
+#figure(image("images/2025-11-01-17-33-24.png"))
+#figure(image("images/2025-11-01-17-33-38.png"))
+
+Nell'esempio precedente relativo alla stringa di ingresso id*id, nella riga 4 della tabella è stata fatta la scelta Shift 7, in accordo con quanto si trova scritto nello stato 2 con prossimo simbolo d'ingresso \*. Notare che se ci troviamo nello stato 2, per la presenza dell'item E -> T. , c'è la possibilità di applicare la riduzione con la produzione E -> T. Nell'esempio è stata fatta la scelta corretta per far terminare l'analisi con l'accettazione della stringa. Se venisse fatta l'altra scelta (la riduzione), si arriverebbe ad una situazione di errore. A questo livello ancora non sappiamo scegliere fra le due possibilità
