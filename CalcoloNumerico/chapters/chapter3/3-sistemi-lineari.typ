@@ -98,3 +98,36 @@ $
   x_i = b_i/a_(i i), space i=1,...,n.
 $
 In conclusione, sono sufficienti 2 vettori di lunghezza $n$ (uno per al diagonale di $A$ e l'altro per il termine noto, che possiamo riscrivere con $underline(x)$) ed $n$ operazioni algebriche elementari.
+
+=== $A$ triangolare
+In questo caso, gli elementi significativi di $A$ si trovano in una porzione _triangolare_ della matrice. Si distinguono due casi:
+- $A$ triangolare *inferiore*, in cui $a_(i j) = 0 " se " j>i$
+//TODO:matrice...
+- $A$ triangolare *superiore*, in cui $a_(i j) = 0 " se " i>j$
+
+Nel caso in cui la matrice A sia triangolare inferiore, il sistema lineare assume la forma:
+#figure(image("images/2025-11-02-22-11-01.png"))
+
+e quindi gli elementi della soluzione possono essere ottenuti mediante sosti-
+tuzioni successive in avanti
+#figure(image("images/2025-11-02-22-11-15.png"))
+(3)
+
+Osseriaviamo che, essendo A nonsingolare, deve aversi $a_(i i) eq.not 0, i =1,...,n$. Pertanto le operazioni in (3) risultano ben definite. Riguardo al costo computazionale, è evidente che solo la porzione triangolare della matrice
+A deve essere necessariamente memorizzata, per un totale di:
+$
+  Sigma_(i=1)^n i = frac(n(n+1),2) approx frac(n^2, 2)
+$
+posizioni di memoria. Per quanto concerne il numero di operazioni richieste, 
+da (3) si evince che sono necessari: 1 flop per calcolare x1. 3 flop per 
+calcolare x2, 5 flop per calcolare x3, ..., 2n — 1 flop per calcolare xn. per
+un totale di
+$
+  Sigma_(i=1)^n (2i-1) = n^2 "flop"
+$
+L’Algoritmo 3.1 implementa (3.4), con la matrice A contenente gli ele-
+menti della matrice A ed il vettore x contenente, inizialmente, il vettore dei 
+termini noti b e, successivamente, riscritto con il vettore soluzione x.
+#figure(image("images/2025-11-02-22-18-57.png"))
+#figure(image("images/2025-11-02-22-19-02.png"))
+//TODO: manca lezione del 29.10.2025
