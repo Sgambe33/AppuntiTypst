@@ -1,4 +1,7 @@
 #import "../../../dvd.typ": *
+#import "@preview/codly:1.3.0": *
+#import "@preview/codly-languages:0.1.1": *
+#show: codly-init.with()
 
 #pagebreak()
 = Sistemi lineari e non lineari
@@ -31,18 +34,19 @@ $
 Nella nostra trattazione, assumeremo che $m gt.eq n$, ovvero che il numero delle equazioni non sia minore del numero delle incognite. Pertanto il numero di colonne della matrice $A$ è minore uguale del numero di righe.
 
 
+#observation(
+  )[
+  - $(a_(i 1),...,a_(i n)) in RR^(1 times n)$, è la i-esima riga di A; (lo stesso per la colonna j-esima in $RR^m$)
+  - $a_(i j)$ è l'elemento che si trova nell'intersezione della riga i-esima con la colonna j-esima.
+]
 
-memo -> $(a_(i 1),...,a_(i n)) in RR^(1 times n)$, è la i-esima riga di A;
-(lo stesso per la colonna j-esima in RR^m)
-$a_(i j)$ è l'elemento che si trova nell'intersezione della riga i-esima con la colonna j-esima.
-
-Assumeremo, inoltre, che la matrice $A$ abbia rango massimo ovvero uguale a $n$. Questo significa che le colonne di $A$ sono vettori linearmente indipendenti tra loro.
+Assumeremo, inoltre, che la matrice $A$ abbia rango massimo, ovvero uguale a $n$. Questo significa che le colonne di $A$ sono vettori linearmente indipendenti tra loro.
 Distingueremo due casi significativi che sono il caso in cui:
 + $m=n <=> A$ è una matrice quadrata
 + $m>n <=> A$ è rango massimo.
 
 == Il caso quadrato
-Se $A in RR^(n times m)$, e rank(A)=n, segue he $A$ è una matrice *non singolare*. Questo significa che $exists A^(-1)$, la matrice inversa di $A$, tale che 
+Se $A in RR^(n times m)$, e rank($A$)$=n$, segue che $A$ è una matrice *non singolare*. Questo significa che $exists A^(-1)$, la matrice inversa di $A$, tale che 
 $
   A^(-1) dot A = A dot A^(-1) = I = mat(1, , , ;, dots.down, , , ;, , dots.down, , ;, , , 1;) in RR^(n times n)
 $
@@ -86,7 +90,7 @@ $
   A=mat(a_(11);, a_(22);, , dots.down;, , , dots.down, ;, , , , a_(n n ))
 $
 ovvero è sufficiente un vettore di lunghezza $n$ per memorizzare gli elementi significativi di $A$. $A$ è un caso particolare di *matrice sparsa*, ovvero una matrice i cui elementi non nulli sono $O(n)$ invece che $n^2$.
-In questo caso $A  underline(x) = underline(b)$ diviene, semplicemente
+In questo caso $A underline(x) = underline(b)$ diviene, semplicemente
 $
   a_(1 1) x_1 = b_1 \
   a_( 2 2) x_2 = b_2 \
@@ -106,28 +110,103 @@ In questo caso, gli elementi significativi di $A$ si trovano in una porzione _tr
 - $A$ triangolare *superiore*, in cui $a_(i j) = 0 " se " i>j$
 
 Nel caso in cui la matrice A sia triangolare inferiore, il sistema lineare assume la forma:
-#figure(image("images/2025-11-02-22-11-01.png"))
+$
+    &a_(1 1)x_1                                                                                 &&= b_1, \
+    &a_(2 1)x_1 + a_(2 2)x_2                                                                    &&= b_2, \
+    &a_(3 1)x_1 + a_(3 2)x_2 + a_(3 3)x_3                                                       &&= b_3, \
+    &dots.v quad quad quad quad dots.v quad quad quad quad dots.down quad quad quad quad dots.v &&\
+    &a_(n 1 )x_1 + a_(n 2)x_2 + ...+a_(n n)x_n                                                  &&= b_n.
+$
 
-e quindi gli elementi della soluzione possono essere ottenuti mediante sosti-
-tuzioni successive in avanti
-#figure(image("images/2025-11-02-22-11-15.png"))
-(3)
-
-Osseriaviamo che, essendo A nonsingolare, deve aversi $a_(i i) eq.not 0, i =1,...,n$. Pertanto le operazioni in (3) risultano ben definite. Riguardo al costo computazionale, è evidente che solo la porzione triangolare della matrice
+e quindi gli elementi della soluzione possono essere ottenuti mediante sostituzioni successive in avanti
+$
+    &x_1 = b_1 \/ a_(1 1),\
+    &x_2 = (b_2 - a_(2 1)x_1) \/ a_(2 2),\
+    &x_3 = (b_3 - a_(3 1)x_1 - a_(3 2)x_2)\/a_(3 3), quad quad quad quad (3)\
+    & quad space space dots.v\
+    & x_n = (b_n - Sigma_(j=1)^(n-1) a_(n j)x_j) \/ a_(n n)
+$
+Osseriaviamo che, essendo A non singolare, deve valere $a_(i i) eq.not 0, i =1,...,n$. Pertanto le operazioni in (3) risultano ben definite. Riguardo al costo computazionale, è evidente che solo la porzione triangolare della matrice
 A deve essere necessariamente memorizzata, per un totale di:
 $
-  Sigma_(i=1)^n i = frac(n(n+1),2) approx frac(n^2, 2)
+  Sigma_(i=1)^n i = frac(n(n+1), 2) approx frac(n^2, 2)
 $
-posizioni di memoria. Per quanto concerne il numero di operazioni richieste, 
-da (3) si evince che sono necessari: 1 flop per calcolare x1. 3 flop per 
-calcolare x2, 5 flop per calcolare x3, ..., 2n — 1 flop per calcolare xn. per
-un totale di
+posizioni di memoria. Per il numero di operazioni richieste, 
+da (3) si evince che sono necessari: 1 `flop` per calcolare $x_1$, 3 `flop` per 
+calcolare $x_2$, 5 `flop` per calcolare $x_3$, ..., $2n — 1$ `flop` per calcolare $x_n$, per un totale di
 $
   Sigma_(i=1)^n (2i-1) = n^2 "flop"
 $
-L’Algoritmo 3.1 implementa (3.4), con la matrice A contenente gli ele-
-menti della matrice A ed il vettore x contenente, inizialmente, il vettore dei 
-termini noti b e, successivamente, riscritto con il vettore soluzione x.
-#figure(image("images/2025-11-02-22-18-57.png"))
-#figure(image("images/2025-11-02-22-19-02.png"))
-//TODO: manca lezione del 29.10.2025
+L'Algoritmo 3.1 implementa (3), con la matrice $A$ contenente gli elementi della matrice $A$ ed il vettore $x$ contenente, inizialmente, il vettore dei 
+termini noti $b$ e, successivamente, riscritto con il vettore soluzione $x$.
+
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: false,
+  header: [*Algoritmo 3.1* Sistema triangolare inferiore],
+)
+```matlab
+for i=1:n
+  for j=1:i-1
+    x(i)=x(i)-A(i,j)*x(j);
+  end
+  x(i)=x(i)/A(i,i);
+end
+```
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: false,
+  header: [*Algoritmo 3.2* Sistema triangolare inferiore V2],
+)
+```matlab
+for j=1:n
+  x(j) = x(j)/A(j,j);
+  for i=j+1:n
+    x(i)=x(i)-A(i,j)*x(j);
+  end
+end
+```
+//29.10.2025
+
+Osserviamo che è possibile definire un metodo di risoluzione alternativo a (3.4). I passi sono i seguenti: una volta calcolata $x_1$, possiamo utilizzarla per aggiornare le componenti del vettore dei termini noti, dalla seconda alla n-esima; calcolata quindi $x_2$ possiamo aggiornare le componenti $3 div n$ del vettore dei termini noti e così via come descritto nell’Algoritmo 3.2. 
+La differenza sostanziale tra gli Algoritmi 3.1 e 3.2 è nella modalità di accesso agli elementi della matrice A: nel primo algoritmo vi si accede per riga, mentre nel secondo vi si accede per colonna. Pertanto, la scelta tra i due sarà determinata dal tipo di memorizzazione delle matrici prevista dal linguaggio utilizzato. 
+
+Nel caso in cui la matrice A sia triangolare superiore. il sistema lineare (3.1) assume la forma:
+$
+  a_(1 1)x_1 + a_(1 2)x_2 + ... + a_(1 n) x_n = b_1,               &\
+  a_(2 2)x_2 + ... + a_(2 n)x_n = b_2,                             &\
+  dots.down quad quad dots.v quad quad dots.v quad quad dots.v quad&\
+  a_(n n )x_2 = b_n.                                               &
+$
+
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: false,
+  header: [*Algoritmo 3.3* Sistema triangolare superiore],
+)
+```matlab
+for j=n:-1:1
+  for j=i+1:n
+    x(i)=x(i)-A(i,j)*x(j);
+  end
+  x(i)=x(i)/A(i,i);
+end
+```
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: false,
+  header: [*Algoritmo 3.4* Sistema triangolare superiore V2],
+)
+```matlab
+for j=n:-1:1
+  x(j) = x(j)/A(j,j);
+  for i=1:j-1
+    x(i)=x(i)-A(i,j)*x(j);
+  end
+end
+```
+e quindi gli elementi della soluzione possono essere ottenuti mediante sostituzioni successive all'indietro. Considerazioni, del tutto analoghe a quelle fatte per il caso triangolare inferiore. valgono riguardo alla ben definizione delle operazioni richieste ed al costo computazionale, sia in termini di flop che di occupazione di memoria. Il metodo di risoluzione è illustrato negli Algoritmi 3.3 e 3.4. Per questi ultimi, valgono le stesse considerazioni fatte rispettivamente per gli Algoritmi 3.1 e 3.2, riguardo alle modalità di accesso ai dati.
