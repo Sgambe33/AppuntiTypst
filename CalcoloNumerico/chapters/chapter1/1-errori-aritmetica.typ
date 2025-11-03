@@ -1,7 +1,18 @@
 #import "../../../dvd.typ": *
 #import "@preview/cetz:0.4.2" as cetz: canvas, draw
 
-= Sorgenti di errore
+#[
+  #set heading(numbering: none)
+  = Introduzione
+]
+
+Molti problemi che derivano dalle applicazioni sono descritti, in modo formale, da un modello matematico.
+Una volta che le equazioni del modello sono risolte, è possibile fare inferenza sul fenomeno studiato. Per risolvere queste equazioni si ricorre spesso all'utilizzo di *metodi numerici*. Questi sono delle tecniche di *approssimazione* che devono soddisfare i seguenti requisiti:
++ *Accuratezza*: la soluzione approssimata deve essere "vicina" alla soluzione del problema. Questa dipende dalle *specifiche* del problema.
++ *Facitilità di implementazione*: in quanto da codificare usando un opportuno linguaggio di programmazione
+
+
+= Errori ed aritmetica finita
 
 Definiamo, in primis, opportune misure dell'errore. Supponiamo che $x in RR$ sia il dato esatto che approssimiamo con $limits(x)^tilde$. Definiamo l'*errore assoluto* ($Delta x$) la differenza:
 $
@@ -20,9 +31,9 @@ Se $limits(x)^tilde$ è il risultato fornito da un metodo numerico definito per 
 + *Errori di iterazione*
 + *Errori di round-off*
 
-== Errori di troncamento
+== Errori di troncamento o discretizzazione
 
-Se, ad esempio, il problema da risolvere è il calcolo della derivata di una funzione $f(x)$ in un punto $x$ assegnato. A questo fine sappiamo che:
+Questi tipi di errori sono legati alla definizione del metodo numerico. Se, ad esempio, il problema da risolvere è il calcolo della derivata di una funzione $f(x)$ in un punto $x$ assegnato. A questo fine sappiamo che:
 $
   f'(x) = lim_(h arrow 0) frac(f(x+h)-f(x), h) approx frac(f(x+overline(h))-f(x), overline(h)) "   dove " overline(h) > 0 " è fisso"
 $
@@ -34,7 +45,7 @@ $
 #observation(
   )[L'errore di troncamento è determinato dalla sostituzione di un problema continuo con uno discreto che lo approssima.]
 
-== Errori di iterazione
+== Errori di iterazione o convergenza
 
 Determinati metodi numerici sono di *tipo iterativo*. Questo significa che sono definiti da una *funzione di iterazione*, $Phi(x)$, tale che, a partire da un'approssimazione iniziale $x_0 approx x$, viene prodotta una successione di approssimazioni mediante l'iterazione:
 $
@@ -215,7 +226,7 @@ Riguardo all'errore di rappresentazione vale i seguente risultato:
   )[
   Pertanto concludiamo che la precisione di macchina di un'aritmetica finita è una maggiorazione uniforme dell'errore relativo di rappresentazione.
 ]
-=== Overflow & Underflow
+=== Overflow e Underflow
 
 Che succede se $x>0$ ma $x>r_2$ oppure $0<x<r_1$?
 
@@ -236,7 +247,7 @@ $
 $
 
 // Lezione del 30/09/2025
-= Standard IEEE-754
+=== Standard IEEE-754
 
 Base binaria (b = 2).\
 Viene utilizzata una rappresentazione con arrotondamento "*round to even*", ovvero, l'ultima cifra della mantissa rappresentata dalla funzione $f l$ è 0. Tuttavia, la maggiorazione dell'errore relativo di rappresentazione continua a valere. Viene implementato un *gradual underflow*. Pertanto, essendo la base binaria, la mantissa di un numero *normalizzato* sarà del tipo:
@@ -252,7 +263,8 @@ Lo standard prevede due tipi di numeri reali:
 - Singola precisione: 32 bit
 - Doppia precisione: 64 bit
 
-== Singola precisione
+#[#set heading(outlined: false, numbering: none)
+  ==== Singola precisione]
 
 In questo caso vengono allocati un totale di 4 byte (o 32 bit ripartiti nel seguente modo):
 - 1 bit per il segno dell mantissa;
@@ -305,7 +317,8 @@ Questo è, ad esempio, originato da forme indeterminate del tipo:
 - $infinity / infinity$
 - $0/0$
 
-== Doppia precisione
+#[#set heading(outlined: false, numbering: none)
+  ==== Doppia precisione]
 
 In quesoto caso vengono utilizzati 8 byte (64 bit) per rappresentare un numero in doppia precisione. Questi sono così ripartiti:
 - 1 bit per il segno della mantissa $space space$ (grigio);
@@ -345,7 +358,7 @@ Se $e=2047$ e $f eq.not 0$, allora abbiamo: NaN (Not a Number).\
 
 #pagebreak()
 
-= Aritmetica finita
+=== Aritmetica finita
 
 Se esguiamo operazioni algebriche $(+, -, *, \/) in.rev plus.circle$, allora:
 $
@@ -353,7 +366,7 @@ $
 $
 Questo implica che, di norma, le proprietà algebriche delle operazioni (associatività, distributività, etc...) non valgono più.
 
-= Conversione fra tipi diversi
+=== Conversione fra tipi diversi
 
 Siano $x$, $pi$ (3.141592653) e $y$ variabili rispettivamente in doppia precisione, in doppia precisione e in singola precisione:
 $
@@ -373,7 +386,7 @@ Talora è necessario convertire anche tra numeri di tipo reale e tipo intero.\
 La conversione da intero a reale, in genere, è innocua, a parte il fatto che in genere non si ha più un intero. Questo è dovuto dal fatto che il range di rappresentazione dei numeri interi è più ristretto di quello dei numeri reali ($cal(I)$). Il *viceversa non è vero*, perché $cal(I)$ è generalmente molto più ampio dell'insieme di rappresentabilità del tipo intero.\
 Nel caso del filmato di Ariane V, il problema è stato originato dalla assegnazione di una variabile in doppia precisionee, legata alla componente tangenziale della velocità, ad una variabile intera di 2 byte. Quindi, se il numero è maggiore di 32767, si ha un errore.
 
-= Condizionamento di un problema
+== Condizionamento di un problema
 
 Supponiamo di voler calcolare la soluzione di un problema che, formalmente, poniamo essere descritto da:
 $
@@ -428,6 +441,7 @@ $
   cases(
     tilde(y)=y(1+epsilon_y)","quad "con "epsilon_y "l'errore relativo sul risultato",
     tilde(x)=x(1+epsilon_x)","quad "con "epsilon_x "l'errore relativo sul dato in ingresso",
+
   )
 $
 e, supponendo $epsilon_x approx 0$, vogliamo stabilire in che modo $epsilon_x$ *si propaga su* $epsilon_y$.
@@ -448,35 +462,10 @@ Diremo, pertanto, che il problema (1) è:
   Se utilizziamo un'aritmetica finita con precisione di macchina $u$, allora avremo che $|epsilon_x|>=u ==> K approx u^(-1)$, allora non ho speranza id ottenere risultati con una qualche accuratezza, poiché $|epsilon_y| approx 1$
 ]
 
-== Condizionamento delle operazioni algebriche elementari
+Segue l'analisi del condizionamento della operazioni algebriche elementari.
 
-=== Moltiplicazione
-$
-       & quad quad quad space y      && = x_1 dot x_2 quad quad "esatta, mentre perturbando" \
-       & y(1+epsilon_y)              && =x_1(1+epsilon_1) dot x_2(1+epsilon_2) \
-       & space space y+y epsilon_y   && =x_1 dot x_2(1+epsilon_1+epsilon_2+epsilon_1 dot epsilon_2) \
-       &                             && approx x_1 dot x_2(1+epsilon_1 + epsilon_2) \
-  => & quad space 1 + epsilon_y    && approx 1+epsilon_1+epsilon_2 \
-  => & quad quad space |epsilon_y| && <= 2 max{|epsilon_1|, |epsilon_2|}
-$
-Concludiamo che la moltiplicazione è sempre *ben condizionato*, poiché il numero di conizionamento è 2.
-
-=== Divisione
-#observation()[
-  Se $|gamma|<1 => Sigma_(i>=0) gamma^i = 1/(1-gamma)$\
-  Pertanto $gamma -> - epsilon => 1/(1+epsilon)=Sigma_(i>=0) (-epsilon)^i = 1 - epsilon+O(epsilon^2)$
-]
-
-$
-       & y              && = x_1/x_2 quad quad "e la perturbazione" \
-       & y(1+epsilon_y) && = (x_1(1+epsilon_1))/(x_2(1+epsilon_2)) = x_1/x_2 (1+epsilon_1)(1-epsilon_2 + O(epsilon_2^2)) \
-       &                && approx x_1/x_2(1+epsilon_1-epsilon_2) \
-  => & 1+epsilon_y    && approx 1+epsilon_1-epsilon_2=>|epsilon_y|<=2 max{|epsilon_1|, |epsilon_2|}
-$
-Anche la divisione è *ben condizionata* (quindi è al pari della moltiplicazione), avendo numero di condizione 2.
-
+#set heading(outlined: false, numbering: none)
 === Somma algebrica
-
 $
     & y                                && = x_1+x_2 quad quad "che, perturbato, dà" \
     & y(1+epsilon_y)                   && =x_1(1+epsilon_1)+x_2(1+epsilon_2) \
@@ -505,6 +494,35 @@ Vi sono però dei casi particolari:
     f(x)=x^10, quad quad x=1 => f'(1)=10
   //TODO: finire l'esempio quando carica il suo poema di pertanto (tabella con eps)
   $
-  Si vede come con $epsilon=1 times e^(-12)$ si perdono 3 cifre di accuratezza. 
+  Si vede come con $epsilon=1 times e^(-12)$ si perdono 3 cifre di accuratezza.
 ]
+
+#[#set heading(outlined: false, numbering: none)
+  === Moltiplicazione]
+$
+       & quad quad quad space y      && = x_1 dot x_2 quad quad "esatta, mentre perturbando" \
+       & y(1+epsilon_y)              && =x_1(1+epsilon_1) dot x_2(1+epsilon_2) \
+       & space space y+y epsilon_y   && =x_1 dot x_2(1+epsilon_1+epsilon_2+epsilon_1 dot epsilon_2) \
+       &                             && approx x_1 dot x_2(1+epsilon_1 + epsilon_2) \
+  => & quad space 1 + epsilon_y    && approx 1+epsilon_1+epsilon_2 \
+  => & quad quad space |epsilon_y| && <= 2 max{|epsilon_1|, |epsilon_2|}
+$
+Concludiamo che la moltiplicazione è sempre *ben condizionato*, poiché il numero di conizionamento è 2.
+
+#[#set heading(outlined: false, numbering: none)
+  === Divisione]
+#observation()[
+  Se $|gamma|<1 => Sigma_(i>=0) gamma^i = 1/(1-gamma)$\
+  Pertanto $gamma -> - epsilon => 1/(1+epsilon)=Sigma_(i>=0) (-epsilon)^i = 1 - epsilon+O(epsilon^2)$
+]
+
+$
+       & y              && = x_1/x_2 quad quad "e la perturbazione" \
+       & y(1+epsilon_y) && = (x_1(1+epsilon_1))/(x_2(1+epsilon_2)) = x_1/x_2 (1+epsilon_1)(1-epsilon_2 + O(epsilon_2^2)) \
+       &                && approx x_1/x_2(1+epsilon_1-epsilon_2) \
+  => & 1+epsilon_y    && approx 1+epsilon_1-epsilon_2=>|epsilon_y|<=2 max{|epsilon_1|, |epsilon_2|}
+$
+Anche la divisione è *ben condizionata* (quindi è al pari della moltiplicazione), avendo numero di condizione 2.
+
+
 

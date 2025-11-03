@@ -215,7 +215,7 @@ Supponiamo di dover dimostrare che un certo linguaggio $L$ è generato da una gr
     $S->"ab"|"aa"|S"aa"|S"ab"|S"ba"|"Sbb"$\
     aa, ab $in L$\
     se $u in L$, allora uaa, uab, uba, ubb $in L$
-  + Ogni *$b$* è *preceduta da $a$*\
+  + Stringhe su {a,b} in cui ogni *$b$* è *preceduta da $a$*\
     $Sigma in L quad quad quad quad quad quad u in L$ allora ua, uab $in L$\
     $S -> epsilon | "Sa" | "Sab"$
 
@@ -259,7 +259,7 @@ Si può quindi notare che c'è un solo modo per terminare la derivazione, applic
 Generalmente useremo la grammatica regolare sinistra negli esempi sottostanti.
 
 #example(multiple: true)[
-  + Stringhe su {a,b} di lunghezza pari. Se io volessi usare una grammatica regolare:
+  + Stringhe su {a,b} di lunghezza pari. Se io volessi usare una grammatica regolare:\
     $
       & |w|= "pari": S \
       & |w|= "dispari": D
@@ -271,7 +271,7 @@ Generalmente useremo la grammatica regolare sinistra negli esempi sottostanti.
       & S->epsilon | a D | b D \
       & D->a S | b S
     $
-  2. Stringhe su {a,b} che contengono tre *$a$* consecutive:
+  + Stringhe su {a,b} che contengono tre *$a$* consecutive:\
     - $w$ non contiene "aaa" e termina con b: $S$\
     - $w$ non contiene "aaa" e termina con a: $A$\
     - $w$ non contiene "aaa" e termina con baa: $B$\
@@ -282,15 +282,152 @@ Generalmente useremo la grammatica regolare sinistra negli esempi sottostanti.
       & B -> a C | b S \
       & C -> epsilon | a C | b C
     $
-  3. Stringhe su {a,b} che non contengono tre *$a$* consecutive:
-  4. Stringhe su {a,b} che non cominciano con "aaa":
-  5. Stringhe su {a,b} che non contengono "aba" usando una grammatica regolare:
-  6. Stringhe su {a,b} in cui ogni $a$ è preceduta o seguita da $b$:
-  7. Stringhe su {a,b} con un numero pari di $a$ e $b$:
-  8. Stringhe su {a,b} con un numero pari di $a$ o un numero dispari di $b$:
-  9. Stringhe su {a,b} di lunghezza dispari che contengono esattamente due $b$:
-  10. Stringhe su {a,b} in cui "aa" occorre esattamente una volta:
+
+  #colbreak()
+  3. Stringhe su {a,b} che non contengono tre *$a$* consecutive:\
+    $
+      (b+a b+a a b)^*(epsilon+a+a a)
+    $
+    #block($
+             &S -> a A|b S| epsilon quad quad quad quad quad quad quad quad quad && "se "S der(*)w S "allora" w = epsilon "oppure" w=u b\
+             &A -> a B|b S| epsilon && "se "S der(*)w A "allora" w = a "oppure" w=u b a\
+             &B-> b S| epsilon && "se "S der(*)w B "allora" w = a a "oppure" w=u b a a
+    $)
+    
+    La differenza con l'esempio precedente è in B, essendo che non può più aggiungere una 'a' ma solo una 'b' o terminare la derivazione
+  + Stringhe su {a,b} che non cominciano con "aaa":\
+    $
+      (b+a b+a a b)(a+b)^*+epsilon+a+a a
+    $
+    
+    #block($
+      &S->a A | b C | epsilon\
+      &A->a B | b C | epsilon quad quad quad quad quad quad quad quad quad quad && "se" S der(*)w A "allora" w=a\
+      &B->b C | epsilon &&"se" S der(*)w B "allora" w=a a\
+      &C->a C | b C | epsilon &&"se" S der(*)w c "allora" w="inizia con "b, a b" o "a a b
+    $)
+  + Stringhe su {a,b} che non contengono la sottostringa "aba":
+    $
+      (b+a^+b b)^*(epsilon+a^++a^+b)
+    $
+    #block($
+      &S->a A | b S | epsilon quad quad quad quad quad quad quad quad quad &&"se" S der(*)w S "allora" w=epsilon, w=b "oppure" w=u b b\
+      &A->a A | b B | epsilon &&"se" S der(*)w A "allora" w=u a\
+      &B->b S |epsilon     &&"se" S der(*)w B "allora" w=u a b
+    $)
+  + Stringhe su {a,b} in cui ogni $a$ è preceduta o seguita da $b$:
+    $
+      (b + a b + b a + a b a)^*
+    $
+    #block($
+             &S->a A | b B | epsilon #h(4cm) &&"se" S der(*)w S "allora" w = u b a "oppure" w = epsilon\
+             &A->b B && "se" S der(*)w A "allora" w=a "oppure" w=u b a a\
+             &B->a S | b B | epsilon && "se" S der(*)w B "allora" w=u b\
+           $)
+  + Stringhe su {a,b} con un numero pari di $a$ e $b$:
+    $
+      (a+b)^*b(a+b)(a+b)
+    $
+    #block($
+             &S->a S | b S | b A\
+             &A->a B | b B #h(4cm) && "se" S der(*)w A "allora" w=u b\
+             &B->a | b && "se" S der(*)w B "allora" w = u b a "oppure" w = u b b
+           $)
+  + Stringhe su {a,b} con un numero pari di $a$ o un numero dispari di $b$:
+    $
+      (a a+b b+(a b+b a)(a a+b b)^*(a b+b a))^*
+    $
+    #block($
+             &S->a A | b B | epsilon #h(4cm) && S der(*)w S "allora" abs(w)_a "e" abs(w)_b "sono pari"\
+             &A->a S | b C && S der(*)w A "allora" abs(w)_a "è dispari e" abs(w)_b "è pari"\
+             &B->a C | b S && S der(*)w B "allora" abs(w)_a "è pari e" abs(w)_b "è dispari"\
+             &C->a B | b A && S der(*)w C "allora" abs(w)_a "e" abs(w)_b "sono dispari"\
+           $)
+    #figure(
+      table(
+        columns: (auto, auto, auto),
+        rows: (auto, auto, auto, auto, auto),
+
+        [], [$abs(w)_a$], [$abs(w)_b$],
+        table.cell(fill: rgb("#68e86680"), "S"), [*_pari_*], [*_dispari_*],
+        align: center,
+        [A], [_dispari_], [_pari_],
+        [B], [_pari_], [_dispari_],
+        [C], [_dispari_], [_dispari_]
+      )
+    )
+  + Stringhe su {a,b} di lunghezza dispari che contengono esattamente due $b$:
+    $
+      a(a a)^*b(a a)^*b(a a)^* + (a a)^*b a(a a)^*b(a a)^*+(a a)^*b(a a)^*b a(a a)^*+a(a a)^*b a(a a)^*b a(a a)
+    $
+    6 possibili situazioni per $S der(*)w X$
+    #figure(
+      table(
+        columns: (auto, auto, auto),
+
+        [], [$abs(w)$], [$abs(w)_b$],
+        [S], [_pari_], [0],
+        [A], [_dispari_], [0],
+        [B], [_dispari_], [1],
+        [C], [_pari_], [1],
+        [D], [_pari_], [2],
+        table.cell(fill: rgb("#68e86680"), "E"), [*_dispari_*], [*2*],
+        align: center,
+      )
+    )
+    #block($
+            &S->a A | b B #h(4cm) && "se" S der(*)w S "allora" abs(w) "è pari e" abs(w)_b = 0\
+            &A->a S | b C         && "se" S der(*)w A "allora" abs(w) "è dispari e" abs(w)_b = 0\
+            &B->a C | b D         && "se" S der(*)w B "allora" abs(w) "è dispari e" abs(w)_b = 1\
+            &C->a B | b E         && "se" S der(*)w C "allora" abs(w) "è pari e" abs(w)_b = 1\
+            &D->a E               && "se" S der(*)w D "allora" abs(w) "è pari e" abs(w)_b = 2\
+            &E->a D | epsilon     && "se" S der(*)w E "allora" abs(w) "è dispari e" abs(w)_b = 2
+          $)
+  + Stringhe su {a,b} in cui "aa" occorre esattamente una volta:
+    $
+      (b+a b)^*a a(b+b a)^*
+    $
+    #block($
+             &S->a A | b S #h(4cm)    && "se" S der(*)w S "allora" w = epsilon "oppure" w = u b\
+             &B->b C | epsilon        && "se" S der(*)w A "allora" w = a "oppure" w = u b a\
+             &A->a B | b S            && "se" S der(*)w B "allora" w = u a" e "w "contiene" a a\
+             &C->a B | b C | epsilon  && "se" S der(*)w C "allora" w = u b" e "w "contiene" a a
+           $)
+    #figure(
+      table(
+        columns: (auto, auto, auto),
+
+        [], [contiene $a a$], [ultimo caratere],
+        [S], [_no_], [_b($epsilon$)_],
+        [A], [_no_], [_a_],
+        table.cell(fill: rgb("#68e86680"), "B"), [*_sì_*], [_a_],
+        table.cell(fill: rgb("#68e86680"), "C"), [*_sì_*], [_b_]
+      )
+    )
+  #colbreak()
   11. Stringhe su {a,b} in cui "aa" occorre almeno due volte:
+    $
+      (a+b)^*(a a(a+b)^*a a+a a a)(a+b)^*
+    $
+    #block($
+             &S->a A | b S #h(3.5cm) && "se" S der(*)w S "allora" w = epsilon "oppure" w = u b\
+             &A->a B | b S && "se" S der(*)w A "allora" w = a "oppure" w = u b a\
+             &B->a D | b C && "se" S der(*)w B "allora" w = u a "e w contiene" a a\
+             &C->a B | b C && "se" S der(*)w C "allora" w = u b" e "w" contiene "a a\
+             &D->a D | b D | epsilon && "se" S der(*)w D "allora" w "contiene 2 volte" a a
+           $)
+    #figure(
+      table(
+        columns: (auto, auto, auto),
+
+        [], [numero $a a$], [ultimo simbolo],
+        [S], [0], [_b($epsilon$)_],
+        [A], [0], [_a_],
+        [B], [1], [_a_],
+        [C], [1], [_b_],
+        table.cell(fill: rgb("#68e86680"), "D"), [$>=$2], [_a,b_]
+      )
+    )
 ]
 
 == Gerarchie di Chomsky (classificazione delle grammatiche) 
@@ -391,10 +528,92 @@ $
     rect((0.5, 0.5), (10.5, 5), radius: 5pt)
     content((5.5, 4.5), "Linguaggi contestuali")
     rect((1, 1), (10, 4), radius: 5pt)
-    content((5.5,3.5), "Linguaggi contestuali")
+    content((5.5,3.5), "Linguaggi non contestuali")
     rect((1.5, 1.5), (9.5, 3), radius: 5pt)
-    content((5.5,2.5), "Linguaggi contestuali")
+    content((5.5,2.5), "Linguaggi regolari")
   })
 $
 
-// TODO: Aggiungere esempi delle varie grammatiche (guarda slide)
+#example(multiple: true, "Linguaggi non contestuali")[
+  - ${a^n b^n | n >= 0}$\
+    $S -> a S b | epsilon$
+  
+  - ${w in {a,b}^* | abs(w)_a=abs(w)_b}$\
+    $S -> a S b S | b S a S | epsilon$
+  
+  - ${w in {0,1}^* | w = w^R}$\
+    $S -> epsilon|0|1|0S 0|1S 1$
+
+  - ${a^n b^n c^k | n,k>=0}$\
+    $S->A B$\
+    $A -> a A b -> epsilon$\
+    $B -> c B | epsilon$
+  
+  - ${a^n b^n c^k d^k | n,k>=0}$\
+    $S->A B$\
+    $A -> a A b -> epsilon$\
+    $B -> c B d | epsilon$
+
+  - ${a^n b^k c^k d^n | n,k>0}$\
+    $S-> a S d | a A d$\
+    $A -> b A c -> b c$
+
+  - ${a^n b^k c^(2n+k) | n,k>0}$\
+    $S-> a S c c | a B c c$\
+    $A -> b B c | b c$
+  Non tutti i linguaggi possono essere generati da una grammatica non contestuale:
+  - ${a^n b^n c^n | n > 0}$
+  - ${a^n b^k c^n d^k | n,k>0}$
+  - ${w w | w in {a,b}^*}$
+]
+
+
+#example(multiple: true, "Linguaggi constetuali")[
+  - ${a^n b^n c^n | n > 0}$\
+    $S -> a b c | a X b c$\
+    $X -> a X b C | a b C$\
+    $C b -> b C$\
+    $C c -> c c$
+
+    $S => a underline(X) b C => a bold(a underline(X) b C) b C => a a bold(a b) underline(bold(C) b) C b C => a a a b bold(b C) underline(C b) b c => a a a b b underline(C bold(b)) bold(C) c => a a a b b bold(b C) underline(C c) => a a a b b b underline(C bold(c)) bold(c) => a a a b b b bold(c c) c$
+
+    Più in generale si può scrivere: $ => a X b c der(+) a^n (b C)^(n-1)b c der(+) a^n b^n C^(n-1)c der(+) a^n b^n c^n$
+  
+  - ${a^n b^k c^n d^k | n,k > 0}$\
+    $S -> A B$\
+    $A -> a A C | a C$\
+    $B -> b B d | b d$\
+    $C b -> b C$\
+    $C d -> c d$\
+    $C c -> c c$
+
+    $S => A B der(+) a^n C^n B der(+) a^n C^n b^k d^k der(+) a^n b^k C^n d^k => a^n b^k C(n-1)c d^k der(+) a^n b^k c^n d^k$
+  
+  - ${w w | w in {a,b}^*}$
+
+    #line(length: 100%, stroke: .25pt)
+    #block($
+      &S -> a A S | b B S | X a | Y b quad quad quad quad &&quad quad quad quad quad quad quad quad  S &&&&der(+) #colmath(7, $bold((a A union b B)^*(X a union Y b))$)\
+      &A a -> a A && &&&&der(*) #colmath(10, $bold(w a X a)$) " oppure " #colmath(10, $bold(w a Y b)$)\
+      &A b -> b A && quad quad quad quad quad "   con" w&&&&=x_1 x_2 dots x_k in {a,b}^k\
+      &B a -> a B && quad quad quad quad quad quad quad quad alpha&&&&=X_1X_2dots X_k in {A,B}^k\
+      &B b -> b B && "  dove" X_i=A "se" x_i &&&&=a "se" X_i=B "se" x_i=b
+    $)
+    #line(length: 100%, stroke: .25pt)
+    #block($
+      &A X -> X A \
+      &A X -> X A quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad space der(+) #colmath(16, $bold(w X w a)$) " oppure " #colmath(16, $bold(w Y w b)$)\
+      &B Y -> Y B \
+      &B Y -> Y B 
+    $)
+    #line(length: 100%, stroke: .25pt)
+    #block($
+      &X -> a quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad quad " " der(+) #colmath(3, $bold(w a w a)$) " oppure " #colmath(3, $bold(w b w b)$)\
+      &Y -> b 
+    $)
+    #block($
+      S &=> a A S => a A b B S =>a A b B b B S => #colmath(7, $bold(a A b B b B X a)$) => a A b b B B X a => a b A b B B X a\
+      &=> #colmath(10, $bold(a b b A B B X a)$) => a b b A B X b a => a b b A X b b a => #colmath(16, $bold(a b b X a b b a)$) => #colmath(3, $bold(a b b a a b b a)$)
+    $)
+    // TODO?: Non so se ne mancano altri da scrivere o meno
+]

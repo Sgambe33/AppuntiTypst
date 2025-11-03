@@ -286,5 +286,10 @@
     attach(=>, tr: #sym)
   $
 }
-#let derplus = $attach(=>, tr: +)$
-#let dertimes = $attach(=>, tr: *)$
+
+#let colmath(..args) = {
+  $
+    #let sym = args.pos()
+    text(fill: #colors.at(sym.at(0)), #sym.at(1))
+  $
+}
