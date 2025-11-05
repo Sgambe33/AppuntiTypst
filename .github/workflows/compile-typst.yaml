@@ -16,9 +16,14 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Check for new commits since last run
+    - name: Check for new commits on main since last run
       id: check-commits
       run: |
+        BRANCH="main"
+
+        # Ensure we have the latest refs for the branch we care about
+        git fetch origin $BRANCH || true
+
         # Find last successful run (if any)
         last_run=$(gh run list --workflow "Compile Typst Documents" --json createdAt,status,conclusion \
           --jq '[.[] | select(.status=="completed" and .conclusion=="success")][0].createdAt' || echo "")
@@ -28,12 +33,12 @@ jobs:
           echo "new_commits=true" >> $GITHUB_OUTPUT
         else
           echo "Last successful run was at: $last_run"
-          # Check for new commits in default branch since last run
-          if git log --since="$last_run" --oneline | grep .; then
-            echo "New commits found."
+          # Check for new commits on the main branch since last run
+          if git log origin/"$BRANCH" --since="$last_run" --oneline | grep .; then
+            echo "New commits found on branch $BRANCH."
             echo "new_commits=true" >> $GITHUB_OUTPUT
           else
-            echo "No new commits since last run. Skipping build."
+            echo "No new commits on branch $BRANCH since last run. Skipping build."
             echo "new_commits=false" >> $GITHUB_OUTPUT
           fi
         fi
@@ -43,7 +48,7 @@ jobs:
     - name: Stop if no new commits
       if: steps.check-commits.outputs.new_commits == 'false'
       run: |
-        echo "Skipping workflow — no new commits since last run."
+        echo "Skipping workflow — no new commits on main since last run."
         exit 0
 
     - name: Install Typst
