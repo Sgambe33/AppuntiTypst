@@ -106,7 +106,6 @@ In conclusione, sono sufficienti 2 vettori di lunghezza $n$ (uno per al diagonal
 === $A$ triangolare
 In questo caso, gli elementi significativi di $A$ si trovano in una porzione _triangolare_ della matrice. Si distinguono due casi:
 - $A$ triangolare *inferiore*, in cui $a_(i j) = 0 " se " j>i$
-//TODO:matrice...
 - $A$ triangolare *superiore*, in cui $a_(i j) = 0 " se " i>j$
 
 Nel caso in cui la matrice A sia triangolare inferiore, il sistema lineare assume la forma:
@@ -227,7 +226,10 @@ end
 Quest'ultima scrittura è sostanzialmente più efficiente (oltre che più compatta) della precedente.
 ]
 
-==== Proprietà matrici triangolari //TODO: rimuovere da outline e numbering
+#[
+  #set heading(numbering: none, outlined: false)
+  === Proprietà matrici triangolari
+]
 - Se $A=(a_(i j)), B=(b_(i j))$ sono matrici triangolari inferiori (rispettivamente superiori), allora anche $C=(c_(i j))$, con
   $
     (1) quad C=A+B quad "o" quad C=A dot B quad (2)
@@ -278,7 +280,8 @@ $
 $
 dove i fattori $F_i$ sono matrici di tipo semplice. Pertanto $F_i$ sarà o diagonale, o triangolare (inferiore o superiore) o ortogonale. Di conseguenza, i sistemi lineari con tali matrici sono facilmente risolvibili.
 
-#example()[
+#example(
+  )[
   Con $k=2$ si ha $A=F_1 dot F_2 $. Quindi se dobbiamo risolvere $A underline(x) = underline(b)$, questo equivale a risolvere:
   $
     F_1 dot F_2 underline(x) = underline(b) => F_1underbracket((F_2 underline(x)), underline(y)) = underline(b)
@@ -298,7 +301,8 @@ $
 $
 e $underline(x_k)$ sarà il vettore soluzione $underline(x)$.
 
-#observation()[
+#observation(
+  )[
   In pratica:
   + non sarà in genere necessario memorizzare esplicitamente i $k$ fattori $F_i, space i=1,...,n$. Infatti potremo sempre sovrascrivere gli elementi della matrice $A$ con l'informazione relativa ai suoi fattori;
   + non sarà necessario memorizzare le soluzioni intermedie $x_i, space i=0,...,k$. Infatti, lo stesso vetto potrà essere utilizzato per contenere il termine noto e poi sovrascritto con le soluzioni intermedie.
@@ -310,15 +314,13 @@ In definitiva, un generico metodo di risoluzione si caratterizzerà per la speci
 #definition(
   "Fattorizzazione LU di una matrice",
 )[
-  Diremo che $A in RR^(n times n)$, non singolare, è *fattorizzabile LU* se $exists L$ matrice triangolare inferiore a *diagonale unitaria*, e $U$ triangolare superiore, tali che $A = L dot U$.
+  Diremo che $A in RR^(n times n)$, non singolare, è *fattorizzabile LU* se $exists L in R^(n times n)$ matrice triangolare inferiore a *diagonale unitaria*, e $U in RR^(n times n)$ triangolare superiore, tali che $A = L dot U$.
 ]
 
 #observation(
   )[
 Se $A=L U$, allora risolvo $A underline(x) = underline(b)$ risolvendo, nell'ordine, $L underline(y) = underline(b) and U underline(x) = underline(y)$, che sono sistemi di tipo semplice, con un costo di $2n^2$ `flops`.
 ]
-
-
 
 //POSSIBILE DOMANDA ESONERO
 #theorem()[
@@ -353,3 +355,116 @@ Se $A=L U$, allora risolvo $A underline(x) = underline(b)$ risolvendo, nell'ordi
   $
   Ovvero la fattorizzazione è *unica*.
 ]
+
+//05.11.2025
+Per dimostrare costruttivamente l'esistenza della fattorizzazione e le condizioni sotto le quali essa è definita, vediamo come risolvere il seguente problema. Supponiamo di aver assegnato un vettore
+$
+  underline(v) = mat(v_1;dots.v;v_k;dots.v;v_n) in RR^n
+$
+di cui vogliamo azzerare le componenti dalla $(k+1)$-esima in poi mediante moltiplicazione per una matrice $L$ triangolare inferiore e a diagonale unitaria (non singolare). Ovvero, definire $L$ tale che:
+$
+  L underline(v) = 
+  mat(v_1;dots.v;v_k;0;dots.v;0)
+  #stack(dir: ttb, spacing: 1em, [\ \ $ lr(}, size: #320%) n-k $])
+$
+
+Se $v_k eq.not 0$, allora possiamo definire il *vettore elementare di Gauss*:
+$
+  underline(g)_k = 1/(v_k) (overparen(0\,...\,0, k), v_(k+1),..., v_n)^T in RR^n
+$
+e sia
+$
+  e_k = mat(0;dots.v;1;dots.v;0) in RR^n
+$
+il k-esimo versore di $RR^n$, definiamo la corrispondente *matrice elementare di Gauss*:
+#figure(image("images/2025-11-05-19-07-34.png"))
+$L$ è una matrice triangolare inferiore con diagonale unitaria. Inoltre:
+$
+  L underline(v) =(I - underline(g)_k underline(e)_k^T) underline(v) = underline(v) - underline(g)_k (underline(e)_k^T underline(v)) = underline(v) - underline(g)_k v_k = mat(v_1;dots.v;v_k;v_(k+1);dots.v;v_n) - mat(0;dots.v;0;v_(k+1);dots.v;v_n) #stack(dir: ttb, spacing: 1em, [$ lr(}, size: #300%) k $ \ \ ])
+  = mat(v_1;dots.v;v_k;0;dots.v;0)
+$
+Ricapitolando, $v_k eq.not 0 <=> exists underline(g)_k <=> L= I - underline(g)_k dot underline(e)_k^T : L underline(v) = mat(v_1;dots.v;v_k;0;dots.v;0) $ 
+
+#observation(
+  )[
+  $
+    L^(-1) = (I #strong[-] underline(g)_k dot underline(e)_k^T)^(-1) = I #strong[+] underline(g)_k dot underline(e)_k^T
+  $
+  Infatti:
+  $
+    L^(-1) L = (I + underline(g)_k dot underline(e)_k^T) (I - underline(g)_k dot underline(e)_k^T) = I - underline(g)_k dot underline(e)_k^T + underline(g)_k dot underline(e)_k^T - underline(g)_k dot underline(e)_k^T dot underline(g)_k dot underline(e)_k^T=\
+    =I - cancel(underline(g)_k dot underline(e)_k^T) + cancel(underline(g)_k dot underline(e)_k^T) - underline(g)_k dot overparen((underline(e)_k^T dot underline(g)_k), =0) dot underline(e)_k^T= I
+  $
+]
+A questo putno, andiamo a definire il *metodo di eliminazione di Gauss*.
+- si tratta di un metodo costruttivo;
+- le condizioni che garantiscono la sua esecuzione saranno le condizioni che garantiscono l'esistenza della fattorizzazione $L U$;
+- è un metodo semi-iterativo, che consiste in $n-1$ passi se $A in RR^(n times n)$: al passo j-esimo l'obiettivo sarà quello di trasformare la j-esima colonna della matrice corrente in quella di una matrice triangolare superiore, ovvero, azzerare gli elementi al di sotto di quello diagonale ($(j,j)$).
+
+A questo fine, se $A=(a_(i j)) equiv (a_(i j)^1) = A^1$ è la matrice da fattorizzare. Inoltre, $a_(i j)^k$ sta a denotare l'ultimo passo della procedura (il k-esimo) in cui l'elemento $(i,j)$ è stato modificato.
+
+$
+  A= mat(
+    a_(11)^1, a_(12)^1, a_(13)^1, dots, dots, a_(1n)^1;a_(21)^1, a_(22)^1, a_(23)^1, dots, dots, a_(2n)^1;a_(31)^1, a_(32)^1, a_(33)^1, dots, dots, a_(3n)^1;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;a_(n 1)^1, a_(n 2)^1, a_(n 3)^1, dots, dots, a_(n n)^1
+  ) equiv A^1
+$
+
+Se $a_(11)^1 eq.not 0$, allora possiamo definire:
+- il primo vettore elementare di Gauss: $underline(g)_1 = 1/a_(11)^1 (0, a_(21)^1, ..., a_(n 1)^1)^T$
+- la prima matrice elementare di Gauss: $L_1 = I - underline(g)_1 underline(e)_1^T$ 
+tali che:
+
+$
+  L_1 A= mat(
+    a_(11)^1, a_(12)^1, a_(13)^1, dots, dots, a_(1n)^1;0, a_(22)^2, a_(23)^2, dots, dots, a_(2n)^2;0, a_(32)^2, a_(33)^2, dots, dots, a_(3n)^2;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;0, a_(n 2)^2, a_(n 3)^2, dots, dots, a_(n n)^2
+  ) equiv A^2
+$
+
+#observation()[
+  $L_1A^1 = A^2$
+]
+Al secondo passo di eleiminazione, se $a_(22)^2 eq.not 0$, allora possiamo definire:
+- il secondo vettore elementare di Gauss $underline(g)_2 = 1/(a_(22)^2) (0...0 a_(32)^2 ... a_(n 2)^2)^T$
+- la seconda matrice elementare di Gauss $L_2 = I - underline(g)_2 = underline(e)_2^T$, 
+tali che:
+
+$
+  L_1 A= mat(
+    a_(11)^1, a_(12)^1, a_(13)^1, dots, dots, a_(1n)^1;0, a_(22)^2, a_(23)^2, dots, dots, a_(2n)^2;0, 0, a_(33)^3, dots, dots, a_(3n)^3;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;0, 0, a_(n 3)^3, dots, dots, a_(n n)^3
+  ) equiv A^3
+$
+
+#observation()[
+  $L_2 A^2 = A^2$
+]
+Procedendo in maniera analoga, al passo j-esimo, se $a_(j j)^j eq.not 0$, potremo definire:
+- il j-esimo vettore di Gauss: $underline(g)_j = 1/(a_(j j)^j) (0...0 a_(j+1,j)^j ... a_(n j)^j)^T$
+- la j-esima matrice elementare di Gauss $L_j = I - underline(g)_j = underline(e)_j^T$ tale che:
+
+$
+  L_j dot ... dot L_1 A = mat(
+    a_(11)^1, a_(12)^1, a_(13)^1, dots, dots, a_(1n)^1;0, a_(22)^1, a_(23)^1, dots, dots, a_(2n)^1;0, 0, a_(33)^1, dots, dots, a_(3n)^1;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;0, 0, 0, dots, a_(n,j+1)^(j+1), a_(n n)^(j+1)
+  ) = A^(j+1)
+$
+
+#observation()[
+  $L_j A^j = A^(j+1)$
+]
+Se questo è possibile, $forall j =1 ,...,n-1$, si ottiene che:
+$
+  L_(n-1) dot L_(n-2) dot ... dot L_1 A = mat(
+    a_(11)^1, a_(12)^1, a_(13)^1, dots, dots, a_(1n)^1;0, a_(22)^2, a_(23)^2, dots, dots, a_(2n)^2;0, 0, a_(33)^3, dots, dots, a_(3n)^3;dots.v, dots.v, dots.down, dots.down, , dots.v;dots.v, dots.v, , dots.down, dots.down, dots.v;0, 0, 0, dots, 0, a_(n n)^n
+  ) = A^n equiv U
+$
+Possiamo quindi concludere che questa procedura è definita se e solo se $a_(j j)^j eq.not 0, forall j=1,...,n <=> U$ è non singolare. Inoltre, dall'uguaglianza $
+  underbrace(L_(n-1) dot L_(n-2) dot ... dot L_1, L^(-1)) A=U
+$ 
+si osserva che:
++ $L_i$ è triangolare inferiore a diagonale unitaria.
++ $L_i^(-1)$ è triangolare inferiore a diagonale unitaria.
++ Il prodotto di matrici triangolari inferiori a diagonale unitaria è una matrice triangolare inferiore a diagonale unitaria.
+Si ottiene che possiamo porre $L_(n-1) dot L_(n-2) dot ... dot L_1 = L^(-1)$ con $L$ triangolare inferiore a diagonale unitaria. Di conseguenza:
+$
+  L^(-1)A=U => A=L U
+$
+che è la fattorizzazione richiesta.
