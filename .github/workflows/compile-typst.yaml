@@ -1,33 +1,26 @@
 name: Compile Typst Documents
-
 on:
   workflow_dispatch:
   schedule:
     - cron: "0 0 */2 * *"
-
 jobs:
   compile-typst:
     permissions: write-all
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-
     - name: Check for new commits on main since last run
       id: check-commits
       run: |
         BRANCH="main"
-
         # Ensure we have the latest refs for the branch we care about
         git fetch origin $BRANCH || true
-
         # Find last successful run (if any)
         last_run=$(gh run list --workflow "Compile Typst Documents" --json createdAt,status,conclusion \
           --jq '[.[] | select(.status=="completed" and .conclusion=="success")][0].createdAt' || echo "")
-
         if [ -z "$last_run" ]; then
           echo "No previous successful run found. Proceeding..."
           echo "new_commits=true" >> $GITHUB_OUTPUT
@@ -44,21 +37,15 @@ jobs:
         fi
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Stop if no new commits
-      if: steps.check-commits.outputs.new_commits == 'false'
-      run: |
-        echo "Skipping workflow — no new commits on main since last run."
-        exit 0
-
     - name: Install Typst
+      if: steps.check-commits.outputs.new_commits == 'true'
       run: |
         wget https://github.com/typst/typst/releases/latest/download/typst-x86_64-unknown-linux-musl.tar.xz
         tar -xf typst-x86_64-unknown-linux-musl.tar.xz
         sudo mv typst-x86_64-unknown-linux-musl/typst /usr/local/bin/
         typst --version
-
     - name: Find and compile Typst documents
+      if: steps.check-commits.outputs.new_commits == 'true'
       run: |
         mkdir -p compiled-pdfs
         find . -name "main.typ" -type f | while read -r file; do
@@ -68,11 +55,11 @@ jobs:
           [ -z "$pdf_name" ] || [ "$pdf_name" = "." ] && pdf_name="main"
           typst compile --root . "$file" "compiled-pdfs/${pdf_name}.pdf"
         done
-
     - name: List compiled PDFs
+      if: steps.check-commits.outputs.new_commits == 'true'
       run: ls -la compiled-pdfs/
-
     - name: Publish build artifacts
+      if: steps.check-commits.outputs.new_commits == 'true'
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
