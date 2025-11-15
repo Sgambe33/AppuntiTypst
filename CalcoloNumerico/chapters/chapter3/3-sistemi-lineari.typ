@@ -72,7 +72,7 @@ Cominciamo con l'esame di casi di sitemi lineari "semplici". Questi casi sono qu
 La loro elencazione è fatta per complessità computazionale crescente. Quest'ultima è misurata in termini di occupazione di memoria e numero di operazioni algebriche richieste per la risoluzione del sistema.
 
 === $A$ diagonale
-In questo caso $a_(i j ) = 0$ con $i eq.not j$
+In questo caso $a_(i j ) = 0$ con $i eq.not j$ ovvero solamente i valori della diagonale principale possono essere diversi da 0:
 $
   A = mat(
     a_(11), a_(12), ..., a_(1n);a_(21), a_(22), ..., a_(2n);dots.v, dots.v, dots.down, dots.v;a_(m 1), a_(m 2), ..., a_(m n);
@@ -165,7 +165,7 @@ end
 ```
 //29.10.2025
 
-Osserviamo che è possibile definire un metodo di risoluzione alternativo a (3). I passi sono i seguenti: una volta calcolata $x_1$, possiamo utilizzarla per aggiornare le componenti del vettore dei termini noti, dalla seconda alla n-esima; calcolata quindi $x_2$ possiamo aggiornare le componenti $3 div n$ del vettore dei termini noti e così via come descritto nell'Algoritmo 3.2. 
+Osserviamo che è possibile definire un metodo di risoluzione alternativo a (3). I passi sono i seguenti: una volta calcolata $x_1$, possiamo utilizzarla per aggiornare le componenti del vettore dei termini noti, dalla seconda alla n-esima; calcolata quindi $x_2$ possiamo aggiornare le componenti $3 : n$ del vettore dei termini noti e così via come descritto nell'Algoritmo 3.2. 
 La differenza sostanziale tra gli Algoritmi 3.1 e 3.2 è nella modalità di accesso agli elementi della matrice $A$: nel primo algoritmo vi si accede per riga, mentre nel secondo vi si accede per colonna. Pertanto, la scelta tra i due sarà determinata dal tipo di memorizzazione delle matrici prevista dal linguaggio utilizzato. 
 
 Nel caso in cui la matrice $A$ sia triangolare superiore. Il sistema lineare (1) assume la forma:
@@ -252,7 +252,33 @@ Quest'ultima scrittura è sostanzialmente più efficiente (oltre che più compat
   ]
 
 - Se A e B sono triangolari inferiori (rispettivamente superiori) a diagonale unitaria, allora anche $C=A dot B$ è una matrice triangolare inferiore (rispettivamente superiore) a diagonale unitaria.\
-  #proof()[TODO]
+  #proof(
+    )[
+    Siano A e B due matrici $n times n$ triangolari inferiori a diagonale unitaria. Per definizione, questo significa:
+    - Per A: $a_(i j) = 0$ se $i < j$ (elementi sopra la diagonale) e $a_(i i) = 1$ (diagonale unitaria).
+    - Per B: $b_(i j) = 0$ se $i < j$ (elementi sopra la diagonale) e $b_(i i) = 1$ (diagonale unitaria).
+    Vogliamo dimostrare che $C = A dot B$ ha le stesse proprietà. L'elemento generico $c_(i j)$ di C è dato da:
+    $
+      c_(i j) = sum_(k=1)^(n) a_(i k) dot b_(k j)
+    $
+    Dobbiamo dimostrare due cose:
+    + C è triangolare inferiore: $c_(i j) = 0$ per $i < j$.
+      Analizziamo la sommatoria $c_(i j) = sum_(k=1)^(n) a_(i k) b_(k j)$ nel caso in cui $i < j$. Esaminiamo ogni singolo termine $a_(i k) b_(k j)$ della somma:
+      - Caso $k > i$: poiché A è triangolare inferiore, tutti gli elementi $a_(i k)$ con $i < k$ (indice di colonna maggiore dell'indice di riga) sono zero. Quindi, $a_(i k) = 0$. L'intero termine $a_(i k) b_(k j)$ diventa $0 dot b_(k j) = 0$.
+      - Caso $k lt.eq i$: poiché siamo partiti dall'ipotesi che $i < j$, se $k lt.eq i$, allora segue che $k < j$. Poiché B è triangolare inferiore, tutti gli elementi $b_(k j)$ con $k < j$ (indice di colonna maggiore dell'indice di riga) sono zero. Quindi, $b_(k j) = 0$. L'intero termine $a_(i k) b_(k j)$ diventa $a_(i k) dot 0 = 0$.
+      In ogni possibile caso per $k$ (sia $k > i$ che $k lt.eq i$), il termine $a_(i k) b_(k j)$ è zero. Di conseguenza, la loro somma $c_(i j)$ è zero. Questo dimostra che C è triangolare inferiore.
+
+    + C è a diagonale unitaria ($c_(i i) = 1$).
+      Analizziamo ora gli elementi sulla diagonale, dove $i = j$.
+      $
+        c_(i i) = sum_(k=1)^(n) a_(i k) dot b_(k i)
+      $
+      Spezziamo la sommatoria in tre parti:
+      - Termini per $k < i$:Poiché B è triangolare inferiore, $b_(k i) = 0$ (perché $k < i$). Questi termini sono tutti nulli.
+      - Termini per $k > i$:Poiché A è triangolare inferiore, $a_(i k) = 0$ (perché $i < k$). Anche questi termini sono tutti nulli.
+      - Termine per $k = i$:L'unico termine che sopravvive è quello dove $k = i$. Questo termine è $a_(i i) dot b_(i i)$.Per ipotesi, A e B sono a diagonale unitaria, quindi $a_(i i) = 1$ e $b_(i i) = 1$. Il termine vale $1 dot 1 = 1$.Sommando le tre parti (tutti zeri tranne un 1), otteniamo:$c_(i i) = 0 + 1 + 0 = 1$.
+      Questo dimostra che C ha diagonale unitaria.
+  ]
 
 - Se $A=(a_(i j))$ è triangolare inferiore (rispettivamente superiore) e non singolare, allora $A^(-1)$ è triangolare inferiore (rispettivamente superiore) e $(A^(-1))_(i i) = a_(i i)^(-1), forall i=1,...,n$.\
   #proof()[TODO]
@@ -270,7 +296,7 @@ In questo caso, la soluzione del sistema lineare (1) è $underline(x) = A^(-1)un
 
 L'analisi di questi casi semplici ci permette ora di affrontare il caso generale in cui $A$ è una generica matrice non singolare.
 
-== Il caso generale
+== Fattorizzazione di una matrice
 $
   A underline(x) = underline(b), quad A in RR^(n times n), quad "det"(A) eq.not 0 quad quad quad (1)
 $
@@ -305,7 +331,7 @@ e $underline(x_k)$ sarà il vettore soluzione $underline(x)$.
   )[
   In pratica:
   + non sarà in genere necessario memorizzare esplicitamente i $k$ fattori $F_i, space i=1,...,n$. Infatti potremo sempre sovrascrivere gli elementi della matrice $A$ con l'informazione relativa ai suoi fattori;
-  + non sarà necessario memorizzare le soluzioni intermedie $x_i, space i=0,...,k$. Infatti, lo stesso vetto potrà essere utilizzato per contenere il termine noto e poi sovrascritto con le soluzioni intermedie.
+  + non sarà necessario memorizzare le soluzioni intermedie $x_i, space i=0,...,k$. Infatti, lo stesso vettore potrà essere utilizzato per contenere il termine noto e poi sovrascritto con le soluzioni intermedie.
 ]
 In definitiva, un generico metodo di risoluzione si caratterizzerà per la specifica fattorizzazione (2).
 
@@ -361,7 +387,7 @@ Per dimostrare costruttivamente l'esistenza della fattorizzazione e le condizion
 $
   underline(v) = mat(v_1;dots.v;v_k;dots.v;v_n) in RR^n
 $
-di cui vogliamo azzerare le componenti dalla $(k+1)$-esima in poi mediante moltiplicazione per una matrice $L$ triangolare inferiore e a diagonale unitaria (non singolare). Ovvero, definire $L$ tale che:
+di cui vogliamo azzerare le componenti dalla $(k+1)$-esima in poi mediante moltiplicazione per una matrice $L$ triangolare inferiore e a diagonale unitaria (non singolare). Ovvero, definiamo $L$ tale che:
 $
   L underline(v) = 
   mat(v_1;dots.v;v_k;0;dots.v;0)
@@ -396,32 +422,32 @@ Ricapitolando, $v_k eq.not 0 <=> exists underline(g)_k <=> L= I - underline(g)_k
     =I - cancel(underline(g)_k dot underline(e)_k^T) + cancel(underline(g)_k dot underline(e)_k^T) - underline(g)_k dot overparen((underline(e)_k^T dot underline(g)_k), =0) dot underline(e)_k^T= I
   $
 ]
-A questo putno, andiamo a definire il *metodo di eliminazione di Gauss*.
+A questo punto, andiamo a definire il *metodo di eliminazione di Gauss*.
 - si tratta di un metodo costruttivo;
 - le condizioni che garantiscono la sua esecuzione saranno le condizioni che garantiscono l'esistenza della fattorizzazione $L U$;
-- è un metodo semi-iterativo, che consiste in $n-1$ passi se $A in RR^(n times n)$: al passo j-esimo l'obiettivo sarà quello di trasformare la j-esima colonna della matrice corrente in quella di una matrice triangolare superiore, ovvero, azzerare gli elementi al di sotto di quello diagonale ($(j,j)$).
+- è un metodo semi-iterativo, che consiste in $n-1$ passi se $A in RR^(n times n)$: al passo j-esimo l'obiettivo sarà quello di trasformare la j-esima colonna della matrice corrente in quella di una matrice triangolare superiore, ovvero, azzerare gli elementi al di sotto di quello diagonale ($j,j$).
 
-A questo fine, se $A=(a_(i j)) equiv (a_(i j)^1) = A^1$ è la matrice da fattorizzare. Inoltre, $a_(i j)^k$ sta a denotare l'ultimo passo della procedura (il k-esimo) in cui l'elemento $(i,j)$ è stato modificato.
+A questo fine, se $A=(a_(i j)) equiv (a_(i j)^((1))) = A^((1))$ è la matrice da fattorizzare. Inoltre, $a_(i j)^((k))$ sta a denotare l'ultimo passo della procedura (il k-esimo) in cui l'elemento $(i,j)$ è stato modificato.
 
 $
   A= mat(
-    a_(11)^1, a_(12)^1, a_(13)^1, dots, dots, a_(1n)^1;a_(21)^1, a_(22)^1, a_(23)^1, dots, dots, a_(2n)^1;a_(31)^1, a_(32)^1, a_(33)^1, dots, dots, a_(3n)^1;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;a_(n 1)^1, a_(n 2)^1, a_(n 3)^1, dots, dots, a_(n n)^1
-  ) equiv A^1
+    a_(11)^((1)), a_(12)^((1)), a_(13)^((1)), dots, dots, a_(1n)^((1));a_(21)^((1)), a_(22)^((1)), a_(23)^((1)), dots, dots, a_(2n)^((1));a_(31)^((1)), a_(32)^((1)), a_(33)^((1)), dots, dots, a_(3n)^((1));dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;a_(n 1)^((1)), a_(n 2)^((1)), a_(n 3)^((1)), dots, dots, a_(n n)^((1))
+  ) equiv A^((1))
 $
 
-Se $a_(11)^1 eq.not 0$, allora possiamo definire:
-- il primo vettore elementare di Gauss: $underline(g)_1 = 1/a_(11)^1 (0, a_(21)^1, ..., a_(n 1)^1)^T$
+Se $a_(11)^((1)) eq.not 0$, allora possiamo definire:
+- il primo vettore elementare di Gauss: $underline(g)_1 = 1/a_(11)^((1)) (0, a_(21)^((1)), ..., a_(n 1)^((1)))^T$
 - la prima matrice elementare di Gauss: $L_1 = I - underline(g)_1 underline(e)_1^T$ 
 tali che:
 
 $
   L_1 A= mat(
-    a_(11)^1, a_(12)^1, a_(13)^1, dots, dots, a_(1n)^1;0, a_(22)^2, a_(23)^2, dots, dots, a_(2n)^2;0, a_(32)^2, a_(33)^2, dots, dots, a_(3n)^2;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;0, a_(n 2)^2, a_(n 3)^2, dots, dots, a_(n n)^2
+    a_(11)^((1)), a_(12)^((1)), a_(13)^((1)), dots, dots, a_(1n)^((1));0, a_(22)^2, a_(23)^2, dots, dots, a_(2n)^2;0, a_(32)^2, a_(33)^2, dots, dots, a_(3n)^2;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;0, a_(n 2)^2, a_(n 3)^2, dots, dots, a_(n n)^2
   ) equiv A^2
 $
 
 #observation()[
-  $L_1A^1 = A^2$
+  $L_1A^((1)) = A^2$
 ]
 Al secondo passo di eleiminazione, se $a_(22)^2 eq.not 0$, allora possiamo definire:
 - il secondo vettore elementare di Gauss $underline(g)_2 = 1/(a_(22)^2) (0...0 a_(32)^2 ... a_(n 2)^2)^T$
@@ -430,7 +456,7 @@ tali che:
 
 $
   L_1 A= mat(
-    a_(11)^1, a_(12)^1, a_(13)^1, dots, dots, a_(1n)^1;0, a_(22)^2, a_(23)^2, dots, dots, a_(2n)^2;0, 0, a_(33)^3, dots, dots, a_(3n)^3;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;0, 0, a_(n 3)^3, dots, dots, a_(n n)^3
+    a_(11)^((1)), a_(12)^((1)), a_(13)^((1)), dots, dots, a_(1n)^((1));0, a_(22)^2, a_(23)^2, dots, dots, a_(2n)^2;0, 0, a_(33)^3, dots, dots, a_(3n)^3;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;0, 0, a_(n 3)^3, dots, dots, a_(n n)^3
   ) equiv A^3
 $
 
@@ -443,7 +469,7 @@ Procedendo in maniera analoga, al passo j-esimo, se $a_(j j)^j eq.not 0$, potrem
 
 $
   L_j dot ... dot L_1 A = mat(
-    a_(11)^1, a_(12)^1, a_(13)^1, dots, dots, a_(1n)^1;0, a_(22)^1, a_(23)^1, dots, dots, a_(2n)^1;0, 0, a_(33)^1, dots, dots, a_(3n)^1;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;0, 0, 0, dots, a_(n,j+1)^(j+1), a_(n n)^(j+1)
+    a_(11)^((1)), a_(12)^((1)), a_(13)^((1)), dots, dots, a_(1n)^((1));0, a_(22)^((1)), a_(23)^((1)), dots, dots, a_(2n)^((1));0, 0, a_(33)^((1)), dots, dots, a_(3n)^((1));dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;0, 0, 0, dots, a_(n,j+1)^(j+1), a_(n n)^(j+1)
   ) = A^(j+1)
 $
 
@@ -453,7 +479,7 @@ $
 Se questo è possibile, $forall j =1 ,...,n-1$, si ottiene che:
 $
   L_(n-1) dot L_(n-2) dot ... dot L_1 A = mat(
-    a_(11)^1, a_(12)^1, a_(13)^1, dots, dots, a_(1n)^1;0, a_(22)^2, a_(23)^2, dots, dots, a_(2n)^2;0, 0, a_(33)^3, dots, dots, a_(3n)^3;dots.v, dots.v, dots.down, dots.down, , dots.v;dots.v, dots.v, , dots.down, dots.down, dots.v;0, 0, 0, dots, 0, a_(n n)^n
+    a_(11)^((1)), a_(12)^((1)), a_(13)^((1)), dots, dots, a_(1n)^((1));0, a_(22)^2, a_(23)^2, dots, dots, a_(2n)^2;0, 0, a_(33)^3, dots, dots, a_(3n)^3;dots.v, dots.v, dots.down, dots.down, , dots.v;dots.v, dots.v, , dots.down, dots.down, dots.v;0, 0, 0, dots, 0, a_(n n)^n
   ) = A^n equiv U
 $
 Possiamo quindi concludere che questa procedura è definita se e solo se $a_(j j)^j eq.not 0, forall j=1,...,n <=> U$ è non singolare. Inoltre, dall'uguaglianza $
@@ -468,3 +494,257 @@ $
   L^(-1)A=U => A=L U
 $
 che è la fattorizzazione richiesta.
+
+== Costo computazionale
+Esaminiamo gli aspetti del costo computazionale supponendo che la fattorizzazione esista.
+- *Memoria*: l'idea è quella di sovrascrivere la matrice $A$ con l'informazione dei suoi fattori $L$ e $U$. Chiaramente la porzione triangolare superiore di $U$ può essere sovrascritta sulla porzione triangolare superiore di $A$. Riguardo al fattore $L$, ricordiamo che:
+
+  + $L^(-1)=L_(n-1) L_(n-2) dot ... dot L_1$
+    $L=(L_(n-1) dot ... dot L_1)^(-1)=L_1^(-1) dot ... dot L_(n-1)^-1$
+  + $L_i = I - underline(g)_i underline(e)_i^T => L_i^(-1) = I + underline(g)_i underline(e)_i^T$
+  + Le prime componenti di $underline(g)_i$ sono nulle.
+
+  Pertanto
+  $
+    L=(I+underline(g)_1 underline(e)_1^T)(I+underline(g)_2 underline(e)_2^T) dot ... dot (I+underline(g)_(n-1) underline(e)_(n-1)^T)
+  $
+
+  #underline[n=3]
+
+  $
+    L&=(I+underline(g)_1 underline(e)_1^T)(I+underline(g)_2 underline(e)_2^T)=\
+     &=I+underline(g)_1 underline(e)_1^T + underline(g)_2 underline(e)_2^T + underline(g)_1 overbrace(underline(e)_1^T underline(g)_2, =0) underline(e)_2^T = \
+     &= I + sum_(i=1)^2 underline(g)_i underline(e)_i^T
+  $
+
+  Questa proprietà vale, in generale, per ogni $n$. Perciò otteniamo che:
+  $
+    L=I+ sum_(i=1)^(n-1) underline(g)_i underline(e)_i^T quad quad quad (3)
+  $
+  Dunque al passo i-esimo della fattorizzazione possiamo riscrivere gli $(n-i)$ elementi, al di sotto di quello diagonale in colonna $i$, con gli elementi significativi di $underline(g)_i$. Di conseguenza, alla fine dell'algoritmo, avremo riscritto gli elementi della porzione strettamente triangolare inferiore di $A$, con la porzione strettamente triangolare inferiore del secondo termine di (3). Evidentemente la diagonale di $L$, che sappiamo essere unitaria, non necessita di essere memorizzata esplicitamente. In conclusione, la matrice $A$ può eesere sovrascritta con l'infornazione dei suoi fattori $L$ e $U$.
+
+- *Numero operazioni*
+
+  Abbiamo visto che:
+  #figure(image("images/2025-11-11-13-46-44.png"))
+  equivale a:
+  $
+    (I-underline(g)_i underline(e)_i^T)A^((i)) = A^((i))-underline(g)_i (underline(e)_i^T A^((i)))
+  $
+  se $a$ è un array $n times n$ che contiene gli elementi di $A$, allora:
+  ```matlab
+                                        for i=1:n-1     %passi di eliminazione
+                                          if a(i,i)==0
+                                            error('non fattorizzabile');
+                                          end
+                                          a(i+1:n,i)=a(i+1:n,i)/a(i,i);
+                                          a(i+1:n, i+1:n) = a(i+1:n, i+1:n) - a(i+1:n, i) * a(i, i+1:n);
+                                        end
+                                        ```
+  Operazioni all'iterazione $i$:
+  - $(n-1)$ divisioni (per $underline(g)_i$)
+  - $2(n-1)^2$ `flops` ($(n-1)^2$ somme $+(n-1)^2*$)
+  per un totale di:
+  $
+    2 sum_(i=1)^(n-1) (n-1)(n-i+ 1/2) = 2 sum_(i=1)^(n-1) i (i+1/2) approx 2 sum_(i-1)^(n-1) i^2 approx 2 n^3/3 "flops"
+  $
+  #observation()[
+    $sum_(i=1)^n i^k approx integral_1^n i^k "di" approx frac(n^(k+1), k+1)$
+  ]
+
+=== Esistenza Fattorizzazione $L U$
+
+$
+  A = L U <=> a_(i i)^((i)) eq.not 0, space forall i=1,...,n <=> "det"(U) eq.not 0
+$
+A questo riguardo, se $A=(a_(i j)) in RR^(n times n)$, denotiamo con $A_k in RR^(k times k)$, la sottomatrice di $A$ ottenuta come intersezione delle sue prime $k$ righe e $k$ colonne:
+$
+  A_k = mat(a_(11), dots, dots, a_(1 k);dots.v, , , dots.v;dots.v, , , dots.v;a_(k 1), dots, dots, a_(k k))
+$
+#example()[
+  Se $A= mat(1, 2, 3;4, 5, 6;7, 8, 9)$, allora: $A_1 = (1), A_2 = mat(1, 2;4, 5), A_3 equiv A$.
+]
+
+#observation()[
+  $
+    A_k &= [I_k O_(k, n-k)] A mat(I_k;O_(n-k,k))=\
+        & = ([I_k O_(k,n-k)] L)(U mat(I_k;O_(n-k,k)))=\
+        & = [L_k O_(k,n-k)] mat(U_k;O_(n-k,k)) = L_k U_k
+  $
+]
+#definition(
+  )[
+  Si definisce *minore principale di ordine k* di una matrice, il determinante della sottomatrice principale di ordine $k$.
+]
+Pertanto, dall'uguaglianza:
+$
+  A_k = L_k U_k
+$
+Segue che:
+$
+  det(A_k) & = det(L_k U_k) = \
+           & = underbracket(det(L_k), 1) dot det(U_k) = \
+           & = Pi_(i=1)^k a_(i i)^((i)), forall k = 1,...,n
+$
+A questo punto osserviamo che:
+$
+  det(U) = Pi_(i=1)^n a_(i i)^((i)) eq.not 0
+$
+- $<=> forall k = 1,...,n : Pi_(i=1)^k a_(i i)^((i)) eq.not 0$
+- $<=> forall k = 1,...,n : det(U_k) eq.not 0$
+- $<=> forall k = 1,...,n : det(A_k) eq.not 0$
+
+In altri termini, abbiamo dimostrato il seguente risultato.
+
+#theorem(
+  "Esistenza della fattorizzazione LU",
+)[
+  Data una matrice non-singolare $A$, *$A$ è fattorizzabile LU se e solo se tutti i suoi minori principali sono non nulli*.
+]
+#observation(
+  )[
+  Affinché il sistema lineare
+  $
+    A underline(x) = underline(b), A in RR^(n times n)
+  $
+  abbia soluzione (unica), è necessario e sufficiente che $det(A) = det(A_n) eq.not 0$. Tuttavia, se vogliamo fattorizzare $A=L U$, per risolverlo, allora si richiede che:
+  $
+    det(A_k) eq.not 0, forall k=1,...,n
+  $
+  condizione generalmente molto più restrittiva che non richiede solo che $det(A) eq.not 0$.
+]
+Tuttavia, esistono importanti classi di matrici per cui:
++ la non singolarità di $A$ deriva da una proprietà algebrica della matrice;
++ tutte le sottomatrici principali di $A$, godo della medisima proprietà.
+
+Questo avviene, in particolare, per:
+- *matrici a diagonale dominante*
+- *matrici simmetriche e definite positive*
+
+== Matrici a diagonale dominante
+
+#definition()[
+  Data una matrice $A=(a_(i j)) in RR^(n times n)$, si dice che essa è:
+  - diagonale dominante per righe se:
+  $
+    abs(a_(i i)) > sum_(j=1\
+    j eq.not i)^n abs(a_(i j)), space forall i =1,...n
+  $
+
+  - diagonale dominante per colonne se:
+  $
+    abs(a_(j j)) > sum_(i=1\
+    i eq.not j)^n abs(a_(i j)), space forall j =1,...n
+  $
+]
+
+#example(multiple: true)[
+  #align(center, grid(columns: 2, column-gutter: 30pt, $
+    A=mat(-3, 2, 0;4, -7, 1;1, -5, 8) " è d.d per righe."
+  $, $
+    A=mat(2, 8, 7;1, -9, 0;0, 0, 8) " è d.d per colonne."
+  $))
+]
+
+Valgono le seguenti proprietà:
+#lemma(
+  )[
+  Se una matrice $A$ è diagonale dominante pei righe (rispettivamente, per colonne), allora tali sono tutte le sue sottomatrici principali: $forall k=1,...,n: A_k$ è a d.d.
+]
+
+#lemma(
+  )[
+  Una matrice A è diagonale dominante per righe (rispettivamente, per colonne) se e solo se $A^T$ è diagonale dominante per colonne (rispettivamente, per righe).
+]
+
+#lemma(
+  )[
+  Se una matrice $A in RR^(n times n)$ è diagonale dominante per righe (rispettivamente, per colonne), allora è non singolare, ovvero $det(A) eq.not 0$.
+]
+
+#proof(
+  )[
+  Dimostriamo il caso in cui la matrice è dominante per righe. Supponiamo per assurdo che una matrice $A$ sia singolare e quindi $det(A)=0$. Segue che esiste un vettore $underline(x) in RR^n, underline(x) eq.not 0$ tale che
+  $
+    A underline(x) = underline(0) space space space (1)
+  $
+  Poiché un qualunque multiplo scalare di $x$ soddisfa ancora la (1), possiamo assumere che la sua componente di massimo modulo sia $x_k = 1$.
+  Se $underline(e)_k in RR^n$ è il k-esimo versore, segue che:
+  $
+    (underline(e)_k^T A)underline(x) = underline(e)_k^T underline(0) = 0
+  $
+  ovvero, la k-esima equazione del sistema (1) sarà:
+  $
+    (a_(k 1), ..., a_(k n)) mat(x_1;dots.v;dots.v;x_n) = sum_(j=1)^n a_(k j) x_j ) =0
+  $
+  Proseguendo:
+  $
+    a_(k k) overbrace(x_k, =1) = - sum_(j=1\ j eq.not k)^n a_(k j) x_(j)
+  $
+  da cui si ottiene finalmente:
+  $
+    abs(a_(k k)) = abs(a_(k k) x_k) = abs(- sum_(j eq.not k) a_(k j) x_(j)) lt.eq sum_(j eq.not k) abs(a_(k j) x_(j)) lt.eq sum_(j eq.not k) abs(a_(k j))
+  $
+  che contraddice la d.d per righe di $A$ sulla riga k-esima. Deve quindi valere $det(A) eq.not 0$.
+]
+
+#lemma()[
+  Dal lemma precedente segue che se $A$ è d.d, per righe o per colonne, allora è fattorizzabile LU.
+]
+
+== Matrici SDP
+#definition()[
+  Diremo che $A = (a_(i j)) in RR^(n times n)$ è *sdp* (simmetrica e definita positiva) se:
+  + $A = A^T$ (simmetria, ovvero $forall i,j: a_(i j) = a_(j i)$)
+  + $forall underline(x) in RR^n, underline(x)eq.not underline(0): underline(x)^T A underline(x) > 0$ (definita positività)
+]
+
+Valgono le seguenti proprietà:
+
+#lemma()[
+  Tutte le sottomatrici principali di una matrice sdp sono sdp:
+  $
+    A " sdp " => forall k=1,...,n: A_k " è sdp"
+  $
+]
+#proof()[
+  TODO
+]
+
+#lemma()[
+  Una matrice sdp è non singolare:
+  $
+    det(A_k) eq.not 0
+  $
+]
+#proof()[
+  TODO
+]
+
+#lemma()[
+  Dai lemmi precedenti segue che se $A$ è sdp, allora $A$ è fattorizzabile LU.
+]
+
+#theorem()[
+  Gli elementi diagonali di una matrice $A$ sdp sono positivi:
+  $
+    forall i = 1,...,n: a_(i i) > 0
+  $
+]
+#proof()[
+  TODO
+]
+
+#theorem()[
+  $A$ è sdp se solo se $A=L D L^T$
+  con:
+  - $L$ triangolare inferiore a diagonale unitaria
+  - $D$ matrice con diagonale unitaria
+]
+#proof()[
+  TODO
+]
+
+#observation()[
+  Se $A$ è sdp, la matrice è fattorizzabile LDL. Quest'ultima fattorizzazione è molto più efficiente dal punto di vista computazionale della fattorizzazione LU, specialmente per il fatto che non risulta più necessario calcolare il fattore U. 
+]
