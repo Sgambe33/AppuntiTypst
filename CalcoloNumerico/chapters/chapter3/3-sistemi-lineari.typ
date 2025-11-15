@@ -533,14 +533,14 @@ Esaminiamo gli aspetti del costo computazionale supponendo che la fattorizzazion
   $
   se $a$ è un array $n times n$ che contiene gli elementi di $A$, allora:
   ```matlab
-                                        for i=1:n-1     %passi di eliminazione
-                                          if a(i,i)==0
-                                            error('non fattorizzabile');
+                                          for i=1:n-1     %passi di eliminazione
+                                            if a(i,i)==0
+                                              error('non fattorizzabile');
+                                            end
+                                            a(i+1:n,i)=a(i+1:n,i)/a(i,i);
+                                            a(i+1:n, i+1:n) = a(i+1:n, i+1:n) - a(i+1:n, i) * a(i, i+1:n);
                                           end
-                                          a(i+1:n,i)=a(i+1:n,i)/a(i,i);
-                                          a(i+1:n, i+1:n) = a(i+1:n, i+1:n) - a(i+1:n, i) * a(i, i+1:n);
-                                        end
-                                        ```
+                                          ```
   Operazioni all'iterazione $i$:
   - $(n-1)$ divisioni (per $underline(g)_i$)
   - $2(n-1)^2$ `flops` ($(n-1)^2$ somme $+(n-1)^2*$)
@@ -621,6 +621,8 @@ Questo avviene, in particolare, per:
 - *matrici a diagonale dominante*
 - *matrici simmetriche e definite positive*
 
+//12.11.2025
+
 == Matrici a diagonale dominante
 
 #definition()[
@@ -693,7 +695,8 @@ Valgono le seguenti proprietà:
 ]
 
 == Matrici SDP
-#definition()[
+#definition(
+  )[
   Diremo che $A = (a_(i j)) in RR^(n times n)$ è *sdp* (simmetrica e definita positiva) se:
   + $A = A^T$ (simmetria, ovvero $forall i,j: a_(i j) = a_(j i)$)
   + $forall underline(x) in RR^n, underline(x)eq.not underline(0): underline(x)^T A underline(x) > 0$ (definita positività)
@@ -745,6 +748,7 @@ Valgono le seguenti proprietà:
   TODO
 ]
 
-#observation()[
-  Se $A$ è sdp, la matrice è fattorizzabile LDL. Quest'ultima fattorizzazione è molto più efficiente dal punto di vista computazionale della fattorizzazione LU, specialmente per il fatto che non risulta più necessario calcolare il fattore U. 
+#observation(
+  )[
+  Se $A$ è sdp, la matrice è fattorizzabile LDL. Quest'ultima fattorizzazione è molto più efficiente dal punto di vista computazionale della fattorizzazione LU, specialmente per il fatto che non risulta più necessario calcolare il fattore U.
 ]
