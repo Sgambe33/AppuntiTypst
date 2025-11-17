@@ -22,10 +22,6 @@ $
   L(A)={w in Sigma^* bar [q_0, w] der(*) [q, epsilon], q in F}
 $
 
-#example()[
-  Stringhe su {0,1} che contengono due 1 consecutivi.
-]
-
 === Diagrammi di transizione
 
 #definition(
@@ -311,7 +307,7 @@ Per adesso considereremo solo automi in cui $delta$ è *totale* ovvero ad ogni s
     ])
 ]
 
-In alcuni casi la *non appartenenza* di una stringa al linguaggio di un automa piò essere determinata anche prima di terminare la scansione della stringa, ad esempio quando si chiede che le stringhe non contengano una particolare sottostringa e questa viene indidividuata. In questi automi mancano alcune combinazioni di stato-simbolo perché corrispondono all'arresto.
+In alcuni casi la *non appartenenza* di una stringa al linguaggio di un automa piò essere determinata anche prima di terminare la scansione della stringa, ad esempio quando si chiede che le stringhe non contengano una particolare sottostringa e questa viene individuata. In questi automi mancano alcune combinazioni di stato-simbolo perché corrispondono all'arresto.
 
 == Automi a stati finiti non deterministici (NFA)
 
