@@ -18,19 +18,30 @@ Dato un simbolo della grammatica $X$ e un suo attributo $a$, la notazione *$X.a$
 === Attributi ereditati e sintetizzati
 Per i simboli non-terminali ci sono due tipi di attributi:
 
-+ *Attributi sintetizzati*: un attributo di un non-terminale A relativo a un nodo N dell'albero di parsing è detto sintetizzato se è definito da una regola semantica associata alla produzione relativa al nodo N. Si noti che una tale produzione deve avere A come testa. Un attributo sintetizzato relativo a un nodo N è definito unicamente in base ai figli di N e a N stesso. 
++ *Attributi sintetizzati* ⬆️: 
+  - Flusso: Bottom-Up (dal basso verso l'alto).
+  - Associazione: Associati al non-terminale in testa alla produzione (il "genitore", es. A in $A -> alpha$).
+  - Definizione: Calcolati tramite una regola semantica associata alla produzione stessa.
+  - Dipendenze: Definiti unicamente in base agli attributi dei figli (simboli nel corpo $alpha$) e/o del nodo stesso.
+
   #example(
     )[
-    In un'espressione aritmetica come $E -> E_1 + T$, l'attributo $E$.val (il valore dell'espressione) è sintetizzato calcolando $E_1$.val + $T$.val (i valori dei figli).
+    In un'espressione aritmetica come $E -> E_1 + T$, l'attributo $E$.val (il valore del genitore) è sintetizzato calcolando $E_1$. val + $T$.val (i valori dei figli).
   ]
 
-+ *Attributi ereditati*: un attributo di un non-terminale B relativo a un nodo N dell'albero di parsing è detto ereditato se è definito dalla regola semantica associata alla produzione relativa al nodo padre di NV. Si noti che tale produzione avrà B tra i simboli del corpo. Un attributo ereditato è definito solamente in base al padre di N, a N stesso e ai fratelli di N. 
++ *Attributi ereditati* ⬇️➡️: 
+  - Flusso: Top-Down (dall'alto verso il basso) o Laterale (tra fratelli).
+  - Associazione: Associati a un non-terminale nel corpo della produzione (un "figlio", es. B in $A \-> alpha B beta$).
+  - Definizione: Calcolati tramite una regola semantica associata alla produzione del padre.
+  - Dipendenze: Definiti in base agli attributi del padre (A), dei fratelli (simboli in $alpha$ o $beta$), e/o del nodo stesso (B).
 
 #observation(
   )[
-  Mentre non permettiamo che un attributo ereditato al nodo N possa essere definito in base ai valori degli attributi dei figli di N, ammettiamo invece che un attributo sintetizzato relativo al nodo N possa essere definito anche in base ai valori di attributi ereditati relativi al nodo N stesso.
-
-  I terminali possono avere attributi sintetizzati, ma non attributi ereditati.
+  - Restrizione (Ereditati): Un attributo ereditato (al nodo N) non può dipendere dagli attributi dei figli di N.
+  - Inter-dipendenza: Un attributo sintetizzato (al nodo N) può dipendere da attributi ereditati dello stesso nodo N.
+  Terminali:
+  - Possono avere attributi sintetizzati (es. digit.lexval, fornito dal lexer).
+  - Non possono avere attributi ereditati.
 ]
 
 #example(
@@ -172,7 +183,7 @@ Ogni traduzione comporta effetti collaterali, ad esempio stampa di un risultato 
   + id.entry, valore lessicale, puntatore alla tavola dei simboli
   + L.inh , attributo che indica il tipo degli identificatori della lista
   #figure(image("images/2025-11-17-10-08-37.png"), caption: "Grafo delle dipendenze per float id1, id2, id3
-                  ")
+                                ")
   6, 8 e 10: attributi fittizi utilizzati per rappresentare le chiamate alla
   funzione addType().
 
