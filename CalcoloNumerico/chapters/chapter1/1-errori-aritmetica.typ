@@ -398,8 +398,6 @@ dove:
 - $f$ contiene la descrizione formale del problema
 
 Assumiamo inoltre che $x,y in RR " e " f:RR ->RR$.
-
-//TODO: Finire grafico
 $
   #canvas(
     {
@@ -492,8 +490,48 @@ Vi sono però dei casi particolari:
   Ad esempio:
   $
     f(x)=x^10, quad quad x=1 => f'(1)=10
-  //TODO: finire l'esempio quando carica il suo poema di pertanto (tabella con eps)
   $
+  #align(center, grid(columns: 2, align: center, column-gutter: 10pt, table(
+    columns: 2,
+    [eps],
+    [$((1+"eps")^10-1)\/"eps"$],
+    [1.00e-01],
+    [15.937424601000023],
+    [1.00e-02],
+    [10.462212541120453],
+    [1.00e-03],
+    [10.045120210251168],
+    [1.00e-04],
+    [10.004501200209237],
+    [1.00e-05],
+    [10.000450012070949],
+    [1.00e-06],
+    [10.000044999403102],
+    [1.00e-07],
+    [10.000004506682814],
+    [1.00e-08],
+    [10.000000383314500],
+  ), table(
+    columns: 2,
+    [eps],
+    [$((1+"eps")^10-1)\/"eps"$],
+    [1.00e-09],
+    [10.000000827403710],
+    [1.00e-10],
+    [10.000000827403710],
+    [1.00e-11],
+    [10.000000827403708],
+    [1.00e-12],
+    [10.000889005823410],
+    [1.00e-13],
+    [9.992007221626409],
+    [1.00e-14],
+    [9.992007221626409],
+    [1.00e-15],
+    [11.102230246251565],
+    [1.00e-16],
+    [0.000000000000000],
+  )))
   Si vede come con $epsilon=1 times e^(-12)$ si perdono 3 cifre di accuratezza.
 ]
 
