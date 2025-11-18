@@ -22,10 +22,6 @@ $
   L(A)={w in Sigma^* bar [q_0, w] der(*) [q, epsilon], q in F}
 $
 
-#example()[
-  Stringhe su {0,1} che contengono due 1 consecutivi.
-]
-
 === Diagrammi di transizione
 
 #definition(
@@ -50,6 +46,8 @@ $
     )
 ]
 Per adesso considereremo solo automi in cui $delta$ è *totale* ovvero ad ogni simbolo in input è associato uno stato.
+
+#pagebreak()
 
 #example(
   )[
@@ -124,104 +122,192 @@ Per adesso considereremo solo automi in cui $delta$ è *totale* ovvero ad ogni s
     ))
 
   + Stringhe su {a,b} che non iniziano "aba":
-    #figure(image("images/2025-10-08-16-35-25.png"))
     #figure(diagram(
       node-stroke: 0.9pt,
       cell-size: 5mm,
       spacing: 3mm,
-      node((-4, 0), [S], extrude: (-2, 0)),
-      node((-2, 0), [A], extrude: (-2, 0)),
-      node((0, 0), [B], extrude: (-2, 0)),
-      node((2, 0), [C]),
+      node((-4, 0), [S], extrude: (-2, 0), name: <s>),
+      node((-2, 0), [A], extrude: (-2, 0), name: <a>),
+      node((0, 0), [B], extrude: (-2, 0), name: <b>),
+      node((2, 0), [C], name: <c>),
       edge((-5.2, 0), (-4.0, 0), "-|>", []),
-      edge((-4, 0), (-2, 0), "-|>", [a]),
-      edge((-2, 0), (0, 0), "-|>", [a]),
-      edge((0, 0), (2, 0), "-|>", [a]),
-      edge((-4, 0), (-4, 0), "-|>", [b], bend: 130deg),
-      edge((-2, 0), (-4, 0), "-|>", [b], bend: 50deg),
-      edge((0, 0), (-4.3, 0), "-|>", [b], bend: 60deg),
-      edge((2, 0), (2, 0), "-|>", [a,b], bend: 130deg),
+      edge(<s>, <s>, "-|>", [b], bend: 130deg),
+      edge(<s>, <a>, "-|>", [a]),
+      edge(<a>, <a>, "-|>", [a], bend: 130deg),
+      edge(<a>, <b>, "-|>", [b]),
+      edge(<b>, <s>, "-|>", [b], bend: 45deg),
+      edge(<b>, <c>, "-|>", [a]),
+      edge(<c>, <c>, "-|>", [a,b], bend: 130deg),
     ))
   + Stringhe su {a,b} in cui ogni "a" è preceduta o seguita da "b":
-    #figure(image("images/2025-10-08-16-35-34.png"))
     #figure(diagram(
       node-stroke: 0.9pt,
       cell-size: 5mm,
       spacing: 3mm,
-      node((-4, 0), [S], extrude: (-2, 0)),
-      node((-2, 0), [A], extrude: (-2, 0)),
-      node((0, 0), [B], extrude: (-2, 0)),
-      node((2, 0), [C]),
-      edge((-5.2, 0), (-4.0, 0), "-|>", []),
-      edge((-4, 0), (-2, 0), "-|>", [a]),
-      edge((-2, 0), (0, 0), "-|>", [a]),
-      edge((0, 0), (2, 0), "-|>", [a]),
-      edge((-4, 0), (-4, 0), "-|>", [b], bend: 130deg),
-      edge((-2, 0), (-4, 0), "-|>", [b], bend: 50deg),
-      edge((0, 0), (-4.3, 0), "-|>", [b], bend: 60deg),
-      edge((2, 0), (2, 0), "-|>", [a,b], bend: 130deg),
+      node((-2, 0), [S], extrude: (-2, 0), name: <s>),
+      node((0, 0), [A], name: <a>),
+      node((-2, 2), [B], extrude: (-2, 0), name: <b>),
+      node((2, 0), [C], name: <c>),
+      edge((-3.2, 0), (-2.0, 0), "-|>"),
+      edge(<s>, <a>, "-|>", [a]),
+      edge(<s>, <b>, "-|>", [b]),
+      edge(<a>, <c>, "-|>", [a]),
+      edge(<a>, <b>, "-|>", [b]),
+      edge(<b>, <b>, "-|>", [b], bend: -130deg),
+      edge(<b>, <s>, "-|>", [a], bend: 60deg),
+      edge(<c>, <c>, "-|>", [a,b], bend: 130deg),
     ))
   + Stringhe su {a,b} dove $abs(w)_a$ e $abs(w)_b$ sono pari:
-    #figure(image("images/2025-10-08-16-35-41.png"))
-    #figure(diagram(
-      node-stroke: 0.9pt,
-      cell-size: 5mm,
-      spacing: 3mm,
-      node((-4, 0), [S], extrude: (-2, 0)),
-      node((-2, 0), [A], extrude: (-2, 0)),
-      node((0, 0), [B], extrude: (-2, 0)),
-      node((2, 0), [C]),
-      edge((-5.2, 0), (-4.0, 0), "-|>", []),
-      edge((-4, 0), (-2, 0), "-|>", [a]),
-      edge((-2, 0), (0, 0), "-|>", [a]),
-      edge((0, 0), (2, 0), "-|>", [a]),
-      edge((-4, 0), (-4, 0), "-|>", [b], bend: 130deg),
-      edge((-2, 0), (-4, 0), "-|>", [b], bend: 50deg),
-      edge((0, 0), (-4.3, 0), "-|>", [b], bend: 60deg),
-      edge((2, 0), (2, 0), "-|>", [a,b], bend: 130deg),
-    ))
-  + Stringhe su {a,b} di lunghezza dispari che contengono esattamente due "b":
-    #figure(image("images/2025-10-08-16-35-48.png"))
-    #figure(diagram(
-      node-stroke: 0.9pt,
-      cell-size: 5mm,
-      spacing: 3mm,
-      node((-4, 0), [S], extrude: (-2, 0)),
-      node((-2, 0), [A], extrude: (-2, 0)),
-      node((0, 0), [B], extrude: (-2, 0)),
-      node((2, 0), [C]),
-      edge((-5.2, 0), (-4.0, 0), "-|>", []),
-      edge((-4, 0), (-2, 0), "-|>", [a]),
-      edge((-2, 0), (0, 0), "-|>", [a]),
-      edge((0, 0), (2, 0), "-|>", [a]),
-      edge((-4, 0), (-4, 0), "-|>", [b], bend: 130deg),
-      edge((-2, 0), (-4, 0), "-|>", [b], bend: 50deg),
-      edge((0, 0), (-4.3, 0), "-|>", [b], bend: 60deg),
-      edge((2, 0), (2, 0), "-|>", [a,b], bend: 130deg),
-    ))
+    #grid(columns: (.5fr, 1fr), align(center)[
+      #table(
+        columns: (auto, auto, auto),
+        align: center,
+        [],
+        [$abs(w)_a$],
+        [$abs(w)_b$],
+        table.cell(fill: rgb("#68e86680"), "S"),
+        [*_pari_*],
+        [*_pari_*],
+        [A],
+        [_dispari_],
+        [_pari_],
+        [B],
+        [_pari_],
+        [_dispari_],
+        [C],
+        [_dispari_],
+        [_dispari_],
+      )
+    ], align(center)[
+      #diagram(
+        node-stroke: 0.9pt,
+        cell-size: 5mm,
+        spacing: 3mm,
+        node((-2.5, 0), [S], extrude: (-2, 0), name: <s>),
+        node((0, 0), [A], name: <a>),
+        node((-2.5, 2.5), [B], name: <b>),
+        node((0, 2.5), [C], name: <c>),
+        edge((-3.7, 0), <s>, "-|>"),
+        edge(<s>, <a>, "-|>", [a], bend: 15deg),
+        edge(<s>, <b>, "-|>", [b], bend: 15deg),
+        edge(<a>, <s>, "-|>", [a], bend: 15deg),
+        edge(<a>, <c>, "-|>", [b], bend: 15deg),
+        edge(<b>, <s>, "-|>", [b], bend: 15deg),
+        edge(<b>, <c>, "-|>", [a], bend: 15deg),
+        edge(<c>, <a>, "-|>", [b], bend: 15deg),
+        edge(<c>, <b>, "-|>", [a], bend: 15deg),
+      )
+    ])
 
-  + Stringhe su {a,b} in cui "aa" occorre solo una volta:
-    #figure(image("images/2025-10-08-16-35-55.png"))
-    #figure(diagram(
-      node-stroke: 0.9pt,
-      cell-size: 5mm,
-      spacing: 3mm,
-      node((-4, 0), [S], extrude: (-2, 0)),
-      node((-2, 0), [A], extrude: (-2, 0)),
-      node((0, 0), [B], extrude: (-2, 0)),
-      node((2, 0), [C]),
-      edge((-5.2, 0), (-4.0, 0), "-|>", []),
-      edge((-4, 0), (-2, 0), "-|>", [a]),
-      edge((-2, 0), (0, 0), "-|>", [a]),
-      edge((0, 0), (2, 0), "-|>", [a]),
-      edge((-4, 0), (-4, 0), "-|>", [b], bend: 130deg),
-      edge((-2, 0), (-4, 0), "-|>", [b], bend: 50deg),
-      edge((0, 0), (-4.3, 0), "-|>", [b], bend: 60deg),
-      edge((2, 0), (2, 0), "-|>", [a,b], bend: 130deg),
-    ))
+  + Stringhe su {a,b} di lunghezza dispari che contengono esattamente due "b":
+    #grid(columns: (.5fr, 1fr), align(center)[
+      #table(
+        columns: (auto, auto, auto),
+        align: center,
+        [],
+        [$abs(w)$],
+        [$abs(w)_b$],
+        [S],
+        [_pari_],
+        [0],
+        [A],
+        [_dispari_],
+        [0],
+        [B],
+        [_dispari_],
+        [1],
+        [C],
+        [_pari_],
+        [1],
+        [D],
+        [_pari_],
+        [2],
+        table.cell(fill: rgb("#68e86680"), "E"),
+        [*_dispari_*],
+        [*2*],
+        [F],
+        [_pari,#linebreak()dispari_],
+        [>2],
+      )
+    ], align(center)[
+      #diagram(
+        node-stroke: 0.9pt,
+        cell-size: 5mm,
+        spacing: 3mm,
+        node((-2.5, 0), [S], name: <s>),
+        node((0, 0), [A], name: <a>),
+        node((-2.5, 2), [B], name: <b>),
+        node((0, 2), [C], name: <c>),
+        node((-2.5, 4), [D], name: <d>),
+        node((0, 4), [E], extrude: (-2, 0), name: <e>),
+        node((-1.25, 6), [F], name: <f>),
+        edge((-3.7, 0), <s>, "-|>"),
+        edge(<s>, <a>, "-|>", [a], bend: 15deg),
+        edge(<s>, <b>, "-|>", [b]),
+        edge(<a>, <s>, "-|>", [a], bend: 15deg),
+        edge(<a>, <c>, "-|>", [b]),
+        edge(<b>, <d>, "-|>", [b]),
+        edge(<b>, <c>, "-|>", [a], bend: 15deg),
+        edge(<c>, <e>, "-|>", [b]),
+        edge(<c>, <b>, "-|>", [a], bend: 15deg),
+        edge(<d>, <f>, "-|>", [b], label-sep: -15pt),
+        edge(<d>, <e>, "-|>", [a], bend: 15deg),
+        edge(<e>, <f>, "-|>", [b], label-sep: -15pt),
+        edge(<e>, <d>, "-|>", [a], bend: 15deg),
+        edge(<f>, <f>, "-|>", [a,b], label-pos: 80%, bend: -130deg),
+      )
+    ])
+  #colbreak()
+
+  6. Stringhe su {a,b} in cui "aa" occorre solo una volta:
+    #grid(columns: (.5fr, 1fr), align(center)[
+      #table(
+        columns: (auto, auto, auto),
+        align: center,
+        [],
+        [_aa_],
+        [u.c.],
+        [S],
+        [0],
+        [$b(epsilon)$],
+        [A],
+        [0],
+        [_a_],
+        table.cell(fill: rgb("#68e86680"), "B"),
+        [*1*],
+        [_a_],
+        table.cell(fill: rgb("#68e86680"), "C"),
+        [*1*],
+        [_b_],
+        [D],
+        [$>=2$],
+        [_a,b_],
+      )
+    ], align(center)[
+      #diagram(
+        node-stroke: 0.9pt,
+        cell-size: 5mm,
+        spacing: 3mm,
+        node((-3, 0), [S], extrude: (-2, 0), name: <s>),
+        node((-1, 0), [A], name: <a>),
+        node((1, 0), [B], name: <b>),
+        node((3, 0), [C], name: <c>),
+        node((1, 2), [D], name: <d>),
+        edge((-4.2, 0), <s>, "-|>"),
+        edge(<s>, <a>, "-|>", [a], bend: 15deg),
+        edge(<s>, <s>, "-|>", [b], bend: 130deg),
+        edge(<a>, <b>, "-|>", [a], bend: 15deg),
+        edge(<a>, <s>, "-|>", [b], bend: 15deg),
+        edge(<b>, <d>, "-|>", [a], bend: 15deg),
+        edge(<b>, <c>, "-|>", [b], bend: 15deg),
+        edge(<c>, <b>, "-|>", [a], bend: 15deg),
+        edge(<c>, <c>, "-|>", [b], bend: 130deg),
+        edge(<d>, <d>, "-|>", [a,b], label-pos: 80%, bend: -130deg),
+      )
+    ])
 ]
 
-In alcuni casi la *non appartenenza* di una stringa al linguaggio di un automa piò essere determinata anche prima di terminare la scansione della stringa, ad esempio quando si chiede che le stringhe non contengano una particolare sottostringa e questa viene indidividuata. In questi automi mancano alcune combinazioni di stato-simbolo perché corrispondono all'arresto.
+In alcuni casi la *non appartenenza* di una stringa al linguaggio di un automa piò essere determinata anche prima di terminare la scansione della stringa, ad esempio quando si chiede che le stringhe non contengano una particolare sottostringa e questa viene individuata. In questi automi mancano alcune combinazioni di stato-simbolo perché corrispondono all'arresto.
 
 == Automi a stati finiti non deterministici (NFA)
 
@@ -563,8 +649,261 @@ Alla fine, continuando così, si ottengono cinque stati:
   [$C$],
 )
 Gli stati finali del DFA sono quelli che contengono gli stati finali del NFA: in questo caso solo $E$ (contiene infatti 10). Attenzione, c'è sempre uno stato finale, altrimenti vi è un errore. Il DFA finale è quindi:
-#figure(image("images/2025-10-09-09-28-35.png"))
+#figure(diagram(
+  node-stroke: 0.9pt,
+  cell-size: 2mm,
+  spacing: 3mm,
+  node((-4.0, 0), [A]),
+  node((0.0, 0), [B]),
+  node((0, -4.0), [C]),
+  node((4.0, 0.0), [D]),
+  node((8, 0.0), [E], extrude: (-2, 0)),
+  // EDGES //
+  edge((-6, 0.0), (-4.0, 0), "-|>", [start]),
+  edge((-4.0, 0.0), (0.0, 0.0), "-|>", [a]),
+  edge((-4.0, 0.0), (0.0, -4.0), "-|>", [b]),
+  edge((0.0, 0.0), (0.0, 0.0), "<|-", [a], bend: -130deg),
+  edge((0.0, 0.0), (4.0, 0.0), "-|>", [b]),
+  edge((0.0, -4.0), (0.0, 0.0), "-|>", [a]),
+  edge((0.0, -4.0), (0.0, -4.0), "<|-", [b], bend: 130deg),
+  edge((4.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 20deg, label-sep: -2pt),
+  edge((4.0, 0.0), (8.0, 0.0), "-|>", [b]),
+  edge((8.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 35deg),
+  edge((8.0, 0.0), (0.0, -4.0), "-|>", [b]),
+))
 ]
 
 //TODO: Aggiungere esempio extra da foto
 #figure(image("images/2025-10-09-09-29-31.png"))
+
+=== Simulazione di un NFA
+
+Una strategia utilizzata per esempio in molti programmi di elaborazione di testo consiste nel costruire un NFA a partire da un'espressione regolare e quindi procedere alla sua simulazione mediante costruzione per sottoinsiemi effettuata al momento.
+
+L'algoritmo riceve in input una stringa $x$, un NFA con stato iniziale $s_0$, gli stati di accettazione $F$ e una funzione di transizione _move_(). Successivamente, viene mantenuto un insieme di stati correnti $S$, costituito dagli stati raggiungibili a partire da $s_0$ seguendo un percorso etichettato con i simboli d'ingresso letti finora. Se $c$ è il prossimo carattere, letto dalla funzione _nextChar_(), per prima cosa calcola _move_(S, c), quindi calcola la chiusura mediante la funzione $epsilon$-closure().
+
+#figure(```c
+S = ε-closure(s0); 
+c = nextChar();
+while ( c != eof ) { 
+  S = ε-closure(move(S,c)); 
+  c = nextChar();
+} 
+if ( S ∩ F != Ø) return "yes "; 
+else return "no"; 
+```)
+
+== Minimizzazione di un DFA
+
+Possono esistere molti automi deterministici che riconoscono lo stesso linguaggio. Tali automi non solo hanno stati con nomi diversi, ma addirittura possono avere un numero diverso di stati. Se implemntiamo un analizzatore lessicale basandoci su un DFA, preferiremo un DFA con il minimo numero possibile di stati, poiché ogni stato richiede elementi aggiuntivi nella tabella che descrive l'analizzatore lessicale stesso.
+
+Il problema del nome degli stati si risolve facilmente. Diremo infatti che due automi sono *uguali a meno dei nomi* se uno può essere trasformato nell'altro modificando solamente i nomi degli stati.
+
+Si può anche dimostrare ch eper ogni linguaggio regolare esiste un DFA con un numero di stati minimo e tale DFA è unico a meno dei nomi. Inoltre tale DFA minimo può essre costruito a partire da un qualsiasi DFA, raggruppando insiemi di stati equivalenti
+
+#definition(
+  "Stati distinguibili",
+)[
+  Diciamo che una stringa $x$ *distingue* o *rende distinguibile* lo stato $s$ dallo stato $t$ se esattamente uno degli stati raggiungibili da $s$ e da $t$mediante un percorso etichettato con la stringa $s$ è di accettazione. Si dice inoltre che lo stato $s$ è *distinguibile* $t$ se esiste almeno una stringa che li distingue.
+]
+
+L'algoritmo di minimizzazione degli stati si basa sul partizionamento degli stati del DFA in gruppi di stati non distinguibili. Ogni gruppo è infine fuso in un unico stato del nuovo DFA minimo. L'algoritmo modifica progressivamente una partizione i cui gruppi sono insiemi di stati non acnora identificati come distinguibili; due stati qualsiasi, appartenenti a insiemi diversi della prtizione, sono invece giò stati identificato come distinguibili. Quando la partizione non può essere ulteriormente modificata spezzando un gruppo in gruppi più piccoli, allora essa rappresenta il DFA minimo.
+
+Inizialmente la partizione contiene due gruppi di stati: stati d'accettazione e di non accettazione. Il procedimento fondamentale consiste nel considerare un generico gruppo $A={s_1,s_2,...,s_k}$ della partizione corrente e un generico simbolo d'ingresso $a$ e verificare se il simbolo $a$ può essere utilizzato per distinguere alcuni degli stati del gruppo $A$. A tale scopo si esaminano le transizioni da ognuno degli stati $s_1,s_2,...,s_k$ relative al simbolo d'ingresso $a$; se gli stati raggiunti da tali transioni ricadono in due o più geuppi della partizione corrente, si suddivide $A$ in un insieme di gruppi in modo tale che due stati $s_i$ e $s_j$ siano nello stesso gruppo se e solo se, in corrispondenza del simbolo d'ingresso $a$ le transizioni da ognuno di essi portano a stati di uno stesso gruppo. Si ripete quindi questo procedimento finché nessun gruppo possa essere ulteriormente suddiviso per nessun simbolo d'ingresso.
+
+#example(
+  )[
+  Consideriamo ancora il seguente DFA:
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    cell-size: 2mm,
+    spacing: 3mm,
+    node((-4.0, 0), [A]),
+    node((0.0, 0), [B]),
+    node((0, -4.0), [C]),
+    node((4.0, 0.0), [D]),
+    node((8, 0.0), [E], extrude: (-2, 0)),
+    // EDGES //
+    edge((-6, 0.0), (-4.0, 0), "-|>", [start]),
+    edge((-4.0, 0.0), (0.0, 0.0), "-|>", [a]),
+    edge((-4.0, 0.0), (0.0, -4.0), "-|>", [b]),
+    edge((0.0, 0.0), (0.0, 0.0), "<|-", [a], bend: -130deg),
+    edge((0.0, 0.0), (4.0, 0.0), "-|>", [b]),
+    edge((0.0, -4.0), (0.0, 0.0), "-|>", [a]),
+    edge((0.0, -4.0), (0.0, -4.0), "<|-", [b], bend: 130deg),
+    edge((4.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 20deg),
+    edge((4.0, 0.0), (8.0, 0.0), "-|>", [b]),
+    edge((8.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 35deg),
+    edge((8.0, 0.0), (0.0, -4.0), "-|>", [b]),
+  ))
+  La partizione iniziale consiste dei due gruppi ${A,B,C,D}{E}$ ch e contengono rispettivamente gli stait di non accettazione e quelli d'accettazione. Ora:
+  - ${E}$ non può essere spezzato ulteriormente e quindi rimane invariato.
+  - ${A,B,C,D}$ può essere spezzato e per fare ciò dobbiamo considerare l'effetto di ogni simbolo d'ingresso.
+  *Analizziamo "a"*: ognuno degli stati del gruppo, in corrispondenza del simbolo $a$, prevede una transizione verso lo stato $B$ e quindi non si possono distinguere gli stati.
+
+  *Analizziamo "b"*: con ingresso $b$ dagli stati $A,B,C$ si passa agli stati ${A,B,C,D}$ ma dallo stato $D$ si passa allo stato $E$ che non appartiene allo stesso gruppo di $D$ e pertanto viene inserito in un nuovo gruppo.
+  $
+    {A,B,C}{D}{E}
+  $
+  Ripetiamo iterativamente sul gruppo o gruppi che possono essere ancora spezzati e otteniamo:
+  $
+    {A,C}{B}{D}{E}
+  $
+  Da questa situazione non possiamo andare avanti in quanto ogni transizione fa rimanere nello stesso gruppo. L'automa DFA minimo equivalente sarà quindi composto da quattro stati, uno per ogni gruppo rimasto. Il suo stato iniziale sarà $A$ e il finale $E$:
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    cell-size: 5mm,
+    spacing: 3mm,
+    node((0.0, 0), [A]),
+    node((3.0, 0), [B]),
+    node((3.0, 3.0), [D]),
+    node((0, 3.0), [E], extrude: (-2, 0)),
+    // EDGES //
+    edge((-1.5, 0.0), (0.0, 0), "-|>", [start]),
+    edge((0.0, 0.0), (3.0, 0.0), "-|>", [a]),
+    edge((0.0, 0.0), (0.0, 0.0), "<|-", [b], bend: 130deg),
+    edge((3.0, 0.0), (3.0, 0.0), "<|-", [a], bend: 130deg),
+    edge((3.0, 0.0), (3.0, 3.0), "-|>", [b]),
+    edge((3.0, 3.0), (3.0, 0.0), "-|>", [a], bend: -30deg),
+    edge((3.0, 3.0), (0.0, 3.0), "-|>", [b]),
+    edge((0.0, 3.0), (3.0, 0.0), "-|>", [a]),
+    edge((0.0, 3.0), (0.0, 0.0), "-|>", [b]),
+  ))
+]
+
+//TODO: volendo ci sono altri 2 esempi da trascrivere
+
+== Costruzione di un analizzatore lessicale
+=== Riconoscimento dei token
+//TODO: manca questo capitolo
+
+=== Diagrammi di transizione
+Il riconoscimento dei token è il processo attraverso il quale l'analizzatore lessicale esamina la sequenza di caratteri in ingresso per trovare il prefisso più lungo che corrisponda al pattern di un token. A tale scopo, le espressioni regolari (introdotte precedentemente) vengono convertite in *diagrammi di transizione*.
+
+#definition(
+  )[Un *diagramma di transizione* è essenzialmente un grafo composto da stati (nodi, rappresentati da cerchi) che riflettono le condizioni possibili durante l'analisi dell'input. Gli stati sono collegati da archi orientati etichettati con simboli (o insiemi di simboli). 
+]
+
+Valgono alcune convenzioni come per i DFA e NFA:
+1. Lo stato iniziale (o di partenza) è indicato da un arco entrante non proveniente da altri stati.
+2. Gli stati finali (o di accettazione) sono indicati con un doppio cerchio e associati a un'azione, tipicamente la restituzione di un token e del suo attributo al parser.
+3. Se il carattere che ha portato allo stato finale non fa parte del lessema riconosciuto, lo stato finale è annotato con un asterisco (\*), che indica la necessità di arretrare (retract) di una posizione il puntatore forward d'ingresso.
+
+#example(
+  )[
+Il seguente diagramma di transizione riconosce i lessemi relativi al token *relop*
+//TODO: Convertire diagramma
+#figure(image("images/2025-10-19-17-50-11.png"))
+Se l'analisi inizia nello stato 0 e legge <, si passa allo stato 1.
+- Dallo stato 1, se si legge `=` si riconosce `<=` e si passa allo stato finale 2 (restituendo relop, LE).
+- Dallo stato 1, se si legge `>` si riconosce `<>` e si passa allo stato 3 (restituendo relop, NE).
+- Dallo stato 1, se si legge qualsiasi altro carattere (other), si riconosce `<` e si passa allo stato 4, che richiede un arretramento (\*) poiché il carattere letto non fa parte del lessema.
+]
+
+L'analizzatore lessicale deve anche gestire l'eliminazione degli *spazi bianchi* (token ws), definiti da caratteri come spazi, tabulazioni e ritorni a capo. Quando il token ws viene riconosciuto, non viene restituito al parser; l'analizzatore *ricomincia* immediatamente l'analisi a partire dal carattere successivo.
+
+=== Riconoscimento di Identificatori e Parole Chiave
+#figure(image("images/2025-10-19-17-54-47.png"))
+Il diagramma di transizione per gli identificatori (Figura 3.12) riconosce anche i lessemi delle *parole chiave* (come if, then, else) se queste hanno una struttura simile agli identificatori.
+Due metodi principali sono usati per gestire il conflitto tra identificatori e parole chiave riservate:
+
++ *Installazione Preventiva nella Tabella dei Simboli*: Le parole chiave sono pre-caricate nella tabella dei simboli con un'indicazione del token che rappresentano. Quando il diagramma id riconosce un lessema (stato 11), la funzione `getToken()` consulta la tabella dei simboli: se il lessema è una parola chiave, restituisce il token specifico (es. IF); altrimenti, restituisce il token ID.
+
++ *Diagrammi Separati e Priorità*: Si possono usare diagrammi specifici per ogni parola chiave (come quello ipotetico per then in Figura 3.13). Questo approccio richiede di imporre una priorità in modo che, se un lessema corrisponde sia a una parola chiave sia a un id, venga data la precedenza alla parola chiave.
+  #figure(image("images/2025-10-19-17-56-42.png"))
+
+
+=== Completamento dell'esempio
+Il diagramma per gli identificatori (Figura 3.12) inizia leggendo una lettera (stato 9) e procede nello stato 10, dove accetta qualsiasi sequenza di lettere o cifre. Quando incontra un simbolo che non fa parte del lessema, passa allo stato 11, accetta, e arretra il puntatore.
+#figure(image("images/2025-10-19-17-58-24.png"))
+Il diagramma per il token number (Figura 3.14) è più complesso, gestendo interi, parti frazionarie (opzionali, introdotte da un punto) ed esponenti (opzionali, introdotti da E). L'identificazione di un numero intero avviene uscendo dallo stato 13 nello stato 20, mentre il riconoscimento di un numero con parte frazionaria senza esponente termina nello stato 21.
+#figure(image("images/2025-10-19-17-58-53.png"))
+Il diagramma degli spazi bianchi (Figura 3.15) riconosce caratteri delimitatori (delim). Lo stato finale 24 accetta il lessema di separazione e arretra il puntatore (\*), ma l'azione associata non restituisce un token al parser, bensì induce l'analizzatore lessicale a ricominciare l'analisi dall'input successivo.
+
+=== Architettura di un analizzatore lessicale basato su diagrammi di transizione
+L'implementazione di un analizzatore lessicale basato su diagrammi si traduce in codice in cui ogni stato corrisponde a una porzione di logica, spesso gestita tramite un costrutto di scelta multipla (switch) sulla variabile `state`.
+
+#example(
+  )[
+```cpp
+  TOKEN getRelop() 
+  { 
+    TOKEN retToken = new(RELOP); 
+    while(1) {/*repeat character processing until a return or failure occurs*/  
+      switch(state) { 
+        case 0:  
+          c = nextChar(); 
+          if (c == '<') state = 1; 
+          else if (c == '=') state = 5;  
+          else if (c == '>') state = 6;  
+          else fail(); /*lexeme is not a relop*/ 
+          break; 
+        case 1: 
+        ...
+        case 8:  
+          retract(); 
+          retToken.attribute = GT;  
+          return(retToken); 
+      } 
+    } 
+  } 
+  ```
+La funzione schematica `getRelop()` simula il diagramma per gli operatori relazionali. Il `switch(state)` gestisce le transizioni. Se un carattere non atteso viene letto, viene chiamata la funzione `fail()`, che ripristina il puntatore `forward` a `lexemeBegin` e passa il controllo a un nuovo diagramma di transizione o avvia la procedura di recupero dagli errori. Gli stati finali con arretramento (come lo stato 8) invocano la funzione `retract()` prima di restituire il token.
+]
+Per gestire tutti i token, si possono usare diversi approcci:
++ *Sequenziale*: Provare i diagrammi uno dopo l'altro.
++ *In Parallelo*: Eseguire tutti i diagrammi contemporaneamente, scegliendo il lessema più lungo riconosciuto.
++ *Diagramma Unico (Preferito)*: Combinare tutti i diagrammi in uno solo. Il diagramma combinato legge l'input finché non può più progredire, e poi sceglie il lessema più lungo accettato. Nel caso in cui il primo carattere identifichi univocamente il token (come nell'esempio), gli stati iniziali dei singoli diagrammi vengono semplicemente uniti in un unico stato iniziale.
+
+=== Il generatore di analizzatori lessicali Lex
+*Lex (o Flex)* è uno strumento che automatizza la creazione di analizzatori lessicali. Il programmatore fornisce una specifica ad alto livello (i pattern in espressioni regolari) e *Lex* genera il codice sorgente (in C, salvato in lex.yy.c) che simula il diagramma di transizione combinato.
+
+#figure(image("images/2025-10-19-18-08-06.png"))
+
+Il file `lex.l` (programma sorgente Lex) viene elaborato dal compilatore Lex per produrre `lex.yy.c`. Questo file viene poi compilato per ottenere un eseguibile (spesso a.out), che funge da analizzatore lessicale. L'analizzatore generato è tipicamente richiamato come subroutine dal parser, restituendo il nome del token (un intero) e utilizzando la variabile globale `yylval` per passare eventuali attributi.
+
+#observation(
+  )[
+Un *programma Lex* è diviso in tre sezioni principali:
++ *Dichiarazioni*: Contiene definizioni di variabili, costanti simboliche per i nomi dei token, e definizioni regolari (nomi simbolici che abbreviano espressioni regolari complesse, come {delim} o {ws}). Le sezioni racchiuse tra `%{` e `%}` vengono copiate direttamente nel file `lex.yy.c`.
++ *Regole di Traduzione*: Hanno la forma `Pattern { Action }`, dove `Pattern` è un'espressione regolare e `Action` è un frammento di codice C.
++ *Funzioni Ausiliarie*: Codice C per funzioni come `installID()` o `installNum()`.
+]
+//TODO: aggiungere il mega script mancante come esempio?
+
+
+== Progettazione di un generatore di analizzatori lessicali
+Un generatore come Lex opera *trasformando le espressioni regolari in automi finiti*. L'architettura dell'analizzatore lessicale generato (Figura 3.42) consiste in una *parte fissa di simulazione* dell'automa e *componenti generati* come la tabella di transizione e le azioni (frammenti di codice C).
+
+Per costruire automa, Lex per prima cosa prende *ogni espressione regolare* del programma e la trasforma mediante l'algoritmo apposito in un NFA $N_i$. Dato che si vuole ottenere un singolo automa che riconosca lessemi corrispondenti a un qualsiasi pattern del programma, Lex combina gli NFA cosi costruiti in un unico automa non-deterministico aggiungendo un nuovo stato iniziale con transizioni $epsilon$ verso ognuno degli stati iniziali degli automi $N_i$ relativi ai pattern $p_i$. 
+
+#figure(image("images/2025-10-19-18-21-13.png"))
+
+=== Riconoscimento dei pattern basato su NFA
+Se l'analizzatore lessicale simula il comportamento di un NFA combinato, la sua simulazione segue l'input, mantenendo traccia dell'insieme di stati raggiungibili in ogni momento. Quando l'analisi non può più proseguire, l'analizzatore lessicale torna indietro nella sequenza degli insiemi di stati per trovare l'insieme contenente uno stato di accettazione (NFA) che corrisponde al prefisso più lungo. In caso di conflitti tra pattern, viene applicata la regola di priorità (scegliendo il pattern elencato per primo nel programma Lex).
+
+=== Riconoscimento dei pattern basato su DFA
+L'approccio implementato da Lex si basa sulla conversione dell'NFA combinato in un DFA equivalente tramite l'algoritmo già visto. Ogni stato del DFA corrisponde a un insieme di stati NFA. Se uno stato DFA include più stati di accettazione NFA, viene etichettato con il pattern avente la massima priorità (quello elencato per primo in Lex). 
+
+
+#example(
+  )[
+  #figure(image("images/2025-10-19-18-25-02.png"))
+  Ad esempio, il DFA per i pattern a, abb e $a^* b^+$ combina i possibili stati di accettazione, garantendo la regola del prefisso più lungo e della priorità.
+  La simulazione del DFA prosegue fino a raggiungere uno stato pozzo (dead state, ∅) o quando non vi sono più transizioni possibili. A quel punto, si arretra fino all'ultimo stato DFA di accettazione visitato per determinare il lessema riconosciuto.
+  L'operatore di lookahead (/) nei DFA richiede un'attenzione particolare: la fine del lessema è identificata dalla posizione nell'input in cui si entrava nello stato NFA precedente la ϵ-transizione associata all'operatore /, massimizzando la lunghezza della parte r
+  1
+  ​
+  del pattern r
+  1
+  ​
+  /r
+  2
+  ​
+  .
+
+]
+
+//TODO: manca diversa roba del paragrafo 3.8, vedi PDF evidenziato.
+
+//Ormai l'oridine degli argomenti è andato a farsi friggere
