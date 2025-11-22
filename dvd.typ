@@ -113,21 +113,14 @@
   pagebreak()
 
   // Reset page settings for content pages
-  set page(
-    background: none,
-    margin: auto,
-    number-align: center,
-    numbering: "1",
-    header: context {
-      if here().page() == 1 {
-        return none
-      }
-      box(stroke: (bottom: 0.7pt), inset: 0.4em)[
-        #text(font: "New Computer Modern Sans")[#h(1fr)#title]
-      ]
-    },
-    footer: none,
-  )
+  set page(background: none, margin: auto, number-align: center, numbering: "1", header: context {
+    if here().page() == 1 {
+      return none
+    }
+    box(stroke: (bottom: 0.7pt), inset: 0.4em)[
+      #text(font: "New Computer Modern Sans")[#h(1fr)#title]
+    ]
+  }, footer: none)
 
   set outline(indent: 1em)
   show outline: set heading(numbering: none)
@@ -214,13 +207,7 @@
   titlefmt: thmtitle.with(color: color.darken(30%)),
   bodyfmt: thmtext.with(color: color.darken(70%)),
   namefmt: thmname.with(color: color.darken(30%)),
-  frame: (
-    body-color: color.lighten(92%),
-    border-color: color.darken(10%),
-    thickness: 1.5pt,
-    inset: 1.2em,
-    radius: 0.3em,
-  ),
+  frame: (body-color: color.lighten(92%), border-color: color.darken(10%), thickness: 1.5pt, inset: 1.2em, radius: 0.3em),
   ..builderargs,
 )
 
@@ -278,12 +265,16 @@
 
 //CUSTOM FUNCTIONS
 
-#let der(
-  ..args
-) = {
+#let der(..args) = {
   $
     #let sym = args.pos().join("", last: "")
     attach(=>, tr: #sym)
+  $
+}
+
+#let uu(arg)={
+  $
+    underline(arg)
   $
 }
 
