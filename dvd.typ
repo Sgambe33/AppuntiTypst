@@ -42,7 +42,6 @@
 
   set heading(numbering: "1.")
   show heading: it => {
-    set text(font: "New Computer Modern Sans")
     set par(first-line-indent: 0em)
 
     if it.numbering != none {
@@ -60,7 +59,7 @@
     // Full page cover with overlay text
     place(center + horizon)[
       #align(center)[
-        #set text(font: "New Computer Modern Sans", fill: white)
+        #set text(fill: white)
         #block(
           fill: rgb(0, 0, 0, 150), // Semi-transparent black background
           inset: 2em,
@@ -113,24 +112,31 @@
   pagebreak()
 
   // Reset page settings for content pages
-  set page(background: none, margin: auto, number-align: center, numbering: "1", header: context {
-    if here().page() == 1 {
-      return none
-    }
-    box(stroke: (bottom: 0.7pt), inset: 0.4em)[
-      #text(font: "New Computer Modern Sans")[#h(1fr)#title]
-    ]
-  }, footer: none)
+  set page(
+    background: none,
+    margin: auto,
+    number-align: center,
+    numbering: "1",
+    header: context {
+      if here().page() == 1 {
+        return none
+      }
+      box(stroke: (bottom: 0.7pt), inset: 0.4em)[
+        #h(1fr)#title
+      ]
+    },
+    footer: none,
+  )
 
   set outline(indent: 1em)
   show outline: set heading(numbering: none)
   show outline: set par(first-line-indent: 0em)
 
   show outline.entry.where(level: 1): it => {
-    text(font: "New Computer Modern Sans", accent)[#strong[#it]]
+    text(accent)[#strong[#it]]
   }
   show outline.entry: it => {
-    text(font: "New Computer Modern Sans", accent)[#it]
+    text(accent)[#it]
   }
 
   // Main body
@@ -139,10 +145,10 @@
 }
 
 #let thmtitle(t, color: rgb("#000000")) = {
-  text(font: "New Computer Modern Sans", weight: "semibold", fill: color)[#t]
+  text(weight: "semibold", fill: color)[#t]
 }
 #let thmname(t, color: rgb("#000000")) = {
-  text(font: "New Computer Modern Sans", fill: color)[(#t)]
+  text(fill: color)[(#t)]
 }
 
 #let thmtext(t, color: rgb("#000000")) = {
@@ -207,7 +213,13 @@
   titlefmt: thmtitle.with(color: color.darken(30%)),
   bodyfmt: thmtext.with(color: color.darken(70%)),
   namefmt: thmname.with(color: color.darken(30%)),
-  frame: (body-color: color.lighten(92%), border-color: color.darken(10%), thickness: 1.5pt, inset: 1.2em, radius: 0.3em),
+  frame: (
+    body-color: color.lighten(92%),
+    border-color: color.darken(10%),
+    thickness: 1.5pt,
+    inset: 1.2em,
+    radius: 0.3em,
+  ),
   ..builderargs,
 )
 
@@ -272,7 +284,7 @@
   $
 }
 
-#let uu(arg)={
+#let uu(arg) = {
   $
     underline(arg)
   $

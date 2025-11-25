@@ -51,14 +51,14 @@ while 1
 end
 ```
 
-Il criterio di arresta sopra commentato rende l'intera implementazione _naive_ e poco efficiente:
+Il criterio di arresto sopra commentato rende l'intera implementazione _naive_ e poco efficiente:
 - non sempre è richiesto un calcolo *esatto* della radice ma solo quello di una sua approssimazione entro una tolleranza `tol`;
 - la condizione `fx == 0` potrebbe non essere mai soddisfatta a causa dell'aritmetica finita. 
   #example()[Considerando il polinomio
   $
     p(x) = (x-1.1)^20 (x-pi)
   $
-  che ha radi e in $x=pi$. Utilizzando Matlab per calcolare $p(pi)$, si ottiene:
+  che ha radice in $x=pi$. Utilizzando Matlab per calcolare $p(pi)$, si ottiene:
   $
     p = "poly"([1.1 * "ones"(1,20),pi])\
     "polyval"(p, pi) approx -5,5213 dot 10^(-5)
@@ -68,7 +68,7 @@ Il criterio di arresta sopra commentato rende l'intera implementazione _naive_ e
 
 == Criteri di arresto e condizionamento
 
-Vediamo come migliorare la precedente computazione "naive". Se inizializziamo $a_1=a$ e $b_1=b$, l'ampiezza del primo intervallo di confidenza, allora al passo i-esimo:
+Vediamo come migliorare la precedente computazione _naive_. Se inizializziamo $a_1=a$ e $b_1=b$ (l'ampiezza del primo intervallo di confidenza) allora al passo i-esimo:
 $
   x_i = (a_i+b_i)/2^i
 $
@@ -77,7 +77,7 @@ $
   abs(x^*-x_i) lt.eq (b_i-a_i)/2 = (b_(i-1)-a_(i-1))/2^2 = (b_(i-2)-a_(i-2))/2^3 = ... = (b_1-a_1)/2^i = (b-a)/2^i
 $
 
-Da questo argomento, deduciamo che, se desideriamo un'approssimazione della soluzione con accuratezza `tol` la potremo conseguire in un numero di iterazioni, imax, dato da:
+Da questo argomento, deduciamo che, se desideriamo un'approssimazione della soluzione con accuratezza `tol` la potremo conseguire in un numero di iterazioni, `imax`, dato da:
 $
   (b-a)/2^i lt.eq "tol" => (b-a)/"tol" lt.eq 2^i => i gt.eq log_2(b-a)/"tol"
 $
