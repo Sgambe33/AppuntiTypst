@@ -394,7 +394,7 @@ che garantisce che, se raggiungiamo la radice, ci fermiamo. Questo significa che
 ]
 #proof(
   )[
-  $forall x,y in I(x^*)$ e callo sviluppo di Taylor con resto al primo ordine segue dunque:
+  $forall x,y in I(x^*)$ e per lo sviluppo di Taylor con resto al primo ordine segue dunque:
   $
     abs(Phi(x)-Phi(y)) = abs(cancel(Phi(x)) - cancel(Phi(x)) - Phi'(epsilon)(x-y)) = abs(Phi'(epsilon)) dot abs(x-y) < L abs(x-y), space "con " L<1
   $
@@ -407,9 +407,8 @@ $
   Phi(x^*) = x^*-overparen(f(x^*), = 0)/(f'(x^*)) = x^*
 $
 Se $x^*$ è una radice semplice, allora $f'(x^*) eq.not 0 and $
-//TODO: come fare bar più grande?
 $
-  Phi'(x^*) = [ 1-(f'(x)^2 - f''(x)f(x))/(f'(x)^2) ] bar_(x=x^*) = [ (f''(x)overparen(f(x), =0))/(f'(x)^2) ] bar_(x=x^*) = (f''(x^*)overparen(f(x^*), =0))/(f'(x^*)^2) = 0
+  Phi'(x^*) = [ 1-(f'(x)^2 - f''(x)f(x))/(f'(x)^2) ] lr(bar, size: #300%)_(x=x^*) = [ (f''(x)overparen(f(x), =0))/(f'(x)^2) ] lr(bar, size: #300%)_(x=x^*) = (f''(x^*)overparen(f(x^*), =0))/(f'(x^*)^2) = 0
 $
 #figure(image("images/2025-10-21-17-07-50.png"))
 Nel caso di una radice multipla di molteplicità $m$, si può dimostrare che
@@ -511,7 +510,19 @@ $
 $
 Quindi, il costo per iterazione è doppio rispetto al metodo di Newton _standard_. Il vantaggio è che si può dimostrare che la successione ${x_i^*}$ converge quadraticamente a $x^*$ (anche se la convergenza rimane di tipo locale). Questa procedura a 2 livelli definisce il *metodo di accelerazione di Aitken*.
 #figure(
-  image("images/2025-10-22-16-00-39.png"),
+  table(
+    columns: 4,
+    rows: 9,
+    table.cell($f(x)=(x-1)^(10) dot e^x$, colspan: 4),
+    [it],[Newton],[Newton modificato],[Aitken],
+    [0],[0],[0],[0],
+    [1],[1.111111111111111e-01],[1.111111111111111e+00],[9.111111111111099e-01],
+    [2],[2.086720867208672e-01],[1.001221001221001e+00],[9.992895975197171e-01],
+    [3],[2.946049884277536e-01],[1.000000149066197e+00],[9.999999545628913e-01],
+    [4],[3.704979405704750e-01],[1.000000000000002e+00],[1.000000244342852e-00],
+    [5],[4.376770876576362e-01],[1.000000000000000e+00],[1.000000090874212e+00],
+    [6],[4.972598543829098e-01],[1.000000000000000e+00],[1.000000000000000e+00],
+  ),
   caption: "Esempio di come Newton modificato e Aitken portino ad ottenere il valore della radice più velocemente del metodo di Newton standard.",
 )
 
