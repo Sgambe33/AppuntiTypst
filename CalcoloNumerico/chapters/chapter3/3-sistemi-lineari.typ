@@ -962,7 +962,7 @@ Quindi, definendo la matrice di permutazione elementare
 $P_2$ che permuta l'elemento 2 con il $k_2$ ($k_2 gt.eq 2$) di un vettore, otteniamo che:
 $
   P_2 L_1 P_1 A = mat(
-    a_(k_1 1)^((1)), a_(k_1 2)^((1)), dots.c ,dots.c, a_(k_1 n)^((1)); 0, a_(k_2 2)^((2)), dots.c,dots.c, a_(k_2 n)^((2)); dots.v, dots.v, , dots.v; dots.v, a_(22)^((22)), dots.c,dots.c, a_(2n)^((2)); dots.v, dots.v, , dots.v; 0, a_(n 2)^((2)), dots.c,dots.c, a_(n n)^(22); delim: "["
+    a_(k_1 1)^((1)), a_(k_1 2)^((1)), dots.c, dots.c, a_(k_1 n)^((1)); 0, a_(k_2 2)^((2)), dots.c, dots.c, a_(k_2 n)^((2)); dots.v, dots.v, , dots.v; dots.v, a_(22)^((22)), dots.c, dots.c, a_(2n)^((2)); dots.v, dots.v, , dots.v; 0, a_(n 2)^((2)), dots.c, dots.c, a_(n n)^(22); delim: "["
   )
 $
 Pertanto è definito il secondo vettore elementare di Gauss: $ uu(g)_2 = frac(1, a_(k_2 2)^((2))) (0 0 a_(32)^((2)) ... a_(22)^((2)) ... a_(n 2)^((2)))^T $
@@ -1123,9 +1123,238 @@ for i=1:n-1
   a(i+1:n,i)=a(i+1:n,i)/a(i,i); % g_i
   a(i+1:n,i+1:n) = a(i+1:n,i+1:n)-a(i+1:n,i)\*a(i,i+1:n);
 end
-???
+if a(n,n) == 0, error('matrice singolare'), end
 ```
+
+//26.11.2025
 == Condizionamento del problema
+#example()[
+  $
+    A=mat(
+      1, , , , , ;
+      alpha, 1, , , , ;
+      , alpha, dots.down, , , ;
+      , , dots.down, dots.down, , ;
+      , , , alpha, 1, ;
+      , , , , alpha, 1;
+    ) in RR^(10 times 10), quad uu(b) = beta mat(1; 1+alpha; 1+alpha; dots.v; dots.v; 1+alpha) in RR^10\
+    => A uu(x) = uu(b) => uu(x) = mat(beta; dots.v; dots.v; beta) in RR^10
+  $
+  Scriviamo una funzione:
+  #codly(
+    languages: codly-languages,
+    zebra-fill: none,
+    breakable: false,
+  )
+  ```matlab
+  function x=bidia(alfa, beta)
+    x = beta * ones(10, 1); %x_1 = beta
+    x(2:10)=x(2:10)+beta * alfa; % x_i = beta + beta * alfa = beta (1+alfa)
+    for i=2:10
+      x(i)=x(i)-alfa*x(i-1);
+    end % x = vettore di beta
+    return
+  ```
+  Questa funzione è equivalente a risolvere il precedente sistema $A uu(x) = uu(b)$
+  - Invocare `bidia(100,1)` restituisce tutti 1.
+  - Invocare `bidia(100,2)` restituisce tutti 2.
+  - Invocando la funzione con 1.1 o $pi$ restituisce numeri vicini al valore passato ma che si discostano sempre di più fino a quando non hanno più niente in comune.
+  All'aumentare di $alpha$ ogni piccolo errore di arrotondamento introdotto nel passaggio precedente viene amplificato per $alpha$ nel passaggio successivo. L'ultimo elemento del vettore sarà molto diverso da $beta$.
+]
+Che cosa è successo? Il motivo di quanto osservato è spiegato dall'analisi del *condizionamento del problema*. Ovvero, se invece del problema esatto
+$
+  A uu(x) = uu(b), quad quad det(A)eq.not 0
+$
+risolviamo quello perturbato
+$
+  (A + Delta A) (uu(x) + Delta uu(x)) = uu(b) + Delta uu(b)
+$
+dove:
++ $A in RR^(n times n) => Delta A in RR^(n times n)$, contenente le perturbazioni degli elementi di $A$.
++ $uu(b) in RR^n => Delta uu(b) in RR^n$, contenente le perturbazioni degli elementi di $uu(b)$.
++ $uu(x) in RR^n => Delta uu(x) in RR^n$, contenente le perturbazioni degli elementi di $uu(x)$.
+
+Vogliamo quantificare come $Delta A$ e $Delta uu(b)$ (che sono le perturbazioni sui dati in ingresso del problema) influenzano $Delta uu(x)$, che è la perturbazione del risultato.
+Per questo motivo è necessario introdurre la nozione di *norma indotta su matrice*.
+
+=== Norme indotte
+#definition("Norma di un vettore")[
+  Sia $norm(dot) : V --> RR$, con $V$ spazio vettoriale. Diremo che $norm(dot)$ è una norma sul vettore $V$ se:
+  + $forall uu(v) in V: norm(uu(v)) gt.eq 0 and norm(uu(v)) = 0 => uu(v) = uu(0) in V$
+  + $forall uu(v) in V$ e $alpha in RR : norm(alpha dot uu(v)) = bar alpha bar dot norm(uu(v))$
+  + $forall uu(x), uu(y) in V: norm(uu(x) + uu(y)) lt.eq norm(uu(x)) + norm(uu(y))$ (disuguaglianza triangolare)
+]
+Nel caso in cui $V = RR^n$, la classe di norme più utilizzata è:
+$
+  uu(v) = (v_1,..., v_)^T, quad norm(uu(v))_p = root(p, sum_(i=1)^n abs(V_i)^p), quad p gt.eq 1
+$
+I valori di $p$ più utilizzati sono:
+$
+  p&=1: norm(uu(v))_1 = sum_(i=1)^n abs(v_i) quad "(norma Manhattan)"\
+  p&=2: norm(uu(v))_2 = sqrt(sum_(i=1)^n abs(v_i)^2) = sqrt(uu(v)^T uu(v)) quad "(norma eculidea)"\
+  p&=infinity: norm(uu(v))_infinity = lim_(p -> infinity) norm(uu(v))_p equiv max_(i=1,..,n) abs(v_i) quad "(norma del massimo)"
+$
+
+#example()[
+  Dato il vettore $uu(v)$ definito come $uu(v) = mat(-7, 2, 4; delim: "[")$ si ha che:
+  $
+           norm(uu(v))_1 & = 7+2+4 = 14 \
+           norm(uu(v))_2 & = sqrt(49 + 4 +16) = sqrt(69) \
+    norm(uu(v))_infinity & = 7
+  $
+]
+#observation()[
+  La function `norm` di Matlab implementa una generica norma $p$:
+  - `norm(v)` è la norma Euclidea (default);
+  - `norm(v, 1)` è la norma 1;
+  - `norm(v, inf)` è la norma $infinity$;
+]
+
+Nel caso in cui $V = RR^(m times n)$, possiamo definire *norme su matrici* , *indotte dalle corrispondenti norme su vettore*.
+
+#definition("Norme indotte")[
+  Se $A in RR^(m times n)$ definiamo:
+  $
+    norm(A)_p = sup_(uu(x) in RR^n\ uu(x)eq.not uu(0)) frac(overbracket(norm(A uu(x))_p, "norma" p "in" RR^m), underbracket(norm(uu(x))_p, "norma" p "in" RR^n))
+  $
+  come la norma $p$ su matrice, indotta dalla corrispondente norma $p$ su vettore.
+]
+Vediamo delle formulazioni equivalenti alla precedente. In particolare, osserviamo che il vettore:
+$
+  uu(v) = frac(uu(x), norm(uu(x))_p)
+$
+ha
+$
+  norm(uu(v))_p = norm(frac(uu(x), norm(uu(x))))_p = frac(1, norm(uu(x))_p) dot norm(uu(x))_p = 1 quad quad ("seconda proprietà delle norme")
+$
+Pertanto:
+$
+  norm(A)_p & = sup_(norm(uu(x))_p > 0) frac(norm(A uu(x))_p, norm(uu(x)_p)) \
+            & = sup_(norm(uu(x))_p > 0) norm(A dot frac(uu(x), norm(uu(x))_p))_p \
+            & =sup_(norm(uu(v))_p = 1) norm(A dot uu(v))_p = max_(norm(uu(v))_p = 1) norm(A dot uu(v))_p
+$
+
+La trasformazione da $sup$ a $max$ deriva dal fatto che stiamo operando sull'insieme di tutti i vettori con norma 1 ovvero un insieme chiuso e limitato. In un insieme tale, l'operatore $sup$ coincide con l'operatore $max$.
+
+#example()[
+  Se $A=mat(
+    a_(11), dots.c, a_(1 n);
+    dots.v, , dots.v; a_(m 1), dots.c, a_(m n); delim: "["
+  ) in RR^(m times n)$, allora:
+  - $norm(A)_1 & = max_(j=1,...,n) sum_(i=1)^m abs(a_(i j))$: si sommano i valori assoluti di ogni colonna e si prende il massimo.
+
+  - $norm(A)_infinity & = max_(j=1,...,m) sum_(i=1)^n abs(a_(i j))$: si sommando i valori assoluti di ogni riga e si prende il massimo.
+]
+#observation()[
+  $norm(A)_1 = norm(A^T)_infinity$
+]
+#example()[
+  $A=mat(1, -2, 3; -4, 5, 6) => cases(norm(A)_1 = 9, norm(A)_infinity = 15)$
+]
+#observation()[
+  In Matlab:
+  - `norm(A, 1)` ritorna la norma 1 di $A$.
+  - `norm(A, inf)` ritorna la norma $infinity$ di $A$.
+]
+#observation()[
+  Se $A in RR^(m times n)$, allora:
+  - $A^T A in RR^(n times n)$
+  - $A A^T in RR^(m times m)$
+  sono quadrate.
+]
+
+Il calcolo della norma 2 di una matrice risulta essere il più complicato.
+#set math.cases(gap: 2em)
+$
+  norm(A)_2 = sqrt(rho(A^T A)) = sqrt(rho(A A^T)) quad quad cases(rho(A^T A) = max_(lambda in sigma(A^T A)) abs(lambda) "raggio spettrale di" A^T A, rho(A A^T) = attach(max, b: mu in sigma(A A^T)) abs(mu) "raggio spettrale di" A A^T)
+$
+Ricordiamo che con $sigma$ si indica l'insieme degli autovalori e che $rho$ (il raggio spettrale) rappresenta il massimo autovalore in modulo.
+
+
+#observation()[
+  + `norm(A)` ritorna la norma 2 di A.
+  + Se $A in RR^(n times n)$, $A$ ortogonale, allora $A^T A = A A^T = I space (A^(-1)=A^T)$, pertanto $norm(A)_2 = sqrt(rho(I)) = 1$
+  + si può dimostrare che , $forall A in RR^(m times n)$:
+    $
+      norm(A)_2 lt.eq sqrt(norm(A)_1 dot norm(A)_infinity)
+    $
+  *NB*: E' *necessario* conoscere le $norm(dot)_1, norm(dot)_2, norm(dot)_infinity$ su vettore e matrice.
+]
+
+=== Compatibilità tra norma indotta su matrice e corrisp. norma su vettore
+Per brevità, in seguito, verrà omesso il pedice $p$ della norma, sottointendendo che sia sempre lo stesso.
+Si ottiene che per $uu(x) eq.not uu(0)$:
+$
+  norm(A uu(x)) = norm(A frac(uu(x), norm(uu(x)))) dot norm(uu(x)) lt.eq (sup_(norm(uu(v))=1) norm(A uu(v))) dot norm(uu(x)) = norm(A) dot norm(uu(x))
+$
+Ovvero abbiamo concluso che:
+$
+  norm(A uu(x)) lt.eq norm(A) dot norm(uu(x)) quad ("compatibilità della norma")
+$
+In modo analogo si dimostra che, se $A in R^(m times n), B in RR^(n times k)$:
+$
+  norm(A dot B) lt.eq norm(A) dot norm(B)
+$
+//TODO: da dimostrare / finire A CASA (certo
+#observation()[
+  + Se $A in RR^(n times n), forall norm(dot)$ norma indotta su matrice, vale: $rho(A) lt.eq norm(A)$
+  + $forall norm(dot)$ norma indotta su matrice, vale:
+    $
+      norm(I) = max_(norm(uu(v))=1) norm(I uu(v)) = max_(norm(uu(v))=1) norm(uu(v)) = 1
+    $
+  + Dalla 2. segue che, se $A in RR^(n times n)$, $det(A)eq.not 0$:
+    $
+      norm(A) dot norm(A^(-1)) gt.eq norm(A dot A^(-1)) = norm(I) =1
+    $
+]
+
+Ritorniamo a discutere il problema perturbato (2). A questo fine, supponiamo che:
+$
+  Delta A = epsilon F, quad "con" epsilon in RR, F in RR^(n times n)
+$
+e, similmente supponiamo che:
+$
+  Delta uu(b)= epsilon uu(f), quad "con" uu(f) in RR^n
+$
+Definiamo quindi:
+$
+      A(epsilon) & = A + epsilon F => A(0) = A \
+  uu(b)(epsilon) & =uu(b) + epsilon uu(f) => uu(b)(0) = uu(b)
+$
+e, inoltre, indichiamo con $uu(x)(epsilon)$ la soluzione del sistema lineare:
+$
+  A(epsilon) = uu(x)(epsilon) = uu(b)(epsilon) <=> (2) quad quad (3)
+$
+Inoltre, da questo segue che:
++ $uu(x)(0) = uu(x)$, soluzione di (1);
++ Per $epsilon approx 0$:
+  $
+    uu(x)(epsilon) = uu(x)(0) + epsilon accent(uu(x), dot)(0) + O(epsilon^2) approx uu(x) + underbracket(epsilon accent(uu(x), dot)(0)) \
+    epsilon uu(x)(0) => Delta uu(x) = uu(x)(epsilon) - uu(x) approx epsilon dot accent(uu(x), dot)(0)
+  $
+
+Andiamo ad ottenere $accent(uu(x), dot)(0)$. Poiché la (3) vale indenticamente in un intorno di $epsilon=0$, questo significa che anche le derivate prime dei 2 membri devono essere uguali:
+$
+  underbrace(accent(A, dot)(epsilon), F) uu(x)(epsilon) + A(epsilon) accent(uu(x), dot)(epsilon) = underbrace(accent(uu(b), dot)(epsilon), uu(f))
+$
+e, calcolando in $epsilon=0$, otteniamo:
+$
+  F underbrace(uu(x)(0), uu(x)) + underbrace(A(0), A) accent(uu(x), dot)(0) = uu(f)
+$
+da cui:
+$
+  F uu(x) + A accent(uu(x), dot)(0) = uu(f)
+$
+e moltiplicando membro a membro per $epsilon$:
+$
+  underbrace(epsilon F, =Delta A) uu(x) + A underbrace((epsilon accent(uu(x), dot)(0)), =Delta uu(x)) = underbrace((epsilon uu(f)), = Delta uu(b))
+$
+ovvero:
+$
+  Delta A uu(x) + A Delta uu(x) = Delta uu(b)
+$
+
+
 == Sistemi lineari sovradeterminati
 === Esistenza della fattorizzazione QR
 === Il metodo di Householder
