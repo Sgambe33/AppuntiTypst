@@ -575,106 +575,157 @@ Se ripredendiamo l'esempio di conversione da espressione regolare a NFA, possiam
 
 #example(
   )[
-Continuiamo la conversione da espressione regolare a DFA, ricordando `(a|b)*abb`. Lo stato iniziale $A$ del DFA equivalente si ottiene con $epsilon$-closure(0), cioè $A={0,1,2,3,4,7}$ poiché questi sono tutti e soli gli stati raggiungibili dallo stato 0 seguende un percorso formato unicamente da archi etichettati con $epsilon$.
-#figure(diagram(
-  node-stroke: 0.9pt,
-  cell-size: 5mm,
-  spacing: 3mm,
-  node((-4.0, 0), [0]), // start state (0)
-  node((-2.0, 0), [1]),
-  node((-0.5, 1.0), [2]),
-  node((1.0, 1.0), [3]),
-  node((2.0, 0.0), [6]),
-  node((1.0, -1.0), [5]),
-  node((-0.5, -1.0), [4]),
-  node((3.5, 0.0), [7]),
-  node((5.0, 0.0), [8]),
-  node((6.5, 0.0), [9]),
-  // final state: use `extrude` to create a double-stroke (double circle)
-  node((8.5, 0.0), [10], extrude: (-2, 0)),
-  // Edges (labels in square brackets). `bend` controls curvature.
-  edge((-5.2, 0.0), (-4.0, 0.0), "-|>", [start]), // external incoming "start" arrow
-  edge((-4.0, 0.0), (-2.0, 0.0), "-|>", [ε]), // 0 -> 1
-  edge((-2.0, 0.0), (-0.5, 1.0), "-|>", [ε]), // 1 -> 2 (upper)
-  edge((-0.5, 1.0), (1.0, 1.0), "-|>", [a]), // 2 -> 3 (a)
-  edge((1.0, 1.0), (2.0, 0.0), "-|>", [ε]), // 3 -> 6
-  edge((-2.0, 0.0), (-0.5, -1.0), "-|>", [ε]), // 1 -> 4 (lower)
-  edge((-0.5, -1.0), (1.0, -1.0), "-|>", [b]), // 4 -> 5 (b)
-  edge((1.0, -1.0), (2.0, 0.0), "-|>", [ε], label-sep: 1pt), // 5 -> 6
-  // loop from 6 back to 1 (top arc)
-  edge((2.0, 0.0), (-2.0, 0.0), "-|>", [ε], bend: -90deg, label-pos: 0.4),
-  // small ε-edge from 6 to 7
-  edge((2.0, 0.0), (3.5, 0.0), "-|>", [ε]),
-  // linear path to final
-  edge((3.5, 0.0), (5.0, 0.0), "-|>", [a]),
-  edge((5.0, 0.0), (6.5, 0.0), "-|>", [b]),
-  edge((6.5, 0.0), (8.5, 0.0), "-|>", [b]),
-  // long outer ε-arc from state 0 sweeping under into state 7 (like in the picture)
-  edge((-4.0, 0.0), (3.5, 0.0), "-|>", [ε], bend: -60deg, label-pos: 0.5),
-))
-Cominciamo costruendo delle tabelle di transizione:
-$
-  "Dtran"[A,a]=epsilon"-cl(move("A,a"))"=epsilon"-cl("{3,8}")"={3,6,7,1,2,4,8} = B quad quad (B eq.not A) \
-  "Dtran"[A,b]=epsilon"-cl("{5}")"={1,2,4,5,6,7} = C quad quad (C eq.not A,B) \
-  "Dtran"[B,a]=epsilon"-cl(move("B,a"))"=epsilon"-cl("{3,8}")"={3,6,7,1,2,4,8} = B
-$
-Alla fine, continuando così, si ottengono cinque stati:
-#table(
-  columns: 4,
-  rows: 6,
-  align: center,
-  [Stato NFA],
-  [Stato DFA],
-  [$a$],
-  [$b$],
-  [${0,1,2,4,7}$],
-  [$A$],
-  [$B$],
-  [$C$],
-  [${1,2,3,4,6,7,8}$],
-  [$B$],
-  [$B$],
-  [$D$],
-  [${1,2,4,5,6,7}$],
-  [$C$],
-  [$B$],
-  [$C$],
-  [${1,2,4,5,6,7,9}$],
-  [$D$],
-  [$B$],
-  [$E$],
-  [${1,2,4,5,6,7,10}$],
-  [$E$],
-  [$B$],
-  [$C$],
-)
-Gli stati finali del DFA sono quelli che contengono gli stati finali del NFA: in questo caso solo $E$ (contiene infatti 10). Attenzione, c'è sempre uno stato finale, altrimenti vi è un errore. Il DFA finale è quindi:
-#figure(diagram(
-  node-stroke: 0.9pt,
-  cell-size: 2mm,
-  spacing: 3mm,
-  node((-4.0, 0), [A]),
-  node((0.0, 0), [B]),
-  node((0, -4.0), [C]),
-  node((4.0, 0.0), [D]),
-  node((8, 0.0), [E], extrude: (-2, 0)),
-  // EDGES //
-  edge((-6, 0.0), (-4.0, 0), "-|>", [start]),
-  edge((-4.0, 0.0), (0.0, 0.0), "-|>", [a]),
-  edge((-4.0, 0.0), (0.0, -4.0), "-|>", [b]),
-  edge((0.0, 0.0), (0.0, 0.0), "<|-", [a], bend: -130deg),
-  edge((0.0, 0.0), (4.0, 0.0), "-|>", [b]),
-  edge((0.0, -4.0), (0.0, 0.0), "-|>", [a]),
-  edge((0.0, -4.0), (0.0, -4.0), "<|-", [b], bend: 130deg),
-  edge((4.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 20deg, label-sep: -2pt),
-  edge((4.0, 0.0), (8.0, 0.0), "-|>", [b]),
-  edge((8.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 35deg),
-  edge((8.0, 0.0), (0.0, -4.0), "-|>", [b]),
-))
+  Continuiamo la conversione da espressione regolare a DFA, ricordando `(a|b)*abb`. Lo stato iniziale $A$ del DFA equivalente si ottiene con $epsilon$-closure(0), cioè $A={0,1,2,3,4,7}$ poiché questi sono tutti e soli gli stati raggiungibili dallo stato 0 seguende un percorso formato unicamente da archi etichettati con $epsilon$.
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    cell-size: 5mm,
+    spacing: 3mm,
+    node((-4.0, 0), [0]), // start state (0)
+    node((-2.0, 0), [1]),
+    node((-0.5, 1.0), [2]),
+    node((1.0, 1.0), [3]),
+    node((2.0, 0.0), [6]),
+    node((1.0, -1.0), [5]),
+    node((-0.5, -1.0), [4]),
+    node((3.5, 0.0), [7]),
+    node((5.0, 0.0), [8]),
+    node((6.5, 0.0), [9]),
+    // final state: use `extrude` to create a double-stroke (double circle)
+    node((8.5, 0.0), [10], extrude: (-2, 0)),
+    // Edges (labels in square brackets). `bend` controls curvature.
+    edge((-5.2, 0.0), (-4.0, 0.0), "-|>", [start]), // external incoming "start" arrow
+    edge((-4.0, 0.0), (-2.0, 0.0), "-|>", [ε]), // 0 -> 1
+    edge((-2.0, 0.0), (-0.5, 1.0), "-|>", [ε]), // 1 -> 2 (upper)
+    edge((-0.5, 1.0), (1.0, 1.0), "-|>", [a]), // 2 -> 3 (a)
+    edge((1.0, 1.0), (2.0, 0.0), "-|>", [ε]), // 3 -> 6
+    edge((-2.0, 0.0), (-0.5, -1.0), "-|>", [ε]), // 1 -> 4 (lower)
+    edge((-0.5, -1.0), (1.0, -1.0), "-|>", [b]), // 4 -> 5 (b)
+    edge((1.0, -1.0), (2.0, 0.0), "-|>", [ε], label-sep: 1pt), // 5 -> 6
+    // loop from 6 back to 1 (top arc)
+    edge((2.0, 0.0), (-2.0, 0.0), "-|>", [ε], bend: -90deg, label-pos: 0.4),
+    // small ε-edge from 6 to 7
+    edge((2.0, 0.0), (3.5, 0.0), "-|>", [ε]),
+    // linear path to final
+    edge((3.5, 0.0), (5.0, 0.0), "-|>", [a]),
+    edge((5.0, 0.0), (6.5, 0.0), "-|>", [b]),
+    edge((6.5, 0.0), (8.5, 0.0), "-|>", [b]),
+    // long outer ε-arc from state 0 sweeping under into state 7 (like in the picture)
+    edge((-4.0, 0.0), (3.5, 0.0), "-|>", [ε], bend: -60deg, label-pos: 0.5),
+  ))
+  Cominciamo costruendo delle tabelle di transizione:
+  $
+    "Dtran"[A,a]=epsilon"-cl(move("A,a"))"=epsilon"-cl("{3,8}")"={3,6,7,1,2,4,8} = B quad quad (B eq.not A) \
+    "Dtran"[A,b]=epsilon"-cl("{5}")"={1,2,4,5,6,7} = C quad quad (C eq.not A,B) \
+    "Dtran"[B,a]=epsilon"-cl(move("B,a"))"=epsilon"-cl("{3,8}")"={3,6,7,1,2,4,8} = B
+  $
+  Alla fine, continuando così, si ottengono cinque stati:
+  #table(
+    columns: 4,
+    rows: 6,
+    align: center,
+    [Stato NFA],
+    [Stato DFA],
+    [$a$],
+    [$b$],
+    [${0,1,2,4,7}$],
+    [$A$],
+    [$B$],
+    [$C$],
+    [${1,2,3,4,6,7,8}$],
+    [$B$],
+    [$B$],
+    [$D$],
+    [${1,2,4,5,6,7}$],
+    [$C$],
+    [$B$],
+    [$C$],
+    [${1,2,4,5,6,7,9}$],
+    [$D$],
+    [$B$],
+    [$E$],
+    [${1,2,4,5,6,7,10}$],
+    [$E$],
+    [$B$],
+    [$C$],
+  )
+  Gli stati finali del DFA sono quelli che contengono gli stati finali del NFA: in questo caso solo $E$ (contiene infatti 10). Attenzione, c'è sempre uno stato finale, altrimenti vi è un errore. Il DFA finale è quindi:
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    cell-size: 2mm,
+    spacing: 3mm,
+    node((-4.0, 0), [A]),
+    node((0.0, 0), [B]),
+    node((0, -4.0), [C]),
+    node((4.0, 0.0), [D]),
+    node((8, 0.0), [E], extrude: (-2, 0)),
+    // EDGES //
+    edge((-6, 0.0), (-4.0, 0), "-|>", [start]),
+    edge((-4.0, 0.0), (0.0, 0.0), "-|>", [a]),
+    edge((-4.0, 0.0), (0.0, -4.0), "-|>", [b]),
+    edge((0.0, 0.0), (0.0, 0.0), "<|-", [a], bend: -130deg),
+    edge((0.0, 0.0), (4.0, 0.0), "-|>", [b]),
+    edge((0.0, -4.0), (0.0, 0.0), "-|>", [a]),
+    edge((0.0, -4.0), (0.0, -4.0), "<|-", [b], bend: 130deg),
+    edge((4.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 20deg, label-sep: -2pt),
+    edge((4.0, 0.0), (8.0, 0.0), "-|>", [b]),
+    edge((8.0, 0.0), (0.0, 0.0), "-|>", [a], bend: 35deg),
+    edge((8.0, 0.0), (0.0, -4.0), "-|>", [b]),
+  ))
+]
+#pagebreak()
+#example()[
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    cell-size: 2mm,
+    spacing: 3mm,
+    // NODES //
+    node((-3, 0), [0], name: <0>),
+    node((-1, 0), [1], name: <1>),
+    node(( 1, 0), [2], name: <2>),
+    node(( 3, 0), [3], name: <3>, extrude: (-2, 0)),
+    // EDGES //
+    edge((-5, 0), <0>, [start], "-|>", label-pos: 0.1),
+    edge(<0>, <0>, [a], "<|-", bend: 130deg),
+    edge(<0>, <0>, [b], "<|-", bend: -130deg),
+    edge(<0>, <1>, [a], "-|>"),
+    edge(<1>, <2>, [b], "-|>"),
+    edge(<2>, <3>, [b], "-|>"),
+  ))
+
+  $
+    &epsilon dot "cl" (0) && &&= {0} &&= A  \
+    &"Dtran"[A, a] &&=epsilon - "cl"("move"(A, a)) =epsilon-"cl"({0,1})&&={0,1}&&=B \
+    &"Dtran"[A, b] &&=epsilon - "cl"("move"(A, b)) =epsilon-"cl"({0})  &&={0}  &&=A \
+    &"Dtran"[B, a] &&=epsilon - "cl"("move"(B, a)) =epsilon-"cl"({0,1})&&={0,1}&&=B \
+    &"Dtran"[B, b] &&=epsilon - "cl"("move"(B, b)) =epsilon-"cl"({0,2})&&={0,2}&&=C \
+    &"Dtran"[C, a] &&=epsilon - "cl"("move"(C, a)) =epsilon-"cl"({0,1})&&={0,1}&&=B \
+    &"Dtran"[C, d] &&=epsilon - "cl"("move"(C, d)) =epsilon-"cl"({0,3})&&={0,3}&&=D \
+    &"Dtran"[D, a] &&=epsilon - "cl"("move"(D, a)) =epsilon-"cl"({0,1})&&={0,1}&&=B \
+    &"Dtran"[D, b] &&=epsilon - "cl"("move"(D, b)) =epsilon-"cl"({0})  &&={0}  &&=A \
+  $
+
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    cell-size: 2mm,
+    spacing: 3mm,
+    // NODES //
+    node((-3, 0.5), [A], name: <A>),
+    node((-1, 0.0), [B], name: <B>),
+    node(( 1, 0.5), [C], name: <C>),
+    node(( 3, 1.0), [D], name: <D>, extrude: (-2, 0)),
+    // EDGES //
+    edge((-5, 0), <A>, [start], "-|>", label-pos: 0.1),
+    edge(<A>, <A>, [b], "-|>", bend: 130deg, loop-angle: 270deg),
+    edge(<A>, <B>, [a], "-|>"),
+    edge(<B>, <B>, [a], "-|>", bend: 130deg, loop-angle: 120deg),
+    edge(<B>, <C>, [b], "-|>", bend: -15deg),
+    edge(<C>, <B>, [a], "-|>", bend: -15deg),
+    edge(<C>, <D>, [b], "-|>"),
+    edge(<D>, <A>, [b], "-|>", bend: 30deg),
+    edge(<D>, <B>, [a], "-|>", bend: -60deg),
+  ))
 ]
 
-//TODO: Aggiungere esempio extra da foto
-#figure(image("images/2025-10-09-09-29-31.png"))
 
 === Simulazione di un NFA
 
@@ -792,8 +843,44 @@ Valgono alcune convenzioni come per i DFA e NFA:
 #example(
   )[
 Il seguente diagramma di transizione riconosce i lessemi relativi al token *relop*
-//TODO: Convertire diagramma
-#figure(image("images/2025-10-19-17-50-11.png"))
+
+#figure(diagram(
+    node-stroke: 0.9pt,
+    label-size: 3mm,
+    label-sep: 0.1em,
+    cell-size: 2mm,
+    spacing: 3mm,
+    // NODES // 
+    node((0, 0), [0], name: <a>),
+    node((6, 0), [1], name: <b>),
+    node((9, 0), [2], extrude: (-3, 0), name: <c>),
+    node((9, 1), [3], extrude: (-3, 0), name: <d>),
+    node((9, 2), [4], extrude: (-3, 0), name: <e>),
+    node((6, 3), [5], extrude: (-3, 0), name: <f>),
+    node((6, 4), [6], name: <g>),
+    node((9, 4), [7], extrude: (-3, 0), name: <h>),
+    node((9, 5), [8], extrude: (-3, 0), name: <i>),
+    // TEXT NODES //
+    node((10, 0), [*return*(*relop*, LE)], stroke: none),
+    node((10, 1), [*return*(*relop*, NE)], stroke: none),
+    node((10, 2), [*return*(*relop*, NT)], stroke: none),
+    node((7, 3), [*return*(*relop*, EQ)], stroke: none, inset: 0pt, width: 95pt),
+    node((10, 4), [*return*(*relop*, GE)], stroke: none),
+    node((10, 5), [*return*(*relop*, GT)], stroke: none),
+    node((9.175, 1.65), [*\**], stroke: none, inset: 0pt),
+    node((9.175, 4.65), [*\**], stroke: none, inset: 0pt),
+    // EDGES //
+    edge((-1.2, 0), <a>, "-|>", [start], label-pos: 0),
+    edge(<a>, <b>, "-|>", $<$),
+    edge(<b>, <c>, "-|>", $=$),
+    edge(<b>, <d>, "-|>", $>$, bend: -15deg),
+    edge(<b>, <e>, "-|>", [*other*], bend: -30deg),
+    edge(<a>, <f>, "-|>", $=$, bend:-15deg),
+    edge(<a>, <g>, "-|>", $>$, bend:-30deg),
+    edge(<g>, <h>, "-|>", $=$),
+    edge(<g>, <i>, "-|>", [*other*], bend:-15deg)
+  )
+)
 Se l'analisi inizia nello stato 0 e legge <, si passa allo stato 1.
 - Dallo stato 1, se si legge `=` si riconosce `<=` e si passa allo stato finale 2 (restituendo relop, LE).
 - Dallo stato 1, se si legge `>` si riconosce `<>` e si passa allo stato 3 (restituendo relop, NE).
@@ -803,21 +890,119 @@ Se l'analisi inizia nello stato 0 e legge <, si passa allo stato 1.
 L'analizzatore lessicale deve anche gestire l'eliminazione degli *spazi bianchi* (token ws), definiti da caratteri come spazi, tabulazioni e ritorni a capo. Quando il token ws viene riconosciuto, non viene restituito al parser; l'analizzatore *ricomincia* immediatamente l'analisi a partire dal carattere successivo.
 
 === Riconoscimento di Identificatori e Parole Chiave
-#figure(image("images/2025-10-19-17-54-47.png"))
+#figure(diagram(
+    node-stroke: 0.9pt,
+    label-size: 3mm,
+    label-sep: 0.1em,
+    cell-size: 2mm,
+    spacing: 3mm,
+    // NODES // 
+    node((0, 0), [9], name: <a>),
+    node((4, 0), [10], name: <b>),
+    node((8, 0), [11], extrude: (-3, 0), name: <c>),
+    // TEXT NODES //
+    node((9, 0), [*return*(getToken(), installID())], stroke: none),
+    node((8.175, -0.65), [*\**], stroke: none, inset: 0pt),
+    // EDGES //
+    edge((-1.2, 0), <a>, "-|>", [start], label-pos: 0),
+    edge(<a>, <b>, "-|>", [*letter*]),
+    edge(<b>, <b>, "<|-", [*letter* o *digit*], bend: 130deg),
+    edge(<b>, <c>, "-|>", [*other*]),
+  )
+)
 Il diagramma di transizione per gli identificatori (Figura 3.12) riconosce anche i lessemi delle *parole chiave* (come if, then, else) se queste hanno una struttura simile agli identificatori.
 Due metodi principali sono usati per gestire il conflitto tra identificatori e parole chiave riservate:
 
 + *Installazione Preventiva nella Tabella dei Simboli*: Le parole chiave sono pre-caricate nella tabella dei simboli con un'indicazione del token che rappresentano. Quando il diagramma id riconosce un lessema (stato 11), la funzione `getToken()` consulta la tabella dei simboli: se il lessema è una parola chiave, restituisce il token specifico (es. IF); altrimenti, restituisce il token ID.
 
 + *Diagrammi Separati e Priorità*: Si possono usare diagrammi specifici per ogni parola chiave (come quello ipotetico per then in Figura 3.13). Questo approccio richiede di imporre una priorità in modo che, se un lessema corrisponde sia a una parola chiave sia a un id, venga data la precedenza alla parola chiave.
-  #figure(image("images/2025-10-19-17-56-42.png"))
+#figure(diagram(
+    node-stroke: 0.9pt,
+    label-size: 3mm,
+    label-sep: 0.1em,
+    cell-size: 3mm,
+    spacing: 3mm,
+    // NODES // 
+    node((0, 0), radius: 3mm, name: <a>),
+    node((4, 0), radius: 3mm, name: <b>),
+    node((8, 0), radius: 3mm, name: <c>),
+    node((12, 0), radius: 3mm, name: <d>),
+    node((16, 0), radius: 3mm, name: <e>),
+    node((20, 0), radius: 3mm, extrude: (-3, 0), name: <f>),
+    // TEXT NODES //
+    node((20.5, -0.65), [*\**], stroke: none, inset: 0pt),
+    // EDGES //
+    edge((-1.5, 0), <a>, "-|>", [start], label-pos: 0),
+    edge(<a>, <b>, "-|>", [t]),
+    edge(<b>, <c>, "-|>", [h]),
+    edge(<c>, <d>, "-|>", [e]),
+    edge(<d>, <e>, "-|>", [n]),
+    edge(<e>, <f>, "-|>", [*nonlet/dig*])
+  )
+)
 
 
 === Completamento dell'esempio
 Il diagramma per gli identificatori (Figura 3.12) inizia leggendo una lettera (stato 9) e procede nello stato 10, dove accetta qualsiasi sequenza di lettere o cifre. Quando incontra un simbolo che non fa parte del lessema, passa allo stato 11, accetta, e arretra il puntatore.
-#figure(image("images/2025-10-19-17-58-24.png"))
+#figure(diagram(
+    node-stroke: 0.9pt,
+    label-size: 3mm,
+    label-sep: 0.1em,
+    cell-size: 6mm,
+    spacing: 3mm,
+    // NODES // 
+    node((0, 0), [12], name: <12>),
+    node((2, 0), [13], name: <13>),
+    node((4, 0), [14], name: <14>),
+    node((6, 0), [15], name: <15>),
+    node((8, 0), [16], name: <16>),
+    node((10, 0), [17], name: <17>),
+    node((12, 0), [18], name: <18>),
+    node((14, 0), [19], extrude: (-3, 0), name: <19>),
+    node((4, 2), [20], extrude: (-3, 0), name: <20>),
+    node((8, 2), [21], extrude: (-3, 0), name: <21>),
+    // TEXT NODES //
+    node((4.5, 1.65), [*\**], stroke: none, inset: 0pt),
+    node((8.5, 1.65), [*\**], stroke: none, inset: 0pt),
+    node((14.5, -0.325), [*\**], stroke: none, inset: 0pt),
+    // EDGES //
+    edge((-1.5, 0), <12>, "-|>", [start], label-pos: 0),
+    edge(<12>, <13>, "-|>", [*digit*]),
+    edge(<13>, <13>, "<|-", [*digit*], bend: 130deg),
+    edge(<13>, <14>, "-|>", [.]),
+    edge(<13>, <16>, "-|>", [E], bend: -30deg),
+    edge(<13>, <20>, "-|>", [*other*], bend: -30deg),
+    edge(<14>, <15>, "-|>", [*digit*]),
+    edge(<15>, <15>, "<|-", [*digit*], bend: 130deg),
+    edge(<15>, <16>, "-|>", [E]),
+    edge(<15>, <21>, "-|>", [*other*], bend: -30deg),
+    edge(<16>, <17>, "-|>", [$+$ o $-$]),
+    edge(<16>, <18>, "-|>", [*digit*], bend: -30deg),
+    edge(<17>, <18>, "-|>", [*digit*]),
+    edge(<18>, <18>, "<|-", [*digit*], bend: 130deg),
+    edge(<18>, <19>, "-|>", [*other*]),
+  )
+)
 Il diagramma per il token number (Figura 3.14) è più complesso, gestendo interi, parti frazionarie (opzionali, introdotte da un punto) ed esponenti (opzionali, introdotti da E). L'identificazione di un numero intero avviene uscendo dallo stato 13 nello stato 20, mentre il riconoscimento di un numero con parte frazionaria senza esponente termina nello stato 21.
-#figure(image("images/2025-10-19-17-58-53.png"))
+#figure(diagram(
+    node-stroke: 0.9pt,
+    label-size: 3mm,
+    label-sep: 0.1em,
+    cell-size: 10mm,
+    spacing: 3mm,
+    // NODES // 
+    node((0, 0), [22], name: <22>),
+    node((2, 0), [23], name: <23>),
+    node((4, 0), [24], extrude: (-3, 0), name: <24>),
+    // TEXT NODES //
+    node((4.45, -0.325), [*\**], stroke: none, inset: 0pt),
+    // EDGES //
+    edge((-1.5, 0), <22>, "-|>", [start], label-pos: 0),
+    edge(<22>, <23>, "-|>", [*delim*]),
+    edge(<23>, <23>, "<|-", [*delim*], bend: 130deg),
+    edge(<23>, <24>, "-|>", [*other*]),
+  )
+)
 Il diagramma degli spazi bianchi (Figura 3.15) riconosce caratteri delimitatori (delim). Lo stato finale 24 accetta il lessema di separazione e arretra il puntatore (\*), ma l'azione associata non restituisce un token al parser, bensì induce l'analizzatore lessicale a ricominciare l'analisi dall'input successivo.
 
 === Architettura di un analizzatore lessicale basato su diagrammi di transizione
@@ -858,7 +1043,31 @@ Per gestire tutti i token, si possono usare diversi approcci:
 === Il generatore di analizzatori lessicali Lex
 *Lex (o Flex)* è uno strumento che automatizza la creazione di analizzatori lessicali. Il programmatore fornisce una specifica ad alto livello (i pattern in espressioni regolari) e *Lex* genera il codice sorgente (in C, salvato in lex.yy.c) che simula il diagramma di transizione combinato.
 
-#figure(image("images/2025-10-19-18-08-06.png"))
+#figure(diagram(
+    label-size: 3mm,
+    label-sep: 0.1em,
+    cell-size: (3mm, 6mm),
+    spacing: 3mm,
+    edge-stroke: 1pt,
+    // NODES // 
+    node((0, 0), align($"    Programma sorgente Lex" \ $ + `lex.l`, right), width: 6cm, name: <cls>),
+    node((0, 2), align(`lex.yy.c`, right), width: 6cm, name: <ccs>),
+    node((0, 4), align("Sequenza d'ingresso", right), width: 6cm, name: <gs>),
+    node((4, 0), [Compilatore lex], width: 3cm, stroke: 0.3mm, name: <clc>),
+    node((4, 2), [Compilatore C], width: 3cm, stroke: 0.3mm, name: <ccc>),
+    node((4, 4), `a.out`, width: 3cm, stroke: 0.3mm, name: <gc>),
+    node((8, 0), align(`lex.yy.c`, left), width: 6cm, name: <cld>),
+    node((8, 2), align(`a.out`, left), width: 6cm, name: <ccd>),
+    node((8, 4), align("Sequenza di token", left), width: 6cm, name: <gd>),
+    // EDGES //
+    edge(<cls>, <clc>, "-|>"),
+    edge(<clc>, <cld>, "-|>"),
+    edge(<ccs>, <ccc>, "-|>"),
+    edge(<ccc>, <ccd>, "-|>"),
+    edge(<gs>, <gc>, "-|>"),
+    edge(<gc>, <gd>, "-|>")
+  )
+)
 
 Il file `lex.l` (programma sorgente Lex) viene elaborato dal compilatore Lex per produrre `lex.yy.c`. Questo file viene poi compilato per ottenere un eseguibile (spesso a.out), che funge da analizzatore lessicale. L'analizzatore generato è tipicamente richiamato come subroutine dal parser, restituendo il nome del token (un intero) e utilizzando la variabile globale `yylval` per passare eventuali attributi.
 
@@ -877,7 +1086,51 @@ Un generatore come Lex opera *trasformando le espressioni regolari in automi fin
 
 Per costruire automa, Lex per prima cosa prende *ogni espressione regolare* del programma e la trasforma mediante l'algoritmo apposito in un NFA $N_i$. Dato che si vuole ottenere un singolo automa che riconosca lessemi corrispondenti a un qualsiasi pattern del programma, Lex combina gli NFA cosi costruiti in un unico automa non-deterministico aggiungendo un nuovo stato iniziale con transizioni $epsilon$ verso ognuno degli stati iniziali degli automi $N_i$ relativi ai pattern $p_i$. 
 
-#figure(image("images/2025-10-19-18-21-13.png"))
+#figure(diagram(
+    node-stroke: 0.9pt,
+    label-sep: 0.1em,
+    label-size: 4mm,
+    cell-size: 3mm,
+    spacing: 3mm,
+    // NODES // 
+    node((-2, 3), $s_0$, name: <s0>),
+    node(( 1, 0), radius: 4mm, name: <1>),
+    node(( 1, 2), radius: 4mm, name: <2>),
+    node(( 1.5, 4), align(top, text(size: 15pt, "...")), stroke: none),
+    node(( 1, 6), radius: 4mm, name: <n>),
+    // ELLISSI //
+    node((1.5, 0), $N(p_1)$, 
+       shape: ellipse, 
+       width: 4.5cm,
+       height: 1.25cm,
+       stroke: 1pt,
+    ),
+    node((1.5, 2), $N(p_2)$, 
+       shape: ellipse, 
+       width: 4.5cm,
+       height: 1.25cm,
+       stroke: 1pt,
+    ),
+
+    node((1.5, 6), $N(p_n)$, 
+       shape: ellipse, 
+       width: 4.5cm,
+       height: 1.25cm,
+       stroke: 1pt,
+    ),
+    // CERCHI CONCENTRICI //
+    node((2, 0), radius: 4mm, extrude: (-5, 0)),
+    node((2, 2), radius: 4mm, extrude: (-5, 0)),
+
+    node((2, 6), radius: 4mm, extrude: (-5, 0)),
+    // EDGES //
+    edge(<s0>, <1>, $epsilon$, "-|>"),
+    edge(<s0>, <2>, $epsilon$, "-|>"),
+
+    edge(<s0>, <n>, $epsilon$, "-|>")
+  )
+)
+
 
 === Riconoscimento dei pattern basato su NFA
 Se l'analizzatore lessicale simula il comportamento di un NFA combinato, la sua simulazione segue l'input, mantenendo traccia dell'insieme di stati raggiungibili in ogni momento. Quando l'analisi non può più proseguire, l'analizzatore lessicale torna indietro nella sequenza degli insiemi di stati per trovare l'insieme contenente uno stato di accettazione (NFA) che corrisponde al prefisso più lungo. In caso di conflitti tra pattern, viene applicata la regola di priorità (scegliendo il pattern elencato per primo nel programma Lex).
@@ -888,7 +1141,37 @@ L'approccio implementato da Lex si basa sulla conversione dell'NFA combinato in 
 
 #example(
   )[
-  #figure(image("images/2025-10-19-18-25-02.png"))
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    node-shape: circle,
+    label-size: 3mm,
+    label-sep: 0.1em,
+    cell-size: 3mm,
+    spacing: 3mm,
+    edge-stroke: .75pt,
+    // NODES // 
+    node((0, 0), [0137], width: 1cm, name: <0>),
+    node((6, 0), [247], width: 1cm, extrude: (-2, 0), name: <1>),
+    node((6, 4), [58], width: 1cm, extrude: (-2, 0), name: <5>),
+    node((3, 4), [68], width: 1cm, extrude: (-2, 0), name: <6>),
+    node((3, 2), [7], width: 0.75cm, name: <7>),
+    node((0, 4), [8], width: 1cm, extrude: (-2, 0), name: <8>),
+    node((0, 5), $a^*b^+$, stroke: none),
+    node((3, 5), $a b b$, stroke: none),
+    node((6, 5), $a^*b^+$, stroke: none),
+    // EDGES //
+    edge((-2.2, 0), <0>, [start], "-|>", label-pos: 0.1),
+    edge(<0>, <1>, $a$, "-|>"),
+    edge(<0>, <8>, $b$, "-|>"),
+    edge(<1>, <5>, $b$, "-|>"),
+    edge(<1>, <7>, $a$, "-|>"),
+    edge(<5>, <6>, $a$, "-|>"),
+    edge(<6>, <8>, $b$, "-|>"),
+    edge(<7>, <7>, $a$, "<|-", bend: 130deg, loop-angle: 135deg),
+    edge(<7>, <8>, $b$, "-|>"),
+    edge(<8>, <8>, $b$, "-|>", bend: 130deg, loop-angle: 180deg),
+  )
+)
   Ad esempio, il DFA per i pattern a, abb e $a^* b^+$ combina i possibili stati di accettazione, garantendo la regola del prefisso più lungo e della priorità.
   La simulazione del DFA prosegue fino a raggiungere uno stato pozzo (dead state, ∅) o quando non vi sono più transizioni possibili. A quel punto, si arretra fino all'ultimo stato DFA di accettazione visitato per determinare il lessema riconosciuto.
   L'operatore di lookahead (/) nei DFA richiede un'attenzione particolare: la fine del lessema è identificata dalla posizione nell'input in cui si entrava nello stato NFA precedente la ϵ-transizione associata all'operatore /, massimizzando la lunghezza della parte r
