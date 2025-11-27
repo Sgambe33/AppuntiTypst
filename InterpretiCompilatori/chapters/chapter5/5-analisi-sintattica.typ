@@ -1,4 +1,6 @@
 #import "../../../dvd.typ": *
+#import "@preview/algo:0.3.6": algo, i, d, comment, code
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge
 #pagebreak()
 
 = Analisi Sintattica
@@ -70,7 +72,21 @@ Una forma generale di parsing top-down, detta anche parsing a discesa ricorsiva,
   ))]
 
 Il seguente algoritmo pemette di esaminare una stringa in ingresso applicando la discesa ricorsiva.
-#figure(image("images/2025-10-20-22-34-05.png"))
+
+#algo(
+  title: ([*void* A])
+)[
+  void A() {#i\
+    Scegli, per $A$, una produzione $A --> X_1X_2 dots X_k;$\
+    for ($i$ da 1 fino a $k$)#i\
+      if ($X_i$ è un non-terminale)#i\
+        richiama la procedura $X_i()$;#d\
+      else if ($X_i$ è uguale al simbolo d'ingresso corrente $a$)#i\
+        procedi al simbolo successivo nella sequenza d'ingresso;#d\
+        else \/\* si è verificato un errore \*\/;#d\
+    }#d\
+  }
+]
 
 #example()[
   Consideriamo la grammatica seguente:
@@ -104,11 +120,178 @@ $
 $
 //TODO: magari spiegare meglio
 
-Come stringa in ingresso consideriamo: `for(;expr;expr) other`
-#figure(image("images/2025-10-20-22-37-15.png"))
-
 //TODO: Suddividere in sezioni e alternare spiegazione a diagrammi
-#figure(image("images/2025-10-20-22-37-37.png"))
+Come stringa in ingresso consideriamo: `for(;expr;expr) other`
+#figure(diagram(
+    cell-size: 5mm,
+    spacing: 3mm,
+
+    // NODES //
+    node((4, 0), $s t m t$, name: <top>),
+
+    node((0, 1), [*for*], name: <for>),
+    node((1, 1), $($, name: <parO>),
+    node((2, 1), $o p t e x p r$, name: <opt1>),
+    node((3, 1), $;$, name: <semC1>),
+    node((4, 1), $o p t e x p r$, name: <opt2>),
+    node((5, 1), $;$, name: <semC2>),
+    node((6, 1), $o p t e x p r$, name: <opt3>),
+    node((7, 1), $)$, name: <parC>),
+    node((8, 1), $s t m t$, name: <stmt>),
+
+    node((2, 2), $epsilon$, name: <eps>),
+    node((4, 2), [*expr*], name: <expr1>),
+    node((6, 2), [*expr*], name: <expr2>),
+    node((8, 2), [*other*], name: <other>),
+
+    // EDGES //
+    edge(<top>, <for>, bend: -7.5deg),
+    edge(<top>, <parO>, bend: -5deg),
+    edge(<top>, <opt1>, bend: -2.5deg),
+    edge(<top>, <semC1>),
+    edge(<top>, <opt2>),
+    edge(<top>, <semC2>),
+    edge(<top>, <opt3>, bend: 2.5deg),
+    edge(<top>, <parC>, bend: 5deg),
+    edge(<top>, <stmt>, bend: 7.5deg),
+
+    edge(<opt1>, <eps>),
+    edge(<opt2>, <expr1>),
+    edge(<opt3>, <expr2>),
+    edge(<stmt>, <other>)
+  )
+)
+
+#figure(diagram(
+    cell-size: 5mm,
+    spacing: 3mm,
+
+    // NODES //
+    node((1, 0), $bold(#text(8pt)[Albero]) \ bold(#text(8pt)[di parsing])$),
+    node((6.5, 0), $s t m t$, name: <top>),
+
+    node((0.25, 1), $(a)$),
+
+    node((1, 2), $bold(#text(8pt)[Input])$),
+    node((3, 2), [*for*], name: <for>),
+    node((4, 2), [*(*], name: <parO>),
+    node((5, 2), [*;*], name: <semC1>),
+    node((6, 2), [*expr*], name: <opt2>),
+    node((7, 2), [*;*], name: <semC2>),
+    node((8, 2), [*expr*], name: <opt3>),
+    node((9, 2), [*)*], name: <parC>),
+
+    // EDGES //
+    edge((.5, 1), (10.75, 1)),
+    edge((6.5, 0.6), <top>, "-|>", mark-scale: .75),
+    edge((3, 2.7), <for>, "-|>", mark-scale: .75),
+
+    // BORDI //
+    edge((0, -1), (11, -1), "="),
+    edge((0, 3), (11, 3), "=")
+  )
+)
+
+#figure(diagram(
+    cell-size: 5mm,
+    spacing: 3mm,
+
+    // NODES //
+    node((1, 0), $bold(#text(8pt)[Albero]) \ bold(#text(8pt)[di parsing])$),
+    node((6, 0), $s t m t$, name: <top>),
+
+    node((0.25, 2), $(b)$),
+
+    node((1, 3), $bold(#text(8pt)[Input])$),
+    node((3, 3), [*for*], name:<startG>),
+    node((4, 3), [*(*]),
+    node((5, 3), [*;*]),
+    node((6, 3), [*expr*]),
+    node((7, 3), [*;*]),
+    node((8, 3), [*expr*]),
+    node((9, 3), [*)*]),
+    
+    node((2, 1), [*for*], name: <for>),
+    node((3, 1), $($, name: <parO>),
+    node((4, 1), $o p t e x p r$, name: <opt1>),
+    node((5, 1), $;$, name: <semC1>),
+    node((6, 1), $o p t e x p r$, name: <opt2>),
+    node((7, 1), $;$, name: <semC2>),
+    node((8, 1), $o p t e x p r$, name: <opt3>),
+    node((9, 1), $)$, name: <parC>),
+    node((10, 1), $s t m t$, name: <stmt>),
+
+    // EDGES //
+    edge(<top>, <for>, bend: -7.5deg),
+    edge(<top>, <parO>, bend: -5deg),
+    edge(<top>, <opt1>, bend: -2.5deg),
+    edge(<top>, <semC1>),
+    edge(<top>, <opt2>),
+    edge(<top>, <semC2>),
+    edge(<top>, <opt3>, bend: 2.5deg),
+    edge(<top>, <parC>, bend: 5deg),
+    edge(<top>, <stmt>, bend: 7.5deg),
+
+    edge((.5, 2), (11.75, 2)),
+    edge((2, 1.7), <for>, "-|>", mark-scale: .75),
+    edge((3, 3.7), <startG>, "-|>", mark-scale: .75),
+
+    // BORDI //
+    edge((0, -1), (12, -1), "="),
+    edge((0, 4), (12, 4), "=")
+  )
+)
+
+#figure(diagram(
+    cell-size: 5mm,
+    spacing: 3mm,
+
+    // NODES //
+    node((1, 0), $bold(#text(8pt)[Albero]) \ bold(#text(8pt)[di parsing])$),
+    node((6, 0), $s t m t$, name: <top>),
+
+    node((0.25, 2), $(c)$),
+
+    node((1, 3), $bold(#text(8pt)[Input])$),
+    node((3, 3), [*for*]),
+    node((4, 3), [*(*], name:<startG>),
+    node((5, 3), [*;*]),
+    node((6, 3), [*expr*]),
+    node((7, 3), [*;*]),
+    node((8, 3), [*expr*]),
+    node((9, 3), [*)*]),
+    
+    node((2, 1), [*for*], name: <for>),
+    node((3, 1), $($, name: <parO>),
+    node((4, 1), $o p t e x p r$, name: <opt1>),
+    node((5, 1), $;$, name: <semC1>),
+    node((6, 1), $o p t e x p r$, name: <opt2>),
+    node((7, 1), $;$, name: <semC2>),
+    node((8, 1), $o p t e x p r$, name: <opt3>),
+    node((9, 1), $)$, name: <parC>),
+    node((10, 1), $s t m t$, name: <stmt>),
+
+    // EDGES //
+    edge(<top>, <for>, bend: -7.5deg),
+    edge(<top>, <parO>, bend: -5deg),
+    edge(<top>, <opt1>, bend: -2.5deg),
+    edge(<top>, <semC1>),
+    edge(<top>, <opt2>),
+    edge(<top>, <semC2>),
+    edge(<top>, <opt3>, bend: 2.5deg),
+    edge(<top>, <parC>, bend: 5deg),
+    edge(<top>, <stmt>, bend: 7.5deg),
+
+    edge((.5, 2), (11.75, 2)),
+    edge((3, 1.7), <parO>, "-|>", mark-scale: .75),
+    edge((4, 3.7), <startG>, "-|>", mark-scale: .75),
+
+    // BORDI //
+    edge((0, -1), (12, -1), "="),
+    edge((0, 4), (12, 4), "=")
+  )
+)
+
 
 Lo scopo è quello di costruire il resto dell'albero 
 di parsing in modo che la stringa da questo generata coincida con la stringa d'ingresso. 
@@ -173,7 +356,18 @@ Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta pià ri
 *OUTPUT*: Una grammatica equivalente a $G$ ma priva di ricorsione sinistra. \
 *METODO*:
 //TODO: trovare modo di convertire algoritmo bene
-#figure(image("images/2025-10-21-18-32-58.png"))
+#algo(
+  title: "Eliminazione ricorsione sinistra",
+)[
+  ordina aritrariament i non-terminali come $A_1, A_2, dots, a_n$.\
+  for ( ogni $i$ da 1 fino a $n$ ) {#i\
+    for ( ogni $j$ da 1 fino a $i - 1$ ) {#i\
+      sostituisci ogni produzione nella forma $A_i --> A_j gamma$ con le produzioni $A_i --> delta_1 lambda | delta_2 lambda | dots | delta_k lambda$, in cui $A_j --> delta_1 | delta_2 | dots | delta_k$ sono tutte le produzioni per il non-terminale $A_j$ in esame.#d\
+    }\
+    elimina la ricorsione sinistra immediata dalle produzioni per $A_i$#d\
+  }
+]
+
 #example(
   )[
   Applichiamo l'algoritmo appena visto alla grammatica seguente:
@@ -398,9 +592,39 @@ E' sempre possibile costruire un parser predittivo - cioè un parser a discesa r
 === Parsing a discesa ricorsiva per grammatiche LL(1)
 Se le regole per la variabile $A$ sono $A-> alpha_1 bar alpha_2 bar ... bar alpha_k$ allora:
 #grid(
-  columns: 2,
-  figure(image("images/2025-10-30-19-22-15.png", width: 63%)),
-  figure(image("images/2025-10-30-19-22-26.png", width: 50%)),
+  columns: 3,
+  algo(
+    title: [*void* A]
+  )[
+    if ($a in "FIRST"(alpha_1)$)#i\
+      {codice per $alpha_1$;}#d\
+    else if ($a in "FIRST"(alpha_2)$)#i\
+      {codice per $alpha_2$;}\
+      $quad quad space space dots.v$#d\
+    else if ($a in "FIRST"(alpha_k)$)#i\
+      {codice per $alpha_k$;}#d\
+    else if ($ A cancel(=>)^* epsilon$ *or* $cancel(in) "FOLLOW"(A)$)#i\
+      {errore();}\
+  ],
+  $
+    quad  
+  $,
+  algo(
+    inset: 14.15pt,
+    line-numbers: false,
+  )[
+    codice per $a_i=X_1X_2dots X_n$\ 
+    \
+
+    for ($i=1;i<=n;i$++) {#i\
+      if ($X_i in V$)#i\
+        $X_i()$;#d\
+      else if ($X_i=a$)#i\
+        $a=$next.token;#d\
+      else#i\
+        errore();#d#d\
+    }
+  ],
 )
 //TODO: manca esempio da slide "Sulle LL(1).pptx"
 
@@ -417,10 +641,82 @@ Per ogni produzione $A-> alpha$ della grammatica $G$:
 Se in $M[A, a]$ non c'è nessuna regola si ha una condizione di errore: il simbolo a non può essere ottenuto applicando nessuna delle regole per $A$.
 Se $M[A, a]$ contiene più di una regola allora la grammatica non è LL(1) perché a appartiene agli insiemi FIRST di due regole distinte oppure $A der(*) epsilon$ e $a$ appartiene al FOLLOW($A$) e al FIRST di una regola per $A$.
 
+#pagebreak()
+
 #example()[
-  #figure(image("images/2025-11-01-12-53-32.png"))
-  #figure(image("images/2025-11-01-12-53-46.png"))
-  //TODO: convertire immagini
+  #grid(
+    column-gutter: 12.5%,
+    columns: 3,
+    [$
+      &E &&-> T E'\
+      &E'&&-> +T E' | epsilon\
+      &T &&-> F T'\
+      &T'&&-> *F T' | epsilon\
+      &F &&-> (E) | bold(id)
+    $],
+    [$
+      &"FIRST"(T E')  &&={(, bold(id)}\
+      &"FIRST"(+T E') &&={+}\
+      &"FIRST"(F T')  &&={(, bold(id)}\
+      &"FIRST"(*F T') &&={*}\
+      &"FIRST"((E))   &&={(}
+    $],
+    [$
+      &\
+      &"FOLLOW"(E')       &&={(, \$}\
+      &\
+      &"FOLLOW"(T')       &&={+, ), \$}\
+      &"FOLLOW"(bold(id)) &&={bold(id)}\
+    $]
+  )
+  #figure(table(
+    columns: (.33fr, .9fr, 1fr, 1fr, 1fr, .75fr, .75fr),
+    rows: auto,
+    table.header(
+      [],[*id*], [+],[\*],[(],[)],[\$] 
+    ),
+    [$E $], [$E -> T E' $], [                ], [             ], [$E -> T E'$], [               ], [               ],
+    [$E'$], [            ], [$E' -> +T E'   $], [             ], [           ], [$E' -> epsilon$], [$E' -> epsilon$],
+    [$T'$], [$T -> F T' $], [                ], [             ], [           ], [               ], [               ],
+    [$T'$], [            ], [$T' -> epsilon'$], [$T' -> *F T'$], [           ], [$T' -> epsilon$], [$T' -> epsilon$],
+    [$F $], [$F -> $ *id*], [                ], [             ], [$F -> (E) $], [               ], [               ]
+  ))
+  #block(
+    $
+      &S -> i E t S | i E t S e S | a\
+      &E -> b
+    $
+  )
+  #grid(
+    column-gutter: 5%,
+    columns: 3,
+    [$
+      &S &&-> i E t S S' | a\
+      &S'&&-> e S | epsilon\
+      &E &&-> b
+    $],
+    [$
+      &"FIRST"(i E t S S')  &&={i}\
+      &"FIRST"(e S)         &&={e}\
+      &
+    $],
+    [$
+      &"FIRST"(a) &&= {a}\
+      &\ \
+      &"FOLLOW"(bold(id))&&="FOLLOW"(S)&&={e, \$}
+    $]
+  )
+  #figure(table(
+    columns: (.33fr, .9fr, 1fr, 1fr, 1fr, .75fr, .75fr),    
+    rows: (1.75em, 1.75em, 3.5em, 1.75em),
+    align: horizon,
+    table.header(
+      [],[$a$], [$b$],[$e$],[$i$],[$t$],[\$] 
+    ),
+    [$S $], [$S -> a$], [        ], [                             ], [$S -> i E t S S'$], [], [               ],
+    [$S'$], [        ], [        ], [$&S' -> e S \ &S' -> epsilon$], [                 ], [], [$S' -> epsilon$],
+    [$E $], [        ], [$E -> b$], [                             ], [                 ], [], [               ]
+  ))
 ]
 
 == Parsing predittivo non ricorsivo
