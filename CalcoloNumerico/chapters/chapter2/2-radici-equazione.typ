@@ -37,7 +37,7 @@ Il nome del metodo deriva dal fatto che, ad ogni iterazione, l'ampiezza dell'int
 
 
 ```matlab
-fa = f(a) 
+fa = f(a)
 fb = f(b)
 ...
 while 1
@@ -53,17 +53,17 @@ end
 
 Il criterio di arresto sopra commentato rende l'intera implementazione _naive_ e poco efficiente:
 - non sempre è richiesto un calcolo *esatto* della radice ma solo quello di una sua approssimazione entro una tolleranza `tol`;
-- la condizione `fx == 0` potrebbe non essere mai soddisfatta a causa dell'aritmetica finita. 
+- la condizione `fx == 0` potrebbe non essere mai soddisfatta a causa dell'aritmetica finita.
   #example()[Considerando il polinomio
-  $
-    p(x) = (x-1.1)^20 (x-pi)
-  $
-  che ha radice in $x=pi$. Utilizzando Matlab per calcolare $p(pi)$, si ottiene:
-  $
-    p = "poly"([1.1 * "ones"(1,20),pi])\
-    "polyval"(p, pi) approx -5,5213 dot 10^(-5)
-  $
-  La funzione `poly` restituisce i coefficienti del polinomio le cui radici sono in argomento alla funzione.
+    $
+      p(x) = (x-1.1)^20 (x-pi)
+    $
+    che ha radice in $x=pi$. Utilizzando Matlab per calcolare $p(pi)$, si ottiene:
+    $
+      p = "poly"([1.1 * "ones"(1,20),pi])\
+      "polyval"(p, pi) approx -5,5213 dot 10^(-5)
+    $
+    La funzione `poly` restituisce i coefficienti del polinomio le cui radici sono in argomento alla funzione.
   ]
 
 == Criteri di arresto e condizionamento
@@ -88,8 +88,8 @@ $
 questo è il numero massimo di iterazioni di cui avremo bisogno. Questo ci permette di riformulare il ciclo precedente come:
 
 ```matlab
-fa = feval(f,a); 
-fb = feval(f,b); 
+fa = feval(f,a);
+fb = feval(f,b);
 x = (a+b)/2;
 fx = feval(f,x);
 imax = ceil( log2(b-a) - log2(tol) );
@@ -112,15 +112,33 @@ end
 In questo caso, evidentemente non si va più in loop per errore. Tuttavia rimane da riformulare in modo più efficace la condizione di uscita. Vediamo geometricamente come interpretare questa cosa:
 
 #figure(image("images/2025-10-14-14-59-18.png", width: 60%))
+Dobbiamo fare attenzione alla distanza verticale ($abs(f(x))$) e orizzontale ($abs(x-x^*)$). Se la funzione è molto "piatta" vicino alla radice, $f(x)$ può essere un valore piccolissimo anche se $x$ è lontano da $x^*$. Al contrario, se la funzione è "ripida", $f(x)$ può essere grande anche se siamo molto vicini a $x^*$.
 
+Per collegare l'errore orizzontale a quello verticale, usiamo lo sviluppo di Taylor al primo ordine centrato nella radice $x^*$.
 $
-  f(x) = overparen(f(x^*), =0) + f'(x^*)(x-x^*) + o(abs(x-x^*)^2) approx f'(x^*)(x-x^*) => abs(x-x^*) lt.eq (abs(f(x)))/(abs(f'(x^*))) lt.eq "tol"
+  f(x) = overparen(f(x^*), =0) + f'(x^*)(x-x^*) + o(abs(x-x^*)^2) approx f'(x^*)(x-x^*)
 $
-da questo ricaviamo che:
+Questa formula ci dice che la funzione $f(x)$ (altezza) è approssimativamente uguale alla pendenza della retta tangente ($f'$) moltiplicata per la distanza della radice $(x-x^*)$.
+$
+  abs(x-x^*) approx frac(abs(f(x)), abs(f'(x^*))) quad quad
+$
+Si vuole che  l'errore sulla $x$ sia minore della tolleranza `tol`:
+$
+  abs(x-x^*) <= "tol"
+$
+Sostituiamo l'approssimazione trovata:
+$
+  (abs(f(x)))/(abs(f'(x^*))) lt.eq "tol"
+$
+Moltiplichiamo entrambi i lati per la derivata prima e otteniamo che
 $
   abs(f(x)) lt.eq "tol" dot abs(f'(x^*))
 $
-è quanto dobbiamo richiedere alla $f(x)$. Nell'iterazione del metodo di bisezione, al passo i-esimo, noi abbiamo calcolato $f(x_i)$, e, inoltre, conosciamo $f(a_i)$ e $f(b_i)$:
+è quanto dobbiamo richiedere alla $f(x)$. Non basta chiedere che $f(x)$ sia piccolo quanto `tol`. Dobbiamo chiedere che sia piccolo quanto `tol` scalato dalla pendenza della funzione.
+- Se la funzione è molto ripida ($f'$ grande), possiamo accettare un $f(x)$ più grande.
+- Se la funzione è molto piatta ($f'$ quasi zero), dobbiamo richiedere un $f(x)$ piccolissimo per essere sicuri di essere vicini alla radice.
+
+Nell'iterazione del metodo di bisezione, al passo i-esimo, noi abbiamo calcolato $f(x_i)$, e, inoltre, conosciamo $f(a_i)$ e $f(b_i)$:
 #figure(image("images/2025-10-14-15-04-33.png", width: 60%))
 Questo significa che possiamo approssimare:
 $
@@ -129,7 +147,7 @@ $
 senza valutazioni di funzione aggiuntive.
 
 
-Questo ci permette, in fine, di ottenere questa versione ottimizzata del metodo di bisezione in cui sono solo omessi i controlli di consistenza sui parametri di ingresso.
+Questo ci permette di ottenere questa versione ottimizzata del metodo di bisezione in cui sono solo omessi i controlli di consistenza sui parametri di ingresso.
 
 ```matlab
 fa = feval(f,a);
@@ -146,7 +164,7 @@ for i=2:imax
     b = x;
     fb = fx;
   else
-    a = x; 
+    a = x;
     fa = fx;
   end
   x = (a+b)/2;
@@ -156,119 +174,121 @@ end
 
 == Ordine di convergenza
 
-Osserviamo che, definito:
+Definiamo l'errore assoluto al passo $i$-esimo come la distanza tra la radice vera $x^*$ e la nostra approssimazione $x_i$:
 $
   e_i = x^* - x_i
 $
-l'errore del passo i-esimo del metodo, allora, per costruzione, il metodo di bisezione soddisfa:
+Per come è costruito il metodo di bisezione (che dimezza l'intervallo ad ogni passo), sappiamo che l'errore è sempre limitato dalla semi-ampiezza dell'intervallo corrente:
 $
   abs(e_i) lt.eq epsilon_i = (b-a)/2^i
 $
-e inoltre:
+Vogliamo vedere come decresce questa limitazione dell'errore passando dal passo $i$ al passo successivo $i+1$. Calcoliamo il rapporto tra le due limitazioni:
 $
-  epsilon_(i+1)/epsilon_i = 1/2
+  epsilon_(i+1)/epsilon_i = frac(frac(b-a, 2^(i+1)), frac(b-a, 2^i)) = frac(b-a, 2^(i+1)) dot frac(2^i, b-a) = frac(2^i, 2^(i-1)) = 1/2
 $
 il che implica che:
 $
   lim_(i-> infinity) epsilon_(i+1)/epsilon_i =1/2
 $
-Più in generale, dato un generico metodo iterativo, per il quale l'errore al passo i-esimo, $e_i$, soddisfa:
-$
-  lim_(i -> infinity) e_i = 0
-$
-si dirà *convergente*.
+#observation()[
+  Questo dimostra che, nel metodo di bisezione, la stima del massimo errore possibile si dimezza esattamente ad ogni iterazione.
+]
+
+#definition()[
+  Generalizzando, un qualsiasi metodo iterativo si dice *convergente* se l'errore tende a zero man mano che si procede con le iterazioni:
+  $
+    lim_(i -> infinity) e_i = 0
+  $
+]
 
 #observation()[
   Il metodo di bisezione, se applicabile, è *sempre* convergente.
 ]
 
-Inoltre, un metodo si dirà avere *ordine* (di convergenza) $p$, se $p$ è il più grande reale positivo per cui:
-$
-  lim_(i -> infinity) abs(e_(i+1))/abs(e_i)^p = c < infinity space space space (1)
-$
-In questo caso, $c$ si dice *costante asintotica dell'errore*. Cerchiamo di dare un significato alla definizione di ordine descritto dalla (1). In effetti, questo significa che, per $i>>1$, si ha che:
+Per classificare l'efficienza dei metodi di approssimazione, dobbiamo introdurre il concetto di *ordine di convergenza*.
+#definition()[
+  Si dice che un metodo ha ordine $p$ se $p$ è il più grande numero reale positivo tale che esista un limite finito non nullo:
+  $
+    lim_(i -> infinity) abs(e_(i+1))/abs(e_i)^p = c < infinity space space space (1)
+  $
+  Dove $c$ è detta *costante asintotica dell'errore*.
+]
+Cerchiamo di dare un significato alla definizione di ordine descritto dalla (1). Per $i>>1$, possiamo scrivere che:
 $
   abs(e_(i+1)) approx c dot abs(e_i)^p space space space (2)
 $
-da questo deduciamo che:
-+ se $p<1$, allora il metodo non converge. Affinché si abbia convergenza, bisogna avere $p gt.eq 1$. In particolare, se $p=1$, si parlerà di convergenza lineare, se $p=2$, si parlerà di convergenza quadratica e così via.
-
-+ se $p=1$, allora per $i>>1$:
-  $
-      &abs(e_(i+1)) approx c dot abs(e_i)\
-      &abs(e_(i+2)) approx abs(e_(i+1)) approx c^2 dot abs(e_i)\
-      & quad quad quad quad quad dots.v\
-      &abs(e_(i+k)) approx c^k dot abs(e_i) --> 0, k-->infinity
-  $
-  se e solo se $c<1$.
-
-  Pertanto un metodo di ordine 1 è *convergente* se e solo se la sua *costante asintotica* dell'errore è minore di 1.
-
+Questa relazione ci dice come l'errore futuro dipende dall'errore attuale. Analizziamo i casi in base a $p$:
++ Se $p<1$: il metodo non converge in quanto l'errore tenderebbe ad aumentare. Affinché si abbia convergenza, bisogna avere $p gt.eq 1$.
   #observation()[
-    Pertanto, il metodo di bisezione ha ordine 1, con costante asintotica dell'errore pari a $1/2$
+    In particolare, se $p=1$, si parlerà di *convergenza lineare*, se $p=2$, si parlerà di *convergenza quadratica* e così via.
   ]
 
-+ Dalla (2) segue che metodi di ordine più elevato generalmente convergono più rapidamente di metodi di ordine più basso. Vediamo un esempio.
-  #example(
-    )[
-    Supponiamo di avere 2 metodi, uno di ordine 1 e l'altro di ordine 2. Supponiamo anche che, per entrambi, la costante asintotica dell'errore sia $c=0,1$ e che l'errore da cui partiamo sia, sempre per entrambi, $abs(e_0) = 0,1$. Otteniamo, premesso che la (2) valga a partire da $i=0$:
++ Se $p=1$: per $i>>1$:
+  $
+    & abs(e_(i+1)) approx c dot abs(e_i) \
+    & abs(e_(i+2)) approx abs(e_(i+1)) approx c^2 dot abs(e_i) \
+    & quad quad quad quad quad dots.v \
+    & abs(e_(i+k)) approx c^k dot abs(e_i)
+  $
+  Affinché l'errore vada a zero($e_(i+k) -> 0 "per" k->infinity$) è necessario che $c<1$. Pertanto un metodo di ordine 1 è *convergente* se e solo se la sua *costante asintotica* dell'errore è minore di 1.
+
+  #observation()[
+    Il metodo di bisezione ha ordine 1, con costante asintotica dell'errore pari a $1/2$.
+  ]
+
++ Se $p > 1$ (es. Convergenza Quadratica $p=2$): l'errore al passo successivo è proporzionale a una potenza dell'errore corrente. Se l'errore è piccolo (es. $10^(-3)$), elevarlo a potenza (es. al quadrato) lo rende minuscolo ($10^(-6)$).
+  #example()[
+    Supponiamo di avere 2 metodi, uno di ordine $p=1$ e l'altro di ordine $p=2$. Supponiamo anche che, per entrambi, la costante asintotica dell'errore sia $c=0.1$ e che l'errore da cui partiamo sia, sempre per entrambi, $abs(e_0) = 0.1$. Otteniamo, premesso che la (2) valga a partire da $i=0$:
 
     #align(center, table(
       align: center,
       columns: 3,
       rows: 6,
-      [$i$],
-      [$e_i space (p=1)$],
-      [$e_i space (p=2)$],
-      [0],
-      [$10^(-1)$],
-      [$10^(-1)$],
-      [1],
-      [$10^(-2)$],
-      [$10^(-3)$],
-      [2],
-      [$10^(-3)$],
-      [$10^(-7)$],
-      [3],
-      [$10^(-4)$],
-      [$10^(-15)$],
-      [$dots.v$],
-      [$dots.v$],
-      [$dots.v$],
+      [$i$], [$e_i space (p=1)$], [$e_i space (p=2)$],
+      [0], [$10^(-1)$], [$10^(-1)$],
+      [1], [$10^(-2)$], [$10^(-3)$],
+      [2], [$10^(-3)$], [$10^(-7)$],
+      [3], [$10^(-4)$], [$10^(-15)$],
+      [$dots.v$], [$dots.v$], [$dots.v$],
     ))
     Da questo semplice esempio si comprende che è bene ricercare metodi di ordine più elevato.
   ]
 
-Preliminarmente, discutiamo il *condizionamento del problema*. Noi cerchiamo $x^*$ talche che $f(x^*)=0$, che è la soluzione del problema che ci prefiggiamo di risolvere. Se, invece di $x^*$, abbiamo una soluzione perturbata $tilde(x)$, tale che $0 eq.not f(tilde(x)) approx 0$, allora siamo interessati a capire quanto la differenza
+Preliminarmente, discutiamo il *condizionamento del problema*. Il nostro obiettivo è cercare $x^*$ tale che $f(x^*)=0$, che è la soluzione del problema che ci prefiggiamo di risolvere. Se, invece di $x^*$, abbiamo una soluzione perturbata $tilde(x)$, tale che $f(tilde(x)) approx 0$ (non è sol. esatta ma rende la funzione quasi zero), allora siamo interessati a capire quanto la differenza
 $
   f(tilde(x)) - overbrace(f(x^*), =0) = f(tilde(x))
 $
-si ripercuote sull'errore $tilde(x) - x^*$. Otteniamo che:
+che rappresenta l'errore sull'asse Y,
+si ripercuote sull'errore $tilde(x) - x^*$ (asse X). Sviluppando $f(tilde(x))$ con Taylor centrato nella radice vera $x^*$:
 $
   f(tilde(x)) = overbrace(f(x^*), =0) + f'(x^*)(tilde(x)-x^*)+o((tilde(x)-x^*)^2) approx f'(x^*)(tilde(x)-x^*)
 $
-da cui otteniamo che:
+Isolando l'errore sull'asse X otteniamo:
 $
   abs(tilde(x) - x^*) lt.approx abs(f(tilde(x)))/abs(f'(x^*))
 $
 In questa relazione:
-+ $abs(tilde(x))$ è la perturbazione del valore $emptyset$ che dovremmo avere;
+//TODO: è f(x) o x e basta?
++ $abs(f(tilde(x)))$ è la perturbazione del valore $emptyset$ che dovremmo avere;
 + $abs(tilde(x)-x^*)$ è l'errore determinato da tale perturbazione;
 + $k=1/abs(f'(x^*))$ è il *numero di condizionamento* del problema.
 
-Pertanto, il problema è *ben condizionato*, se $abs(f'(x^*))>>1$. Viceversa, se $abs(f'(x^*))approx 0$, allora la radice è *mal condizionata*.
+- *Problema ben condizionato* ($abs(f'(x^*))>>1$): se la derivata è grande (la funzione è "ripida"), allora $k$ è piccolo.
+- *Problema mal condizionato* ($abs(f'(x^*))approx 0$): se la derivata è quasi zero (la funzione è "piatta"), allora $k$ è molto grande e l'errore si amplifica.
 
 #definition()[
-  Una radice si dice avere *molteplicità* $m gt.eq 1$ se:
+  Una radice $x^*$ ha *molteplicità* $m gt.eq 1$ se la funzione e le sue prime $m-1$ derivate si annullano in quel punto, ma la derivata $m$-esima no:
   $
-    0=f(x^*)=f'(x^*)=dots=f^(m-1)(x^*) and f^(m)(x^*) eq.not 0
+    f(x^*) = f'(x^*) = dots = f^(m-1)(x^*) = 0 quad "e" quad f^(m)(x^*) eq.not 0
   $
-  Se $m=1$ la radice si dice *semplice* (allora $f'(x^*)=0$), viceversa, la radice si dice *multipla*.
+  Distinguiamo due casi:
+  - *Radice Semplice* ($m=1$): vale $f(x^*) = 0$ ma $f'(x^*) eq.not 0$.
+  - *Radice Multipla* ($m gt.eq 2$): vale $f(x^*) = 0$ e necessariamente $f'(x^*) = 0$.
 ]
 
-#observation(
-  )[
-  Da quanto esposto, si deduce che l'approssimazione di una radice *multipla* dà origine ad un problema *sempre malcondizionato*.
+#observation()[
+  Poiché per una radice multipla la derivata prima è nulla ($f'(x^*) = 0$), il numero di condizionamento $k = 1/abs(f'(x))$ tende all'infinito. Di conseguenza possiamo affermare che l'approssimazione di una radice *multipla* dà origine ad un problema *sempre malcondizionato*.
+
 ]
 
 == Metodo di Newton
@@ -291,12 +311,10 @@ definisce il *metodo di Newton*. Andiamo a fare alcune considerazioni:
 + il costo per iterazione consiste in una valutazione di $f(x)$ e una valutazione di $f'(x)$ (moralmente doppio, rispetto al metodo di bisezione).
 
 A fronte di questo costo per iterazione più elevato, vale il seguente risultato.
-#theorem(
-  )[
+#theorem()[
   Sia $f(x) in C^2$ in un interno della radice $x^*$. Supponiamo che il metodo di Newton converga a $x^*$ e che $x^*$ sia semplice. Allora l'ordine di convergenza è (almeno) 2.
 ]
-#proof(
-  )[
+#proof()[
   Indichiamo con $x^*$ la radice verso cui l'iterazione sta convergendo. Si ottiene, per un opportuno $epsilon_i$ compreso tra $x^* " e " x_i$:
   $
     0 & = f(x^*)=f(x_i)+f'(x_i)(x^*-x_i)+1/2 f''(epsilon_i)(x^*-x_i)^2 \
@@ -325,7 +343,7 @@ ovvero, l'ordine di convergenza del metodo di Newton diventa *lineare*, come con
 
 == Convergenza locale
 
-Facciamo prima un riepilogo dei metodi appena visti per la ricerca degli zeri di una funzione. 
+Facciamo prima un riepilogo dei metodi appena visti per la ricerca degli zeri di una funzione.
 - Metodo di bisezione:
   - applicabile se $f in C[a,b] and f(a)f(b)<0$;
   - ordine di convergenza lineare;
@@ -342,8 +360,7 @@ $
 $
 non è in generale possibile garantire la convergenza da un generico punto iniziale $x_0$.
 
-#example(
-  )[
+#example()[
   Ad esempio, se consideriamo
   $
     f(x) = x^3 -5x = x(x^2-5)
@@ -373,8 +390,7 @@ $
 $
 che garantisce che, se raggiungiamo la radice, ci fermiamo. Questo significa che il problema di determinare lo zero di $f(x)$ equivale a trovare un *punto fisso* della funzione di iterazione $Phi(x)$. Pertanto, vogliamo vedere sotto quali condizioni per $Phi(x)$, partendo da un intorno del suo punto fisso (2), la successione di approssimazioni (1) converge a $x^*$. Vale il seguente risultato.
 
-#theorem(
-  )[
+#theorem()[
   Se $exists delta > 0 : forall x,y in overbrace([x^*-delta, x^*+delta], =I(x^*))$ allora $Phi$ è *Lipschitziana* con costante $L<1$, cioè
   $
     abs(Phi(x)-Phi(y)) lt.eq L abs(x-y) space space forall x,y in I
@@ -388,12 +404,10 @@ che garantisce che, se raggiungiamo la radice, ci fermiamo. Questo significa che
   TODO
 ]
 
-#corollary(
-  )[
+#corollary()[
   Se $exists delta > 0 : forall x in overbrace([x^*-delta, x^*+delta], =I(x^*))$, $abs(Phi'(x)) lt.eq L<1$, allora $x_(i+1)=Phi(x_i)$ converge a $x^*$, per $i-> infinity$.
 ]
-#proof(
-  )[
+#proof()[
   $forall x,y in I(x^*)$ e per lo sviluppo di Taylor con resto al primo ordine segue dunque:
   $
     abs(Phi(x)-Phi(y)) = abs(cancel(Phi(x)) - cancel(Phi(x)) - Phi'(epsilon)(x-y)) = abs(Phi'(epsilon)) dot abs(x-y) < L abs(x-y), space "con " L<1
@@ -406,7 +420,7 @@ $
   Phi(x) = x-f(x)/(f'(x))\
   Phi(x^*) = x^*-overparen(f(x^*), = 0)/(f'(x^*)) = x^*
 $
-Se $x^*$ è una radice semplice, allora $f'(x^*) eq.not 0 and $
+Se $x^*$ è una radice semplice, allora $f'(x^*) eq.not 0 and$
 $
   Phi'(x^*) = [ 1-(f'(x)^2 - f''(x)f(x))/(f'(x)^2) ] lr(bar, size: #300%)_(x=x^*) = [ (f''(x)overparen(f(x), =0))/(f'(x)^2) ] lr(bar, size: #300%)_(x=x^*) = (f''(x^*)overparen(f(x^*), =0))/(f'(x^*)^2) = 0
 $
@@ -424,7 +438,7 @@ $
   x_(i+1) = Phi(x_i), space i=0,1,...
 $
 per determinare uno zero di $f(x)$, cerchiamo un criterio di arresto idoneo per l'iterazione. Esaminiamo, in particolare, il metodo id Newton:
-$ $
+$$
 Come abbiamo precedentemente visto per il metodo di bisezione, il valore di $f(x)$ nell'approssimazione, è da considerarsi "piccolo" se
 $
   abs(f(x_i)) lt.eq "tol" dot abs(f'(x^*)) approx "tol" dot abs(f'(x_i))
@@ -433,14 +447,14 @@ ovvero se
 $
   abs(f(x_i))/abs(f'(x_i)) lt.eq "tol"
 $
-e quindi, per il metodo di Newton, questo equivale a richiedere che 
+e quindi, per il metodo di Newton, questo equivale a richiedere che
 $
   abs(x_(i+1) - x_i) lt.eq "tol"
 $
 che è un controllo sull'errore assoluto. Tuttavia, se $x_i -> x^*$, con $abs(x^*) >> 1$, sarebbe più efficace effetuare un controllo sull'errore relativo, ovvero
 $
   abs(x^*-x_i)/abs(x^*) lt.eq "tol"
-$ 
+$
 Per rendere la scelta del criterio d'arresto "automatica", potremmo passare a un criterio del tipo:
 $
   abs(x_(i+1) - x_i) lt.eq (1+abs(x_i)) dot "tol"
@@ -501,10 +515,9 @@ $
 da cui otteniamo:
 $
   (x_i^*)^2 -(x_(i+1)+x_(i-1)) dot x_i^* + x_(i+1) dot x_(i-1) = (x_i^*)^2 - 2x_i x_i^* + x_i^2\
-
   x_i^*=frac(x_(i+1)-x_(i-1)-x_i^2, x_(i+1)-2x_i+x_(i-1))
 $
-Questa iterazione definisce una procedura a 2 livelli: 
+Questa iterazione definisce una procedura a 2 livelli:
 $
   x_0 overshell(-->, "Newton") x_i overshell(-->, "Newton") x_i => x_1^* " da cui ripeto i due passi di Newton"
 $
@@ -514,14 +527,14 @@ Quindi, il costo per iterazione è doppio rispetto al metodo di Newton _standard
     columns: 4,
     rows: 9,
     table.cell($f(x)=(x-1)^(10) dot e^x$, colspan: 4),
-    [it],[Newton],[Newton modificato],[Aitken],
-    [0],[0],[0],[0],
-    [1],[1.111111111111111e-01],[1.111111111111111e+00],[9.111111111111099e-01],
-    [2],[2.086720867208672e-01],[1.001221001221001e+00],[9.992895975197171e-01],
-    [3],[2.946049884277536e-01],[1.000000149066197e+00],[9.999999545628913e-01],
-    [4],[3.704979405704750e-01],[1.000000000000002e+00],[1.000000244342852e-00],
-    [5],[4.376770876576362e-01],[1.000000000000000e+00],[1.000000090874212e+00],
-    [6],[4.972598543829098e-01],[1.000000000000000e+00],[1.000000000000000e+00],
+    [it], [Newton], [Newton modificato], [Aitken],
+    [0], [0], [0], [0],
+    [1], [1.111111111111111e-01], [1.111111111111111e+00], [9.111111111111099e-01],
+    [2], [2.086720867208672e-01], [1.001221001221001e+00], [9.992895975197171e-01],
+    [3], [2.946049884277536e-01], [1.000000149066197e+00], [9.999999545628913e-01],
+    [4], [3.704979405704750e-01], [1.000000000000002e+00], [1.000000244342852e-00],
+    [5], [4.376770876576362e-01], [1.000000000000000e+00], [1.000000090874212e+00],
+    [6], [4.972598543829098e-01], [1.000000000000000e+00], [1.000000000000000e+00],
   ),
   caption: "Esempio di come Newton modificato e Aitken portino ad ottenere il valore della radice più velocemente del metodo di Newton standard.",
 )
@@ -548,8 +561,7 @@ $
   x_(i+1) = x_i - frac(f(x_i), f(x_i)-f(x_(i+1))) (x_i - x_(i+1)), space i=1,2,...
 $
 
-#observation(
-  )[
+#observation()[
   + Il metodo richiede due approssimazioni iniziali per essere innescato (metodo a due passi).
   + Il costo per iterazione è di 1 valutazione funzionale eccetto la valutazione iniziale in cui ne facciamo 2.
   + L'ordine di convergenza verso radici semplici è:
@@ -568,5 +580,5 @@ $
 Per i passi successivi si utilizza l'approssimazione $f'(x_i) approx f'(x_0)$. L'espressione del metodo delle corde è pertanto:
 $
   x_(i+1) = x_i - frac(f(x_i), f'(x_i)) space i=1,2,...
-$ 
+$
 e richiede una valutazione per iterazione. La sua convergenza è ovviamente locale e l'ordine di convergenza si vede essere 1 (convergenza lineare). E' spesso utilizzato in problemi per cui è nota un'approssimazione iniziale $x_0$ molto vicina alla soluzione $x^*$.
