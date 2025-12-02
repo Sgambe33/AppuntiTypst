@@ -1202,9 +1202,96 @@ Negli esempi lo stack viene rappresentato con l'elemento di testa
 a destra (così contenuto dello stack e input da scandire, letti di
 seguito, corrispondono alle fdf dx.
 
-#figure(image("images/2025-11-01-16-00-47.png"))
-#figure(image("images/2025-11-01-16-00-52.png"))
-#figure(image("images/2025-11-01-16-00-57.png"))
+#grid(
+  columns: (.2fr, .7fr),
+  column-gutter: 20pt,
+  align: horizon,
+
+  [#block($
+    &S &&-> a S b   &&| space space a A b \
+    &A &&-> a A c   &&| space space a c \
+    \ \ \ \ 
+    &S &&=> a S b   && => a a A b b =>\ 
+    &  &&=> a a a A && c b b => a a a a c c b b 
+  $)], grid.cell(
+    table(
+      stroke: none,
+      columns: (.2fr, .3fr, .5fr),
+      align: (left, right, left),
+      table.header(
+        [Stack], [Input], [Azione]
+      ),
+      table.hline(start: 0),
+      table.vline(end: 1, x: 1, stroke: (paint: gray)),
+      table.vline(end: 1, x: 2, stroke: (paint: gray)),
+      table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
+      table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
+      [_\$_     ], [_aaaaccbb\$_], [_shift_              ],
+      [_\$a_    ], [_ aaaccbb\$_], [_shift_              ],
+      [_\$aa_   ], [_  aaccbb\$_], [_shift_              ],
+      [_\$aaa_  ], [_   accbb\$_], [_shift_              ],
+      [_\$aaaa_ ], [_    ccbb\$_], [_shift_              ],
+      [_\$aaaac_], [_     cbb\$_], [_reduce_ $A ->$ _ac_],
+      [_\$aaaA_ ], [_     cbb\$_], [_shift_              ],
+      [_\$aaaAc_], [_      bb\$_], [_reduce_ $A ->$ _aAc_],
+      [_\$aaA_  ], [_      bb\$_], [_shift_              ],
+      [_\$aaAb_ ], [_       b\$_], [_reduce_ $S ->$ _aAb_],
+      [_\$aS_   ], [_       b\$_], [_shift_              ],
+      [_\$aSb_  ], [_        \$_], [_reduce_ $S ->$ _aSb_],
+      [_\$S_    ], [_        \$_], [_shift_              ],
+  )),
+  [#block($
+  $)]
+)
+
+#figure(table(
+  stroke: none,
+  columns: (.2fr, .3fr, .5fr),
+  align: (left, right, left),
+  table.header(
+    [Stack], [Input], [Azione]
+  ),
+  table.hline(start: 0),
+  table.vline(end: 1, x: 1, stroke: (paint: gray)),
+  table.vline(end: 1, x: 2, stroke: (paint: gray)),
+  table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
+  table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
+
+  [_\$_          ], [_*id*\**id*\$_], [_shift_              ],
+  [_\$_ *id*     ], [_    \**id*\$_], [_reduce_ $F ->$ *id* ],
+  [_\$F_         ], [_    \**id*\$_], [_reduce_ $T -> F    $],
+  [_\$T_         ], [_    \**id*\$_], [_shift_              ],
+  [_\$T \*_      ], [_      *id*\$_], [_shift_              ],
+  [_\$T \*_ *id* ], [_          \$_], [_reduce_ $F ->$ *id* ],
+  [_\$T \* F_    ], [_          \$_], [_reduce_ $T -> T * F$],
+  [_\$T_         ], [_          \$_], [_reduce_ $E -> T    $],
+  [_\$E_         ], [_          \$_], [_accept_              ],
+))
+
+#figure(table(
+  stroke: none,
+  columns: (.2fr, .3fr, .5fr),
+  align: (left, right, left),
+  table.header(
+    [Stack], [Input], [Azione]
+  ),
+  table.hline(start: 0),
+  table.vline(end: 1, x: 1, stroke: (paint: gray)),
+  table.vline(end: 1, x: 2, stroke: (paint: gray)),
+  table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
+  table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
+
+  [_\$_         ], [_*id* + *id*\$_], [_shift_              ],
+  [_\$_   *id*  ], [_     + *id*\$_], [_reduce_ $F ->$ *id* ],
+  [_\$F_        ], [_     + *id*\$_], [_reduce_ $T -> F    $],
+  [_\$T_        ], [_     + *id*\$_], [_reduce_ $E -> T    $],
+  [_\$E_        ], [_     + *id*\$_], [_shift_              ],
+  [_\$E + _     ], [_       *id*\$_], [_shift_              ],
+  [_\$E + _ *id*], [_           \$_], [_reduce_ $F ->$ *id* ],
+  [_\$E + F_    ], [_           \$_], [_reduce_ $T -> F    $],
+  [_\$E + T_    ], [_           \$_], [_reduce_ $E -> E + T$],
+  [_\$E_        ], [_           \$_], [_accept_             ],
+))
 
 //TODO: le problematiche le ha fatte? (4.5.4)
 
@@ -1265,23 +1352,37 @@ Se $I$ è un insieme di item di G, CLOSURE($I$) è un insieme di item costruito 
 
 Se $A -> alpha dot B beta$ appartiene a CLOSURE($I$), a un certo punto durante il parsing, ci si aspetta di riconoscere una stringa prodotta da $B beta$. Questa avrà un prefisso derivabile da $B$ applicando una delle regole per $B$. Si aggiungono quindi tutti gli item relativi alle regole per $B$, cioè se $B ->gamma$ è una regola in $G$, aggiungiamo $B -> dot gamma$ a CLOSURE($I$).
 
+#pagebreak()
+
 #example()[
-  #figure(image("images/2025-11-01-17-10-16.png"))
+  #block($
+           &E' &&-> &&E\
+           &E  &&-> &&E + T &&| T\
+           &T  &&-> &&T " * " F &&| F \
+           &F  &&-> &&(E)   &&| bold(id)
+         $)
+  
+  Se $I = {[E' -> dot E]}$, allora `CLOSURE`($I$) contiene anche gli item:
+  - $E -> dot E + T$ e $E -> dot T$ perché $dot$ precede _E_ in $E' -> dot E$
+  - $T -> dot T * F$ e $T -> dot F space$ perché $dot$ precede _T_ in $E' -> dot T$
+  - $F -> dot (E)$ e $F -> dot bold(id) quad $ perché $dot$ precede _E_ in $T' -> dot F$
 ]
 
 Per calcolare la chiusura di un insieme di item si può definire una
 funzione:
 
-SetOfItems *CLOSURE*($I$) {\
-#h(0.5cm)J = I\
-#h(0.5cm)*repeat*\
-#h(1.5cm)*for* ( ogni item A → α⋅Bβ in J )\
-#h(1.5cm)*for* ( ogni regola B → γ in G )\
-#h(2cm)*if* (B → ⋅γ non appartiene già a J )\
-#h(2.5cm)aggiungi B → ⋅γ a J;\
-#h(0.5cm)*until* nessun nuovo item è aggiunto a J;\
-#h(0.5cm)*return* J;\
-}\
+#block(algo(
+  title: [SetOfItems *CLOSURE*],
+  parameters: ([_I_],)
+)[
+  J = I\
+  repeat#i\
+    for ( ogni item $A -> alpha dot B beta$ in J )#i\
+      for ( ogni regola $B -> dot gamma$ in G )#i\
+        aggiungi $B -> dot gamma$ a J;#d#d#d\
+  until nessun nuovo item è aggiunto a J;\
+  return J;
+])
 
 === Funzione GOTO
 
@@ -1305,15 +1406,18 @@ Viene usata per definire le transizioni dell'automa LR(0). Gli stati dell'automa
 
 Per calcolare la collezione canonica degli insiemi di item LR(0) si può definire una funzione:
 
-void *items*($G'$) {\
-#h(0.5cm)C = CLOSURE(${[S' → dot S ]}$);\
-#h(0.5cm)*repeat*\
-#h(1cm)*for* ( ogni insieme di item $I$ in $C$ )\
-#h(1.5cm)*for* ( ogni simbolo $X$ in $G$ )\
-#h(2cm)*if* (GOTO($I, X$) non è vuoto e non appartiene a $C$ )\
-#h(2.5cm)aggiungi GOTO($I, X$) a $C$;\
-#h(0.5cm)*until* nessun nuovo insieme di item è aggiunto a $C$;\
-}\
+#block(algo(
+  title: [void *items*],
+  parameters: ($G'$,)
+)[
+  C = `CLOSURE`({[$S' -> dot S$]});\
+  repeat#i\
+    for ( ogni insieme di item $I$ in $C$ )#i\
+      for ( ogni simbolo $X$ in $G$ )#i\
+        if ( `GOTO`($I, X$) non è vuoto e non appartiene a $C$ )#i\
+          aggiungi `GOTO`($I, X$) a $C$;#d#d#d#d\
+  until nessun nuovo insieme di item è aggiunto a $C$;
+])
 
 //TODO: manca immagine 4.29? vedi esempio 4.28
 
@@ -1332,9 +1436,55 @@ L'algoritmo di parsing utilizza lo stack per tenere traccia degli stati
 e dei simboli grammaticali. 
 
 Se scegliamo di impilare il simbolo di ingresso, si impila anche lo stato verso cui avviene lo shift.
-Quando si applica una riduzione A - > X1 X2 … Xn (e questo può avvenire se lo stato in cui siamo contiene l'item A - > X1 X2 … Xn . , allora dalla pila degli dobbiamo togliere n stati e dallo stato j che rimane in cima alla pila guardare l'automa LR(0) per vedere qual è lo stato in cui j va con simbolo A. Ciò è coerente con il significato di item. 
+Quando si applica una riduzione $A -> X_1 X_2 dots X_n$ (e questo può avvenire se lo stato in cui siamo contiene l'item $A -> X_1 X_2 dots X_n$ . , allora dalla pila degli dobbiamo togliere n stati e dallo stato j che rimane in cima alla pila guardare l'automa LR(0) per vedere qual è lo stato in cui j va con simbolo A. Ciò è coerente con il significato di item. 
 
-#figure(image("images/2025-11-01-17-33-24.png"))
-#figure(image("images/2025-11-01-17-33-38.png"))
+#figure(table(
+  stroke: none,
+  columns: (.33fr, .33fr, .33fr, 1fr),
+  align: (left, left, right, left),
+  table.header(
+    [Stack], [Simboli], [Input], [Azione]
+  ),
+  table.hline(start: 0),
+  table.vline(end: 1, x: 1, stroke: (paint: gray)),
+  table.vline(end: 1, x: 2, stroke: (paint: gray)),
+  table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
+  table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
 
-Nell'esempio precedente relativo alla stringa di ingresso id*id, nella riga 4 della tabella è stata fatta la scelta Shift 7, in accordo con quanto si trova scritto nello stato 2 con prossimo simbolo d'ingresso \*. Notare che se ci troviamo nello stato 2, per la presenza dell'item E -> T. , c'è la possibilità di applicare la riduzione con la produzione E -> T. Nell'esempio è stata fatta la scelta corretta per far terminare l'analisi con l'accettazione della stringa. Se venisse fatta l'altra scelta (la riduzione), si arriverebbe ad una situazione di errore. A questo livello ancora non sappiamo scegliere fra le due possibilità
+  [0       ], [_\$_          ], [_*id* \* *id* \$_], [_shift_ 5            ],
+  [0 5     ], [_\$ *id*_     ], [_     \* *id* \$_], [_reduce_ $F ->$ *id* ],
+  [0 3     ], [_\$ F_        ], [_     \* *id* \$_], [_reduce_ $T -> F$    ],
+  [0 2     ], [_\$ T_        ], [_     \* *id* \$_], [_shift_ 7            ],
+  [0 2 7   ], [_\$ T \*_     ], [_        *id* \$_], [_shift_ 5            ],
+  [0 2 7 5 ], [_\$ T \* *id*_], [_             \$_], [_reduce_ $F ->$ *id* ],
+  [0 2 7 10], [_\$ T \* F_   ], [_             \$_], [_reduce_ $T -> T * F$],
+  [0 2     ], [_\$ T_        ], [_             \$_], [_reduce_ $E -> T$    ],
+  [0 1     ], [_\$ E_        ], [_             \$_], [_accept_             ],
+))
+
+#figure(table(
+  stroke: none,
+  columns: (.33fr, .33fr, .33fr, 1fr),
+  align: (left, left, right, left),
+  table.header(
+    [Stack], [Simboli], [Input], [Azione]
+  ),
+  table.hline(start: 0),
+  table.vline(end: 1, x: 1, stroke: (paint: gray)),
+  table.vline(end: 1, x: 2, stroke: (paint: gray)),
+  table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
+  table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
+
+  [0      ], [_\$_         ], [_*id* + *id*\$_], [_shift_ 5           ],
+  [0 5    ], [_\$ *id*_    ], [_     + *id*\$_], [_reduce_ $F ->$ *id*],
+  [0 3    ], [_\$ F_       ], [_     + *id*\$_], [_reduce_ $T -> F$   ],
+  [0 2    ], [_\$ T_       ], [_     + *id*\$_], [_reduce_ $E -> T$   ],
+  [0 1    ], [_\$ E_       ], [_       *id*\$_], [_shift_ 6           ],
+  [0 1 6  ], [_\$ E +_     ], [_           \$_], [_shift_ 5           ],
+  [0 1 6 5], [_\$ E + *id*_], [_           \$_], [_reduce_ $F ->$ *id*],
+  [0 1 6 3], [_\$ E + F_   ], [_           \$_], [_reduce_ $T -> F$   ],
+  [0 1 6 9], [_\$ E + T_   ], [_           \$_], [_reduce_ $E -> E+ T$],
+  [0 1    ], [_\$ E_       ], [_           \$_], [_accept_            ],
+))
+
+Nell'esempio precedente relativo alla stringa di ingresso $id*id$, nella riga 4 della tabella è stata fatta la scelta _Shift_ 7, in accordo con quanto si trova scritto nello stato 2 con prossimo simbolo d'ingresso \*. Notare che se ci troviamo nello stato 2, per la presenza dell'item $E -> T$. , c'è la possibilità di applicare la riduzione con la produzione $E -> T$. Nell'esempio è stata fatta la scelta corretta per far terminare l'analisi con l'accettazione della stringa. Se venisse fatta l'altra scelta (la riduzione), si arriverebbe ad una situazione di errore. A questo livello ancora non sappiamo scegliere fra le due possibilità
