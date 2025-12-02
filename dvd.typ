@@ -29,7 +29,6 @@
   author: "",
   abstract: none,
   cover-image: none,
-  bottom-logo: none,
   accent: colors.at(6),
   body,
 ) = {
@@ -74,12 +73,6 @@
         #if author != none [
           #block(fill: rgb(0, 0, 0, 150), inset: 1em, radius: 0.3em, text(16pt)[by #author])
         ]
-      ]
-    ]
-
-    place(bottom)[
-      #align(center)[
-        #bottom-logo
       ]
     ]
   } else {
