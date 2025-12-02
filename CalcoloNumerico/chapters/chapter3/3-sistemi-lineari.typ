@@ -1140,6 +1140,7 @@ if a(n,n) == 0, error('matrice singolare'), end
     ) in RR^(10 times 10), quad uu(b) = beta mat(1; 1+alpha; 1+alpha; dots.v; dots.v; 1+alpha) in RR^10\
     => A uu(x) = uu(b) => uu(x) = mat(beta; dots.v; dots.v; beta) in RR^10
   $
+  <esempio_mat>
   Scriviamo una funzione:
   #codly(
     languages: codly-languages,
@@ -1353,7 +1354,104 @@ ovvero:
 $
   Delta A uu(x) + A Delta uu(x) = Delta uu(b)
 $
+Da questo vogliamo ricavare una misura scalare (alias un numero) che quantifica ciascuna perturbazione, al fine di ottenere una relazione più compatta tra loro. Dalla (3) otteniamo che:
+$
+  Delta uu(x) = A^(-1) ( Delta b - Delta A dot uu(x))
+$
+Passando alle norme ($norm(dot)$ rappresenta una qualsiasi norma su vettore e la corrispondente norma indotta su matrice), otteniamo che:
+$
+  norm(Delta uu(x)) & = norm(A^(-1) (Delta uu(b) - Delta A dot uu(x))) \
+  & lt.eq norm(A^(-1)) dot norm(Delta uu(b) - Delta A dot uu(x)) space space "(vedi prop. norme)" \
+  & lt.eq norm(A^(-1)) dot (norm(Delta uu(b)) + norm(Delta A dot uu(x)))\
+  & lt.eq norm(A^(-1)) dot (norm(Delta uu(b)) + norm(Delta A) dot norm(uu(x))) \
+  & = norm(A) dot norm(A^(-1)) dot (frac(norm(Delta uu(b)), norm(A)) + frac(norm(Delta A), norm(A)) dot norm(uu(x)))
+$
+Dividendo per $norm(uu(x))$ si ha:
+$
+  frac(norm(Delta uu(x)), norm(uu(x))) lt.eq norm(A) dot norm(A^(-1)) (frac(norm(Delta uu(b)), norm(A)dot norm(uu(x))) + frac(norm(Delta A), norm(A)))
+$
+A questo punto, osserviamo che :
+$
+  uu(b) = A uu(x) => norm(uu(b)) = norm(A uu(x)) lt.eq norm(A) dot norm(uu(x)) => frac(1, norm(uu(b))) gt.eq frac(1, norm(A) dot norm(uu(x)))
+$
+Pertanto, possiamo maggiorare:
+$
+  frac(norm(Delta uu(b)), norm(A)dot norm(uu(x)))lt.eq frac(norm(Delta uu(b)), norm(uu(b)))
+$
+In conclusione, otteniamo quindi che:
+$
+  frac(norm(Delta uu(x)), norm(uu(x))) lt.eq norm(A) dot norm(A^(-1)) (frac(norm(Delta uu(b)), norm(uu(b))) + frac(norm(Delta A), norm(A))) quad quad (4)
+$
+In questa diseguaglianza:
+- $frac(norm(Delta uu(x)), norm(uu(x)))$: può essere assimilato ad una sorta di *errore relativo* sul risultato.
 
+- $frac(norm(Delta uu(b)), norm(uu(b)))$: può essere assimilato ad un "errore relativo" sul termine noto.
+
+- $frac(norm(Delta A), norm(A))$: è una sorta di "errore relativo" sulla matrice dei coefficienti.
+
+Da quanto esposto, la quantità:
+$
+  k(A) = norm(A) dot norm(A^(-1))
+$
+definisce il numero di condizione del problema.
+#definition()[
+  $k(A)$ si dice *numero di condizione* della matrice A. Se:
+  - $k(A) >> 1$: diremo che $A$ è *malcondizionata*.
+  - $k(A) =o(1)$ (costante di moderata entità): dirmeo che $A$ è *ben condizionata*.
+]
+#observation()[
+  + $k(A)=norm(A) dot norm(A^(-1)) gt.eq norm(A dot A^(-1)) = norm(I) = 1$, per ogni norma indotta su matrice.
+  + Se $A$ è ortogonale, allora:
+    $
+      A^T = A^(-1) quad and quad norm(A)_2 = 1
+    $
+    Pertanto:
+    $
+      k_2(A) = norm(A)_2 dot norm(A^(-1))_2 = norm(A)_2 dot norm(A^T)_2 = 1
+    $
+    Una matrice ortogonale è sempre *ben condizionata*.
+]
+Alla luce di questa analisi, rivediamo gli esempi precedenti.
+//TODO: aggiungere riferimenti
+Nell'esempio all'inizio di questo capitolo ... si vede facilmente che utilizzando $norm(dot)_1 " o " norm(dot)_infinity$ si ha che $k(A)approx 10^20$.
+Osserviamo che, se utilizziamo un'aritmetica finita con precisione di macchina $u$, allora:
+$
+  frac(norm(Delta uu(b)), norm(uu(b))), frac(norm(Delta A), norm(A)) gt.eq u
+$
+Se $k(A)approx u^(-1)$ allora il secondo membro di (4) può arrivare a 1, il che significa che abbiamo una totale perdita di informazione.
+#observation()[
+  Nel caso di sistemi molto malcondizionati, la soluzione del sistema linare va ricercata in altre forme.
+]
+
+
+
+
+Vediamo come utilizzare le norme su matrice per ottenere una implementazione più efficieente della fattorizzazione LU con pivoting. Ricordiamo che , se $a in RR^(n times n)$ allora possiamo scrivere uno pseudo codice, che la implementa, come segue:
+```matlab
+p=1:n;
+for i=1:n
+  [mi, ki]=max(abs(a(i:n,i)));
+  if mi==0, error('a singolare'), end
+  ki = ki + i-1;
+  if ki > i
+    p([i,ki]) = p([ki, i]);
+    a([i,ki], :) = a([ki,i],:);
+  end
+  a(i+1:n, i)=a(i+1:n, i) / a(i,i);
+  a(i+1:n,i+1:n) = a(i+1:n,i+1:n) - a(i+1:n,i) * a(i,i+1:n);
+end
+```
+Fermo restando il resto, vogliamo implementare un controllo più rubusto, per diagnosticare la "singolarità" della matrice, rispetto al controllo `if mi==0` che è decisamente "ingenuo". Un primo rimedio, potrebbe essere un controllo del tipo `if mi <= tol` con `tol` tolleranza da specificare. Per capire come scegliere `tol`, consideriamo il seguente esempio:
+$
+  mat(10, 1; 1, 10) mat(x_1; x_2) = mat(1, 1; 1, 1) quad quad (5)
+$
+in cui:
++ la matrice è diagonale dominante e quindi fattorizzabile LU.
++ la soluzione è $x_1=x_2=1$.
+Se `eps` è la precisione di macchina, sembrerebbe ragionevole il controllo `if mi <= eps,...`. Tuttavia, se moltiplichiamo membro a membro, la (5) per `eps/10^4`, otteniamo che la matrice viene diagnosticata come singolare ma, non di meno, la matrice dei coefficienti rimane sempre diagonale dominante e la soluzione $x_1=x_2=1$.P ertanto la soluzione corretta al problema può essere quella di scegliere
+#align(center, [`tol = 100*eps*norm(a,1)`])
+- 100 è un multiplo scalare della precisione di macchina (può dipendere anche dalla dimensione $n$ del problema).
+- usare una norma poco costosa come $1$ o $infinity$ *non* $norm(dot)_2$.
 
 == Sistemi lineari sovradeterminati
 === Esistenza della fattorizzazione QR
