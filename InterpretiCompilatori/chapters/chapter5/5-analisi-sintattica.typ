@@ -73,7 +73,7 @@ Una forma generale di parsing top-down, detta anche parsing a discesa ricorsiva,
 
 Il seguente algoritmo pemette di esaminare una stringa in ingresso applicando la discesa ricorsiva.
 
-#algo(
+#figure(algo(
   title: ([*void* A])
 )[
   void A() {#i\
@@ -86,7 +86,7 @@ Il seguente algoritmo pemette di esaminare una stringa in ingresso applicando la
         else \/\* si è verificato un errore \*\/;#d\
     }#d\
   }
-]
+], caption: "Procedura tipica per un non-terminal in un parser top-down")
 
 #example()[
   Consideriamo la grammatica seguente:
@@ -159,7 +159,8 @@ Come stringa in ingresso consideriamo: `for(;expr;expr) other`
     edge(<opt2>, <expr1>),
     edge(<opt3>, <expr2>),
     edge(<stmt>, <other>)
-  )
+  ),
+  caption: "Un albero di parsing"
 )
 
 #figure(diagram(
@@ -289,9 +290,9 @@ Come stringa in ingresso consideriamo: `for(;expr;expr) other`
     // BORDI //
     edge((0, -1), (12, -1), "="),
     edge((0, 4), (12, 4), "=")
-  )
+  ),
+  caption: "Parsing top-down relativo alla scansione dell'input da sinistra a destra (a -> b -> c)"
 )
-
 
 Lo scopo è quello di costruire il resto dell'albero 
 di parsing in modo che la stringa da questo generata coincida con la stringa d'ingresso. 
@@ -356,7 +357,7 @@ Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta pià ri
 *OUTPUT*: Una grammatica equivalente a $G$ ma priva di ricorsione sinistra. \
 *METODO*:
 //TODO: trovare modo di convertire algoritmo bene
-#algo(
+#figure(algo(
   title: "Eliminazione ricorsione sinistra",
 )[
   ordina aritrariament i non-terminali come $A_1, A_2, dots, a_n$.\
@@ -366,7 +367,7 @@ Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta pià ri
     }\
     elimina la ricorsione sinistra immediata dalle produzioni per $A_i$#d\
   }
-]
+], caption: "Algoritmo per l'eliminazione della ricorsione sinistra da una grammatica")
 
 #example(
   )[
@@ -740,15 +741,123 @@ Inizialmente lo stack contiene il simbolo \$ (in fondo) e il simbolo distinto de
 
 Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la stringa in esame è stata scandita completamente, la stringa viene accettata. Il comportamento del parser è descritto dalle sue configurazioni che sono costituite dal contenuto dello stack e dalla parte di input ancora da esaminare.
 
-#figure(image("images/2025-11-01-15-44-17.png"))
+
+#figure(diagram(
+  node-stroke: none,
+  spacing: 3mm,
+  
+  node((0.5, 0), [Input]),
+  node((1.865, 0), table(columns: 8, [⠀], [⠀], [⠀], [⠀], [$a$], [$+$], [$b$], [$s$])),
+  node((0, 2), "Stack"),
+  node((1, 2.45), table([$X$], [$Y$], [$Z$], [\$])),
+  node((2, 2), $\ "Programma "\ "di parsing" \ "predittivo"$, width: 90pt, shape: rect, stroke: 0.9pt, name: <center>),
+  node((4, 2), "Output", name: <right>),
+  node((2, 3.5), $\ "Tabella "\ "di parsing" \ "M"$, width: 90pt, shape: rect, stroke: 0.9pt, name: <bottom>),
+
+  edge(<center>, (2, 0), "-|>"),
+  edge(<center>, (0.7, 2), "-|>"),
+  edge(<center>, <right>, "-|>"),
+  edge(<center>, <bottom>, "-|>")
+))
 
 Inizialmente $w\$$ nel buffer $S\$$ nello stack ($S$ in cima), _ip_ punta al primo simbolo $a$ di $w$.
 
 Assegna a $X$ il simbolo in cima allo stack $PP(X="pop"(PP))$
-#figure(image("images/2025-11-01-15-45-45.png"))
-#figure(image("images/2025-11-01-15-45-52.png"))
-#figure(image("images/2025-11-01-15-45-58.png"))
-#figure(image("images/2025-11-01-15-46-02.png"))
+#block(algo()[
+  while($X cancel(=, angle: #45deg) \$ $) {#i\
+    if ($X = a$) avanza il puntatore $i p$;\
+    else if ($X in Sigma union {\$}$) errore();
+    else if ($M[X, a] = emptyset$) errore();
+    else if ($M[X, a] = X -> Y_1Y_2 dots Y_k$) {#i\
+      produci come uscita $X -> Y_1Y_2 dots Y_k$;\
+      inserisci $Y_k,Y_(k-1),dots,Y_1$ nello stack ($Y_1$ in cima)#d\
+    }\
+    assegna a $X$ il simbolo in cima allo stack ($X = p o p(PP)$)#d\
+  }\
+  if ($a = \$$) accetta altrimenti errore();
+])
+
+#figure(table(
+  columns: 4
+))
+#figure(
+  table(
+    stroke: none,
+    columns: (.5fr, .5fr, .4fr, 1fr),
+    align: (start, end, end, start),
+    table.hline(start:0),
+    table.header(
+      table.cell(align: center, [Riconosciuta]),
+      table.cell(align: horizon, [Stack]),
+      table.cell(align: center, [Input]),
+      table.cell(align: center, [Azione])
+    ),
+    table.hline(start: 0),
+    table.vline(start: 1, x: 3, stroke: (paint: gray, dash: "dotted")),
+    table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dotted")),
+    [$                          $], [$E\$           $], [$bold(id)+bold(id)*bold(id)\$$], [$                     $],
+    [$                          $], [$T E'\$        $], [$bold(id)+bold(id)*bold(id)\$$], [output  $E -> T E'    $],
+    [$                          $], [$F T'E'\$      $], [$bold(id)+bold(id)*bold(id)\$$], [output  $T -> F T'    $],
+    [$                          $], [$bold(id)T'E'\$$], [$bold(id)+bold(id)*bold(id)\$$], [output  $F -> bold(id)$],
+    [$bold(id)                  $], [$T'E'\$        $], [$+bold(id)*bold(id)\$        $], [consuma $bold(id)     $],
+    [$bold(id)                  $], [$E'\$          $], [$+bold(id)*bold(id)\$        $], [output  $T' -> epsilon$],
+    [$bold(id)                  $], [$+T E'\$       $], [$+bold(id)*bold(id)\$        $], [output  $E' -> +T E'  $],
+    [$bold(id)+                 $], [$T E'\$        $], [$bold(id)*bold(id)\$         $], [consuma $+            $],
+    [$bold(id)+                 $], [$F T'E'\$      $], [$bold(id)*bold(id)\$         $], [output  $T -> F T'    $],
+    [$bold(id)+                 $], [$bold(id)T'E'\$$], [$bold(id)*bold(id)\$         $], [output  $F -> bold(id)$],
+    [$bold(id)+bold(id)         $], [$T'E'\$        $], [$*bold(id)\$                 $], [consuma $bold(id)     $],
+    [$bold(id)+bold(id)         $], [$*F T'E'\$     $], [$*bold(id)\$                 $], [output  $T' -> *F T'  $],
+    [$bold(id)+bold(id)*        $], [$F T'E'\$      $], [$bold(id)\$                  $], [consuma $*            $],
+    [$bold(id)+bold(id)*        $], [$bold(id)T'E'\$$], [$bold(id)\$                  $], [output  $F -> bold(id)$],
+    [$bold(id)+bold(id)*bold(id)$], [$T'E'\$        $], [$\$                          $], [consuma $bold(id)     $],
+    [$bold(id)+bold(id)*bold(id)$], [$E'\$          $], [$\$                          $], [output  $T' -> epsilon$],
+    [$bold(id)+bold(id)*bold(id)$], [$\$            $], [$\$                          $], [output  $E' -> epsilon$],
+
+    table.hline(start:0),
+  ),
+)
+
+#figure(table(
+    columns: (.5fr, .5fr, .4fr, .75fr),
+    align: (start, end, end, start),
+    table.header(
+      table.cell(align: center, [Riconosciuta]),
+      table.cell(align: end, [Stack]),
+      table.cell(align: center, [Input]),
+      table.cell(align: center, [Azione])
+    ),
+    [       ], [$E\$           $], [$bold(id)*+bold(id)\$$], [                      ],
+    [       ], [$T E'\$        $], [$bold(id)*+bold(id)\$$], [output $E -> T E'    $],
+    [       ], [$F T'E'\$      $], [$bold(id)*+bold(id)\$$], [output $T -> F T'    $],
+    [       ], [$bold(id)T'E'\$$], [$bold(id)*+bold(id)\$$], [output $F ->$ *id*    ],
+    [*id*   ], [$T'E'\$        $], [$*+bold(id)\$        $], [consuma *id*          ],
+    [*id*   ], [$*F T'E'\$     $], [$*+bold(id)\$        $], [output $T' -> *F T'  $],
+    [*id* \*], [$F T'E'\$      $], [$+bold(id)\$         $], [consuma $*           $],
+    [*id* \*], [$F T'E'\$      $], [$+bold(id)\$         $], [                      ],
+))
+
+#figure(table(
+    columns: (.5fr, .5fr, .4fr, .75fr),
+    align: (start, end, end, start),
+    table.header(
+      table.cell(align: center, [Riconosciuta]),
+      table.cell(align: end, [Stack]),
+      table.cell(align: center, [Input]),
+      table.cell(align: center, [Azione])
+    ),
+    [      ], [$E\$             $], [(*id*\$], [                                           ],
+    [      ], [$T E'\$          $], [(*id*\$], [output  $E -> T E'$                        ],
+    [      ], [$F T'E'\$        $], [(*id*\$], [output  $T -> F T'$                        ],
+    [      ], [$(E)T'E'\$       $], [(*id*\$], [output  $F -> (E)$                         ],
+    [(     ], [$E)T'E'\$        $], [*id*\$ ], [consuma $($                                ],
+    [(     ], [$T E')T'E'\$     $], [*id*\$ ], [output  $E -> T E'$                        ],
+    [(     ], [$F T'E')T'E'\$   $], [*id*\$ ], [output  $T -> F T'$                        ],
+    [(     ], [*id* $T'E')T'E'\$$], [*id*\$ ], [output  $F ->$ *id*                        ],
+    [( *id*], [$T'E')T'E'\$     $], [\$     ], [consuma *id*                               ],
+    [( *id*], [$E')T'E'\$       $], [\$     ], [output  $T' -> epsilon$                    ],
+    [( *id*], [$)T'E'\$         $], [\$     ], [output  $E' -> epsilon$                    ],
+    [( *id*], [$)T'E'\$         $], [\$     ], [errore(): ')' $cancel(angle: #15deg, =) $\$],
+))
 
 /// 27 Ottobre 2025: Parsing bottom-up. Riduzioni, metodo di potatura nel parsing shift - reduce, il concetto di handle e sue proprietà (paragrafi 4.5, 4.5.1, 4.5.2, 4.5.3, 4.5.4  e dispensa "Analisi bottom-up").
 
@@ -756,8 +865,176 @@ Assegna a $X$ il simbolo in cima allo stack $PP(X="pop"(PP))$
 Il parsing bottom-up procede alla costruzione di un albero di parsing per una data stringa d'ingresso cominciando dalle foglie (bottom) e procedendo verso I'alto (up) fino alla radice. 
 
 #example(multiple: true)[
-  #figure(image("images/2025-11-01-15-55-43.png"))
-  #figure(image("images/2025-11-01-15-55-49.png"))
+  #block($
+           &E -> T &&| E + T\
+           &T -> F &&| T * F\
+           &F -> bold(id) &&| (E)
+         $)
+  #figure(diagram(
+    node-stroke: none,
+    edge-corner-radius: 5pt,
+    spacing: 1mm,
+    node((0, 0), [*id*]),
+    node((1, 0), [*\**]),
+    node((2, 0), [*id*]),
+    node((3, 0), [*$F$*]),
+    node((4, 0), [*\**]),
+    node((5, 0), [*id*]),
+    node((6, 0), [*$T$*]),
+    node((7, 0), [*\**]),
+    node((8, 0), [*id*]),
+    node((9, 0), [*$T$*]),
+    node((10, 0), [*\**]),
+    node((11, 0), [*$F$*]),
+    node((13, 0), [*$T$*]),
+    node((16, 0), [*$E$*]),
+
+    
+    node((3, 1), [*id*]),
+    node((6, 1), [*$F$*]),
+    node((9, 1), [*$F$*]),
+    node((11, 1), [*id*]),
+    node((12, 1), [*$T$*]),
+    node((13, 1), [*$*$*]),
+    node((14, 1), [*$F$*]),
+    node((16, 1), [*$T$*]),
+  
+    node((6, 2), [*id*]),
+    node((9, 2), [*id*]),
+    node((12, 2), [*$F$*]),
+    node((14, 2), [*id*]),
+    node((15, 2), [*$T$*]),
+    node((16, 2), [*$*$*]),
+    node((17, 2), [*$F$*]),
+    
+    node((12, 3), [*id*]),
+    node((15, 3), [*$F$*]),
+    node((17, 3), [*id*]),
+    
+    node((15, 4), [*id*]),
+
+    // EDGES //
+    edge((-1, 2), (-1, -1), (18, -1), (18, 5), (-1, 5), (-1, 2)),
+    edge((2.5, -1), (2.5, 5)),
+    edge((5.5, -1), (5.5, 5)),
+    edge((8.5, -1), (8.5, 5)),
+    edge((11.5, -1), (11.5, 5)),
+    edge((14.5, -1), (14.5, 5)),
+
+    edge((3, 0), (3, 1)),
+    edge((6, 0), (6, 1)),
+    edge((9, 0), (9, 1)),
+    edge((11, 0), (11, 1)),
+    edge((13, 0), (12, 1)),
+    edge((13, 0), (13, 1)),
+    edge((13, 0), (14, 1)),
+    edge((16, 0), (16, 1)),
+
+    
+    edge((6, 1), (6, 2)),
+    edge((9, 1), (9, 2)),
+    edge((12, 1), (12, 2)),
+    edge((14, 1), (14, 2)),
+    edge((16, 1), (15, 2)),
+    edge((16, 1), (16, 2)),
+    edge((16, 1), (17, 2)),
+    
+    edge((12, 2), (12, 3)),
+    edge((15, 2), (15, 3)),
+    edge((17, 2), (17, 3)),
+    
+    edge((15, 3), (15, 4)),
+    
+  ))
+    #figure(diagram(
+    node-stroke: none,
+    edge-corner-radius: 5pt,
+    spacing: 1mm,
+    node-shape: rect,
+    node((0, 0), [*id*]  , width: 18pt),
+    node((1, 0), [*+*]   , width: 18pt),
+    node((2, 0), [*id*]  , width: 18pt),
+    node((3, 0), [*$F$*] , width: 18pt),
+    node((4, 0), [*+*]   , width: 18pt),
+    node((5, 0), [*id*]  , width: 18pt),
+    node((6, 0), [*$T$*] , width: 18pt),
+    node((7, 0), [*+*]   , width: 18pt),
+    node((8, 0), [*id*]  , width: 18pt),
+    node((9, 0), [*$E$*] , width: 18pt),
+    node((10, 0), [*+*]  , width: 18pt),
+    node((11, 0), [*id*] , width: 18pt),
+    node((12, 0), [*$E$*], width: 18pt),
+    node((13, 0), [*$+$*], width: 18pt),
+    node((14, 0), [*$F$*], width: 18pt),
+    node((15, 0), [*$E$*], width: 18pt),
+    node((16, 0), [*$+$*], width: 18pt),
+    node((17, 0), [*$T$*], width: 18pt),
+    node((19, 0), [*$E$*], width: 18pt),
+    
+    node((3, 1), [*id*]  , width: 18pt),
+    node((6, 1), [*$F$*] , width: 18pt),
+    node((9, 1), [*$T$*] , width: 18pt),
+    node((12, 1), [*$T$*], width: 18pt),
+    node((14, 1), [*id*] , width: 18pt),
+    node((15, 1), [*$T$*], width: 18pt),
+    node((17, 1), [*$F$*], width: 18pt),
+    node((18, 1), [*$E$*], width: 18pt),
+    node((19, 1), [*$+$*], width: 18pt),
+    node((20, 1), [*$T$*], width: 18pt),
+  
+    node((6, 2), [*id*]  , width: 18pt),
+    node((9, 2), [*$F$*] , width: 18pt),
+    node((12, 2), [*$F$*], width: 18pt),
+    node((15, 2), [*$F$*], width: 18pt),
+    node((17, 2), [*id*] , width: 18pt),
+    node((18, 2), [*$T$*], width: 18pt),
+    node((20, 2), [*$F$*], width: 18pt),
+    
+    node((9, 3), [*id*]  , width: 18pt),
+    node((12, 3), [*id*] , width: 18pt),
+    node((15, 3), [*id*] , width: 18pt),
+    node((18, 3), [*$F$*], width: 18pt),
+    node((20, 3), [*id*] , width: 18pt),
+    
+    node((18, 4), [*id*] , width: 18pt),
+
+    // EDGES //
+    edge((-1, 2), (-1, -1), (21, -1), (21, 5), (-1, 5), (-1, 2)),
+    edge((2.5, -1), (2.5, 5)),
+    edge((5.5, -1), (5.5, 5)),
+    edge((8.5, -1), (8.5, 5)),
+    edge((11.5, -1), (11.5, 5)),
+    edge((14.5, -1), (14.5, 5)),
+    edge((17.5, -1), (17.5, 5)),
+
+    edge((3, 0), (3, 1)),
+    edge((6, 0), (6, 1)),
+    edge((9, 0), (9, 1)),
+    edge((12, 0), (12, 1)),
+    edge((14, 0), (14, 1)),
+    edge((15, 0), (15, 1)),
+    edge((17, 0), (17, 1)),
+    edge((19, 0), (18, 1)),
+    edge((19, 0), (19, 1)),
+    edge((19, 0), (20, 1)),
+
+    
+    edge((6, 1), (6, 2)),
+    edge((9, 1), (9, 2)),
+    edge((12, 1), (12, 2)),
+    edge((15, 1), (15, 2)),
+    edge((17, 1), (17, 2)),
+    edge((18, 1), (18, 2)),
+    edge((20, 1), (20, 2)),
+    
+    edge((9, 2), (9, 3)),
+    edge((12, 2), (12, 3)),
+    edge((15, 2), (15, 3)),
+    edge((18, 2), (18, 3)),
+    edge((20, 2), (20, 3)),
+    
+    edge((18, 3), (18, 4)),
+  ))
 ]
 
 === Riduzioni
@@ -789,8 +1066,62 @@ Il parsing bottom-up della sequenza da sinistra a destra dei simboli di una stri
 
 
 //TODO: scegliere tra le immagini
-#figure(image("images/2025-11-01-15-58-18.png"))
-#figure(image("images/2025-11-01-16-12-02.png"))
+#figure(
+  table(
+    stroke: none,
+    columns: (3cm, 3cm, 4cm),
+    align: start,
+    table.hline(start:0),
+    table.header(
+      table.cell(align: center, [Fdf dx]),
+      table.cell(align: horizon, [Handle]),
+      table.cell(align: center, [Regola riduzione]),
+    ),
+    table.hline(start: 0),
+    table.vline(start: 0, x: 2, stroke: (paint: gray, dash: "dotted")),
+    table.vline(start: 0, x: 1, stroke: (paint: gray, dash: "dotted")),
+    [*id* $*$ *id*], [*id*   ], [$F -->$ *id*], 
+    [$F *$ *id*   ], [$F    $], [$T --> F   $], 
+    [$T *$ *id*   ], [*id*   ], [$F -->$ *id*], 
+    [$T * F      $], [$T * F$], [$T -->T * F$], 
+    [$T          $], [$T    $], [$E -> T    $], 
+    [$E          $], [$     $], [$          $], 
+
+    table.hline(start: 0),
+    
+    [*id* $+$ *id*], [*id*   ], [$F -->$ *id* ],
+    [$F +$ *id*   ], [$F    $], [$T --> F    $],
+    [$T +$ *id*   ], [$T    $], [$E --> T    $],
+    [$E +$ *id*   ], [*id*   ], [$F -->$ *id* ],
+    [$E + F      $], [$F    $], [$T --> F    $],
+    [$E + T      $], [$E + T$], [$E --> E + T$],
+    [$E          $], [$     $], [$           $], 
+    table.hline(start: 0),
+  ),
+)
+
+#figure(table(
+  stroke: none,
+  columns: (5cm, 3cm, 5cm),
+  align: (end, horizon, start),
+  table.hline(start:0),
+  table.header(
+    table.cell(align: center, [Forma sentenziale destra]),
+    table.cell(align: horizon, [Handle]),
+    table.cell(align: center, [Produzione riducente]),
+  ),
+  table.hline(start: 0),
+  table.vline(start: 0, x: 2, stroke: (paint: gray, dash: "dotted")),
+  table.vline(start: 0, x: 1, stroke: (paint: gray, dash: "dotted")),
+
+  [$bold("id")_1 * bold("id")_2$], [$bold("id")_1$], [$F -> $ *id*],
+  [$F * bold("id")_2           $], [$F           $], [$T -> F    $],
+  [$T * bold("id")_2           $], [$bold("id")_2$], [$F -> $ *id*],
+  [$T * F                      $], [$T * F       $], [$E -> T * F$],
+
+  table.hline(start: 0)
+), caption: "Handle durante un possibile parsing della stringa "+$bold(id)_1 * bold(id)_2$)
+
 
 Nel primo esempio nella stringa T \* id, T non viene ridotta
 anche se è parte dx della regola E → T .
@@ -813,7 +1144,22 @@ essere un handle.
 
 Formalmente, se $S der(*) alpha A w => alpha beta w$ la produzione $A -> beta$ nella posizione che segue $alpha$ è un handle di $alpha beta w$.
 #figure(
-  image("images/2025-11-01-15-58-57.png", width: 30%),
+  diagram(
+    node-stroke: none,
+    edge-corner-radius: none,
+    spacing: 1mm,
+
+    node((3, 0), $S$, name: <s>), 
+    node((2.5, 4), $A$, name: <a>),
+    node((-2, 7.75), $alpha$),
+    node((2.5, 7.75), $beta$),
+    node((8.5, 7.75), $omega$),
+    
+    edge(<s>, <a>, dash: "dashed"),
+    edge(<s>, (15, 7), (3.75, 7)),
+    edge(<s>, (-8, 7), (1.25, 7)),
+    edge(<a>, (3.5, 7), (1.5, 7), <a>),
+  ),
   caption: [Un handle $A->beta$ nell'albero di parsing relativo alla stringa $alpha beta w$],
 )
 
