@@ -236,10 +236,10 @@
 
 #let theorem-style = builder-thmbox(color: colors.at(1), shadow: (offset: (x: 3pt, y: 3pt), color: luma(70%)))
 
-#let theorem = theorem-style("theorem", "Theorem")
+#let theorem = theorem-style("theorem", "Teorema").with(numbering: none)
 
 #let lemma = theorem-style("lemma", "Lemma")
-#let corollary = theorem-style("corollary", "Corollary")
+#let corollary = theorem-style("corollary", "Corollario").with(numbering: none)
 
 #let definition-style = builder-thmline(color: colors.at(8))
 #let observation-style = builder-thmline(color: colors.at(11))
