@@ -1,5 +1,6 @@
 #import "../../../dvd.typ": *
 #import "@preview/cetz:0.4.2" as cetz: canvas, draw
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge
 
 #[
   #set heading(numbering: none)
@@ -288,15 +289,28 @@ In questo caso vengono allocati un totale di 4 byte (o 32 bit ripartiti nel segu
 - 8 bit per l'esponente (s = 8);
 - 23 bit per la frazione $f$ (m = 24).
 $
-  #let colors = (green, gray, black, yellow)
-  #for value in (1, 8, 23) {
-    rect(
-      width: 1.5625% * value,
-      height: 20pt,
-      fill: colors.at(calc.rem-euclid(value, 4)).transparentize(75%),
-      stroke: black,
-    )
+  #let cells = ()
+
+  #for n in range(32) {
+    if (n == 0) {
+      cells.push(table.cell(fill: gray.transparentize(75%))[$$])
+    } else if (n in range(1, 8)) {
+      cells.push(table.cell(fill: green.transparentize(75%), stroke: (right: (dash: "densely-dotted")))[$$])
+    } else if (n == 8) {
+      cells.push(table.cell(fill: green.transparentize(75%))[$$])
+    } else if (n in range(9, 31)) {
+      cells.push(table.cell(fill: yellow.transparentize(75%), stroke: (right: (dash: "densely-dotted")))[$$])
+    } else {
+      cells.push(table.cell(fill: yellow.transparentize(75%))[$$])
+    }
   }
+
+  #figure(table(
+    columns: 32,
+    rows: 1,
+
+    ..cells
+  ))
 $
 Da questo segue che la precisione di macchina (singola precisione IEEE-754) vale:
 $
@@ -342,15 +356,28 @@ In questo caso vengono utilizzati 8 byte (64 bit) per rappresentare un numero in
 - 52 bit per la frazione $f$ (m = 53 --- verde).
 
 $
-  #let colors = (green, gray, black, yellow)
-  #for value in (1, 11, 52) {
-    rect(
-      width: 1.5625% * value,
-      height: 20pt,
-      fill: colors.at(calc.rem-euclid(value, 4)).transparentize(75%),
-      stroke: black,
-    )
+  #let cells = ()
+
+  #for n in range(64) {
+    if (n == 0) {
+      cells.push(table.cell(fill: gray.transparentize(75%))[$$])
+    } else if (n in range(1, 11)) {
+      cells.push(table.cell(fill: green.transparentize(75%), stroke: (right: (dash: "densely-dotted")))[$$])
+    } else if (n == 11) {
+      cells.push(table.cell(fill: green.transparentize(75%))[$$])
+    } else if (n in range(12, 63)) {
+      cells.push(table.cell(fill: yellow.transparentize(75%), stroke: (right: (dash: "densely-dotted")))[$$])
+    } else {
+      cells.push(table.cell(fill: yellow.transparentize(75%))[$$])
+    }
   }
+
+  #figure(table(
+    columns: 64,
+    rows: 1,
+
+    ..cells
+  ))
 $
 
 #observation()[
@@ -373,9 +400,9 @@ Se $e=2047$ e $f eq.not 0$, allora abbiamo: NaN (Not a Number).\
 
 === Aritmetica finita
 
-Se eseguiamo operazioni algebriche $(+, -, *, \/) in.rev plus.circle$, allora:
+Se eseguiamo operazioni algebriche $(+, -, *, \/) in.rev plus.o$, allora:
 $
-  forall x, y in RR: quad x plus.circle y quad = quad f l(f l (x) plus.circle f l(y))
+  forall x, y in RR: quad x plus.o y quad = quad f l(f l (x) plus.o f l(y))
 $
 Questo implica che, di norma, le proprietà algebriche delle operazioni (associatività, distributività, etc...) non valgono più.
 

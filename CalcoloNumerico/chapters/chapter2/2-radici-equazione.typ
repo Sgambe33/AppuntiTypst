@@ -22,7 +22,23 @@ Assumiamo che:
 + $f(x)$ sia continua su $[a,b]$;
 + $f(a)f(b)<0$.
 
-#figure(image("images/2025-10-14-14-20-39.png", width: 60%), caption: "Radice di una funzione")
+#figure(canvas({
+  import draw: content
+  plot.plot(size: (15, 8),
+    x-tick-step: .1,
+    y-tick-step: .1, y-min: -0.3, y-max: 0.4,
+    plot-style: (stroke: black), min: -.1,
+    legend: "inner-north-east",
+    {
+      let func = x => calc.pow(calc.exp(1), -x) - 0.588
+      plot.add(func, domain: (0, +1), label: $f(x)$, style: (stroke: blue))
+      plot.add-hline(0, style: (stroke: black))
+      plot.add-vline(.05, .25, .36, .45, .475, .56, .59, .6, .7, .705, .95, min: -0.01, max: 0.01)
+      plot.annotate({
+        content((.55, .025), $x^*$)
+      })
+    })
+}), caption: "Radice di una funzione")
 
 Per il teorema degli zeri di funzioni continue, sappiamo che $exists x^* in [a,b]: f(x^*)=0$. Non conoscendo la posizione precisa della radice, una prima approssimazione naturale è il punto medio:
 $
@@ -111,7 +127,37 @@ end
 
 In questo caso, evidentemente non si va più in loop per errore. Tuttavia rimane da riformulare in modo più efficace la condizione di uscita. Vediamo geometricamente come interpretare questa cosa:
 
-#figure(image("images/2025-10-14-14-59-18.png", width: 60%))
+#figure(canvas({
+  import draw: content, rect
+  plot.plot(axis-style: "school-book", size: (15, 8),
+    x-tick-step: none,
+    y-tick-step: none, y-min: -1.25, y-max: 1.25,
+    x-min: calc.pi - 1, x-max: 2*calc.pi + 1,
+    plot-style: (stroke: black),
+    legend: "inner-north-east",
+    {
+      let func = x => calc.cos(x)
+      plot.add(func, domain: (calc.pi, 2*calc.pi), label: $f(x)$, style: (stroke: colors.at(10)))
+      plot.add-hline( 0.0, style: (stroke: black))
+      plot.add-hline(-0.1, min: calc.pi - 1.05, max: 1.5*calc.pi - .15, style: (stroke: colors.at(8)))
+      plot.add-hline( 0.1, min: calc.pi - 1.05, max: 1.5*calc.pi + .15, style: (stroke: colors.at(8)))
+      plot.add-vline( 1.5*calc.pi - .15, min: -0.1, max: 0.03, style: (stroke: colors.at(8)))
+      plot.add-vline( 1.5*calc.pi + .15, min: -0.03, max: 0.1, style: (stroke: colors.at(8)))
+      plot.add-vline( 1.5*calc.pi, min: -0.03, max: 0.03, style: (stroke: red))
+
+      plot.annotate({
+        content((1.5*calc.pi, -.1), colmath(1, $x^*$))
+      })
+      plot.annotate({
+        rect((calc.pi - 1.04, -0.1), (calc.pi - 0.94, 0.1), fill: rgb("#eaff0075"), stroke: none)
+        content((calc.pi - 1.075, 0.075), "o")
+      })
+      plot.annotate({
+        rect((1.5*calc.pi - .15, -.05), (1.5*calc.pi + .15, +.05), fill: rgb("#eaff0075"), stroke: none)
+      })
+    })
+}))
+
 Dobbiamo fare attenzione alla distanza verticale ($abs(f(x))$) e orizzontale ($abs(x-x^*)$). Se la funzione è molto "piatta" vicino alla radice, $f(x)$ può essere un valore piccolissimo anche se $x$ è lontano da $x^*$. Al contrario, se la funzione è "ripida", $f(x)$ può essere grande anche se siamo molto vicini a $x^*$.
 
 Per collegare l'errore orizzontale a quello verticale, usiamo lo sviluppo di Taylor al primo ordine centrato nella radice $x^*$.
@@ -344,7 +390,7 @@ ovvero, l'ordine di convergenza del metodo di Newton diventa *lineare*, come con
 
 == Convergenza locale
 
-Facciamo prima un riepilogo dei metodi appena visti per la ricerca degli zeri di una funzione.
+Facciamo prima un riepilogo dei metodi appena visti per la degli zeri di una funzione.
 - Metodo di bisezione:
   - applicabile se $f in C[a,b] and f(a)f(b)<0$;
   - ordine di convergenza lineare;

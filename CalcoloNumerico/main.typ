@@ -11,7 +11,7 @@
 
   #pagebreak()
 
-  #include "chapters/chapter1/1-errori-aritmetica.typ"
+  // #include "chapters/chapter1/1-errori-aritmetica.typ"
   #include "chapters/chapter2/2-radici-equazione.typ"
-  #include "chapters/chapter3/3-sistemi-lineari.typ"
+  // #include "chapters/chapter3/3-sistemi-lineari.typ"
 ]
