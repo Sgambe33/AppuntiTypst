@@ -1453,7 +1453,157 @@ Se `eps` è la precisione di macchina, sembrerebbe ragionevole il controllo `if 
 - 100 è un multiplo scalare della precisione di macchina (può dipendere anche dalla dimensione $n$ del problema).
 - usare una norma poco costosa come $1$ o $infinity$ *non* $norm(dot)_2$.
 
+#observation()[
+  In Matlab la function `cond` calcola il numero di condizione di una matrice.
+  - `cond(A)` $-> k(A)$ in norma 2.
+  - `cond(A,1)` $-> k(A)$ in norma 1
+]
+
 == Sistemi lineari sovradeterminati
+Il problema è risolvere
+$
+  A uu(x) = uu(b) quad quad (1)
+$
+con $A in RR^(m times n)$,  $m>n="rank"(A) => uu(b) in RR^m, uu(x) in RR^n$.
+#observation()[
+  Nella (1) $A$ e $uu(b)$ sono i dati del problema, mentre $uu(x)$ è la soluzione da determinare. TUttavia nelle applicazioni del deep-learning, i ruoli si capovolgono. Ad esempio, se ho una rete del tipo
+  //TODO: rifare diagramma rete
+  #figure(image("images/2025-12-03-13-15-10.png"))
+  tipicamente, se $x_1 in RR^(n_1)$ è il vettore degli input e $x_n in RR^(n_N)$ è il vettore con gli output, allora la rete si può formalizzare come:
+  $
+    x_(i+1) = sigma(A_i x_i + b_i), space i=1,...,N
+  $
+  dove $A_i in RR^(n_(i+1) times n_i), space b_i in RR^(n_(i+1))$ e $sigma$ la funzione di attivazione. "Allenare" una rete consiste nel determinare le matrici $A_i$ ed i vettori $b_i$.
+]
+Dobbiamo, innanzitutto, capire cosa si intenda per soluzione del problema. Infatti $A uu(x)$ denota, al variare di $uu(x)$, vettori che si possono ottenere come combinazione lineare delle colonne di $A$, ovvero quelli appartenenti al `range(A)`. La dimensione di questo spazio vettoriale è, in questo caso, $n$. Invece $uu(b) in RR^m$ e nel nostro caso $m>n$.
+//TODO: ^^ qui va spiegato meglio ^^
+#example()[
+  Se
+  $
+    A=mat(1, 0; 1, 1; 1, 0; delim: "[") ==> "range"(A) = mat(x_1; x_1+x_2; x_1; delim: "["), space x_1, x_2 in RR
+  $
+  ma, per esempio, $uu(b) = mat(1; 2; 3; delim: "[") in.not "range"(A)$.
+]
+La conclusione di questo argomento è che una soluzione, nel senso classico, generalmente non esiste. L'idea è la seguente: dato $uu(x) in RR^n$ posso definire il *vettore residuo*
+$
+  uu(r) = A uu(x) - uu(b)
+$
+Chiaramente, se fosse $uu(r) = uu(0) in RR^m$, allora questo significa che
+$
+  uu(0) = A uu(x) - uu(b) ==> A uu(x) = uu(b)
+$
+Quindi, se $uu(r) = uu(0) <=> uu(x)$ è soluzione classica del problema. Viceversa, se non possiamo ottenere $uu(r) = uu(0)$, allora ricerchiamo $uu(x)$:
+$
+  norm(uu(r))_2^2 = norm(A uu(x)-uu(b))_2^2 = min! quad quad (2)
+$
+#observation()[
+  $
+    uu(r) = mat(r_1; r_2; dots.v; r_m; delim: "[") => norm(uu(r))_2^2 = sum_(i=1)^m r_i^2
+  $
+]
+Per questo motivo la soluzione $uu(x)$ che soddisfa la (2), prende il nome di *soluzione ai minimi quadrati* del sistema lineare $A uu(x) = uu(b)$.
+
+Prima di procedere con la determinazione di $uu(x)$, osserviamo che se $Q in RR^(m times m)$ è una matrice ortogonale ($Q^T Q = Q Q^T = I in RR^(m times m)$), allora:
+$
+  norm(Q uu(r))_2^2 = (Q uu(r))^T (Q uu(r)) = uu(r)^T underbracket(Q^T Q, I) uu(r) = uu(r)^T uu(r) = norm(uu(r))_2^2
+$
+Di conseguenza, la norma euclidea di un vettore è invariata per sua moltiplicazione per una matrice ortogonale.
+
+Vale, inoltre, il seguente risultato.
+#theorem("Fattorizzazione QR di A")[
+  Se $A in RR^(m times n), m>n="rank"(A)$, allora esistono:
+  + $Q in RR^(m times m)$, ortogonale;
+  + $accent(R, \^) in RR^(n times n)$, triangolare superiore e non-singolare;
+  tali che:
+  $
+    A = Q R, space "con" R=mat(accent(R, \^); O; delim: "[") in RR^(m times n) space (=> O in RR^(m-n times n))
+  $
+]
+Utilizzando questo risultato, possiamo dimostrare il seguente corollario.
+
+//Possibile domanda esonero
+#corollary()[
+  Se $A in RR^(m times n), m>n="rank"(A)$, allora la soluzione ai minimi quadrati del sistema lineare $A uu(x) = uu(b)$, esiste ed è unica.
+]
+#proof()[
+  Vogliamo determinare $uu(x)$ in modo da minimizzare:
+  $
+    norm(uu(r))_2^2 & = norm(A uu(x)-uu(b))_2^2 \
+    & = norm(Q R uu(x) - uu(b))_2^2 \
+    & = norm(Q(R uu(x)-Q^T uu(b)))_2^2 \
+    & = norm(R uu(x) - Q^T uu(b))_2^2 quad ("definiamo" uu(g) = Q^T uu(b)) quad (a) \
+    & = norm(R uu(x) - uu(g))_2^2 \
+    & = norm(mat(accent(R, \^); O; delim: "[") uu(x) - mat(uu(g)_1; uu(g)_2; delim: "["))_2^2 \
+    & = norm(mat(accent(R, \^) uu(x) -uu(g)_1; - uu(g)_2; delim: "["))\
+    & = mat(accent(R, \^) uu(x) -uu(g)_1; - uu(g)_2; delim: "[")^T mat(accent(R, \^) uu(x) -uu(g)_1; - uu(g)_2; delim: "[")\
+    & = (accent(R, \^) uu(x) -uu(g)_1)^T (accent(R, \^) uu(x) - uu(g)_1) + uu(g)_2^T uu(g)_2 \
+    &= norm(accent(R, \^) uu(x) - uu(g)_1)_2^2 + norm(uu(g)_2)_2^2\
+    & =norm(uu(g)_2)_2^2 = min! quad quad (b)
+  $
+  se $accent(R, \^) uu(x) - uu(g)_1 = uu(0)$, ovvero, se $uu(x)$ è soluzione del sistema lineare $accent(R, \^) uu(x) = uu(g)_1 quad (c)$.
+
+  Poiché $accent(R, \^)$ è triangolare superiore e non-singolare, allora la soluzione di questo sistema lineare esiste ed è unica. Inoltre, si calcola facilmente essendo superiore triangolare.
+]
+#observation()[
+  + Per calcolare $uu(x)$, è sufficiente conoscere il fattore $accent(R, \^)$ e poter fare il prodotto $Q^T uu(b)$, per calcolare $uu(g)$ ((a)).
+  + Una volta calcolato $uu(x)$ dalla (c), per calcolare la norma di
+    $
+      uu(r) = A uu(x) - uu(b)
+    $
+    non è necessario calcolare il residuo stesso. Infatti, abbiamo visto che
+    $
+      norm(uu(r))_2 = norm(uu(g)_2)_2
+    $
+    e il vettore $uu(g)$ (e quindi anche $uu(g)_2$) lo abbiamo già calcolato per ottenere $uu(x)$.
+]
 === Esistenza della fattorizzazione QR
+Prima di vedere la dimostrazione del teorema precedente, consideriamo il seguente problema: dato un vettore $uu(x) in RR^n, uu(x)eq.not uu(0),$ vogliamo determinare una matrice ortogonale $H in RR^(n times n)$, tale che:
+$
+  (4) quad H uu(x) = alpha uu(e)_1, quad "dove" alpha in RR space "e" space uu(e)_1 in RR^n "è il primo versore"
+$
+Osserviamo che, per l'ortogonalità di $H$ si ha:
+$
+  norm(H uu(x))_2^2 = norm(uu(x))_2^2 = norm(alpha uu(e)_1)_2^2 = alpha^2 uu(e)_1^T uu(e)_1 = alpha^2
+$
+segue che:
+$
+  alpha = plus.minus norm(uu(x))_2
+$
+Consideriamo adesso una matrice $H$ nella seguente forma:
+$
+  H = I - frac(2, uu(v)^T uu(v)) uu(v) uu(v)^T quad "con" uu(v) in RR^n "da determinare"
+$
+Osserviamo che:
++ La matrice $H$ è simmetrica per costruzione.
++ La matrice $H$ è ortogonale:
+  $
+    H^T H = H dot H = (I-frac(2, uu(v)^T uu(v)) uu(v) uu(v)^T)(I-frac(2, uu(v)^T uu(v)) uu(v) uu(v)^T) = frac(4, uu(v)^T uu(v)) uu(v) uu(v)^T + frac(4, (uu(v)^T uu(v))^cancel(2)) uu(v) cancel(uu(v)^T uu(v)) uu(v)^T = I
+  $
+  Quindi, qualunque sia la scelta di $uu(v)$, la matrice $H$ è simmetrica e ortogonale. Il problema è, qundi. scegliere $uu(v)$ in modo che la (4) sia soddisfatta.
+
+Verifichiamo che questo è vero se secliamo
+$
+  uu(v) = uu(x) - alpha uu(e)_1 quad quad (5)
+$
+Infatti
+$
+  H uu(x) &= (I-frac(2, uu(v)^T uu(v)) uu(v) uu(v)^T) uu(x) = uu(x) frac(2, uu(v)^T uu(v)) uu(v)^T uu(x) uu(v)\
+  &= uu(x) frac(2, uu(v)^T uu(v)) uu(v)^T uu(x) (uu(x)-alpha uu(e)_1)\
+  &= (1- frac(2, uu(v)^T uu(v)) uu(v)^T uu(x))uu(x) + alpha(frac(2, uu(v)^T uu(v)) uu(v)^T uu(x))uu(e)_1 = alpha uu(e)_1
+$
+se $frac(2, uu(v)^T uu(v)) uu(v)^T uu(x)=1$ ovvero, se $2 uu(v)^T uu(x) = uu(v)^T uu(v)$. Infatti:
+$
+  2uu(v)^T uu(x) & = 2(uu(x)-alpha uu(e)_1)^T uu(x) \
+                 & = 2 uu(x)^T uu(x) - 2 alpha (uu(e)_1^T uu(x)) \
+                 & = 2 norm(uu(x))_2^2 - 2 alpha underbrace(x_1, 1^a "comp di" uu(x)) = 2 alpha^2 -2 alpha x_1 \
+   uu(v)^T uu(v) & =(uu(x)-alpha uu(e)_1)^T (uu(x)-alpha uu(e)_1) \
+                 & = underbrace(uu(x)^T uu(x), =alpha^2) + alpha^2 - 2 alpha underbrace(uu(e)_1^T uu(x), =alpha) \
+                 & = 2 alpha^2 - 2 alpha x_1
+$
+Riguardo al segno di $alpha$ (attenzione), osserviamo che:
+$
+  uu(v) = uu(x) - alpha uu(e)_1 = mat(x_1-alpha; x_2; dots.v; x_n; delim: "[")
+$
+Quindi $alpha$ viene sottratto a $x_1$. Per ottenere un'operazione ben condizionata, $x_1$ e $-alpha$ devono essere concordi e di conseguenza, il segno di $alpha$ è opposto a quello di $x_1$.
 === Il metodo di Householder
 == Cenni sulla risoluzione di sistemi nonlineari

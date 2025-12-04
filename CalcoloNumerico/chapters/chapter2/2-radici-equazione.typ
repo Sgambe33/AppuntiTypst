@@ -263,12 +263,11 @@ si ripercuote sull'errore $tilde(x) - x^*$ (asse X). Sviluppando $f(tilde(x))$ c
 $
   f(tilde(x)) = overbrace(f(x^*), =0) + f'(x^*)(tilde(x)-x^*)+o((tilde(x)-x^*)^2) approx f'(x^*)(tilde(x)-x^*)
 $
-Isolando l'errore sull'asse X otteniamo:
+Isolando l'errore sull'asse $X$ otteniamo:
 $
-  abs(tilde(x) - x^*) lt.approx abs(f(tilde(x)))/abs(f'(x^*))
+  abs(tilde(x) - x^*) approx abs(f(tilde(x)))/abs(f'(x^*))
 $
 In questa relazione:
-//TODO: è f(x) o x e basta?
 + $abs(f(tilde(x)))$ è la perturbazione del valore $emptyset$ che dovremmo avere;
 + $abs(tilde(x)-x^*)$ è l'errore determinato da tale perturbazione;
 + $k=1/abs(f'(x^*))$ è il *numero di condizionamento* del problema.
@@ -296,7 +295,7 @@ In questa relazione:
 
 L'equazione della retta tangente al grafico di $f(x)$ in $(x_0, f(x_0))$ è;
 $
-  cases(y-f(x_0) = f'(x_0)(x-x_0)", tangente", y=0", asse x")
+  cases(y-f(x_0) = f'(x_0)(x-x_0)", tangente", y=0", intersezione asse x")
 $
 da cui si ricava che:
 $
@@ -312,20 +311,22 @@ definisce il *metodo di Newton*. Andiamo a fare alcune considerazioni:
 
 A fronte di questo costo per iterazione più elevato, vale il seguente risultato.
 #theorem()[
-  Sia $f(x) in C^2$ in un interno della radice $x^*$. Supponiamo che il metodo di Newton converga a $x^*$ e che $x^*$ sia semplice. Allora l'ordine di convergenza è (almeno) 2.
+  Sia $f(x) in C^2$ in un intorno della radice $x^*$. Supponiamo che il metodo di Newton converga a $x^*$ e che $x^*$ sia semplice. Allora l'ordine di convergenza è (almeno) 2.
 ]
 #proof()[
-  Indichiamo con $x^*$ la radice verso cui l'iterazione sta convergendo. Si ottiene, per un opportuno $epsilon_i$ compreso tra $x^* " e " x_i$:
+  Indichiamo con $x^*$ la radice verso cui l'iterazione sta convergendo. Scriviamo lo sviluppo di Taylor della funzione $f$ centrato nel punto corrente $x_i$ e valutato nel punto esatto $x^*$:
   $
     0 & = f(x^*)=f(x_i)+f'(x_i)(x^*-x_i)+1/2 f''(epsilon_i)(x^*-x_i)^2 \
       & = f'(x_i)(f(x_i)/(f'(x_i)) - x_i + x^*) + 1/2 f''(epsilon_i)(x^*-x_i)^2 \
       & =^((3)) f'(x_i)underbrace((x^* - x_(i+1)), e_(i+1)) + 1/2 f''(epsilon_i)underbrace((x^*-x_i), e_i)^2
   $
-  Tenendo conto della (3) e per la definizione di errore al passo i-esimo si ottiene:
+  - Sappiamo che $f(x^*) = 0$ (perché $x^*$ è la radice).
+  - $epsilon_i$ è un punto sconosciuto che si trova tra $x_i$ e $x^*$ (Resto di Lagrange).
+  Tenendo conto della (3) e per la definizione di errore al passo i-esimo ($e_i =x^*-x_i$) si ottiene:
   $
     e_(i+1)/(e_i)^2 = -1/2 (f''(epsilon_i))/(f'(x_i))
   $
-  che è ben definita in un intorno di $x^*$ essendo, per ipotesi, $f'(x^*) eq.not 0$. Se il metodo è convergente segue quindi che:
+  che è ben definita in un intorno di $x^*$ essendo, per ipotesi, $f'(x^*) eq.not 0$. Se il metodo è convergente ($x_i -> x^*$), anche il punto intermedio $epsilon_i$ (compreso tra $x_i$ e $x^*$) tende a $x^*$:
   $
     lim_(i -> infinity) abs(e_(i+1))/abs(e_i)^2 = lim_(i -> infinity) 1/2 abs(f''(epsilon_i))/abs(f'(x_i))
     = 1/2 abs(f''(x^*))/abs(f'(x^*))
@@ -338,7 +339,7 @@ $
   lim_(i-> infinity) e_(i+1)/e_i
   = (m-1)/m
 $
-ovvero, l'ordine di convergenza del metodo di Newton diventa *lineare*, come conseguenza del malcondizionamento del problema.
+ovvero, l'ordine di convergenza del metodo di Newton diventa *lineare*, come conseguenza del malcondizionamento del problema e quindi il teorema non vale più.
 
 
 == Convergenza locale
@@ -373,7 +374,7 @@ non è in generale possibile garantire la convergenza da un generico punto inizi
   #figure(image("images/2025-10-21-16-37-32.png"))
 ]
 
-La conclusione di questo esempio è che la convergenza ad una radice è garantita, per il metodo di Newton, solo in un opportuno intorno della radice. Si parla in questo caso, di *convergenza di tipo locale* mente, per il metodo di bisezione, la *convergenza è globale*, ovvero, avviene sempre, se il metodo è applicabile.
+La conclusione di questo esempio è che la convergenza ad una radice è garantita, per il metodo di Newton, solo in un opportuno intorno della radice. Si parla in questo caso, di *convergenza di tipo locale* mentre, per il metodo di bisezione, la *convergenza è globale*, ovvero, avviene sempre, se il metodo è applicabile.
 
 Cerchiamo di formalizzare questo concetto, per un generico metodo iterativo che denoteremo con
 $
@@ -401,7 +402,23 @@ che garantisce che, se raggiungiamo la radice, ci fermiamo. Questo significa che
   - $lim_(i->infinity) x_i = x^*$
 ]
 #proof()[
-  TODO
+  $
+    x_i in I(x^*) <=> abs(x^* - x_i) lt.eq delta
+  $
+  Ragionando per induzione, se $x_0 in I(x^*)$, allora $abs(x^* - x_i)$. Di conseguenza:
+  $
+    abs(x^* - x_1) = abs(Phi(x^*)-Phi(x_0)) lt.eq L abs(x^* - x_0) lt delta => x_1 in I(x_*)
+  $
+  Generalizzando:
+  $
+    abs(x^* - x_i) & = abs(Phi(x^*)-Phi(x_(i-1))) \
+                   & lt.eq L abs(x^* - x_(i-1)) \
+                   & =L abs(Phi(x^*)-Phi(x_(i-2))) \
+                   & lt.eq L^2 abs(x^* - x_(i-2)) \
+                   & ... \
+                   & lt.eq L^i abs(x^* - x_0) -> 0, space i-> infinity
+  $
+  poiché $L<1$.
 ]
 
 #corollary()[
@@ -437,7 +454,7 @@ Se abbiamo il metodo iterativo
 $
   x_(i+1) = Phi(x_i), space i=0,1,...
 $
-per determinare uno zero di $f(x)$, cerchiamo un criterio di arresto idoneo per l'iterazione. Esaminiamo, in particolare, il metodo id Newton:
+per determinare uno zero di $f(x)$, cerchiamo un criterio di arresto idoneo per l'iterazione. Esaminiamo, in particolare, il metodo di Newton:
 $$
 Come abbiamo precedentemente visto per il metodo di bisezione, il valore di $f(x)$ nell'approssimazione, è da considerarsi "piccolo" se
 $
@@ -451,7 +468,7 @@ e quindi, per il metodo di Newton, questo equivale a richiedere che
 $
   abs(x_(i+1) - x_i) lt.eq "tol"
 $
-che è un controllo sull'errore assoluto. Tuttavia, se $x_i -> x^*$, con $abs(x^*) >> 1$, sarebbe più efficace effetuare un controllo sull'errore relativo, ovvero
+che è un controllo sull'errore assoluto. Tuttavia, se $x_i -> x^*$, con $abs(x^*) >> 1$, sarebbe più efficace effettuare un controllo sull'errore relativo, ovvero:
 $
   abs(x^*-x_i)/abs(x^*) lt.eq "tol"
 $
@@ -478,13 +495,13 @@ Vediamo come ovviare al degrado dell'ordine di convergenza del metodo di Newton 
   #set heading(numbering: none, outlined: false)
   === La molteplicità della radice è nota
 ]
-Se $f(x)$ ha una radice $x^*$ di molteplicità $m>1$, ciò significa che $f(x^*)=f'(x^*)=...=f^(m-1)(x^*)=0 and f^m (x^*)eq.not 0$. In questo caso si può vedere che :
+Se $f(x)$ ha una radice $x^*$ di molteplicità $m>1$, ciò significa che $f(x^*)=f'(x^*)=...=f^(m-1)(x^*)=0$ e $f^m (x^*)eq.not 0$. In questo caso si può vedere che :
 $
   f(x) = (x-x^*)^m g(x)
 $
 con $g(x)$ una funzione tale che $g(x^*)eq.not 0$. Nel caso più semplice, $g(x)=c="costante"$, vediamo cosa succede se applichiamo il metodo di Newton a $f(x)=c dot (x-x^*)^m$:
 $
-  x_(i+1) = x_i - overparen(c dot (x_i-x^*)^m, =f(x_i))/underparen(m dot c dot (x_i - x^*)^(m-1), =f'(x_i)) = x_i - m dot (x_i - x^*)/m = x^*
+  x_(i+1) = x_i - overparen(c dot (x_i-x^*)^m, =f(x_i))/underparen(m dot c dot (x_i - x^*)^(m-1), =f'(x_i)) = x_i - (x_i - x^*)/m
 $
 Invece, se utilizzassimo l'iterazione:
 $
