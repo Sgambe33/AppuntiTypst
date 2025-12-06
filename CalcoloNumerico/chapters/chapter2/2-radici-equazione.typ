@@ -22,23 +22,31 @@ Assumiamo che:
 + $f(x)$ sia continua su $[a,b]$;
 + $f(a)f(b)<0$.
 
-#figure(canvas({
-  import draw: content
-  plot.plot(size: (15, 8),
-    x-tick-step: .1,
-    y-tick-step: .1, y-min: -0.3, y-max: 0.4,
-    plot-style: (stroke: black), min: -.1,
-    legend: "inner-north-east",
-    {
-      let func = x => calc.pow(calc.exp(1), -x) - 0.588
-      plot.add(func, domain: (0, +1), label: $f(x)$, style: (stroke: blue))
-      plot.add-hline(0, style: (stroke: black))
-      plot.add-vline(.05, .25, .36, .45, .475, .56, .59, .6, .7, .705, .95, min: -0.01, max: 0.01)
-      plot.annotate({
-        content((.55, .025), $x^*$)
-      })
-    })
-}), caption: "Radice di una funzione")
+#figure(
+  canvas({
+    import draw: content
+    plot.plot(
+      size: (15, 8),
+      x-tick-step: .1,
+      y-tick-step: .1,
+      y-min: -0.3,
+      y-max: 0.4,
+      plot-style: (stroke: black),
+      min: -.1,
+      legend: "inner-north-east",
+      {
+        let func = x => calc.pow(calc.exp(1), -x) - 0.588
+        plot.add(func, domain: (0, +1), label: $f(x)$, style: (stroke: blue))
+        plot.add-hline(0, style: (stroke: black))
+        plot.add-vline(.05, .25, .36, .45, .475, .56, .59, .6, .7, .705, .95, min: -0.01, max: 0.01)
+        plot.annotate({
+          content((.55, .025), $x^*$)
+        })
+      },
+    )
+  }),
+  caption: "Radice di una funzione",
+)
 
 Per il teorema degli zeri di funzioni continue, sappiamo che $exists x^* in [a,b]: f(x^*)=0$. Non conoscendo la posizione precisa della radice, una prima approssimazione naturale è il punto medio:
 $
@@ -129,33 +137,39 @@ In questo caso, evidentemente non si va più in loop per errore. Tuttavia rimane
 
 #figure(canvas({
   import draw: content, rect
-  plot.plot(axis-style: "school-book", size: (15, 8),
+  plot.plot(
+    axis-style: "school-book",
+    size: (15, 8),
     x-tick-step: none,
-    y-tick-step: none, y-min: -1.25, y-max: 1.25,
-    x-min: calc.pi - 1, x-max: 2*calc.pi + 1,
+    y-tick-step: none,
+    y-min: -1.25,
+    y-max: 1.25,
+    x-min: calc.pi - 1,
+    x-max: 2 * calc.pi + 1,
     plot-style: (stroke: black),
     legend: "inner-north-east",
     {
       let func = x => calc.cos(x)
-      plot.add(func, domain: (calc.pi, 2*calc.pi), label: $f(x)$, style: (stroke: colors.at(10)))
-      plot.add-hline( 0.0, style: (stroke: black))
-      plot.add-hline(-0.1, min: calc.pi - 1.05, max: 1.5*calc.pi - .15, style: (stroke: colors.at(8)))
-      plot.add-hline( 0.1, min: calc.pi - 1.05, max: 1.5*calc.pi + .15, style: (stroke: colors.at(8)))
-      plot.add-vline( 1.5*calc.pi - .15, min: -0.1, max: 0.03, style: (stroke: colors.at(8)))
-      plot.add-vline( 1.5*calc.pi + .15, min: -0.03, max: 0.1, style: (stroke: colors.at(8)))
-      plot.add-vline( 1.5*calc.pi, min: -0.03, max: 0.03, style: (stroke: red))
+      plot.add(func, domain: (calc.pi, 2 * calc.pi), label: $f(x)$, style: (stroke: colors.at(10)))
+      plot.add-hline(0.0, style: (stroke: black))
+      plot.add-hline(-0.1, min: calc.pi - 1.05, max: 1.5 * calc.pi - .15, style: (stroke: colors.at(8)))
+      plot.add-hline(0.1, min: calc.pi - 1.05, max: 1.5 * calc.pi + .15, style: (stroke: colors.at(8)))
+      plot.add-vline(1.5 * calc.pi - .15, min: -0.1, max: 0.03, style: (stroke: colors.at(8)))
+      plot.add-vline(1.5 * calc.pi + .15, min: -0.03, max: 0.1, style: (stroke: colors.at(8)))
+      plot.add-vline(1.5 * calc.pi, min: -0.03, max: 0.03, style: (stroke: red))
 
       plot.annotate({
-        content((1.5*calc.pi, -.1), colmath(1, $x^*$))
+        content((1.5 * calc.pi, -.1), colmath(1, $x^*$))
       })
       plot.annotate({
         rect((calc.pi - 1.04, -0.1), (calc.pi - 0.94, 0.1), fill: rgb("#eaff0075"), stroke: none)
         content((calc.pi - 1.075, 0.075), "o")
       })
       plot.annotate({
-        rect((1.5*calc.pi - .15, -.05), (1.5*calc.pi + .15, +.05), fill: rgb("#eaff0075"), stroke: none)
+        rect((1.5 * calc.pi - .15, -.05), (1.5 * calc.pi + .15, +.05), fill: rgb("#eaff0075"), stroke: none)
       })
-    })
+    },
+  )
 }))
 
 Dobbiamo fare attenzione alla distanza verticale ($abs(f(x))$) e orizzontale ($abs(x-x^*)$). Se la funzione è molto "piatta" vicino alla radice, $f(x)$ può essere un valore piccolissimo anche se $x$ è lontano da $x^*$. Al contrario, se la funzione è "ripida", $f(x)$ può essere grande anche se siamo molto vicini a $x^*$.
@@ -500,9 +514,7 @@ Se abbiamo il metodo iterativo
 $
   x_(i+1) = Phi(x_i), space i=0,1,...
 $
-per determinare uno zero di $f(x)$, cerchiamo un criterio di arresto idoneo per l'iterazione. Esaminiamo, in particolare, il metodo di Newton:
-$$
-Come abbiamo precedentemente visto per il metodo di bisezione, il valore di $f(x)$ nell'approssimazione, è da considerarsi "piccolo" se
+per determinare uno zero di $f(x)$, cerchiamo un criterio di arresto idoneo per l'iterazione. Esaminiamo, in particolare, il metodo di Newton. Come abbiamo precedentemente visto per il metodo di bisezione, il valore di $f(x)$ nell'approssimazione, è da considerarsi "piccolo" se
 $
   abs(f(x_i)) lt.eq "tol" dot abs(f'(x^*)) approx "tol" dot abs(f'(x_i))
 $
@@ -565,7 +577,7 @@ $
 $
 Pertanto, anche se $m$ non è nota, sappiamo che per $i>>1$:
 $
-  (e_(i+1))/e_i approx c => e_(i+1) = c dot e_i " e " e_i = c dot e_(i-1)
+  (e_(i+1))/e_i approx frac(e_i, e_(i-1)) approx c \ e_(i+1) = c dot e_i " e " e_i = c dot e_(i-1)
 $
 da cui otteniamo, dividendo membro a membro, che:
 $
@@ -603,13 +615,13 @@ Quindi, il costo per iterazione è doppio rispetto al metodo di Newton _standard
 )
 
 == Metodi quasi Newton
-Ricordiamo che nel metodo di Newton $x_(i+1) = x_i - (f(x_i))/(f'(x_i))$ con un costo di valutazione pari a 2. Questo risultato può essere migliorato lavorando sulla derivata prima al denominatore.
+Ricordiamo il metodo di Newton $x_(i+1) = x_i - (f(x_i))/(f'(x_i))$ con un costo di valutazione pari a 2. Questo risultato può essere migliorato lavorando sulla derivata prima al denominatore.
 #figure(image("images/2025-10-22-16-34-46.png"))
 Ricordiamo la definizione di derivata prima:
 $
   f'(x_i) = lim_(h->infinity) frac(f(x_i+h)-f(x_i), h)
 $
-Se approssimiamo $f'(x_i)$ con frac(f(x_i+h)-f(x_i), h) con $h$ fissato, otterremo un'approssimazione del metodo di Newton: si parla, in questo caso, di un metodo *"quasi" Newton*. Nello specifico, otterremmo un metodo "quasi" Newton che ha un costo di 2 valutazioni funzionali per iterazione. Per migliorare questo approccio, procediamo come segue.
+Se approssimiamo $f'(x_i)$ con $frac(f(x_i+h)-f(x_i), h)$ con $h$ fissato, otterremo un'approssimazione del metodo di Newton: si parla, in questo caso, di un metodo *"quasi" Newton*. Nello specifico, otterremmo un metodo "quasi" Newton che ha un costo di 2 valutazioni funzionali per iterazione. Per migliorare questo approccio, procediamo come segue.
 #[
   #set heading(numbering: none, outlined: false)
   === Metodo delle secanti
@@ -640,8 +652,8 @@ $
   === Metodo delle corde
 ]
 #figure(image("images/2025-10-22-16-43-55.png"))
-Per i passi successivi si utilizza l'approssimazione $f'(x_i) approx f'(x_0)$. L'espressione del metodo delle corde è pertanto:
+Per i passi successivi si utilizza l'approssimazione $f'(x_i) approx f'(x_0)$, ovvero, più semplicemente, calcoliamo la derivata prima soltanto all'inizio e la riutilizziamo per tutti i passi. L'espressione del metodo delle corde è pertanto:
 $
-  x_(i+1) = x_i - frac(f(x_i), f'(x_i)) space i=1,2,...
+  x_(i+1) = x_i - frac(f(x_i), f'(x_0)) space i=1,2,...
 $
 e richiede una valutazione per iterazione. La sua convergenza è ovviamente locale e l'ordine di convergenza si vede essere 1 (convergenza lineare). E' spesso utilizzato in problemi per cui è nota un'approssimazione iniziale $x_0$ molto vicina alla soluzione $x^*$.
