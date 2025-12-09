@@ -30,7 +30,7 @@ $
   A uu(x) = uu(b) space space space (2)
 $
 
-Nella nostra trattazione, assumeremo che $m gt.eq n$, ovvero che il numero delle equazioni non sia minore del numero delle incognite. Pertanto il numero di colonne della matrice $A$ è minore uguale del numero di righe.
+Nella nostra trattazione, assumeremo che $m gt.eq n$, ovvero che il numero di equazioni sia maggiore o uguale al numero di incognite. Pertanto il numero di colonne della matrice $A$ (incognite) è minore uguale del numero di righe (equazioni).
 
 
 #observation()[
@@ -38,10 +38,22 @@ Nella nostra trattazione, assumeremo che $m gt.eq n$, ovvero che il numero delle
   - $a_(i j)$ è l'elemento che si trova nell'intersezione della riga i-esima con la colonna j-esima.
 ]
 
-Assumeremo, inoltre, che la matrice $A$ abbia rango massimo, ovvero uguale a $n$. Questo significa che le colonne di $A$ sono vettori linearmente indipendenti tra loro.
+Assumeremo, inoltre, che la matrice $A$ abbia *rango massimo*, ovvero uguale a $n$. Questo significa che le colonne di $A$ sono vettori linearmente indipendenti tra loro.
 Distingueremo due casi significativi che sono il caso in cui:
 + $m=n <=> A$ è una matrice quadrata
 + $m>n <=> A$ è rango massimo.
+
+#observation()[
+  Ricordiamo la definizione di *rango di matrice*: Il rango di una matrice $A$ è il massimo numero di colonne (o righe) linearmente indipendenti.
+
+  Ricordiamo la proprietà di una matrice *non singolare*:
+  + Il determinante è diverso da zero.
+  + E' invertibile.
+  + Ha rango massimo.
+  + Il sistema lineare ha soluzione unica.
+  + Gli autovalori sono tutti non nulli.
+]
+
 == Sistemi lineari: casi semplici
 
 === Il caso quadrato
@@ -78,7 +90,7 @@ $
   )
 $
 #observation()[
-  Se $a_(i j)$ è il generico elemento in riga $i$ e colonna $j$ di $A$, alora la differenza $j-i$
+  Se $a_(i j)$ è il generico elemento in riga $i$ e colonna $j$ di $A$, allora la differenza $j-i$
   - $=0$ per elementi sulla *diagonale principale*.
   - $=k>0$ per gli elementi sulla *k-esima sopradiagonale*.
   - $=r<0$ per gli elementi sulla *(-k)-esima sottodiagonale*.
@@ -122,15 +134,15 @@ $
   & x_2 = (b_2 - a_(2 1)x_1) \/ a_(2 2) \
   & x_3 = (b_3 - a_(3 1)x_1 - a_(3 2)x_2)\/a_(3 3) quad quad quad quad (3) \
   & quad space space dots.v \
-  & x_n = (b_n - Sigma_(j=1)^(n-1) a_(n j)x_j) \/ a_(n n)
+  & x_n = (b_n - sum_(j=1)^(n-1) a_(n j)x_j) \/ a_(n n)
 $
 Osseriaviamo che, essendo $A$ non singolare, deve valere $a_(i i) eq.not 0, i =1,...,n$. Pertanto le operazioni in (3) risultano ben definite. Riguardo al costo computazionale, è evidente che solo la porzione triangolare della matrice $A$ deve essere necessariamente memorizzata, per un totale di:
 $
-  Sigma_(i=1)^n i = frac(n(n+1), 2) approx frac(n^2, 2)
+  sum_(i=1)^n i = frac(n(n+1), 2) approx frac(n^2, 2)
 $
 posizioni di memoria. Per il numero di operazioni richieste, da (3) si evince che sono necessari: 1 `flop` per calcolare $x_1$, 3 `flop` per calcolare $x_2$, 5 `flop` per calcolare $x_3$, ..., $2n — 1$ `flop` per calcolare $x_n$, per un totale di
 $
-  Sigma_(i=1)^n (2i-1) = n^2 "flop"
+  sum_(i=1)^n (2i-1) = n^2 "flop"
 $
 L'Algoritmo 3.1 implementa (3), con la matrice $A$ contenente gli elementi della matrice $A$ ed il vettore $x$ contenente, inizialmente, il vettore dei termini noti $b$ e, successivamente, riscritto con il vettore soluzione $x$.
 
@@ -182,7 +194,7 @@ $
   header: [*Algoritmo 3.3* Sistema triangolare superiore],
 )
 ```matlab
-for j=n:-1:1
+for j=n:-1:1 %initVal:step:endVal
   for j=i+1:n
     x(i)=x(i)-A(i,j)*x(j);
   end
@@ -196,7 +208,7 @@ end
   header: [*Algoritmo 3.4* Sistema triangolare superiore V2],
 )
 ```matlab
-for j=n:-1:1
+for j=n:-1:1 %initVal:step:endVal
   x(j) = x(j)/A(j,j);
   for i=1:j-1
     x(i)=x(i)-A(i,j)*x(j);
@@ -205,10 +217,10 @@ end
 ```
 e quindi gli elementi della soluzione possono essere ottenuti mediante sostituzioni successive all'indietro.
 $
-  x_(n-i) = frac(b_(n-i)-limits(Sigma)_(j=n-i+1)^n a_(n-i,j)x_j, a_(n-i,n-i)), quad i=0,...,n-1
+  x_(n-i) = frac(b_(n-i)-limits(sum)_(j=n-i+1)^n a_(n-i,j)x_j, a_(n-i,n-i)), quad i=0,...,n-1
 $
 
-Considerazioni, del tutto analoghe a quelle fatte per il caso triangolare inferiore. valgono riguardo alla ben definizione delle operazioni richieste ed al costo computazionale, sia in termini di `flop` che di occupazione di memoria. Il metodo di risoluzione è illustrato negli Algoritmi 3.3 e 3.4. Per questi ultimi, valgono le stesse considerazioni fatte rispettivamente per gli Algoritmi 3.1 e 3.2, riguardo alle modalità di accesso ai dati.
+Considerazioni, del tutto analoghe a quelle fatte per il caso triangolare inferiore, valgono riguardo alla ben definizione delle operazioni richieste ed al costo computazionale, sia in termini di `flop` che di occupazione di memoria. Il metodo di risoluzione è illustrato negli Algoritmi 3.3 e 3.4. Per questi ultimi, valgono le stesse considerazioni fatte rispettivamente per gli Algoritmi 3.1 e 3.2, riguardo alle modalità di accesso ai dati.
 
 //04.11.2025
 
@@ -228,86 +240,91 @@ Considerazioni, del tutto analoghe a quelle fatte per il caso triangolare inferi
   #set heading(numbering: none, outlined: false)
   === Proprietà matrici triangolari
 ]
-- Se $A=(a_(i j)), B=(b_(i j))$ sono matrici triangolari inferiori (rispettivamente superiori), allora anche $C=(c_(i j))$, con
+#corollary()[
+  Se $A=(a_(i j)), B=(b_(i j))$ sono matrici triangolari inferiori (rispettivamente superiori), allora anche $C=(c_(i j))$, con
   $
     (1) quad C=A+B quad "o" quad C=A dot B quad (2)
   $
   sono triangolari inferiori (rispettivamente superiori). Inoltre, nel caso:
   - (1) $C_(i i) = a_( i i) + b_(i i )$
   - (2) $C_(i i) = a_(i i ) dot b_(i i)$
+]
+#proof()[
+  Che $C=A+B$ sia triangolare dello stesso tipo di $A$ e $B$, discende dal fatto che $forall i,j: c_(i j)=a_(i j) +b_(i j)$.
 
-  #proof()[
-    Che $C=A+B$ sia triangolare dello stesso tipo di $A$ e $B$, discende dal fatto che $forall i,j: c_(i j)=a_(i j) +b_(i j)$.
+  Supponiamo che $A$ e $B$ siano triangolari inferiori $<=>$ $a_(i j) = b_(i j) = 0, "se " j>i =>$
+  + $c_(i j)=0, j>i$
+  + $c_(i i) = a_(i i) dot b_( i i)$
+  Infatti, se $e_i, e_j in RR^n$ sono i versori $i$ e $j$:
+  $
+    c_(i j) = e_i^T C e_j = e_i^T A dot B e_j = a_(1 1) a_(1 2)...a_(i,i) overbrace(0...0, n-i) mat(0; dots.v; 0; b_(j j); dots.v; b_(n j)) = cases(i=j: a_(i i) dot b_(i i), i<j: 0)
+  $
+]
 
-    Supponiamo che $A$ e $B$ siano triangolari inferiori $<=>$ $a_(i j) = b_(i j) = 0, "se " j>i =>$
-    + $c_(i j)=0, j>i$
-    + $c_(i i) = a_(i i) dot b_( i i)$
-    Infatti, se $e_i, e_j in RR^n$ sono i versori $i$ e $j$:
+#corollary()[
+  Se A e B sono triangolari inferiori (rispettivamente superiori) a diagonale unitaria, allora anche $C=A dot B$ è una matrice triangolare inferiore (rispettivamente superiore) a diagonale unitaria.
+]
+#proof()[
+  Siano A e B due matrici $n times n$ triangolari inferiori a diagonale unitaria. Per definizione, questo significa:
+  - Per A: $a_(i j) = 0$ se $i < j$ (elementi sopra la diagonale) e $a_(i i) = 1$ (diagonale unitaria).
+  - Per B: $b_(i j) = 0$ se $i < j$ (elementi sopra la diagonale) e $b_(i i) = 1$ (diagonale unitaria).
+  Vogliamo dimostrare che $C = A dot B$ ha le stesse proprietà. L'elemento generico $c_(i j)$ di C è dato da:
+  $
+    c_(i j) = sum_(k=1)^(n) a_(i k) dot b_(k j)
+  $
+  Dobbiamo dimostrare due cose:
+  + C è triangolare inferiore: $c_(i j) = 0$ per $i < j$.
+    Analizziamo la sommatoria $c_(i j) = sum_(k=1)^(n) a_(i k) b_(k j)$ nel caso in cui $i < j$. Esaminiamo ogni singolo termine $a_(i k) b_(k j)$ della somma:
+    - Caso $k > i$: poiché A è triangolare inferiore, tutti gli elementi $a_(i k)$ con $i < k$ (indice di colonna maggiore dell'indice di riga) sono zero. Quindi, $a_(i k) = 0$. L'intero termine $a_(i k) b_(k j)$ diventa $0 dot b_(k j) = 0$.
+    - Caso $k lt.eq i$: poiché siamo partiti dall'ipotesi che $i < j$, se $k lt.eq i$, allora segue che $k < j$. Poiché B è triangolare inferiore, tutti gli elementi $b_(k j)$ con $k < j$ (indice di colonna maggiore dell'indice di riga) sono zero. Quindi, $b_(k j) = 0$. L'intero termine $a_(i k) b_(k j)$ diventa $a_(i k) dot 0 = 0$.
+    In ogni possibile caso per $k$ (sia $k > i$ che $k lt.eq i$), il termine $a_(i k) b_(k j)$ è zero. Di conseguenza, la loro somma $c_(i j)$ è zero. Questo dimostra che C è triangolare inferiore.
+
+  + C è a diagonale unitaria ($c_(i i) = 1$).
+    Analizziamo ora gli elementi sulla diagonale, dove $i = j$.
     $
-      c_(i j) = e_i^T C e_j = e_i^T A dot B e_j = a_(1 1) a_(1 2)...a_(i,i) overbrace(0...0, n-i) mat(0; dots.v; 0; b_(j j); dots.v; b_(n j)) = cases(i=j: a_(i i) dot b_(i i), i<j: 0)
+      c_(i i) = sum_(k=1)^(n) a_(i k) dot b_(k i)
     $
-  ]
+    Spezziamo la sommatoria in tre parti:
+    - Termini per $k < i$: Poiché B è triangolare inferiore, $b_(k i) = 0$ (perché $k < i$). Questi termini sono tutti nulli.
+    - Termini per $k > i$: Poiché A è triangolare inferiore, $a_(i k) = 0$ (perché $i < k$). Anche questi termini sono tutti nulli.
+    - Termine per $k = i$: L'unico termine che sopravvive è quello dove $k = i$. Questo termine è $a_(i i) dot b_(i i)$.Per ipotesi, A e B sono a diagonale unitaria, quindi $a_(i i) = 1$ e $b_(i i) = 1$. Il termine vale $1 dot 1 = 1$. Sommando le tre parti (tutti zeri tranne un 1), otteniamo:$c_(i i) = 0 + 1 + 0 = 1$.
+    Questo dimostra che C ha diagonale unitaria.
+]
 
-- Se A e B sono triangolari inferiori (rispettivamente superiori) a diagonale unitaria, allora anche $C=A dot B$ è una matrice triangolare inferiore (rispettivamente superiore) a diagonale unitaria.\
-  #proof()[
-    Siano A e B due matrici $n times n$ triangolari inferiori a diagonale unitaria. Per definizione, questo significa:
-    - Per A: $a_(i j) = 0$ se $i < j$ (elementi sopra la diagonale) e $a_(i i) = 1$ (diagonale unitaria).
-    - Per B: $b_(i j) = 0$ se $i < j$ (elementi sopra la diagonale) e $b_(i i) = 1$ (diagonale unitaria).
-    Vogliamo dimostrare che $C = A dot B$ ha le stesse proprietà. L'elemento generico $c_(i j)$ di C è dato da:
-    $
-      c_(i j) = sum_(k=1)^(n) a_(i k) dot b_(k j)
-    $
-    Dobbiamo dimostrare due cose:
-    + C è triangolare inferiore: $c_(i j) = 0$ per $i < j$.
-      Analizziamo la sommatoria $c_(i j) = sum_(k=1)^(n) a_(i k) b_(k j)$ nel caso in cui $i < j$. Esaminiamo ogni singolo termine $a_(i k) b_(k j)$ della somma:
-      - Caso $k > i$: poiché A è triangolare inferiore, tutti gli elementi $a_(i k)$ con $i < k$ (indice di colonna maggiore dell'indice di riga) sono zero. Quindi, $a_(i k) = 0$. L'intero termine $a_(i k) b_(k j)$ diventa $0 dot b_(k j) = 0$.
-      - Caso $k lt.eq i$: poiché siamo partiti dall'ipotesi che $i < j$, se $k lt.eq i$, allora segue che $k < j$. Poiché B è triangolare inferiore, tutti gli elementi $b_(k j)$ con $k < j$ (indice di colonna maggiore dell'indice di riga) sono zero. Quindi, $b_(k j) = 0$. L'intero termine $a_(i k) b_(k j)$ diventa $a_(i k) dot 0 = 0$.
-      In ogni possibile caso per $k$ (sia $k > i$ che $k lt.eq i$), il termine $a_(i k) b_(k j)$ è zero. Di conseguenza, la loro somma $c_(i j)$ è zero. Questo dimostra che C è triangolare inferiore.
+#corollary()[
+  Se $A=(a_(i j))$ è triangolare inferiore (rispettivamente superiore) e non singolare, allora $A^(-1)$ è triangolare inferiore (rispettivamente superiore) e $(A^(-1))_(i i) = a_(i i)^(-1), forall i=1,...,n$.
+]
+#proof()[
+  Dimostriamo la tesi per il caso in cui $A$ è triangolare inferiore. Il caso triangolare superiore è analogo (o segue trasponendo l'equazione). Procediamo per induzione sulla dimensione $n$ della matrice.
 
-    + C è a diagonale unitaria ($c_(i i) = 1$).
-      Analizziamo ora gli elementi sulla diagonale, dove $i = j$.
-      $
-        c_(i i) = sum_(k=1)^(n) a_(i k) dot b_(k i)
-      $
-      Spezziamo la sommatoria in tre parti:
-      - Termini per $k < i$:Poiché B è triangolare inferiore, $b_(k i) = 0$ (perché $k < i$). Questi termini sono tutti nulli.
-      - Termini per $k > i$:Poiché A è triangolare inferiore, $a_(i k) = 0$ (perché $i < k$). Anche questi termini sono tutti nulli.
-      - Termine per $k = i$:L'unico termine che sopravvive è quello dove $k = i$. Questo termine è $a_(i i) dot b_(i i)$.Per ipotesi, A e B sono a diagonale unitaria, quindi $a_(i i) = 1$ e $b_(i i) = 1$. Il termine vale $1 dot 1 = 1$. Sommando le tre parti (tutti zeri tranne un 1), otteniamo:$c_(i i) = 0 + 1 + 0 = 1$.
-      Questo dimostra che C ha diagonale unitaria.
-  ]
+  *Passo base ($n=1$):* \
+  Se $A = (a_(1 1))$, allora $A^(-1) = (1/a_(1 1))$. La matrice è banalmente triangolare inferiore e l'elemento è l'inverso dello scalare di partenza.
 
-- Se $A=(a_(i j))$ è triangolare inferiore (rispettivamente superiore) e non singolare, allora $A^(-1)$ è triangolare inferiore (rispettivamente superiore) e $(A^(-1))_(i i) = a_(i i)^(-1), forall i=1,...,n$.\
-  #proof()[
-    Dimostriamo la tesi per il caso in cui $A$ è triangolare inferiore. Il caso triangolare superiore è analogo (o segue trasponendo l'equazione). Procediamo per induzione sulla dimensione $n$ della matrice.
+  *Passo induttivo:* \
+  Supponiamo che la proprietà valga per matrici di dimensione $(n-1) times (n-1)$. Partizioniamo la matrice $A$ di dimensione $n times n$ a blocchi:
+  $ A = mat(A_(n-1), 0; v^T, a_(n n)) $
+  dove $A_(n-1)$ è triangolare inferiore e invertibile per ipotesi, $v$ è un vettore colonna e $0$ è il vettore nullo (poiché $A$ è triangolare inferiore).
 
-    *Passo base ($n=1$):* \
-    Se $A = (a_(1 1))$, allora $A^(-1) = (1/a_(1 1))$. La matrice è banalmente triangolare inferiore e l'elemento è l'inverso dello scalare di partenza.
+  Cerchiamo l'inversa $B = A^(-1)$ partizionata nello stesso modo:
+  $ B = mat(X, y; z^T, w) $
+  Imponiamo la condizione $A B = I_n$:
+  $ mat(A_(n-1), 0; v^T, a_(n n)) mat(X, y; z^T, w) = mat(I_(n-1), 0; 0, 1) $
 
-    *Passo induttivo:* \
-    Supponiamo che la proprietà valga per matrici di dimensione $(n-1) times (n-1)$. Partizioniamo la matrice $A$ di dimensione $n times n$ a blocchi:
-    $ A = mat(A_(n-1), 0; v^T, a_(n n)) $
-    dove $A_(n-1)$ è triangolare inferiore e invertibile per ipotesi, $v$ è un vettore colonna e $0$ è il vettore nullo (poiché $A$ è triangolare inferiore).
+  Svolgendo il prodotto righe per colonne a blocchi otteniamo il sistema:
+  1. $A_(n-1) X + 0 z^T = I_(n-1) => A_(n-1) X = I_(n-1)$
+  2. $A_(n-1) y + 0 w = 0 => A_(n-1) y = 0$
+  3. $v^T y + a_(n n) w = 1$
 
-    Cerchiamo l'inversa $B = A^(-1)$ partizionata nello stesso modo:
-    $ B = mat(X, y; z^T, w) $
-    Imponiamo la condizione $A B = I_n$:
-    $ mat(A_(n-1), 0; v^T, a_(n n)) mat(X, y; z^T, w) = mat(I_(n-1), 0; 0, 1) $
+  Analizziamo le equazioni risultanti:
+  - Dalla (2), poiché $A_(n-1)$ è non singolare, l'unica soluzione è $y = 0$. Questo dimostra che l'ultima colonna di $A^(-1)$ ha tutti zeri sopra la diagonale.
+  - Dalla (1), abbiamo $X = A_(n-1)^(-1)$. Per l'ipotesi induttiva, $X$ è triangolare inferiore e i suoi elementi diagonali sono i reciproci di quelli di $A_(n-1)$.
+  - Dalla (3), sapendo che $y=0$, otteniamo $a_(n n) w = 1 => w = 1/a_(n n)$.
 
-    Svolgendo il prodotto righe per colonne a blocchi otteniamo il sistema:
-    1. $A_(n-1) X + 0 z^T = I_(n-1) => A_(n-1) X = I_(n-1)$
-    2. $A_(n-1) y + 0 w = 0 => A_(n-1) y = 0$
-    3. $v^T y + a_(n n) w = 1$
-
-    Analizziamo le equazioni risultanti:
-    - Dalla (2), poiché $A_(n-1)$ è non singolare, l'unica soluzione è $y = 0$. Questo dimostra che l'ultima colonna di $A^(-1)$ ha tutti zeri sopra la diagonale.
-    - Dalla (1), abbiamo $X = A_(n-1)^(-1)$. Per l'ipotesi induttiva, $X$ è triangolare inferiore e i suoi elementi diagonali sono i reciproci di quelli di $A_(n-1)$.
-    - Dalla (3), sapendo che $y=0$, otteniamo $a_(n n) w = 1 => w = 1/a_(n n)$.
-
-    Ricostruendo la matrice inversa:
-    $ A^(-1) = mat(A_(n-1)^(-1), 0; z^T, 1/a_(n n)) $
-    Poiché il blocco $A_(n-1)^(-1)$ è triangolare inferiore e il blocco sopra la diagonale ($y$) è nullo, l'intera matrice $A^(-1)$ è triangolare inferiore.
-    Inoltre, gli elementi diagonali sono quelli di $A_(n-1)^(-1)$ (che sono $a_(i i)^(-1)$ per $i < n$) e l'ultimo elemento $a_(n n)^(-1)$. La tesi è dimostrata.
-  ]
+  Ricostruendo la matrice inversa:
+  $ A^(-1) = mat(A_(n-1)^(-1), 0; z^T, 1/a_(n n)) $
+  Poiché il blocco $A_(n-1)^(-1)$ è triangolare inferiore e il blocco sopra la diagonale ($y$) è nullo, l'intera matrice $A^(-1)$ è triangolare inferiore.
+  Inoltre, gli elementi diagonali sono quelli di $A_(n-1)^(-1)$ (che sono $a_(i i)^(-1)$ per $i < n$) e l'ultimo elemento $a_(n n)^(-1)$. La tesi è dimostrata.
+]
 
 - Se A è triangolare inferiore (rispettivamente superiore) a diagonale unitaria, allora anche $A^(-1)$ è triangolare inferiore (rispettivamente superiore) a diagonale unitaria.\
   #proof()[TODO]
@@ -317,7 +334,14 @@ Considerazioni, del tutto analoghe a quelle fatte per il caso triangolare inferi
 #definition()[
   Diremo che una matrice $A in RR^(n times n)$ è ortogonale se $A^T A = A A^T = I$. Questo significa che $A$ ortogonale $=> A^(-1)=A^T$.
 ]
-In questo caso, la soluzione del sistema lineare (1) è $uu(x) = A^(-1)uu(b) equiv A^T uu(b)$. Si ottiene con un prodotto matrice vettore, il cui costo è $2n^2$ `flops`.
+In questo caso, la soluzione del sistema lineare (1) è:
+$
+      A uu(x) & = uu(b) \
+  A^T A uu(x) & = A^T uu(b) \
+      I uu(x) & = A^T uu(b) \
+        uu(x) & = A^T uu(b)
+$
+e si ottiene con un prodotto matrice-vettore, il cui costo è $2n^2$ `flops`.
 
 L'analisi di questi casi semplici ci permette ora di affrontare il caso generale in cui $A$ è una generica matrice non singolare.
 
@@ -356,9 +380,9 @@ e $uu(x_k)$ sarà il vettore soluzione $uu(x)$.
   + non sarà in genere necessario memorizzare esplicitamente i $k$ fattori $F_i, space i=1,...,n$. Infatti potremo sempre sovrascrivere gli elementi della matrice $A$ con l'informazione relativa ai suoi fattori;
   + non sarà necessario memorizzare le soluzioni intermedie $x_i, space i=0,...,k$. Infatti, lo stesso vettore potrà essere utilizzato per contenere il termine noto e poi sovrascritto con le soluzioni intermedie.
 ]
-In definitiva, un generico metodo di risoluzione si caratterizzerà per la specifica fattorizzazione (2).
+In definitiva, un generico metodo di risoluzione si caratterizzerà per la *specifica fattorizzazione* (2).
 
-//MANCA ROBA
+//TODO: MANCA ROBA
 
 #definition(
   "Fattorizzazione LU di una matrice",
@@ -367,7 +391,8 @@ In definitiva, un generico metodo di risoluzione si caratterizzerà per la speci
 ]
 
 #observation()[
-  Se $A=L U$, allora risolvo $A uu(x) = uu(b)$ risolvendo, nell'ordine, $L uu(y) = uu(b) and U uu(x) = uu(y)$, che sono sistemi di tipo semplice, con un costo di $2n^2$ `flops`.
+  Se $A=L U$, allora risolvo $A uu(x) = uu(b)$ risolvendo, nell'ordine, $L uu(y) = uu(b) "
+  e " U uu(x) = uu(y)$, che sono sistemi di tipo semplice, con un costo di $2n^2$ `flops`.
 ]
 
 //POSSIBILE DOMANDA ESONERO
@@ -375,7 +400,7 @@ In definitiva, un generico metodo di risoluzione si caratterizzerà per la speci
   Se $A$ è fattorizzabile LU, allora la fottorizzazione è *unica*.
 ]
 #proof()[
-  Supponiamo che $A=L U$ e $A=L_1 U_1$ siano due fattorizzazioni LU di $A$. Dobbiamo dimostrare che $L=L_1 and U=U_1$. Preliminarmente ricordiamo che, poiché $L$ e $L_1$ hanno diagonale unitaria, det($L$) = det($L_1$)$=1$. Da questo segue :
+  Supponiamo che $A=L U$ e $A=L_1 U_1$ siano due fattorizzazioni LU di $A$. Dobbiamo dimostrare che $L=L_1 " e " U=U_1$. Preliminarmente ricordiamo che, poiché $L$ e $L_1$ hanno diagonale unitaria, det($L$) = det($L_1$)$=1$. Da questo segue :
   $
     0 eq.not "det"(A) = "det"(L U) = overbracket("det"(L), =1) dot "det"(U) = "det"(U)
   $
@@ -421,7 +446,7 @@ $
 $
 e sia
 $
-  e_k = mat(0; dots.v; 1; dots.v; 0) in RR^n
+  uu(e)_k = mat(0; dots.v; 1; dots.v; 0) in RR^n
 $
 il k-esimo versore di $RR^n$, definiamo la corrispondente *matrice elementare di Gauss*:
 #figure(image("images/2025-11-05-19-07-34.png"))
@@ -617,7 +642,7 @@ In altri termini, abbiamo dimostrato il seguente risultato.
 #theorem(
   "Esistenza della fattorizzazione LU",
 )[
-  Data una matrice non-singolare $A$, *$A$ è fattorizzabile LU se e solo se tutti i suoi minori principali sono non nulli*.
+  Data una matrice non singolare $A$, *$A$ è fattorizzabile LU se e solo se tutti i suoi minori principali sono non nulli*.
 ]
 #observation()[
   Affinché il sistema lineare
@@ -1513,7 +1538,7 @@ Vale, inoltre, il seguente risultato.
 #theorem("Fattorizzazione QR di A")[
   Se $A in RR^(m times n), m>n="rank"(A)$, allora esistono:
   + $Q in RR^(m times m)$, ortogonale;
-  + $accent(R, \^) in RR^(n times n)$, triangolare superiore e non-singolare;
+  + $accent(R, \^) in RR^(n times n)$, triangolare superiore e non singolare;
   tali che:
   $
     A = Q R, space "con" R=mat(accent(R, \^); O; delim: "[") in RR^(m times n) space (=> O in RR^(m-n times n))
@@ -1542,7 +1567,7 @@ Utilizzando questo risultato, possiamo dimostrare il seguente corollario.
   $
   se $accent(R, \^) uu(x) - uu(g)_1 = uu(0)$, ovvero, se $uu(x)$ è soluzione del sistema lineare $accent(R, \^) uu(x) = uu(g)_1 quad (c)$.
 
-  Poiché $accent(R, \^)$ è triangolare superiore e non-singolare, allora la soluzione di questo sistema lineare esiste ed è unica. Inoltre, si calcola facilmente essendo superiore triangolare.
+  Poiché $accent(R, \^)$ è triangolare superiore e non singolare, allora la soluzione di questo sistema lineare esiste ed è unica. Inoltre, si calcola facilmente essendo superiore triangolare.
 ]
 #observation()[
   + Per calcolare $uu(x)$, è sufficiente conoscere il fattore $accent(R, \^)$ e poter fare il prodotto $Q^T uu(b)$, per calcolare $uu(g)$ ((a)).
@@ -1557,7 +1582,7 @@ Utilizzando questo risultato, possiamo dimostrare il seguente corollario.
     e il vettore $uu(g)$ (e quindi anche $uu(g)_2$) lo abbiamo già calcolato per ottenere $uu(x)$.
 ]
 === Esistenza della fattorizzazione QR
-Prima di vedere la dimostrazione del teorema precedente, consideriamo il seguente problema: dato un vettore $uu(x) in RR^n, uu(x)eq.not uu(0),$ vogliamo determinare una matrice ortogonale $H in RR^(n times n)$, tale che:
+Prima di vedere la dimostrazione del teorema precedente, consideriamo il seguente problema: dato un vettore $uu(x) in RR^n, uu(x)eq.not uu(0),$ vogliamo determinare una matrice ortogonale $H in RR^(n times n)$, detta *matrice di Householder*, tale che:
 $
   (4) quad H uu(x) = alpha uu(e)_1, quad "dove" alpha in RR space "e" space uu(e)_1 in RR^n "è il primo versore"
 $
@@ -1581,7 +1606,7 @@ Osserviamo che:
   $
   Quindi, qualunque sia la scelta di $uu(v)$, la matrice $H$ è simmetrica e ortogonale. Il problema è, qundi. scegliere $uu(v)$ in modo che la (4) sia soddisfatta.
 
-Verifichiamo che questo è vero se secliamo
+Verifichiamo che questo è vero se scegliamo il *vettore di Householder* come:
 $
   uu(v) = uu(x) - alpha uu(e)_1 quad quad (5)
 $
@@ -1604,6 +1629,213 @@ Riguardo al segno di $alpha$ (attenzione), osserviamo che:
 $
   uu(v) = uu(x) - alpha uu(e)_1 = mat(x_1-alpha; x_2; dots.v; x_n; delim: "[")
 $
-Quindi $alpha$ viene sottratto a $x_1$. Per ottenere un'operazione ben condizionata, $x_1$ e $-alpha$ devono essere concordi e di conseguenza, il segno di $alpha$ è opposto a quello di $x_1$.
+
+//09.12.2025
+Quindi $alpha$ viene sottratto a $x_1$. Per ottenere un'operazione ben condizionata, $x_1$ e $-alpha$ devono essere concordi e quindi il segno di $alpha$ è opposto a quello di $x_1$. Questa scelta del segno ha anche la conseguenza di ottenere che la prima componente del vettore $uu(v)$ sia sempre diversa da zero. In effetti otteniamo che $uu(v)_1 = x_1 - alpha$ è la componente di massimo modulo del vettore $uu(v)$.
+
+//TODO: dimostrazione per esercizio^^^
+
+Ciò permette di ottimizzare lo spazio di memoria per memorizzare $uu(v)$. Per capire meglio, vediamo qual'è la matrice di Householder definita dal vettore $beta dot uu(v)$, con $beta eq.not 0$ e un qualunque scalare. Se definiamo $accent(uu(v), \^)=beta dot uu(v)$, avremo:
+$
+  I - frac(2, accent(uu(v), \^)^T accent(uu(v), \^)) accent(uu(v), \^) accent(uu(v), \^)^T = I- frac(2, beta^2 uu(v)^T uu(v)) beta^2 uu(v) uu(v)^T equiv H
+$
+Possiamo quindi concludere che:
++ l'informazione per ottenere $H$ si riduce all'informazione relativa a $v$;
++ l'informazione relativa a $uu(v)$ è la stessa che il vettore $accent(uu(v), \^) = frac(uu(v), v_1)$, la cui prima componente è 1 e, pertanto, può non essere memorizzata esplicitamente. Quindi, l'informazione di $H in RR^(n times n)$, si riduce ad un vettore di lunghezza $n-1$. ???
+
+Possiamo dimostrare che la fattorizzazione $Q R$ esiste. La dimostrazione è costruttiva e definisce il corrispondente algoritmo di fattorizzazione (*algoritmo di Householder*). Analogamente a quanto visto per la fattorizzazione $L U$, si tratta di un metodo semi-iterativo che, in $n$ passi, ottiene la fattorizzazione (ovvero diagnostica che $A$ non ha rango massimo). La matrice al passo $k$ sarà denotata da:
+$
+  A^((k)) = (a_(i j)^((l))) in RR^(m times n) quad , 0 lt.eq l lt.eq k
+$
+con l'indice superiore di ogni elemento che denota qual'è stato l'ultimo passo dell'algoritmo in cui esso è stato modificato.
+
+#proof()[
+  Si parte con la matrice:
+  $
+    (1) quad quad A= mat(
+      a_(11)^((0)), a_(12)^((0)), a_(13)^((0)), dots, dots, a_(1)^((0));
+      a_(21)^((0)), a_(22)^((0)), a_(23)^((0)), dots, dots, a_(2n)^((0));
+      a_(31)^((0)), a_(32)^((0)), a_(33)^((0)), dots, dots, a_(3n)^((0));
+      dots.v, dots.v, dots.v, dots.v, dots.v, dots.v; dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;
+      a_(m 1)^((0)), a_(m 2)^((0)), a_(m 3)^((0)), dots, dots, a_(m n)^((0))
+    ) equiv A^((0))
+  $
+  Il procedimento si articola in $n$ passi elementari: all'i-esimo passo, $i=1,...,n$, la colonna i-esima della matrice corrente viene trasformata nella i-esima colonna di una matrice triangolare superiore. Questo, utilizzando opportune varianti delle matrici elementari di Householder. Al passo 1, possiamo definire una matrice elementare di Householder, $H_1 in RR^(m times m)$, tale che:
+  $
+    H_1 dot mat(a_(11)^((0)); a_(21)^((0)); dots.v; dots.v; a_(m 1)^((0)); delim: "[") = mat(a_(11)^((1)); 0; dots.v; dots.v; 0; delim: "[")
+  $
+  con $a_(11)^((1)) eq.not 0$, se la prima colonna è non nulla (infatti, a meno del segno, $a_(11)^((1))$ ne è la norma euclidea). Pertanto dalla (1) si ottiene:
+  $
+    (2) quad quad H_1 A= mat(
+      a_(11)^((1)), a_(12)^((1)), a_(13)^((1)), dots, dots, a_(1)^((1));
+      0, a_(22)^((1)), a_(23)^((1)), dots, dots, a_(2n)^((1));
+      0, a_(32)^((1)), a_(33)^((1)), dots, dots, a_(3n)^((1));
+      dots.v, dots.v, dots.v, dots.v, dots.v, dots.v; dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;
+      0, a_(m 2)^((1)), a_(m 3)^((1)), dots, dots, a_(m n)^((1))
+    ) equiv A^((1))
+  $
+  #observation()[
+    Le $m-1$ componenti in colonna $1$ che sono state azzerate, possono essere utilizzate per memorizzare le ultime $m-1$ componenti del vettore di Householder, normalizzato in modo da avere prima componente uguale a $1$.
+  ]
+  Reiteriamo la procedura sulla sottomatrice $(m-1) times (n-1)$, data dalla porzione di $A^((1))$ dalla riga $2$ alla $m$ e colonne dalla $2$ alla $n$ (la parte in verde nelle dispense (2)).
+  //TODO: vedere se colorabile
+  A questo punto, possiamo definire la matrice elementare di Householder, $H^((2)) in RR^(m-1 times ,-1)$, tale che:
+  $
+    H^((2)) dot mat(a_(22)^((1)); a_(32)^((1)); dots.v; dots.v; a_(m 2)^((1)); delim: "[")
+    = mat(a_(22)^((2)); 0; dots.v; dots.v; 0; delim: "[")
+  $
+  #observation()[
+    $a_(22)^((2)) eq.not 0$, altrimenti $A$ non ha rango massimo.
+  ]
+  Definiamo adesso:
+  $
+    H_2 = mat(
+      #table(
+        stroke: none,
+        align: center + horizon,
+        columns: (2.5em, 2.5em),
+        table.cell([$1$]),
+        table.cell([$emptyset$], stroke: (left: 1pt, bottom: 1pt)),
+        table.cell([$emptyset$], stroke: (right: 1pt, top: 1pt)),
+        table.cell([$H^((2))$]),
+      ), delim: "["
+    ) in RR^(m times m)
+  $
+  #observation()[
+    Osserviamo che:
+    + $H_2 = H_2^T$
+    + $H_2^T H_2 = H_2^2 = I in RR^(m times m)$, ovvero, $H_2$ è, al pari di $H^((2))$, *simmetrica e ortogonale*.
+  ]
+  Dalla (2) otteniamo che:
+  $
+    H_2 H_1 A= mat(
+      a_(11)^((1)), a_(12)^((1)), a_(13)^((1)), dots, dots, a_(1)^((1));
+      0, a_(22)^((2)), a_(23)^((2)), dots, dots, a_(2n)^((2));
+      0, 0, dots.v, dots.v, dots.v, dots.v;
+      dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;
+      0, 0, a_(m 3)^((2)), dots, dots, a_(m n)^((2))
+    ) equiv A^((2))
+  $
+  #observation()[
+    Anche adesso, la porzione di elementi azzerati in colonna 2 ($m-2$) possono essere utilizzati per memorizzare gli elementi significativi del vettore di Householder normalizzato che definisce $H^((2))$.
+  ]
+  Procedendo in modo analogo, sarà possibile definire matrici come:
+
+  $
+    H_i = mat(
+      #table(
+        stroke: none,
+        align: center + horizon,
+        columns: (2.5em, 2.5em),
+        table.cell([$I_(i-1)$]),
+        table.cell([$emptyset$], stroke: (left: 1pt, bottom: 1pt)),
+        table.cell([$emptyset$], stroke: (right: 1pt, top: 1pt)),
+        table.cell([$H^((i))$]),
+      ), delim: "["
+    ) quad i=1,...,n
+  $
+  con $I_(i-1) in RR^(i-1 times i-1)$ matrice identità e $H^((i))$ matrice elementare di Householder, $H^((i)) in RR^(m-i+1 times m-i+1)$, tale che, in colonna $i$, al passo i-esimo:
+  $
+    H^((i)) dot mat(a_(i i)^((i-1)); dots.v; dots.v; a_(m i)^((i-1)); delim: "[")
+    = mat(a_(i i)^((i)); 0; dots.v; dots.v; 0; delim: "[") in RR^(m-i+1)
+  $
+  ottenendo, infine:
+  $
+    //TODO: rifare meglio la matrice in modo che sia tutto allineato se possibile
+    underbrace(H_n dot H_(n-1) dot ... dot H_1, equiv Q^T) A = mat(
+      a_(11)^((1)), dots, dots, dots, a_(1)^((1));
+      0, a_(22)^((2)), dots, dots, a_(2n)^((2));
+      dots.v, dots.down, dots.down, , dots.v, ;
+      dots.v, dots.v, dots.down, dots.down, dots.v;
+      dots.v, dots, dots, dots.down, a_(n n)^((n));
+      dots.v, , , , 0;
+      dots.v, , , , dots.v;
+      0, dots, dots, dots, 0;
+    )
+  $
+  Nella parte sottostante alla diagonale degli elementi $a_(i i)$ possiamo memorizzare gli elementi significativi dei vettori di Householder normalizzati. Da quest'ultimo passo si ottiene, formalmente, che $A=Q R$.
+
+]
+#observation()[
+  + La procedura si vede essere definita se e solo se $a_(i i)^((i)) eq.not 0, space forall i=1,...,n$. Se qualcuno di questi fosse nullo, allora $A$ non avrebbe rango massimo.
+  + Non è richiesto assemblare la matrice $Q$, ma solo di calcolare, per ottenere la soluzione ai minimi quadrati, il prodotto $Q^T uu(b)$.
+]
+L'ultima osservazione si ottiene andando ad inizializzare
+$
+  uu(x) <-- uu(b)
+$
+e, successivamente:
+$
+  uu(x) <-- H_i uu(x), space i=1,...,n quad quad (3)
+$
+Infatti, questo è equivalente a:
+$
+  H_n dot H_(n-1) dot ... dot H_2 dot H_1 dot uu(x)
+$
+senza assemblare il prodotto
+$
+  H_n dot ... dot H_1 "(DA NON FARE)"
+$
+Inoltre, nella (3), osserviamo che:
+- $
+    H_i uu(x) = mat(
+      #table(
+        stroke: none,
+        align: center + horizon,
+        columns: (2.5em, 2.5em),
+        table.cell([$I_(i-1)$]),
+        table.cell([$emptyset$], stroke: (left: 1pt, bottom: 1pt)),
+        table.cell([$emptyset$], stroke: (right: 1pt, top: 1pt)),
+        table.cell([$H^((i))$]),
+      ), delim: "["
+    ) =
+    mat(
+      #table(
+        stroke: none,
+        align: center + horizon,
+        columns: 2.5em,
+        table.cell([$x_1$]),
+        table.cell([$x_2$], stroke: (top: 1pt)),
+      ), delim: "["
+    ) =
+    mat(
+      #table(
+        stroke: none,
+        align: center + horizon,
+        columns: 2.5em,
+        table.cell([$x_1$]),
+        table.cell([$H^(i)x_2$], stroke: (top: 1pt)),
+      ), delim: "["
+    ), " con " x_1 in RR^(i-1), space x_2 in RR^(m-i+1)
+  $
+- Se $H^(i) = I_(m-i+1) - overbrace(frac(2, accent(uu(v)_i, \^)^T accent(uu(v)_i, \^)), = beta_i) accent(uu(v)_i, \^) accent(uu(v)_i, \^)^T$ con $accent(uu(v)_i, \^)_i$ il vettore di Householder normalizzato, allora:
+  $
+    H^(i) uu(x)_2 & = (I_(m-i+1) - beta_i accent(uu(v)_i, \^)_i accent(uu(v)_i, \^)_i^T) uu(x_2) \
+                  & = x_2 - beta_i accent(uu(v)_i, \^)_i (accent(uu(v)_i, \^)_i^T uu(x)_2) \
+                  & = x_2 - accent(uu(v)_i, \^)_i ( beta_i dot (accent(uu(v)_i, \^)_i^T uu(x_2)))
+  $
+  con un costo *lineare* invece che *quadratico*.
+
 === Il metodo di Householder
+Tutto questo, può essere riassunto nel seguente pseudo/codice che sovrascrive $A in RR^(m times n)$ con l'informazione dei fattori $Q$ e $R$ (porzione significativa dei vettori di Householder normalizzati e porzione triangolare di $R$).
+
+//TODO: rivedere e testare questo codice (sul libro è diverso dalle dispense)
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: false,
+  header: [*Algoritmo 3.8* Fattorizzazione QR di Householder],
+)
+```matlab
+for i=1:n
+  alfa = norm(A(i:m,i));
+  if alfa==0, error('A non ha rango max'), end
+  if A(i,i)>=0, alfa = -alfa; end
+  v1=A(i,i)=-alfa;
+  A(i,i)=alfa;
+  A(i+1:m,i)=A(i+1:m,i)/v1;
+  beta = -v1/alfa;
+  A(i:m,i+1:n)=A(i+1:m,i+1:n)-(beta*[1;A(i+1:m,i)])*([1;A(i+1:m,i)']*A(i:m,i+1:n));
+```
+
 == Cenni sulla risoluzione di sistemi nonlineari
