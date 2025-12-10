@@ -52,7 +52,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         automatic_release_tag: latest
-        title: "Official Build"
+        title: "Ultima versione completa"
         prerelease: false
         files: compiled-pdfs/*.pdf
 
@@ -64,6 +64,6 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         # Il tag sarà dinamico: es. "preview-feature-login"
         automatic_release_tag: "preview-${{ steps.branch-name.outputs.branch }}"
-        title: "Preview: ${{ steps.branch-name.outputs.branch }}"
+        title: "Ultima versione parziale: ${{ steps.branch-name.outputs.branch }}"
         prerelease: true
         files: compiled-pdfs/*.pdf

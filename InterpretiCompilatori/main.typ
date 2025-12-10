@@ -4,8 +4,7 @@
   title: "Appunti Interpreti e Compilatori",
   author: none,
   subtitle: "Teoria\nCorso 2025/2026",
-  cover-image: image("cover.jpg", height: 100%, width: 100%),
-  bottom-logo: image("../unifi.png", width: 100%),
+  cover-image: image("cover.jpg", height: 100%, width: 100%)
 )[
   #outline(title: "Contenuti")
 

@@ -1,5 +1,6 @@
 #import "@preview/ctheorems:1.1.3": *
 #import "@preview/showybox:2.0.4": showybox
+#import "@preview/hydra:0.6.2": hydra
 
 #let colors = (
   rgb("#9E9E9E"),
@@ -29,7 +30,6 @@
   author: "",
   abstract: none,
   cover-image: none,
-  bottom-logo: none,
   accent: colors.at(6),
   body,
 ) = {
@@ -42,7 +42,6 @@
 
   set heading(numbering: "1.")
   show heading: it => {
-    set text(font: "New Computer Modern Sans")
     set par(first-line-indent: 0em)
 
     if it.numbering != none {
@@ -60,7 +59,7 @@
     // Full page cover with overlay text
     place(center + horizon)[
       #align(center)[
-        #set text(font: "New Computer Modern Sans", fill: white)
+        #set text(fill: white)
         #block(
           fill: rgb(0, 0, 0, 150), // Semi-transparent black background
           inset: 2em,
@@ -75,12 +74,6 @@
         #if author != none [
           #block(fill: rgb(0, 0, 0, 150), inset: 1em, radius: 0.3em, text(16pt)[by #author])
         ]
-      ]
-    ]
-
-    place(bottom)[
-      #align(center)[
-        #bottom-logo
       ]
     ]
   } else {
@@ -122,8 +115,14 @@
       if here().page() == 1 {
         return none
       }
+
       box(stroke: (bottom: 0.7pt), inset: 0.4em)[
-        #text(font: "New Computer Modern Sans")[#h(1fr)#title]
+        #h(1fr)
+        #if calc.odd(here().page()) {
+          align(right, emph(hydra(1)))
+        } else {
+          align(left, emph(hydra(2)))
+        }
       ]
     },
     footer: none,
@@ -134,10 +133,10 @@
   show outline: set par(first-line-indent: 0em)
 
   show outline.entry.where(level: 1): it => {
-    text(font: "New Computer Modern Sans", accent)[#strong[#it]]
+    text(accent)[#strong[#it]]
   }
   show outline.entry: it => {
-    text(font: "New Computer Modern Sans", accent)[#it]
+    text(accent)[#it]
   }
 
   // Main body
@@ -146,10 +145,10 @@
 }
 
 #let thmtitle(t, color: rgb("#000000")) = {
-  text(font: "New Computer Modern Sans", weight: "semibold", fill: color)[#t]
+  text(weight: "semibold", fill: color)[#t]
 }
 #let thmname(t, color: rgb("#000000")) = {
-  text(font: "New Computer Modern Sans", fill: color)[(#t)]
+  text(fill: color)[(#t)]
 }
 
 #let thmtext(t, color: rgb("#000000")) = {
@@ -244,10 +243,10 @@
 
 #let theorem-style = builder-thmbox(color: colors.at(1), shadow: (offset: (x: 3pt, y: 3pt), color: luma(70%)))
 
-#let theorem = theorem-style("theorem", "Theorem")
+#let theorem = theorem-style("theorem", "Teorema").with(numbering: none)
 
 #let lemma = theorem-style("lemma", "Lemma")
-#let corollary = theorem-style("corollary", "Corollary")
+#let corollary = theorem-style("corollary", "Corollario").with(numbering: none)
 
 #let definition-style = builder-thmline(color: colors.at(8))
 #let observation-style = builder-thmline(color: colors.at(11))
@@ -278,12 +277,16 @@
 
 //CUSTOM FUNCTIONS
 
-#let der(
-  ..args
-) = {
+#let der(..args) = {
   $
     #let sym = args.pos().join("", last: "")
     limits(=>)^#sym
+  $
+}
+
+#let uu(arg) = {
+  $
+    underline(arg)
   $
 }
 
