@@ -4,9 +4,13 @@
 #show: codly-init.with()
 
 #pagebreak()
+
+#set math.equation(block: true)
+#show math.equation: set block(breakable: true)
+
 = Sistemi lineari e non lineari
 
-In questo capitolo tratteremo la risoluzione di sistemi di equzioni lineari del tipo:
+In questo capitolo tratteremo la risoluzione di sistemi di equazioni lineari del tipo:
 $
   (1) space space space cases(
     a_(11)x_1+a_(12)x_2+...+a_(1n)x_n=b_1,
@@ -136,7 +140,7 @@ $
   & quad space space dots.v \
   & x_n = (b_n - sum_(j=1)^(n-1) a_(n j)x_j) \/ a_(n n)
 $
-Osseriaviamo che, essendo $A$ non singolare, deve valere $a_(i i) eq.not 0, i =1,...,n$. Pertanto le operazioni in (3) risultano ben definite. Riguardo al costo computazionale, è evidente che solo la porzione triangolare della matrice $A$ deve essere necessariamente memorizzata, per un totale di:
+Osserviamo che, essendo $A$ non singolare, deve valere $a_(i i) eq.not 0, i =1,...,n$. Pertanto le operazioni in (3) risultano ben definite. Riguardo al costo computazionale, è evidente che solo la porzione triangolare della matrice $A$ deve essere necessariamente memorizzata, per un totale di:
 $
   sum_(i=1)^n i = frac(n(n+1), 2) approx frac(n^2, 2)
 $
@@ -349,7 +353,7 @@ L'analisi di questi casi semplici ci permette ora di affrontare il caso generale
 $
   A uu(x) = uu(b), quad A in RR^(n times n), quad "det"(A) eq.not 0 quad quad quad (1)
 $
-I metodi che andremo ad esaminare sono i cosidetti *metodi di fattorizzazione* di $A$ del tipo:
+I metodi che andremo ad esaminare sono i cosiddetti *metodi di fattorizzazione* di $A$ del tipo:
 $
   A=F_1 dot F_2 dot ... dot F_k quad quad quad ("k è piccolo") quad quad quad (2)
 $
@@ -397,7 +401,7 @@ In definitiva, un generico metodo di risoluzione si caratterizzerà per la *spec
 
 //POSSIBILE DOMANDA ESONERO
 #theorem()[
-  Se $A$ è fattorizzabile LU, allora la fottorizzazione è *unica*.
+  Se $A$ è fattorizzabile LU, allora la fattorizzazione è *unica*.
 ]
 #proof()[
   Supponiamo che $A=L U$ e $A=L_1 U_1$ siano due fattorizzazioni LU di $A$. Dobbiamo dimostrare che $L=L_1 " e " U=U_1$. Preliminarmente ricordiamo che, poiché $L$ e $L_1$ hanno diagonale unitaria, det($L$) = det($L_1$)$=1$. Da questo segue :
@@ -564,7 +568,7 @@ Esaminiamo gli aspetti del costo computazionale supponendo che la fattorizzazion
   $
     L=I+ sum_(i=1)^(n-1) uu(g)_i uu(e)_i^T quad quad quad (3)
   $
-  Dunque al passo i-esimo della fattorizzazione possiamo riscrivere gli $(n-i)$ elementi, al di sotto di quello diagonale in colonna $i$, con gli elementi significativi di $uu(g)_i$. Di conseguenza, alla fine dell'algoritmo, avremo riscritto gli elementi della porzione strettamente triangolare inferiore di $A$, con la porzione strettamente triangolare inferiore del secondo termine di (3). Evidentemente la diagonale di $L$, che sappiamo essere unitaria, non necessita di essere memorizzata esplicitamente. In conclusione, la matrice $A$ può eesere sovrascritta con l'infornazione dei suoi fattori $L$ e $U$.
+  Dunque al passo i-esimo della fattorizzazione possiamo riscrivere gli $(n-i)$ elementi, al di sotto di quello diagonale in colonna $i$, con gli elementi significativi di $uu(g)_i$. Di conseguenza, alla fine dell'algoritmo, avremo riscritto gli elementi della porzione strettamente triangolare inferiore di $A$, con la porzione strettamente triangolare inferiore del secondo termine di (3). Evidentemente la diagonale di $L$, che sappiamo essere unitaria, non necessita di essere memorizzata esplicitamente. In conclusione, la matrice $A$ può essere sovrascritta con l'informazione dei suoi fattori $L$ e $U$.
 
 - *Numero operazioni*
 
@@ -657,7 +661,7 @@ In altri termini, abbiamo dimostrato il seguente risultato.
 ]
 Tuttavia, esistono importanti classi di matrici per cui:
 + la non singolarità di $A$ deriva da una proprietà algebrica della matrice;
-+ tutte le sottomatrici principali di $A$, godo della medisima proprietà.
++ tutte le sottomatrici principali di $A$, godo della medesima proprietà.
 
 Questo avviene, in particolare, per:
 - *matrici a diagonale dominante*
@@ -1021,7 +1025,7 @@ $P_i$ è la matrice di permutazione che permuta le righe $i$ e $k_i$ ($k_i gt.eq
 
 ????????????? PER QUESTO MOTIVO SI PARLA DI PIVOTING ??????????
 
-Il vettore di Guass corrispondente sarà:
+Il vettore di Gauss corrispondente sarà:
 $
   uu(g)_i = frac(1, a_(k_i i)^((i))) (0,...,0 a_(i+1, i)^((i)) ... a_(i i)^((i)) ... a_(n i)^((i)))^T
 $
@@ -1073,7 +1077,7 @@ $
                       & =(P_(n-1) dot dots dot P_(i+2)) P_(i+1) uu(g)_i \
                       & =frac(1, a_(k_i i)^((i))) (underbrace(0 dots 0, i) k k dots k)^T ? (k space o space * ?)
 $
-Petanto, $L_i$ e $accent(L, \^)_i$ hanno la medesima struttura di matrice di matrice elementare di Gauss (la i-esima per la precisione). In virtù di questo, possiamo formalmente riscrivere la (2) come:
+Pertanto, $L_i$ e $accent(L, \^)_i$ hanno la medesima struttura di matrice di matrice elementare di Gauss (la i-esima per la precisione). In virtù di questo, possiamo formalmente riscrivere la (2) come:
 $
   L_(-1) P A = U, quad "con" space & L^(-1) = accent(L, \^)_(n-1) dot dots dot accent(L, \^)_1 \
                                    & P=P_(n-1) dot dots dot P_1
@@ -1116,7 +1120,7 @@ Osservando che $P$ è una matrice di permutazione (quindi ortogonale), abbiamo d
 ]
 
 === Costo computazionale della fattorizzazione
-- Occupazione di memoria: come visto per la fattorizzazione LU, possiamo utilizzare gli elementi che si azzerano ai vari passi dell'algoritmo, per memorizzare gli elementi significativi dei vettori di Gauss. A quest'ultimi, vanno applicate le permutazioni definite nei passu successivi dell'algoritmo. Di conseguenza, alla fine, $A$ sarà sovrascritta, come nella LU, con gli elementi significativi dei fattori $L$ e $U$ (rispettivamente, la parzione strettamente triangolare inferiore e la porzione angolare superiore). Riguardo alla matrice di permutazione, si utilizza un vettore $p in RR^n$, se $n$ è la dimensione del problema, che è inizializzato con $(1, ..., n)^T$ e a cui si applicano le permutazioni elementari definite nell'algoritmo di fattorizzazione.
+- Occupazione di memoria: come visto per la fattorizzazione LU, possiamo utilizzare gli elementi che si azzerano ai vari passi dell'algoritmo, per memorizzare gli elementi significativi dei vettori di Gauss. A quest'ultimi, vanno applicate le permutazioni definite nei passi successivi dell'algoritmo. Di conseguenza, alla fine, $A$ sarà sovrascritta, come nella LU, con gli elementi significativi dei fattori $L$ e $U$ (rispettivamente, la porzione strettamente triangolare inferiore e la porzione angolare superiore). Riguardo alla matrice di permutazione, si utilizza un vettore $p in RR^n$, se $n$ è la dimensione del problema, che è inizializzato con $(1, ..., n)^T$ e a cui si applicano le permutazioni elementari definite nell'algoritmo di fattorizzazione.
 - Operazioni algebriche elementari: queste rimangono le stesse dell'algoritmo classico. A queste vanno aggiunte:
   $
     sum_(i=1)^(n-1) (k-i) = sum_(i=1)^(n-1) i = approx n^2 / 2 " confronti per il calcolo del pivot."
@@ -1217,7 +1221,7 @@ $
 I valori di $p$ più utilizzati sono:
 $
   p&=1: norm(uu(v))_1 = sum_(i=1)^n abs(v_i) quad "(norma Manhattan)"\
-  p&=2: norm(uu(v))_2 = sqrt(sum_(i=1)^n abs(v_i)^2) = sqrt(uu(v)^T uu(v)) quad "(norma eculidea)"\
+  p&=2: norm(uu(v))_2 = sqrt(sum_(i=1)^n abs(v_i)^2) = sqrt(uu(v)^T uu(v)) quad "(norma euclidea)"\
   p&=infinity: norm(uu(v))_infinity = lim_(p -> infinity) norm(uu(v))_p equiv max_(i=1,..,n) abs(v_i) quad "(norma del massimo)"
 $
 
@@ -1294,6 +1298,8 @@ Il calcolo della norma 2 di una matrice risulta essere il più complicato.
 $
   norm(A)_2 = sqrt(rho(A^T A)) = sqrt(rho(A A^T)) quad quad cases(rho(A^T A) = max_(lambda in sigma(A^T A)) abs(lambda) "raggio spettrale di" A^T A, rho(A A^T) = attach(max, b: mu in sigma(A A^T)) abs(mu) "raggio spettrale di" A A^T)
 $
+#set math.cases(gap: 0.2em)
+
 Ricordiamo che con $sigma$ si indica l'insieme degli autovalori e che $rho$ (il raggio spettrale) rappresenta il massimo autovalore in modulo.
 
 
@@ -1359,7 +1365,7 @@ Inoltre, da questo segue che:
     epsilon uu(x)(0) => Delta uu(x) = uu(x)(epsilon) - uu(x) approx epsilon dot accent(uu(x), dot)(0)
   $
 
-Andiamo ad ottenere $accent(uu(x), dot)(0)$. Poiché la (3) vale indenticamente in un intorno di $epsilon=0$, questo significa che anche le derivate prime dei 2 membri devono essere uguali:
+Andiamo ad ottenere $accent(uu(x), dot)(0)$. Poiché la (3) vale identicamente in un intorno di $epsilon=0$, questo significa che anche le derivate prime dei 2 membri devono essere uguali:
 $
   underbrace(accent(A, dot)(epsilon), F) uu(x)(epsilon) + A(epsilon) accent(uu(x), dot)(epsilon) = underbrace(accent(uu(b), dot)(epsilon), uu(f))
 $
@@ -1838,4 +1844,125 @@ for i=1:n
   A(i:m,i+1:n)=A(i+1:m,i+1:n)-(beta*[1;A(i+1:m,i)])*([1;A(i+1:m,i)']*A(i:m,i+1:n));
 ```
 
+//10.12.2025
+Se:
+$
+  accent(uu(v), \^) = frac(uu(v), v_1) = frac(uu(x)-alpha uu(e)_1, underbrace(x_1-alpha, =v_1)) quad quad alpha^2 = norm(uu(x))_2^2 = uu(x)^T uu(x)
+$
+allora:
+$
+  beta &= frac(2, accent(uu(v), \^)^T accent(uu(v), \^)) = frac(2 v_1^2, uu(v)^T uu(v)) = frac(2(x_1-alpha)^2, (uu(x)-alpha uu(e)_1)^T (uu(x) - alpha uu(e)_1)) \
+  &= frac(2(x_1-alpha)^2, underbrace(uu(x)^T uu(x), =alpha^2) - underbrace(2 alpha x_1, =uu(e)_1^T uu(x)) + alpha^2) = frac(2(x_1-alpha)^2, 2 alpha^2 - 2 alpha x_1) \
+  &= frac(cancel(2)(x_1-alpha)^2, cancel(2) alpha (alpha-x_1)) = - frac((x_1 - alpha)^cancel(2), cancel((x_1 - alpha))alpha) = -frac(x_1-alpha, alpha) equiv -frac(v_1, alpha)
+$
+come vediamo nella riga 8 dell'Algoritmo 3.8.
+//TODO: ci sono altri passaggi nelle dispense da ricontrollare
+Questi accorgimenti consentono di ottenere un costo, in termini di operazionni algebriche elementari, di $2/3 n^2 (3m-n)$ `flops`.
+#observation()[
+  Si potrebbe utilizzare la fattorizzazione $Q R$ anche nel caso $A in RR^(n times n)$, che sarebbe definita sotto l'ipotesi che $A$ sia non singolare, ovvero nel caso $m=n$. Tuttavia, in questo caso, il costo per ottenere la fattorizzazione sarebbe $4/3 n^3$ `flops` cioè circa il doppio rispetto alla fattorizzazione $L U$. Pertanto quest'ultima è in generale da preferirsi.
+]
+
 == Cenni sulla risoluzione di sistemi nonlineari
+Ricordiamo che, nel caso scalare, $f(x)=0$, con $f: RR -->RR$, abbiamo esaminato, tra gli altri, il metodo di Newton:
+$
+  x_(i+1) = x_i - frac(f(x_i), f'(x_i)), space i=0,1,... quad quad (1)
+$
+ed il metodo delle corde:
+$
+  x_(i+1) = x_i - frac(f(x_i), f'(x_0)), space i=0,1,... quad quad (2)
+$
+entrambi con convergenza locale e con ordine, verso *radici semplici*, pari a:
+- 2 per il metodo (1).
+- 1 per il metodo (2).
+#observation()[
+  Se $x^*$ è radice semplice di $f(x)$, allora $f(x^*)=0$ e $f'(x^*) eq.not 0$.
+]
+Per generalizzare il metodo di Newton al caso di sistemi, riscriviamo formalmente (1) come:
+$
+  x_(i+1) = x_i - f'(x_i)^(-1) f(x_i), space i=0,1,... quad quad (3)
+$
+Supponiamo ora di voler risolvere il sistema di $n$ equazioni non lineari nelle $n$ incognite
+$
+  uu(x) = mat(x_1; dots.v; x_n) in RR^n quad F(uu(x))=uu(0) in RR^n quad quad (4)
+$
+dove $F: RR^n --> RR^n$ (_campi vettoriali_). In questo caso, definendo le *funzioni componenti* di $F(uu(x))$:
+$
+  f_i : RR^n --> RR
+$
+allora possiamo riscrivere (4) come:
+$
+  cases(f_1(uu(x))=0, f_2(uu(x))=0, quad space space dots.v, f_n(uu(x))=0) quad quad (5)
+$
+#observation()[
+  Se $uu(e)_i in RR^n$ è l'i-esimo versore, allora $f_i (uu(x))=uu(e)_i^T F(uu(x)), space i=1,...,n$.
+]
+Gli apici adesso verrano usati al posto dei pedici per evitare confusione nei passaggi. Anche ora, dato $uu(x)^0 in RR^n$, possiamo considerare un'approssimazione lineare id $F(uu(x))$ in un intorno di  $uu(x)^0$ :
+$
+  F(uu(x)) approx F(uu(x)^0) + F'(uu(x)^0)(uu(x)-uu(x)^0) quad quad (6)
+$
+dove $F'(uu(x)^0)$ è la *matrice Jacobiana* di $F(uu(x))$ calcolata in $uu(x)^0$. Questa è così definita: $F'(uu(x)) in RR^(n times n)$, il cui elemento $(i, j)$ è dato dalla derivata parziale di $f_i (uu(x))$ rispetto alla componente $x_j$ del vettore:
+$
+  frac(partial, partial x_j) f_i (uu(x))
+$
+Questa è a sua volta definita se $uu(e)_j in RR^n$ è il j-esimo versore, allora:
+$
+  frac(partial, partial x_j) f_i (uu(x)) = lim_(epsilon->0) frac(f_i (uu(x) + epsilon uu(e)_j) - f(uu(x)), epsilon))
+$
+Pertanto, imponendo che il secondo membro della (6) si annulli, otteniamo:
+$
+  F(uu(x)^0) + F'(uu(x)^0)(uu(x)-uu(x)^0) = uu(0) => uu(x)' = uu(x)^0 - (F'(uu(x)^0))^(-1) F(uu(x)^0)
+$
+Reiterando il procedimento, si ottiene il metodo di Newton:
+$
+  uu(x)^(i+1) = uu(x)^i - (F'(uu(x)^i))^(-1) F(uu(x)^i), space i=0,1,... quad quad (7)
+$
+
+#example()[
+  Se $F: RR^2 --> RR^2$ è definita come:
+  $
+    F(uu(x)) = cases(cos(x_1)+e^(x_2), sin(x_1)+7 x_2^2) quad uu(x) = mat(x_1; x_2)
+  $
+  allora:
+  $
+    F'(uu(x)) = mat(
+      #table(
+        stroke: none,
+        align: horizon + center,
+        columns: (5em, 5em),
+        table.cell([$-sin(x_1)$], stroke: (right: 1pt, bottom: 1pt)),
+        table.cell([$e^(x_2)$]),
+        table.cell([$cos(x_1)$]),
+        table.cell([$14x_2$], stroke: (left: 1pt, top: 1pt)),
+      )
+    )
+  $
+]
+#observation()[
+  L'iterazione (7) può essere equivalentemente formulata come:
+  - Risolvi: $F'(uu(x)^i) Delta uu(x)^i = -F(uu(x)?+^i)$
+  - Aggiorna: $uu(x)^(i+1) = uu(x)^i + Delta uu(x)^i, space i=0,1,...$
+]
+
+Il costo computazionale per iterazione, consisterà in:
++ Calcolo di $F(uu(x)^i)$ e $F'(uu(x)^i)$, la seconda è più costosta.
++ Fattorizzazione di $F'(uu(x)^i)$ ($approx 2/3 n^3$ `flops`).
++ Risoluzione del sistema lineare ($approx 2 n^2$ `flops`).
++ Aggiornamento approssimazione ($n$ `flops`).
+
+Al fine di ridurre il costo relativo al calcolo e alla fattorizzazione della Jacobiana, è possibiel utilizzare la versione vettoriale del metodo delle corde, in cui:
+- Risolvi: $F'(uu(x)^0) Delta uu(x)^i=-F(uu(x)^i)$
+- Aggiorna: $uu(x)^(i+1)=uu(x)^i+ Delta uu(x)^i, space i=0,1,...$
+
+Pertanto la matrice Jacobiana si *calcola* e si *fattorizza solo una volta*. Per questo motivo, sebbene questa iterazione converga più lentamente di quella di Newton, ha un costo globale generalmente inferiore.
+
+#[
+  #set heading(numbering: none, outlined: false)
+  === Criterio di arresto
+]
+Come ogni procedimento iterativo, sia il metodo di Newton, che quello delle corde, o Netwon semplificato, necessita di un idoneo criterio di arresto. Nel precednete caso, un cirterio molto utilizzato è il seguente:
+$
+  norm(Delta uu(x) .\/ (1+abs(uu(x))))_infinity
+$
+dove:
+- `./` rappresenta, in Matlab, l'operazione di divisione elemento per elemento sulla destra.
+- $abs(uu(x))$ rappresenta il vettore con i valori assoluti dell'approssimazione corrente.
