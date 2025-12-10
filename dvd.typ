@@ -280,7 +280,7 @@
 #let der(..args) = {
   $
     #let sym = args.pos().join("", last: "")
-    attach(=>, tr: #sym)
+    limits(=>)^#sym
   $
 }
 

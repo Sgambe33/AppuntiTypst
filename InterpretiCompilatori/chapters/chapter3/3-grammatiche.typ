@@ -439,8 +439,7 @@ Ci sono 4 classi di grammatiche, distinte tra di loro per la strutture delle lor
 + *#link(<gramNoCont>)[Grammatiche non contestuali]*
 + *#link(<gramReg>)[Grammatiche regolari]*
 
-Ovviamente hanno sempre in comune la definizione della grammatica (#ref(<defGrammar>))\
-Le grammatiche non contestuali (context-free) e regolari, anche se già spiegate, verrano rispiegate molto brevemente
+Ovviamente hanno sempre in comune la definizione della grammatica (#ref(<defGrammar>)). Le grammatiche non contestuali (context-free) e regolari, anche se già spiegate, verrano rispiegate molto brevemente.
 
 === Grammatiche senza restrizioni (a struttura di frase) <gramNoRes>
 
@@ -470,7 +469,7 @@ Questa grammatiche ha due definizioni che sono equivalenti:
   $alpha -> beta$ dove $alpha, beta in (V union Sigma)^+ quad quad$ (oppure $alpha in (V union Sigma)^* V (V union Sigma)^*$)\
   e, inoltre, $|alpha| <= |beta| quad ("quindi " beta eq.not epsilon)$
 ]
-#pagebreak()
+
 #definition("2")[
   $alpha_1A alpha_2 -> alpha_1beta alpha_2 quad$ con $A in V, space alpha_1, alpha_2, beta in (V union Sigma)^* " e " beta eq.not epsilon$
 ]
@@ -506,7 +505,7 @@ $
   - $"grammatiche non contestuali   "    <--> "  linguaggi non contestuali"$
   - $"grammatiche regolari             " <--> "  linguaggi regolari"$
 - Ad ogni classe di grammatiche corrisponde inoltre un tipo di macchine astratte utilizzabili per stabilire se una stringa appartiene ad un dato linguaggio
-#pagebreak()
+
 #table(
     columns: (auto, auto, 1fr, 1fr),
     align: (center, left, left, left),
