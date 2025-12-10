@@ -1,5 +1,6 @@
 #import "@preview/ctheorems:1.1.3": *
 #import "@preview/showybox:2.0.4": showybox
+#import "@preview/hydra:0.6.2": hydra
 
 #let colors = (
   rgb("#9E9E9E"),
@@ -114,8 +115,14 @@
       if here().page() == 1 {
         return none
       }
+
       box(stroke: (bottom: 0.7pt), inset: 0.4em)[
-        #h(1fr)#title
+        #h(1fr)
+        #if calc.odd(here().page()) {
+          align(right, emph(hydra(1)))
+        } else {
+          align(left, emph(hydra(2)))
+        }
       ]
     },
     footer: none,
