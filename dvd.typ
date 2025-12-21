@@ -125,7 +125,14 @@
         }
       ]
     },
-    footer: none,
+    footer: context {
+      h(1fr)
+      if calc.odd(here().page()) {
+        align(right, [#counter(page).display("1", both: false)])
+      } else {
+        align(left, [#counter(page).display("1", both: false)])
+      }
+    },
   )
 
   set outline(indent: 1em)
@@ -256,6 +263,12 @@
 #let remark = definition-style("remark", "Nota")
 #let observation = observation-style("observation", "Osservazione").with(numbering: none)
 #let example-style = builder-thmline(color: colors.at(16))
+
+#let observation(identifier: "observation", multiple: false, ..args) = {
+  let name = if multiple { "Osservazioni" } else { "Osservazione" }
+  observation-style(identifier, name, ..args).with(numbering: none)(..args)
+}
+
 
 #let example(identifier: "example", multiple: false, ..args) = {
   let name = if multiple { "Esempi" } else { "Esempio" }
