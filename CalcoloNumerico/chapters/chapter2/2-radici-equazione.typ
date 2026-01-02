@@ -2,10 +2,17 @@
 #import "@preview/cetz:0.4.2": canvas, draw
 #import "@preview/cetz-plot:0.1.3": plot
 #import "@preview/algo:0.3.6": algo
+#import "@preview/in-dexter:0.7.2": *
+#import "@preview/codly:1.3.0": *
+#import "@preview/codly-languages:0.1.1": *
+#show: codly-init.with()
 
+#pagebreak()
+
+#show math.equation: set block(breakable: true)
 = Radici di un'equazione
 
-Data una funzione $f:[a,b] subset.eq RR -> RR$ vogliamo determinare $x^* in [a,b]$ tale che $f(x^*)=0$. In questo caso, diremo che $x^*$ è una *radice* (o uno *zero*) di $f(x)$. In generale, $x^*$:
+Data una funzione $f:[a,b] subset.eq RR -> RR$ vogliamo determinare $x^* in [a,b]$ tale che $f(x^*)=0$. In questo caso, diremo che $x^*$ è una #index("Radice di funzione")*radice* (o uno *zero*) di $f(x)$. In generale, $x^*$:
 + la radice può esistere ed essere unica.
 + può esistere ma non essere unica (es. $f(x)=sin x$).
 + oppure non esiste (es. $f(x)=e^x$).
@@ -17,7 +24,7 @@ $
 Di seguito introduciamo il primo metodo: il metodo di bisezione.
 
 == Metodo di bisezione
-
+#index("Metodo di bisezione")
 Assumiamo che:
 + $f(x)$ sia continua su $[a,b]$;
 + $f(a)f(b)<0$.
@@ -59,7 +66,11 @@ Valutando $f(x_1)$ si hanno tre casi:
 
 Il nome del metodo deriva dal fatto che, ad ogni iterazione, l'ampiezza dell'intervallo di incertezza si dimezza.
 
-
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: false,
+)
 ```matlab
 fa = f(a)
 fb = f(b)
@@ -77,26 +88,30 @@ end
 
 Il criterio di arresto sopra commentato rende l'intera implementazione _naive_ e poco efficiente:
 - non sempre è richiesto un calcolo *esatto* della radice ma solo quello di una sua approssimazione entro una tolleranza `tol`;
-- la condizione `fx == 0` potrebbe non essere mai soddisfatta a causa dell'aritmetica finita.
-  #example()[Considerando il polinomio
+- la condizione `f1 == 0` potrebbe non essere mai soddisfatta a causa dell'aritmetica finita.
+  #example()[Consideriamo il polinomio
     $
       p(x) = (x-1.1)^20 (x-pi)
     $
-    che ha radice in $x=pi$. Utilizzando Matlab per calcolare $p(pi)$, si ottiene:
+    Dal punto di vista matematico è ovvio che ha radice esatta in $x=pi$. Se proviamo a calcolare $p(pi)$ utilizzando Matlab, si ottiene:
     $
       p = "poly"([1.1 * "ones"(1,20),pi])\
       "polyval"(p, pi) approx -5,5213 dot 10^(-5)
     $
-    La funzione `poly` restituisce i coefficienti del polinomio le cui radici sono in argomento alla funzione.
+    La funzione `poly` restituisce i coefficienti del polinomio le cui radici sono in argomento alla funzione. Nel nostro caso calcola i coefficienti svolgendo il prodotto:
+    $
+      underbrace((x-1.1) dot (x-1.1) dot ..., 20) dot (x-pi)
+    $
+    La funzione `polyval` prende i coefficienti appena calcolati e valuta il polinomio in $pi$. Durante il calcolo dei coefficienti però, il calcolatore ha subito diversi errori di arrotondamento portando ad un valore finale non esatto.
   ]
 
 == Criteri di arresto e condizionamento
 
 Vediamo come migliorare la precedente computazione _naive_. Se inizializziamo $a_1=a$ e $b_1=b$ (l'ampiezza del primo intervallo di confidenza) allora al passo i-esimo:
 $
-  x_i = (a_i+b_i)/2^i
+  x_i = (a_i+b_i)/2
 $
-che è il punto medio dell'intervallo di confidenza, $[a_i, b_i]$ al passo corrente. Pertanto $x^* in [a_i, b_i]$ e:
+che è il punto medio dell'intervallo di confidenza $[a_i, b_i]$ al passo corrente. Pertanto $x^* in [a_i, b_i]$ e:
 $
   abs(x^*-x_i) lt.eq (b_i-a_i)/2 = (b_(i-1)-a_(i-1))/2^2 = (b_(i-2)-a_(i-2))/2^3 = ... = (b_1-a_1)/2^i = (b-a)/2^i
 $
@@ -111,6 +126,11 @@ $
 $
 questo è il numero massimo di iterazioni di cui avremo bisogno. Questo ci permette di riformulare il ciclo precedente come:
 
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: false,
+)
 ```matlab
 fa = feval(f,a);
 fb = feval(f,b);
@@ -195,12 +215,55 @@ $
   abs(f(x)) lt.eq "tol" dot abs(f'(x^*))
 $
 è quanto dobbiamo richiedere alla $f(x)$. Non basta chiedere che $f(x)$ sia piccolo quanto `tol`. Dobbiamo chiedere che sia piccolo quanto `tol` scalato dalla pendenza della funzione.
-- Se la funzione è molto ripida ($f'$ grande), possiamo accettare un $f(x)$ più grande.
-- Se la funzione è molto piatta ($f'$ quasi zero), dobbiamo richiedere un $f(x)$ piccolissimo per essere sicuri di essere vicini alla radice.
+- Se la funzione è molto ripida ($f'$ grande, es. 1000), allora `tol` $dot 1000$ è grande. Possiamo accettare un $f(x)$ più grande.
+- Se la funzione è molto piatta ($f'$ quasi zero, es. 0.001), allora `tol` $dot 0.001$ è minuscolo. Dobbiamo richiedere un $f(x)$ piccolissimo per essere sicuri di essere vicini alla radice.
 
-Nell'iterazione del metodo di bisezione, al passo i-esimo, noi abbiamo calcolato $f(x_i)$, e, inoltre, conosciamo $f(a_i)$ e $f(b_i)$:
-#figure(image("images/2025-10-14-15-04-33.png", width: 60%))
-Questo significa che possiamo approssimare:
+Per poter applicare la relazione appena trovata, dovremmo calcolarci $f'(x^*)$, cosa impossibile dato che non conosciamo $x^*$. Nell'iterazione del metodo di bisezione, al passo i-esimo, noi abbiamo calcolato $f(x_i)$, e, inoltre, conosciamo $f(a_i)$ e $f(b_i)$:
+
+#figure(
+  canvas({
+    import draw: content
+    plot.plot(
+      x-grid: true,
+      y-grid: true,
+      size: (14, 8),
+      x-tick-step: 1,
+      y-tick-step: 1,
+      y-min: -5,
+      y-max: 5,
+      plot-style: (stroke: black),
+      legend: "inner-north-east",
+      {
+        let func = x => -12 + 180 / (x + 11)
+        let secante = x => -3 / 4 * x + 15 / 4
+        let tangente = x => -4 / 5 * x + 16 / 5
+        let func2 = x => 6 // Solo per allargare il grafico!
+        plot.add(func2, domain: (0, 10))
+        plot.add(func, domain: (1, 9), label: $f(x)$, style: (stroke: blue))
+        plot.add(secante, domain: (1, 9), style: (stroke: yellow))
+        plot.add(tangente, domain: (1.5, 7.5), style: (stroke: black))
+
+        plot.add-hline(0, style: (stroke: black))
+        plot.add-vline(1, 4, 5, 9, min: -0.1, max: 0.1)
+        plot.annotate({
+          content((1, -.4), $a_i$)
+          content((4, -.4), $x^*$)
+          content((5, .4), $x_i$)
+          content((9, -.4), $b_i$)
+          content((1, 3.5), $f(a_i)$)
+          content((9, -3.5), $f(b_i)$)
+        })
+        plot.add(
+          ((1, 3), (9, -3)),
+          style: (stroke: none),
+          mark: "o",
+        )
+      },
+    )
+  }),
+)
+
+Questo significa che possiamo approssimare $f'(x^*)$ come segue:
 $
   f'(x^*) approx (f(b_i)-f(a_i))/(b_i-a_i)
 $
@@ -209,13 +272,17 @@ senza valutazioni di funzione aggiuntive.
 
 Questo ci permette di ottenere questa versione ottimizzata del metodo di bisezione in cui sono solo omessi i controlli di consistenza sui parametri di ingresso.
 
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: true,
+)
 ```matlab
 fa = feval(f,a);
 fb = feval(f,b);
 x = (a+b)/2;
 fx = feval(f,x);
 imax = ceil( log2(b-a) -log2(tol) );
-
 for i=2:imax
   fix = abs( (fb-fa)/(b-a) );
   if abs(fx)<=tol*fix
@@ -244,7 +311,7 @@ $
 $
 Vogliamo vedere come decresce questa limitazione dell'errore passando dal passo $i$ al passo successivo $i+1$. Calcoliamo il rapporto tra le due limitazioni:
 $
-  epsilon_(i+1)/epsilon_i = frac(frac(b-a, 2^(i+1)), frac(b-a, 2^i)) = frac(b-a, 2^(i+1)) dot frac(2^i, b-a) = frac(2^i, 2^(i-1)) = 1/2
+  epsilon_(i+1)/epsilon_i = frac(frac(b-a, 2^(i+1)), frac(b-a, 2^i)) = frac(b-a, 2^(i+1)) dot frac(2^i, b-a) = frac(2^i, 2^(i+1)) = frac(2^i, 2^i dot 2) = 1/2
 $
 il che implica che:
 $
@@ -255,7 +322,7 @@ $
 ]
 
 #definition()[
-  Generalizzando, un qualsiasi metodo iterativo si dice *convergente* se l'errore tende a zero man mano che si procede con le iterazioni:
+  Generalizzando, un qualsiasi metodo iterativo si dice #index("Convergente")*convergente* se l'errore tende a zero man mano che si procede con le iterazioni:
   $
     lim_(i -> infinity) e_i = 0
   $
@@ -263,9 +330,12 @@ $
 
 #observation()[
   Il metodo di bisezione, se applicabile, è *sempre* convergente.
+  $
+    lim_(i->infinity) frac(b-a, 2^i) = 0
+  $
 ]
 
-Per classificare l'efficienza dei metodi di approssimazione, dobbiamo introdurre il concetto di *ordine di convergenza*.
+Per classificare l'efficienza dei metodi di approssimazione, dobbiamo introdurre il concetto di #index("Ordine di convergenza") *ordine di convergenza*.
 #definition()[
   Si dice che un metodo ha ordine $p$ se $p$ è il più grande numero reale positivo tale che esista un limite finito non nullo:
   $
@@ -290,7 +360,7 @@ Questa relazione ci dice come l'errore futuro dipende dall'errore attuale. Anali
     & quad quad quad quad quad dots.v \
     & abs(e_(i+k)) approx c^k dot abs(e_i)
   $
-  Affinché l'errore vada a zero($e_(i+k) -> 0 "per" k->infinity$) è necessario che $c<1$. Pertanto un metodo di ordine 1 è *convergente* se e solo se la sua *costante asintotica* dell'errore è minore di 1.
+  Affinché l'errore vada a zero ($e_(i+k) -> 0 "per" k->infinity$) è necessario che $c<1$. Pertanto un metodo di ordine 1 è *convergente* se e solo se la sua *costante asintotica* dell'errore è minore di 1.
 
   #observation()[
     Il metodo di bisezione ha ordine 1, con costante asintotica dell'errore pari a $1/2$.
@@ -351,7 +421,45 @@ In questa relazione:
 ]
 
 == Metodo di Newton
-#figure(image("images/2025-10-15-16-38-35.png"))
+#figure(
+  canvas({
+    import draw: content
+    plot.plot(
+      x-grid: true,
+      y-grid: true,
+      size: (14, 8),
+      x-tick-step: 1,
+      y-tick-step: 1,
+      y-min: -2,
+      y-max: 6,
+      plot-style: (stroke: black),
+      legend: "inner-north-east",
+      {
+        let func = x => -4 - 36 / (x - 12)
+        let tangente = x => 9 / 4 * x - 13
+        let tangente2 = x => 0.9299 * x - 3.587
+        plot.add(func, domain: (-1, 9), label: $f(x)$, style: (stroke: blue))
+        plot.add(tangente, domain: (-1, 9), style: (stroke: red))
+        plot.add(tangente2, domain: (-1, 9), style: (stroke: green))
+
+
+        plot.add-hline(0, style: (stroke: black))
+        plot.add-vline(3, 3.587 / 0.9299, 5.7778, 8, min: -0.1, max: 0.1)
+        plot.annotate({
+          content((3, -.4), $x^*$)
+          content((8, -.4), $x_0$)
+          content((5.9, -.4), $x_1$)
+          content((3.587 / 0.9299, -.4), $x_2$)
+        })
+        plot.add(
+          ((52 / 9, 1.7857143), (8, 5)),
+          style: (stroke: none),
+          mark: "o",
+        )
+      },
+    )
+  }),
+)
 
 L'equazione della retta tangente al grafico di $f(x)$ in $(x_0, f(x_0))$ è;
 $
@@ -376,9 +484,9 @@ A fronte di questo costo per iterazione più elevato, vale il seguente risultato
 #proof()[
   Indichiamo con $x^*$ la radice verso cui l'iterazione sta convergendo. Scriviamo lo sviluppo di Taylor della funzione $f$ centrato nel punto corrente $x_i$ e valutato nel punto esatto $x^*$:
   $
-    0 & = f(x^*)=f(x_i)+f'(x_i)(x^*-x_i)+1/2 f''(epsilon_i)(x^*-x_i)^2 \
-      & = f'(x_i)(f(x_i)/(f'(x_i)) - x_i + x^*) + 1/2 f''(epsilon_i)(x^*-x_i)^2 \
-      & =^((3)) f'(x_i)underbrace((x^* - x_(i+1)), e_(i+1)) + 1/2 f''(epsilon_i)underbrace((x^*-x_i), e_i)^2
+    0 = f(x^*) & =f(x_i)+f'(x_i)(x^*-x_i)+1/2 f''(epsilon_i)(x^*-x_i)^2 \
+               & = f'(x_i)(underbrace(f(x_i)/(f'(x_i)) - x_i, "passo i+1 Newton") + x^*) + 1/2 f''(epsilon_i)(x^*-x_i)^2 \
+               & =^((3)) f'(x_i)underbrace((x^* - x_(i+1)), e_(i+1)) + 1/2 f''(epsilon_i)underbrace((x^*-x_i), e_i)^2
   $
   - Sappiamo che $f(x^*) = 0$ (perché $x^*$ è la radice).
   - $epsilon_i$ è un punto sconosciuto che si trova tra $x_i$ e $x^*$ (Resto di Lagrange).
@@ -391,7 +499,7 @@ A fronte di questo costo per iterazione più elevato, vale il seguente risultato
     lim_(i -> infinity) abs(e_(i+1))/abs(e_i)^2 = lim_(i -> infinity) 1/2 abs(f''(epsilon_i))/abs(f'(x_i))
     = 1/2 abs(f''(x^*))/abs(f'(x^*))
   $
-  da cui deduciamo che la *convergenza quadratica* ovvero $p=2$ (cubica se $f''(x^*)=0$).
+  da cui deduciamo che il metodo ha *convergenza quadratica* ovvero $p=2$.
 ]
 
 Nel caso di una radice multipla, con molteplicità $m>1$, si può dimostrare che:
@@ -399,9 +507,9 @@ $
   lim_(i-> infinity) e_(i+1)/e_i
   = (m-1)/m
 $
-ovvero, l'ordine di convergenza del metodo di Newton diventa *lineare*, come conseguenza del malcondizionamento del problema e quindi il teorema non vale più.
+ovvero, l'ordine di convergenza del metodo di Newton diventa *lineare*, come conseguenza del mal condizionamento del problema e quindi il teorema non vale più.
 
-
+//21.10.2025
 == Convergenza locale
 
 Facciamo prima un riepilogo dei metodi appena visti per la degli zeri di una funzione.
@@ -431,10 +539,46 @@ non è in generale possibile garantire la convergenza da un generico punto inizi
     1,-1,1,-1,...
   $
   che, evidentemente, non converge.
-  #figure(image("images/2025-10-21-16-37-32.png"))
+  #figure(
+    canvas({
+      import draw: content
+      plot.plot(
+        x-grid: true,
+        y-grid: true,
+        size: (14, 8),
+        x-tick-step: .5,
+        y-tick-step: 1,
+        y-min: -5,
+        y-max: 5,
+        plot-style: (stroke: black),
+        legend: "inner-north-east",
+        {
+          let func = x => calc.pow(x, 3) - 5 * x
+          let func2 = x => -2 * x + 2
+          let func3 = x => -2 * x - 2
+          plot.add(func, domain: (-2.5, 2.5), label: $f(x)=x^3-5x$, style: (stroke: blue))
+          plot.add(func2, domain: (-1, 1), style: (stroke: fuchsia))
+          plot.add(func3, domain: (-1, 1), style: (stroke: fuchsia))
+
+          plot.add-hline(0, style: (stroke: black))
+          plot.add-vline(-1, max: 4, min: 0, style: (stroke: (dash: "dashed")))
+          plot.add-vline(1, max: 0, min: -4, style: (stroke: (dash: "dashed")))
+          plot.annotate({
+            content((-1, -.4), $-1$)
+            content((1, .4), $1$)
+          })
+          plot.add(
+            ((1, -4), (-1, 4)),
+            style: (stroke: none),
+            mark: "o",
+          )
+        },
+      )
+    }),
+  )
 ]
 
-La conclusione di questo esempio è che la convergenza ad una radice è garantita, per il metodo di Newton, solo in un opportuno intorno della radice. Si parla in questo caso, di *convergenza di tipo locale* mentre, per il metodo di bisezione, la *convergenza è globale*, ovvero, avviene sempre, se il metodo è applicabile.
+La conclusione di questo esempio è che la convergenza ad una radice è garantita, per il metodo di Newton, solo in un opportuno intorno della radice. Si parla in questo caso, di #index("Convergenza locale")*convergenza di tipo locale* mentre, per il metodo di bisezione, la #index("Convergenza globale")*convergenza è globale*, ovvero, avviene sempre, se il metodo è applicabile.
 
 Cerchiamo di formalizzare questo concetto, per un generico metodo iterativo che denoteremo con
 $
@@ -445,40 +589,49 @@ in cui $Phi(x)$ è detta *funzione di iterazione*. Ad esempio, per il metodo di 
 $
   Phi(x) = x-f(x)/(f'(x))
 $
-Se il metodo iterativo (1) serve per determinare la radice $x^*$ di $f(x)$, allora $Phi(x)$ deve soddisfare la *proprietà di consistenza*:
+Se il metodo iterativo (1) serve per determinare la radice $x^*$ di $f(x)$, allora $Phi(x)$ deve soddisfare la #index("Proprietà di consistenza")*proprietà di consistenza*:
 $
   x^* = Phi(x^*) space space space (2)
 $
 che garantisce che, se raggiungiamo la radice, ci fermiamo. Questo significa che il problema di determinare lo zero di $f(x)$ equivale a trovare un *punto fisso* della funzione di iterazione $Phi(x)$. Pertanto, vogliamo vedere sotto quali condizioni per $Phi(x)$, partendo da un intorno del suo punto fisso (2), la successione di approssimazioni (1) converge a $x^*$. Vale il seguente risultato.
 
 #theorem()[
-  Se $exists delta > 0 : forall x,y in overbrace([x^*-delta, x^*+delta], =I(x^*))$ allora $Phi$ è *Lipschitziana* con costante $L<1$, cioè
+  Sia $x^*$ un punto fisso della funzione di iterazione $Phi(x)$ (ovvero $x^* = Phi(x^*)$). Supponiamo che esista un intorno circolare $I = [x^* - delta, x^* + delta]$ con $delta > 0$ tale che $Phi$ sia *Lipschitziana* in $I$ con costante $L < 1$. Ovvero:
   $
-    abs(Phi(x)-Phi(y)) lt.eq L abs(x-y) space space forall x,y in I
+    |Phi(x) - Phi(y)| lt.eq L dot |x - y| quad forall x, y in I
   $
-  Allora:
-  - $x^*$ è l'unico punto fisso di $Phi(x)$ in $I$.
-  - se $x_0 in I$, allora $x_i in I, space i=0,1,...$
-  - $lim_(i->infinity) x_i = x^*$
+  Se le ipotesi sono verificate, allora valgono le seguenti proprietà:
+  + $x^*$ è l'unico punto fisso di $Phi(x)$ all'interno dell'intervallo $I$.
+  + Se il punto iniziale $x_0$ appartiene a $I$ ($x_0 in I$), allora tutta la successione generata $x_i$ rimarrà contenuta in $I$ per ogni $i gt.eq 0$.
+  + La successione converge alla soluzione:
+    $
+      lim_(i-> infinity) x_i = x^*
+    $
 ]
 #proof()[
   $
     x_i in I(x^*) <=> abs(x^* - x_i) lt.eq delta
   $
-  Ragionando per induzione, se $x_0 in I(x^*)$, allora $abs(x^* - x_i)$. Di conseguenza:
+  Ragionando per induzione, se $x_0 in I(x^*)$, allora $abs(x^* - x_0) lt.eq delta$. Di conseguenza:
   $
     abs(x^* - x_1) = abs(Phi(x^*)-Phi(x_0)) lt.eq L abs(x^* - x_0) lt delta => x_1 in I(x_*)
   $
-  Generalizzando:
+  Vogliamo dimostrare che la distanza tra la nostra stima corrente $x_i$ e la soluzione vera $x^*$ diventa sempre più piccola man mano che andiamo avanti con le iterazioni ($i -> infinity$).
   $
     abs(x^* - x_i) & = abs(Phi(x^*)-Phi(x_(i-1))) \
-                   & lt.eq L abs(x^* - x_(i-1)) \
-                   & =L abs(Phi(x^*)-Phi(x_(i-2))) \
-                   & lt.eq L^2 abs(x^* - x_(i-2)) \
-                   & ... \
-                   & lt.eq L^i abs(x^* - x_0) -> 0, space i-> infinity
+    abs(x^* - x_i) & lt.eq L abs(x^* - x_(i-1))
   $
-  poiché $L<1$.
+  Ma sappiamo che anche $|x^* - x_(i-1)| lt.eq L dot |x^* - x_(i-2)|$. Allora, sostituendo e ripetendo i passaggi:
+  $
+    |x^* - x_i| & lt.eq L dot underbrace((L dot |x^* - x_(i-2)|), "sostituzione") = L^2 dot |x^* - x_(i-2)| \
+    |x^* - x_i| & lt.eq L dot L dot (L dot |x^* - x_(i-3)|) = L^3 dot |x^* - x_(i-3)| \
+                & dots.v \
+    |x^* - x_i| & lt.eq L^i abs(x^* - x_0)
+  $
+  Analizziamo il termine $L^i$ per $i -> infinity$: poiché per ipotesi $0 lt.eq L < 1$, una potenza di un numero minore di 1 tende a zero quando l'esponente cresce. Di conseguenza, anche l'errore deve tendere a zero:
+  $
+    lim_(i -> infinity) L^i abs(x^* - x_0) = 0 => lim_(i -> infinity) |x^* - x_i| = 0 => lim_(i -> infinity) x_i = x^*
+  $
 ]
 
 #corollary()[
@@ -494,14 +647,48 @@ che garantisce che, se raggiungiamo la radice, ci fermiamo. Questo significa che
 
 Vediamo come si applica questo risultato al metodo di Newton:
 $
-  Phi(x) = x-f(x)/(f'(x))\
+  Phi(x) = x-f(x)/(f'(x)) quad quad
   Phi(x^*) = x^*-overparen(f(x^*), = 0)/(f'(x^*)) = x^*
 $
-Se $x^*$ è una radice semplice, allora $f'(x^*) eq.not 0 and$
+Se $x^*$ è una radice semplice, allora $f'(x^*) eq.not 0$ e
 $
   Phi'(x^*) = [ 1-(f'(x)^2 - f''(x)f(x))/(f'(x)^2) ] lr(bar, size: #300%)_(x=x^*) = [ (f''(x)overparen(f(x), =0))/(f'(x)^2) ] lr(bar, size: #300%)_(x=x^*) = (f''(x^*)overparen(f(x^*), =0))/(f'(x^*)^2) = 0
 $
-#figure(image("images/2025-10-21-17-07-50.png"))
+//TODO: migliorare questo grafico
+#figure(canvas({
+  import draw: content, rect
+  plot.plot(
+    axis-style: "school-book",
+    size: (15, 8),
+    x-tick-step: none,
+    y-tick-step: none,
+    y-min: -1,
+    y-max: 1,
+    x-min: calc.pi - 1,
+    x-max: 2 * calc.pi + 1,
+    plot-style: (stroke: black),
+    legend: "inner-north-east",
+    {
+      let func = x => calc.cos(x) * 0.5
+      plot.add(func, domain: (calc.pi, 2 * calc.pi), label: $Phi'(x)$, style: (stroke: colors.at(10)))
+      plot.add-hline(0.0, style: (stroke: black))
+      plot.add-hline(-0.1, min: calc.pi - 1.05, max: 1.5 * calc.pi - .15, style: (stroke: colors.at(8)))
+      plot.add-hline(0.1, min: calc.pi - 1.05, max: 1.5 * calc.pi + .15, style: (stroke: colors.at(8)))
+      plot.add-vline(1.5 * calc.pi - .15, min: -0.1, max: 0.03, style: (stroke: colors.at(8)))
+      plot.add-vline(1.5 * calc.pi + .15, min: -0.03, max: 0.1, style: (stroke: colors.at(8)))
+      plot.add-vline(1.5 * calc.pi, min: -0.03, max: 0.03, style: (stroke: red))
+
+      plot.annotate({
+        content((1.5 * calc.pi, -.1), colmath(1, $x^*$))
+        content((.62 * calc.pi, .1), colmath(1, $L$))
+        content((.6 * calc.pi, -.1), colmath(1, $-L$))
+      })
+      plot.annotate({
+        rect((1.5 * calc.pi - .15, -.05), (1.5 * calc.pi + .15, +.05), fill: rgb("#eaff0075"), stroke: none)
+      })
+    },
+  )
+}))
 Nel caso di una radice multipla di molteplicità $m$, si può dimostrare che
 $
   Phi'(x^*) = (m-1)/m
@@ -514,38 +701,43 @@ Se abbiamo il metodo iterativo
 $
   x_(i+1) = Phi(x_i), space i=0,1,...
 $
-per determinare uno zero di $f(x)$, cerchiamo un criterio di arresto idoneo per l'iterazione. Esaminiamo, in particolare, il metodo di Newton. Come abbiamo precedentemente visto per il metodo di bisezione, il valore di $f(x)$ nell'approssimazione, è da considerarsi "piccolo" se
-$
-  abs(f(x_i)) lt.eq "tol" dot abs(f'(x^*)) approx "tol" dot abs(f'(x_i))
-$
-ovvero se
+per determinare uno zero di $f(x)$, cerchiamo un criterio di arresto idoneo per l'iterazione. Esaminiamo, in particolare, il metodo di Newton. Come discusso per il metodo di bisezione, un controllo basato esclusivamente su $f(x_i)$ è insufficiente se non rapportato alla derivata prima della funzione nel punto. La condizione di arresto ideale è:
 $
   abs(f(x_i))/abs(f'(x_i)) lt.eq "tol"
 $
-e quindi, per il metodo di Newton, questo equivale a richiedere che
+Nel caso specifico del metodo di Newton si ha che:
 $
-  abs(x_(i+1) - x_i) lt.eq "tol"
+  x_(i+1) = x_i - frac(f(x_i), f'(x_i)) => x_(i+1) - x_i = - frac(f(x_i), f'(x_i)) => abs(x_(i+1) - x_i) = abs(frac(f(x_i), f'(x_i)))
 $
-che è un controllo sull'errore assoluto. Tuttavia, se $x_i -> x^*$, con $abs(x^*) >> 1$, sarebbe più efficace effettuare un controllo sull'errore relativo, ovvero:
-$
-  abs(x^*-x_i)/abs(x^*) lt.eq "tol"
-$
-Per rendere la scelta del criterio d'arresto "automatica", potremmo passare a un criterio del tipo:
-$
-  abs(x_(i+1) - x_i) lt.eq (1+abs(x_i)) dot "tol"
-$
-ovvero
+Ovvero il rapporto tra $f(x_i)$ e derivata coincide esattamente con l'ampiezza del passo d'iterazione. Per arrestare l'algoritmo basandosi sulla quantità $abs(x_(i+1) - x_i)$, si possono adottare due metodi, ognuno con i propri limiti:
++ *Criterio errore assoluto*:
+  $
+    abs(x_(i+1) - x_i) lt.eq "tol"
+  $
+  Attenzione, se la radice $x^*$ è molto grande in modulo, una `tol` troppo piccola potrebbe risultare irraggiungibile a causa della precisione finita di macchina.
+
++ *Criterio errore relativo*:
+  $
+    frac(abs(x_(i+1) - x_i), abs(x_i)) lt.eq "tol"
+  $
+  Attenzione, questo metodo è instabile quando la successione di approssimazioni si avvicina allo zero. Se $x_i -> 0$ si causerà una divisione per zero.
+
+Per ovviare ai problemi dei due criteri precedenti e ottenerne uno adatto ad ogni scenario, adottiamo un criterio ibrido. Esso è:
 $
   abs(x_(i+1)-x_i)/(1+abs(x_i)) lt.eq "tol"
 $
-Pertanto, si ottiene approssimativamente un criterio di arresto basato sull'errore assoluto, se $x_i approx 0$, ovvero, sull'errore relativo se $abs(x_i) >> 1$. Questo criterio di arresto, pertanto, si autoscala in base alla radice a cui si sta convergendo.
+- Nel caso di radici nulle o piccole ($x_i approx 0$), il termine $1+abs(x_i) approx 1$. Pertanto il criterio si comporta come un controllo sull'errore assoluto evitando divisioni per zero.
 
-#observation()[
-  Questo criterio _deve_ essere usato negli elaborati finali.
+- Nel caso di radici grandi ($abs(x_i) >> 1$), il termine $1+abs(x_i)approx abs(x_i)$. Pertanto il criterio si comporta come un controllo sull'errore relativo.
+
+#observation(multiple: true)[
+  - Questo criterio di arresto si autoscala in base alla radice a cui si sta convergendo.
+  - Questo criterio *_deve_* essere usato negli elaborati finali.
 ]
 
+//22.10.2025
 == Il caso di radici multiple
-Vediamo come ovviare al degrado dell'ordine di convergenza del metodo di Newton verso radici multiple (è un problema malcondizionato). Si distinguono, a riguardo, i seguenti due casi significativi:
+Vediamo come ovviare al degrado dell'ordine di convergenza del metodo di Newton verso radici multiple (è un problema mal condizionato). Si distinguono, a riguardo, i seguenti due casi significativi:
 - Molteplicità radice nota.
 - Molteplicità radice incognita.
 
@@ -557,7 +749,7 @@ Se $f(x)$ ha una radice $x^*$ di molteplicità $m>1$, ciò significa che $f(x^*)
 $
   f(x) = (x-x^*)^m g(x)
 $
-con $g(x)$ una funzione tale che $g(x^*)eq.not 0$. Nel caso più semplice, $g(x)=c="costante"$, vediamo cosa succede se applichiamo il metodo di Newton a $f(x)=c dot (x-x^*)^m$:
+con $g(x)$ una funzione tale che $g(x^*)eq.not 0$. Nel caso più semplice, $g(x)=c$ costante, vediamo cosa succede se applichiamo il metodo di Newton a $f(x)=c dot (x-x^*)^m$:
 $
   x_(i+1) = x_i - overparen(c dot (x_i-x^*)^m, =f(x_i))/underparen(m dot c dot (x_i - x^*)^(m-1), =f'(x_i)) = x_i - (x_i - x^*)/m
 $
@@ -571,52 +763,105 @@ Nel caso generale, si dimostra che l'iterazione (primi due passaggi del blocco p
   #set heading(numbering: none, outlined: false)
   === La molteplicità della radice è incognita
 ]
-In questo caso, se definiamo l'errore al passo $i$, $e_i=x^*-x_i$, che
+Supponiamo di voler calcolare la radice $x^*$ di una funzione $f$, ma di non conoscere la molteplicità della radice. Indichiamo con $e_i=x^*-x_i$ l'errore al passo i-esimo. Sappiamo che, se la radice ha molteplicità $m$, allora per il metodo di Newton vale:
 $
-  lim_(i->infinity) (e_(i+1))/e_i = (m-1)/m " con " m " molteplicità (incognita di "x^*")"
+  lim_(i->infinity) (e_(i+1))/e_i = (m-1)/m " con" m "molteplicità incognita di "x^*
 $
-Pertanto, anche se $m$ non è nota, sappiamo che per $i>>1$:
+cioè la convergenza è *lineare* e non quadratica.
+
+Anche se $m$ non è nota, per $i>>1$ possiamo osservare che:
 $
-  (e_(i+1))/e_i approx frac(e_i, e_(i-1)) approx c \ e_(i+1) = c dot e_i " e " e_i = c dot e_(i-1)
+  (e_(i+1))/e_i approx frac(e_i, e_(i-1)) approx c = frac(m-1, m)
 $
-da cui otteniamo, dividendo membro a membro, che:
+Da ciò segue che:
 $
-  (e_(i+1))/e_i approx (e_i)/e_(i-1)
+  #box([
+    $e_(i+1) = c dot e_i$
+  ], stroke: 1pt + black, inset: 5pt)
+  " e "
+  #box([
+    $e_i = c dot e_(i-1)$
+  ], stroke: 1pt + black, inset: 5pt)
 $
-ovvero $e_(i+1) dot e_(i-1) approx e_i^2$ che significa che:
+Dividendo membro a membro le due relazioni otteniamo:
+$
+  (e_(i+1))/e_i approx (e_i)/e_(i-1) => e_(i+1) dot e_(i-1) approx e_i^2
+$
+Andando a sostituire $e_i$ con la sua definizione vale che:
 $
   (x_i^* - x_(i+1))(x_i^* -x_(i-1)) = (x_i^* - x_i)^2
 $
-da cui otteniamo:
+Sviluppando entrambi i membri e semplificando, si ottiene un’equazione di secondo grado in $x^*$, dalla quale si ricava:
 $
-  (x_i^*)^2 -(x_(i+1)+x_(i-1)) dot x_i^* + x_(i+1) dot x_(i-1) = (x_i^*)^2 - 2x_i x_i^* + x_i^2\
-  x_i^*=frac(x_(i+1)-x_(i-1)-x_i^2, x_(i+1)-2x_i+x_(i-1))
+  cancel((x_i^*)^2) -(x_(i+1)+x_(i-1)) dot x_i^* + x_(i+1) dot x_(i-1) = cancel((x_i^*)^2) - 2x_i x_i^* + x_i^2\
+  x_i^*=frac(x_(i+1) dot x_(i-1)-x_i^2, x_(i+1)-2x_i+x_(i-1))
 $
-Questa iterazione definisce una procedura a 2 livelli:
-$
-  x_0 overshell(-->, "Newton") x_i overshell(-->, "Newton") x_i => x_1^* " da cui ripeto i due passi di Newton"
-$
-Quindi, il costo per iterazione è doppio rispetto al metodo di Newton _standard_. Il vantaggio è che si può dimostrare che la successione ${x_i^*}$ converge quadraticamente a $x^*$ (anche se la convergenza rimane di tipo locale). Questa procedura a 2 livelli definisce il *metodo di accelerazione di Aitken*.
-#figure(
-  table(
-    columns: 4,
-    rows: 9,
-    table.cell($f(x)=(x-1)^(10) dot e^x$, colspan: 4),
-    [it], [Newton], [Newton modificato], [Aitken],
-    [0], [0], [0], [0],
-    [1], [1.111111111111111e-01], [1.111111111111111e+00], [9.111111111111099e-01],
-    [2], [2.086720867208672e-01], [1.001221001221001e+00], [9.992895975197171e-01],
-    [3], [2.946049884277536e-01], [1.000000149066197e+00], [9.999999545628913e-01],
-    [4], [3.704979405704750e-01], [1.000000000000002e+00], [1.000000244342852e-00],
-    [5], [4.376770876576362e-01], [1.000000000000000e+00], [1.000000090874212e+00],
-    [6], [4.972598543829098e-01], [1.000000000000000e+00], [1.000000000000000e+00],
-  ),
-  caption: "Esempio di come Newton modificato e Aitken portino ad ottenere il valore della radice più velocemente del metodo di Newton standard.",
-)
+Questa quantità fornisce una *stima migliorata della radice vera*.
+Il metodo può essere interpretato nel seguente modo:
++ Si applicano due passi del metodo di Newton, ottenendo $x_(i-1), x_i, x_(i+1)$.
++ Usando questi tre valori, si costruisce una nuova approssimazione $x_i^*$ tramite la formula precedente.
++ Il processo può essere ripetuto utilizzando di nuovo il metodo di Newton.
+#observation()[
+  Il costo per iterazione è doppio rispetto al metodo di Newton _standard_. Il vantaggio è che si può dimostrare che la successione ${x_i^*}$ converge quadraticamente a $x^*$ (anche se la convergenza rimane di tipo locale).
+]
+#index("Metodo di Aitken")Questa procedura definisce il *metodo di accelerazione di Aitken*.
+#example()[
+  Esempio di come Newton modificato e Aitken portino ad ottenere il valore della radice più velocemente del metodo di Newton standard.
+  #figure(
+    table(
+      columns: 4,
+      rows: 9,
+      table.cell($f(x)=(x-1)^(10) dot e^x$, colspan: 4),
+      [it], [Newton], [Newton modificato], [Aitken],
+      [0], [0], [0], [0],
+      [1], [1.111111111111111e-01], [1.111111111111111e+00], [9.111111111111099e-01],
+      [2], [2.086720867208672e-01], [1.001221001221001e+00], [9.992895975197171e-01],
+      [3], [2.946049884277536e-01], [1.000000149066197e+00], [9.999999545628913e-01],
+      [4], [3.704979405704750e-01], [1.000000000000002e+00], [1.000000244342852e-00],
+      [5], [4.376770876576362e-01], [1.000000000000000e+00], [1.000000090874212e+00],
+      [6], [4.972598543829098e-01], [1.000000000000000e+00], [1.000000000000000e+00],
+    ),
+  )
+]
 
 == Metodi quasi Newton
 Ricordiamo il metodo di Newton $x_(i+1) = x_i - (f(x_i))/(f'(x_i))$ con un costo di valutazione pari a 2. Questo risultato può essere migliorato lavorando sulla derivata prima al denominatore.
-#figure(image("images/2025-10-22-16-34-46.png"))
+#figure(
+  canvas({
+    import draw: content
+    plot.plot(
+      x-grid: true,
+      y-grid: true,
+      size: (14, 8),
+      x-tick-step: 1,
+      y-tick-step: 1,
+      y-min: -2,
+      y-max: 6,
+      plot-style: (stroke: black),
+      legend: "inner-north-east",
+      {
+        let func = x => -4 - 36 / (x - 12)
+        let tangente2 = x => 0.9299 * x - 3.587
+        plot.add(func, domain: (-1, 9), label: $f(x)$, style: (stroke: blue))
+        plot.add(tangente2, domain: (-1, 9), style: (stroke: green))
+
+
+        plot.add-hline(0, style: (stroke: black))
+        plot.add-vline(3, 3.587 / 0.9299, 5.7778, min: -0.1, max: 0.1)
+        plot.annotate({
+          content((3, -.4), $x^*$)
+          content((5.9, -.4), $x_i$)
+          content((3.587 / 0.9299, -.4), $x_(i+1)$)
+        })
+        plot.add(
+          ((52 / 9, 1.7857143),),
+          style: (stroke: none),
+          mark: "o",
+        )
+      },
+    )
+  }),
+)
 Ricordiamo la definizione di derivata prima:
 $
   f'(x_i) = lim_(h->infinity) frac(f(x_i+h)-f(x_i), h)
@@ -626,7 +871,46 @@ Se approssimiamo $f'(x_i)$ con $frac(f(x_i+h)-f(x_i), h)$ con $h$ fissato, otter
   #set heading(numbering: none, outlined: false)
   === Metodo delle secanti
 ]
-#figure(image("images/2025-10-22-16-37-49.png"))
+#index("Metodo delle secanti")
+#figure(
+  canvas({
+    import draw: content
+    plot.plot(
+      x-grid: true,
+      y-grid: true,
+      size: (14, 8),
+      x-tick-step: .5,
+      y-tick-step: 1,
+      y-min: -1,
+      y-max: 7,
+      plot-style: (stroke: black),
+      legend: "inner-north-east",
+      {
+        let func = x => calc.pow(calc.e, x) - 1
+        let secante = x => 4.87 * x - 3.35
+        let secante2 = x => 2.452 * x - .694
+        plot.add(func, domain: (-0.5, 2.5), label: $f(x)$, style: (stroke: blue))
+        plot.add(secante, domain: (-0.5, 2.5), style: (stroke: red))
+        plot.add(secante2, domain: (-0.5, 2.5), style: (stroke: green))
+
+        plot.add-hline(0, style: (stroke: black))
+        plot.add-vline(0, 2, calc.ln(3), .6876, .283, min: -0.1, max: 0.1)
+        plot.annotate({
+          content((0, -.4), $x^*$)
+          content((2, -.4), $x_(i-1)$)
+          content((calc.ln(3), -.4), $x_i$)
+          content((.6876, -.4), $x_(i+1)$)
+          content((.283, -.4), $x_(i+2)$)
+        })
+        plot.add(
+          ((2, calc.pow(calc.e, 2) - 1), (calc.ln(3), 2), (.6876, calc.pow(calc.e, .6876) - 1)),
+          style: (stroke: none),
+          mark: "o",
+        )
+      },
+    )
+  }),
+)
 Consideriamo la retta secante il grafico di $f(x)$ nei due punti $(x_i, f(x_i))$ e $(x_(i-1), f(x_(i-1)))$, il cui coefficiente angolare è dato dal seguente rapporto incrementale:
 $
   frac(f(x_i)-f(x_(i-1)), x_i - x_(i-1)) approx f'(x_i)
@@ -636,7 +920,7 @@ $
   x_(i+1) = x_i - frac(f(x_i), f(x_i)-f(x_(i+1))) (x_i - x_(i+1)), space i=1,2,...
 $
 
-#observation()[
+#observation(multiple: true)[
   + Il metodo richiede due approssimazioni iniziali per essere innescato (metodo a due passi).
   + Il costo per iterazione è di 1 valutazione funzionale eccetto la valutazione iniziale in cui ne facciamo 2.
   + L'ordine di convergenza verso radici semplici è:
@@ -646,12 +930,56 @@ $
     La convergenza verso radici multiple è, al pari del metodo di Newton, *solo lineare*. Trattandosi di un approssimazione del metodo di Newton, la sua convergenza è, generalmente, locale.
 ]
 
-
 #[
   #set heading(numbering: none, outlined: false)
   === Metodo delle corde
 ]
-#figure(image("images/2025-10-22-16-43-55.png"))
+#index("Metodo delle corde")
+#figure(
+  canvas({
+    import draw: content
+    plot.plot(
+      x-grid: true,
+      y-grid: true,
+      size: (14, 8),
+      x-tick-step: .5,
+      y-tick-step: 1,
+      y-min: -1,
+      y-max: 7,
+      plot-style: (stroke: black),
+      legend: "inner-north-east",
+      {
+        let func = x => calc.pow(calc.e, x) - 1
+        let corda = x => calc.pow(calc.e, 2) * x + (calc.pow(calc.e, 2) - 1) - calc.pow(calc.e, 2) * 2
+        let corda2 = x => calc.pow(calc.e, 2) * x + (calc.pow(calc.e, 1.1353) - 1) - calc.pow(calc.e, 2) * 1.1353
+        let corda3 = x => calc.pow(calc.e, 2) * x + (calc.pow(calc.e, .8495) - 1) - calc.pow(calc.e, 2) * .8495
+        plot.add(func, domain: (-0.5, 2.5), label: $f(x)$, style: (stroke: blue))
+        plot.add(corda, domain: (-0.5, 2.5), style: (stroke: red))
+        plot.add(corda2, domain: (-0.5, 2.5), style: (stroke: green))
+        plot.add(corda3, domain: (-0.5, 2.5), style: (stroke: purple))
+
+        plot.add-hline(0, style: (stroke: black))
+        plot.add-vline(0, 2, 1.1353, .8495, .6684, min: -0.1, max: 0.1)
+        plot.annotate({
+          content((0, -.4), $x^*$)
+          content((2, -.4), $x_0$)
+          content((1.1353, -.4), $x_1$)
+          content((.8495, -.4), $x_2$)
+          content((.6684, -.4), $x_3$)
+        })
+        plot.add(
+          (
+            (2, calc.pow(calc.e, 2) - 1),
+            (1.1353, calc.pow(calc.e, 1.1353) - 1),
+            (.8495, calc.pow(calc.e, .8495) - 1),
+          ),
+          style: (stroke: none),
+          mark: "o",
+        )
+      },
+    )
+  }),
+)
 Per i passi successivi si utilizza l'approssimazione $f'(x_i) approx f'(x_0)$, ovvero, più semplicemente, calcoliamo la derivata prima soltanto all'inizio e la riutilizziamo per tutti i passi. L'espressione del metodo delle corde è pertanto:
 $
   x_(i+1) = x_i - frac(f(x_i), f'(x_0)) space i=1,2,...

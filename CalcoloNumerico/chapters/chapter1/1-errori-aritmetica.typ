@@ -1,6 +1,7 @@
 #import "../../../dvd.typ": *
 #import "@preview/cetz:0.4.2" as cetz: canvas, draw
-#import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
+#import "@preview/in-dexter:0.7.2": *
 
 #[
   #set heading(numbering: none)
@@ -10,18 +11,18 @@
 Molti problemi che derivano dalle applicazioni sono descritti, in modo formale, da un modello matematico.
 Una volta che le equazioni del modello sono risolte, è possibile fare inferenza sul fenomeno studiato. Per risolvere queste equazioni si ricorre spesso all'utilizzo di *metodi numerici*. Questi sono delle tecniche di *approssimazione* che devono soddisfare i seguenti requisiti:
 + *Accuratezza*: la soluzione approssimata deve essere "vicina" alla soluzione del problema. Questa dipende dalle *specifiche* del problema.
-+ *Facitilità di implementazione*: in quanto da codificare usando un opportuno linguaggio di programmazione
++ *Facilità di implementazione*: in quanto da codificare usando un opportuno linguaggio di programmazione
 
 
 = Errori ed aritmetica finita
 
-Definiamo, in primis, opportune misure dell'errore. Supponiamo che $x in RR$ sia il dato esatto che approssimiamo con $limits(x)^tilde$. Definiamo l'*errore assoluto* ($Delta x$) la differenza:
+Definiamo, in primis, opportune misure dell'errore. Supponiamo che $x in RR$ sia il dato esatto che approssimiamo con $limits(x)^tilde$.#index("Errore", "assoluto") Definiamo l'*errore assoluto* ($Delta x$) la differenza:
 $
   Delta x = limits(x)^tilde -x
 $
 Da cui segue che $limits(x)^tilde = x + Delta x$.
 
-Questa misura non è completamente esaustiva perché per $Delta x = 10^(-6)$ non potremmo dire se è grande o piccolo se non rapportandolo a $x$. Per questo motivo, se $x eq.not 0$, definiamo l'*errore relativo*:
+Questa misura non è completamente esaustiva perché per $Delta x = 10^(-6)$ non potremmo dire se è grande o piccolo se non rapportandolo a $x$. Per questo motivo, se $x eq.not 0$, #index("Errore", "relativo")definiamo l'*errore relativo*:
 $
   limits(x)^tilde = x (1+ epsilon_x) space " e " space limits(x)^tilde/x = 1 + epsilon_x
 $
@@ -33,41 +34,44 @@ Se $limits(x)^tilde$ è il risultato fornito da un metodo numerico definito per 
 + *Errori di round-off*
 
 == Errori di troncamento o discretizzazione
-
-Questi tipi di errori sono legati alla definizione del metodo numerico. Se, ad esempio, il problema da risolvere è il calcolo della derivata di una funzione $f(x)$ in un punto $x$ assegnato. A questo fine sappiamo che:
+#index("Errore", "di troncamento")
+Questi tipi di errori sono legati alla definizione del metodo numerico. Nascono perché non possiamo calcolare limiti o serie infinite con un numero finito di operazioni. Se, ad esempio, il problema da risolvere è il calcolo della derivata di una funzione $f(x)$ in un punto $x$ assegnato. A questo fine sappiamo che la definizione esatta richiede un limite:
 $
   f'(x) = lim_(h arrow 0) frac(f(x+h)-f(x), h) approx frac(f(x+overline(h))-f(x), overline(h)) "   dove " overline(h) > 0 " è fisso"
 $
-In questo caso $f'(x) - frac(f(x+overline(h))-f(x), overline(h))$ è l'errore di troncamento connesso. Osserviamo che (usando gli sviluppi di Taylor):
-$
-  f(x+overline(h)) = f(x) + frac(overline(h), overline(h))f'(x) + frac(overline(h)^2, 2overline(h)) f''(x) + ... arrow.double frac(f(x+overline(h))-f(x), overline(h)) = o(h)
-$
+Numericamente, il calcolatore non può fare limiti ($h$ non può essere zero). Dobbiamo fermarci a un passo $h$ (o $overline(h)$) piccolo ma finito ($h > 0$). In questo caso $f'(x) - frac(f(x+overline(h))-f(x), overline(h))$ è l'errore di troncamento connesso.
 
-#observation()[L'errore di discretizzazione è determinato dalla sostituzione di un problema continuo con uno discreto che lo approssima (approssimazione derivata prima).
-  L'errore di troncamento nasce quando sostituiamo un processo infinito con uno finito (approssimazione tramite Taylor).
+Per capire quanto grande è l'errore che commettiamo usando questa approssimazione, utilizziamo lo sviluppo di Taylor di $f(x+overline(h))$ centrato in $x$:
+$
+  f(x+overline(h)) = f(x) + frac(overline(h), overline(h))f'(x) + frac(overline(h)^2, 2overline(h)) f''(x) + ... arrow.double frac(f(x+overline(h))-f(x), overline(h)) = O(h)
+$
+Quindi, l'approssimazione che stiamo usando differisce dalla derivata vera $f'(x)$ per una quantità proporzionale ad $h$ (che indichiamo con $O(h)$)
+
+#observation()[
+  - L'errore di discretizzazione è determinato dalla sostituzione di un problema *continuo*  (definito su infiniti punti) con uno *discreto* (definito su un numero finito di punti) che lo approssima (approssimazione derivata prima con $h$ fisso).
+  - L'errore di troncamento nasce quando sostituiamo un processo *infinito* con uno *finito* (approssimazione tramite Taylor).
 ]
 
 == Errori di iterazione o convergenza
-
+#index("Errore", "di iterazione")
 Determinati metodi numerici sono di *tipo iterativo*. Questo significa che sono definiti da una *funzione di iterazione*, $Phi(x)$, tale che, a partire da un'approssimazione iniziale $x_0 approx x$, viene prodotta una successione di approssimazioni mediante l'iterazione:
 $
   x_(n+1) = Phi(x_n) space "con " n=0,1,2,...
 $
 
 #definition("Convergente")[
+  #index("Convergente")
   Diremo che il metodo è *convergente* se:
   $
     lim_(n arrow infinity) x_n = x^*
   $
 ]
 
-Se il metodo è convergente, ed utilizziamo $x_n$, per un opportuno indice $n > 0$, come approssimazione di $x^*$, la differenza $x^*-x_n$ è l'*errore di iterazione*.
+Se il metodo è convergente e, per un opportuno indice $n > 0$, utilizziamo $x_n$ come approssimazione di $x^*$, la differenza $x^*-x_n$ è l'*errore di iterazione*.
 
-#observation()[
-  L'errore di iterazione è legato all'utilizzo del metodo di base ($Phi(x)$)
-]
-#observation()[
-  Praticamente sempre, l'indice $n$ a cui interrompiamo l'iterazione è determinato dinamicamente mediante un opportuno criterio di arresto.
+#observation(multiple: true)[
+  - L'errore di iterazione è legato all'utilizzo del metodo di base $Phi(x)$.
+  - Praticamente sempre, l'indice $n$ a cui interrompiamo l'iterazione è determinato dinamicamente mediante un opportuno criterio di arresto.
 ]
 
 #example("Metodo di Newton")[
@@ -98,7 +102,7 @@ Se il metodo è convergente, ed utilizziamo $x_n$, per un opportuno indice $n > 
 ]
 
 == Errori di round-off
-
+#index("Errore", "di round-off")
 Questi errori sono dovuti all'utilizzo dell'*aritmetica finita* di un calcolatore. In particolare ci preoccuperemo degli errori di rappresentazione, che sono dovuti al fatto che i numeri non sono rappresentabili esattamente in macchina. Considereremo i seguenti tipi di dati numerici:
 
 - *Interi*
@@ -128,7 +132,7 @@ $
 $
 Fissata una base di rappresentazione $b in NN$, le cifre della stringa sono così definite:
 $
-  alpha_0 in {+,-} space space alpha_i, beta_i in {0,1...,b-1}, space i=1,...,m space j=1,...,s space "con" space alpha_1 eq.not 0 space space space (2)
+  alpha_0 in {+,-} space space alpha_i, beta_j in {0,1...,b-1}, space i=1,...,m space j=1,...,s space "con" space alpha_1 eq.not 0 space space space (2)
 $
 Con questa stringa si rappresenta il numero in notazione scientifica:
 $
@@ -146,31 +150,28 @@ $
 Ne consegue che, essendo $b^s >> 1$, allora $nu approx frac(b^s, 2) space (5)$.
 Riguardo alla mantissa abbiamo che:
 $
-  1 lt.eq rho lt.eq (b-1) times overbrace((b-1) ... (b-1), m-1) = b(1-b^n) < b space space space (6)
+  1 lt.eq rho lt.eq (b-1) times overbrace((b-1) ... (b-1), m-1) = b(1-b^(-m)) < b space space space (6)
 $
-#observation()[
-  I numeri della forma (1-6) sono in numero finito.
-]
+ovvero essa risulta essere *normalizzata* (semplicemente compresa tra 1 e $b$).
 
 #definition(
   "Numeri di macchina normalizzati",
 )[
+  #index("Numeri macchina normalizzati")
   I numeri della forma (1-6) costituiscono, assieme allo $emptyset$, l'insieme dei *numeri di macchina normalizzati* $cal(M)$.
 ]
 
-#observation()[
-  Dalla scelta dello shift $nu$ (5), segue che $cal(M)$ contiene (segno a parte) praticamente lo stesso numero di numeri di macchina in [0,1] e (1, $+infinity$)
-]
-
-#observation()[
-  Il più piccolo numero di macchina positivo è:
-  $
-    r_1 = b^(-nu)
-  $
-  Similmente, il più grande numero di macchina si ottiene quando $alpha_i = (b?)$ con $i = 1,...,m$ e $beta_j = (b-1)$ con $j=1,...,s$. Così facendo si ottiene:
-  $
-    r_2 =(1-b^(-m)) b^(b^s - nu) approx b^(b^s -nu)
-  $
+#observation(multiple: true)[
+  - I numeri della forma (1-6) sono in numero finito.
+  - Dalla scelta dello shift $nu$ (5), segue che $cal(M)$ contiene (segno a parte) praticamente lo stesso numero di numeri di macchina in [0,1] e (1, $+infinity$)
+  - Il più piccolo numero di macchina *positivo* è:
+    $
+      r_1 = b^(-nu)
+    $
+    Similmente, il più grande numero di macchina si ottiene quando  $alpha_i = (b-1)?$ con $i = 1,...,m$ e $beta_j = (b-1)$ con  $j=1,...,s$. Così facendo si ottiene:
+    $
+      r_2 =(1-b^(-m)) b^(b^s - nu) approx b^(b^s -nu)
+    $
 ]
 
 Possiamo quindi concludere che:
@@ -184,10 +185,11 @@ $
 Dove $limits(x)^tilde = f l(x)$ è il floating di $x$, che individua il numero di macchina che associamo a $x$.
 
 #definition("Errore di rappresentazione")[
+  #index("Errore", "di rappresentazione")
   Chiamiamo *errore di rappresentazione* la quantità $f l (x) - x$.
 ]
 
-Vediamo come si implementa la fuzione $f l$. Per costruzione vale:
+Vediamo come si implementa la funzione $f l$. Per costruzione vale:
 - $f l (0) = 0$. Più in generale se $x in cal(M)$, allora $f l (x) = x$.
 - $x>0$ allora $f l(-x) = -f l(x)$
 Pertanto è sufficiente dettagliare l'implementazione di $f l (x)$ quando $x>0$. Per questo motivo, se $x in cal(I)$, allora $x$ sarà della forma:
@@ -217,42 +219,48 @@ Riguardo all'errore di rappresentazione vale i seguente risultato:
 #theorem()[
   Per i numeri di $cal(I)$ positivi vale che l'errore relativo di rappresentazione:
   $
-    epsilon_x = frac(abs(f l(x) - x), x) lt.eq u
+    f l(x) = tilde(x) = x (1+epsilon_x) quad abs(epsilon_x) lt.eq u
   $
 ]
 #definition()[
+  #index("Precisione di macchina")
   $u$ è detta *precisione di macchina dell'aritmetica finita*. _E' la maggiorazione uniforme dell'errore relativo di rappresentazione_.
   $
     u = cases(b^(1-m) ", troncamento", 1/2 b^(1-m) ", arrotondamento")
   $
 ]
 #proof()[
-
   Per brevità, si riporta la dimostrazione nel solo caso della rappresentazione con troncamento. Simili argomenti si applicano al caso della rappresentazione con arrotondamento. Siano:
   $
-    x = (alpha_1 alpha_2 ... alpha_(m-1)alpha_m alpha_(m+1) alpha_(m+2) ...) b^(e-nu) \
-    f l (x) = (alpha_1 alpha_2 ... alpha_m) b^(e-nu)
+    x = (alpha_1. alpha_2 ... alpha_(m-1)alpha_m alpha_(m+1) ...) b^(e-nu) \
+    f l (x) = (alpha_1. alpha_2 ... alpha_m) b^(e-nu)
   $
   Allora:
   $
-    epsilon_x = frac(abs(x- f l(x)), abs(x)) = frac(
-      (alpha_1 alpha_2 ... alpha_(m-1)alpha_m alpha_(m+1) alpha_(m+2) ... - alpha_1 alpha_2 ... alpha_m)b^(e-nu),
-      (alpha_1 alpha_2 ...)b^(e-nu),
-    ) lt.eq \ lt.eq frac(0.overbrace(0 ... 0, m-1) alpha_(m+1) alpha_(m+2) ..., 1) = (alpha_(m+1) alpha_(m+2) ...)b^(-m) lt.eq b^(1-m) equiv u
+    abs(epsilon_x) &= frac(abs(x- f l(x)), abs(x)) = frac(
+      abs((alpha_1 alpha_2 ... alpha_m alpha_(m+1) ...)b^(e-nu) - (alpha_1 alpha_2 ... alpha_m)b^(e-nu)),
+      abs((alpha_1 alpha_2 ...)b^(e-nu)),
+    ) \
+    &lt.eq frac(0.overbracket(0 ... 0, m-1) alpha_(m+1) ..., 1) = (alpha_(m+1) alpha_(m+2) ...)b^(-m) lt.eq b^(1-m) equiv u
   $
+  La cifra $alpha_(m+1)$ ha peso $b^(-m)$. Ma quindi, quanto può essere grande al massimo la parte frazionaria che abbiamo rimosso per via del troncamento? Basta pensare al fatto che se anche tutte le cifre dalla posizione $m+1$ in poi avessero valore massimo, esse sarebbero comunque più piccole del valore di una unità in posizione $m$ che vale $b^(1-m)$.
 ]
 
-#observation()[
-  Concludiamo che la precisione di macchina di un'aritmetica finita è una maggiorazione uniforme dell'errore relativo di rappresentazione.
+#observation(multiple: true)[
+  - $abs(x - f l(x)) = abs(f l(x) - x) <=> abs(A-B) = abs(B-A)$
+  - Concludiamo che la precisione di macchina di un'aritmetica finita è una maggiorazione uniforme dell'errore relativo di rappresentazione.
 ]
 === Overflow e Underflow
 
 Che succede se $x>0$ ma $x>r_2$ oppure $0<x<r_1$?
 
-Se $x>r_2$ sostanzialmente $f l (x) = +infinity$. Questo è "gestibile" entro certi limiti (es. $1/infinity = 0$). La condizione $x>r_2$ (o $x< -r_2$) è denominata *overflow*. La condizione $0<x<r_1$ è denominata *underflow*.
+Se $x>r_2$ sostanzialmente $f l (x) = +infinity$. Questo è "gestibile" entro certi limiti (es. $1/infinity = 0$).
+- La condizione $x>r_2$ (o $x< -r_2$) è denominata *overflow*#index("Overflow").
+- La condizione $0<x<r_1$ è denominata *underflow*#index("Underflow").
+
 Per quest'ultimo sono previste 2 recovery:
-- Store $emptyset$ in cui $f l(x) = 0$.
-- Gradual underflow: in questo caso il numero di macchina viene *denormalizzato* permettendo ad $alpha_1$ di essere nullo. Chiaramente va a discapito dell'accuratezza di rappresentazione e il teorema precedente non vale più.
+- *Store $emptyset$* in cui $f l(x) = 0$.
+- *Gradual underflow*: in questo caso il numero di macchina viene *denormalizzato* permettendo ad $alpha_1$ di essere nullo. Chiaramente va a discapito dell'accuratezza di rappresentazione e il teorema precedente non vale più.
 
 In conclusione, per la funzione $f l (x)$ vale che:
 $
@@ -266,7 +274,7 @@ $
 
 // Lezione del 30/09/2025
 === Standard IEEE-754
-
+#index("IEEE-754")
 Base binaria (b = 2).\
 Viene utilizzata una rappresentazione con arrotondamento "*round to even*", ovvero, l'ultima cifra della mantissa rappresentata dalla funzione $f l$ è 0. Tuttavia, la maggiorazione dell'errore relativo di rappresentazione continua a valere. Viene implementato un *gradual underflow*. Pertanto, essendo la base binaria, la mantissa di un numero *normalizzato* sarà del tipo:
 $
@@ -290,21 +298,13 @@ In questo caso vengono allocati un totale di 4 byte (o 32 bit ripartiti nel segu
 - 23 bit per la frazione $f$ (m = 24).
 $
   #let cells = ()
-
   #for n in range(32) {
-    if (n == 0) {
-      cells.push(table.cell(fill: gray.transparentize(75%))[$$])
-    } else if (n in range(1, 8)) {
+    if (n == 0) { cells.push(table.cell(fill: gray.transparentize(75%))[$$]) } else if (n in range(1, 8)) {
       cells.push(table.cell(fill: green.transparentize(75%), stroke: (right: (dash: "densely-dotted")))[$$])
-    } else if (n == 8) {
-      cells.push(table.cell(fill: green.transparentize(75%))[$$])
-    } else if (n in range(9, 31)) {
+    } else if (n == 8) { cells.push(table.cell(fill: green.transparentize(75%))[$$]) } else if (n in range(9, 31)) {
       cells.push(table.cell(fill: yellow.transparentize(75%), stroke: (right: (dash: "densely-dotted")))[$$])
-    } else {
-      cells.push(table.cell(fill: yellow.transparentize(75%))[$$])
-    }
+    } else { cells.push(table.cell(fill: yellow.transparentize(75%))[$$]) }
   }
-
   #figure(table(
     columns: 32,
     rows: 1,
@@ -314,64 +314,51 @@ $
 $
 Da questo segue che la precisione di macchina (singola precisione IEEE-754) vale:
 $
-  u=1/2b^(1-m)=1/2 dot 2^(1-24)= 2^(-23) approx 10^(-7.5)
+  u=1/2b^(1-m)=1/2 dot 2^(1-24)= 2^(-1) dot 2^(-23) = 2^(-24) approx 10^(-7.22)
 $
 Il che vuole dire che lavoriamo con circa 7 cifre decimali significative.\
 Vediamo riguardo all'esponente. Con 8 cifre binarie, si possono rappresentare tutti gli interi in ${0, 1, dots, 255}$ quindi $0 <= e <= 255$. In particolare:
 
-- Se $0 < e < 255$, allora il numero è *normalizzato* e lo *shift* vale $nu=123$;
+- Se $0 < e < 255$, allora il numero è *normalizzato* e lo *shift* vale $nu=127$;
 - Se $e=f=0$, allora abbiamo la rappresentazione dello *0*;
-- Se $e=0 and f eq.not 0$, allora il numero è *denormalizzato* e lo *shift* vale $nu=122$.
+- Se $e=0 and f eq.not 0$, allora il numero è *denormalizzato* e l'esponente effettivo è fissato a $e = 1-127=-126$.
 
 #observation()[
-  La variazione di shift, quando si denormalizza, si spiega osservando che il più piccolo numero denormalizzato (positivo) è:
+  La variazione di shift, quando si denormalizza, si spiega osservando che il più piccolo numero normalizzato (positivo) è:
   $
-    1.0dots 0 dot 2^(1-123)=2^(-122)
+    1.0 dot 2^(1-127)=2^(-126)
   $
   Invece, il più grande numero denormalizzato (positivo) è:
   $
-    1.1dots 1 dot 2^(1-123)=2^(-122)
+    0.1 dots 1 dot 2^(1-127)=2^(-126)
   $
-  Pertanto, i due numeri sono *contigui*.
+  Pertanto, i due numeri sono *contigui*. Ovvero lo spazio tra zero e il più piccolo numero normalizzato è riempito dai denormalizzati.
 ]
 
-Se $e=255$ e $f=0$, allora abbiamo:
+- Se $e=255$ e $f=0$, allora abbiamo:
 $
   + space infinity, "se " alpha_0=0\
   - space infinity, "se " alpha_0=1
 $
-Se $e=255$ e $f eq.not 0$, allora abbiamo: NaN (Not a Number).\
-Questo è, ad esempio, originato da forme indeterminate del tipo:
-- $infinity - infinity$
-- $0 dot infinity$
-- $infinity / infinity$
-- $0/0$
+- Se $e=255$ e $f eq.not 0$, allora abbiamo: NaN (Not a Number). Questo è, ad esempio, originato da forme indeterminate del tipo: $infinity - infinity$, $0 dot infinity$, $infinity / infinity$ e $0/0$.
 
 #[#set heading(outlined: false, numbering: none)
   ==== Doppia precisione]
 
 In questo caso vengono utilizzati 8 byte (64 bit) per rappresentare un numero in doppia precisione. Questi sono così ripartiti:
-- 1 bit per il segno della mantissa (grigio);
-- 11 bit per l'esponente (2 = 11 --- giallo);
-- 52 bit per la frazione $f$ (m = 53 --- verde).
+- 1 bit per il segno della mantissa;
+- 11 bit per l'esponente (s = 11);
+- 52 bit per la frazione $f$ (m = 53).
 
 $
   #let cells = ()
-
   #for n in range(64) {
-    if (n == 0) {
-      cells.push(table.cell(fill: gray.transparentize(75%))[$$])
-    } else if (n in range(1, 11)) {
+    if (n == 0) { cells.push(table.cell(fill: gray.transparentize(75%))[$$]) } else if (n in range(1, 11)) {
       cells.push(table.cell(fill: green.transparentize(75%), stroke: (right: (dash: "densely-dotted")))[$$])
-    } else if (n == 11) {
-      cells.push(table.cell(fill: green.transparentize(75%))[$$])
-    } else if (n in range(12, 63)) {
+    } else if (n == 11) { cells.push(table.cell(fill: green.transparentize(75%))[$$]) } else if (n in range(12, 63)) {
       cells.push(table.cell(fill: yellow.transparentize(75%), stroke: (right: (dash: "densely-dotted")))[$$])
-    } else {
-      cells.push(table.cell(fill: yellow.transparentize(75%))[$$])
-    }
+    } else { cells.push(table.cell(fill: yellow.transparentize(75%))[$$]) }
   }
-
   #figure(table(
     columns: 64,
     rows: 1,
@@ -389,14 +376,13 @@ $
 In modo sostanzialmente analogo al caso della singola precisione, si ha che:
 - Se $0< e < 2047$, allora il numero è normalizzato e lo shift vale $nu=1023$.
 - Se $e=f=0$, allora abbiamo la rappresentazione dello *0*;
-- Se $e=0 and f eq.not 0$, allora il numero è *denormalizzato* e lo *shift* vale $nu=1022$.
-
-Se $e=2047$ e $f=0$, allora abbiamo:
+- Se $e=0 and f eq.not 0$, allora il numero è *denormalizzato* e l'esponente effettivo è fissato a $e = 1-1023=-1022$.
+- Se $e=2047$ e $f=0$, allora abbiamo:
 $
   + space infinity, "se " alpha_0=0\
   - space infinity, "se " alpha_0=1
 $
-Se $e=2047$ e $f eq.not 0$, allora abbiamo: NaN (Not a Number).\
+- Se $e=2047$ e $f eq.not 0$, allora abbiamo: NaN (Not a Number).
 
 === Aritmetica finita
 
@@ -408,21 +394,36 @@ Questo implica che, di norma, le proprietà algebriche delle operazioni (associa
 
 === Conversione fra tipi diversi
 
-Siano $x$, $pi$ (3.141592653) e $y$ variabili rispettivamente in doppia precisione, in doppia precisione e in singola precisione:
-$
-  cases(x=pi, y=x)
-$
-allora $y$ conterrà $pi$ con la massima accuratezza consentita alla singola precisione.
-Viceversa:
-$
-  cases(y=pi, x=y)
-$
-allora $x$ conterrà $pi$ con l'accuratezza della singola precisione.
-Inoltre:
-- $x=1"E "308, quad quad quad x "dà " 9.99dots 9E space 308$
-- $y=1"E "308, quad quad quad y "dà " infinity$
+Consideriamo le seguenti variabili:
+- $pi approx 3.141592653dots$.
+- $x$: variabile in doppia precisione (64 bit, $approx 16$ cifre significative).
+- $y$: variabile in singola precisione (32 bit, $approx 7$ cifre significative).
 
-Talora è necessario convertire anche tra numeri di tipo reale e tipo intero. La conversione da intero a reale, in genere, è innocua, a parte il fatto che in genere non si ha più un intero. Questo è dovuto dal fatto che il range di rappresentazione dei numeri interi è più ristretto di quello dei numeri reali ($cal(I)$). Il *viceversa non è vero*, perché $cal(I)$ è generalmente molto più ampio dell'insieme di rappresentabilità del tipo intero.\
+Analizziamo cosa accade quando trasferiamo i dati tra le due variabili:
+- Da Doppia a Singola (*Downcasting*):
+  $
+    cases(x = pi, y = x)
+  $
+  La variabile $y$ conterrà il valore di $pi$, ma troncato alla precisione della singola. Si ha una perdita di informazione irreversibile.
+- Da Singola a Doppia (*Upcasting*):
+  $
+    cases(y = pi, x = y)
+  $
+  In questo caso, $pi$ viene prima troncato per entrare in $y$. Quando viene copiato in $x$, il valore rimane quello troncato. Le cifre aggiuntive non conterranno la vera espansione di $pi$, ma zeri.
+
+La precisione non è l'unica differenza; cambia anche il range di valori rappresentabili.
+- Singola precisione: arriva fino a circa $approx 3.4 times 10^38$.
+- Doppia precisione: arriva fino a circa $approx 1.8 times 10^308$.
+Pertanto, se proviamo ad assegnare un numero molto grande come $1 times 10^308$:
+- $x = 1E 308 => x$ memorizza correttamente il numero (è dentro il range).
+- $y = 1E 308 => y$ diventa $+infinity$, poiché il numero supera la capacità massima della singola precisione.
+
+Quando si convertono numeri tra rappresentazione intera (discreta) e reale (floating-point), bisogna prestare attenzione ai domini di rappresentabilità.
+- *Da Intero a Reale*: questa conversione è generalmente sicura per quanto riguarda il range (i reali coprono un intervallo molto più ampio degli interi). Tuttavia, si perde la natura "esatta" dell'intero: il numero viene trasformato in una coppia mantissa+esponente.(Nota: se l'intero è molto grande, potremmo perdere precisione se la mantissa del reale non ha abbastanza bit per rappresentare tutte le cifre dell'intero).
+- *Da Reale a Intero*: questa operazione è pericolosa per due motivi:
+  - Troncamento: si perde tutta la parte decimale.
+  - Overflow: l'insieme dei numeri reali rappresentabili $cal(I)$ è molto più vasto del range degli interi. Se il numero reale supera il massimo intero rappresentabile, si verifica un errore di overflow.
+
 Nel caso del filmato di Ariane V, il problema si è originato dall'assegnazione di una variabile in doppia precisione, legata alla componente tangenziale della velocità, ad una variabile intera di 2 byte. Quindi, se il numero è maggiore di 32767, si ha un errore.
 
 == Condizionamento di un problema
@@ -460,15 +461,15 @@ $
   })
 $
 
-In generale, al posto di $x$, avremo un dato perturbato $tilde(x)$ e, se usiamo un calcolatore, per via dell'utilizzo dell'aritmetica finita, avremo una funzione perturbata, $tilde(f)$, invece di $f$. Questo fornirà un risultato perturbato:
+In generale, al posto di $x$, avremo un dato perturbato $tilde(x)$ e, se usiamo un calcolatore, per via dell'utilizzo dell'aritmetica finita, avremo una funzione perturbata $tilde(f)$, invece di $f$. Questo fornirà un risultato perturbato:
 $
   tilde(y)=tilde(f)(tilde(x)) space space space (2)
 $
 
 #observation()[
-  Tuttavia, analizzare la differenza tra il risultato fornito dalla precedente, rispetto alla iniziale, è in generale complesso. Ci limiteremo a studiare il problema, assai più semplice, $tilde(y)=f(tilde(x)) space space space (3)$
+  Tuttavia, analizzare la differenza tra il risultato fornito dalla (2), rispetto alla (1), è in generale complesso. Ci limiteremo a studiare il problema, assai più semplice, $tilde(y)=f(tilde(x)) space space space (3)$
 ]
-Ovvero, studiamo le amplificazioni di perturbazioni sui dati in ingresso, utilizzando un'*aritmetica esatta*. Lo studio della differenza tra il risultato fornito da (3), invece che dalla (1), costituisce l'*analisi del conzionamento del problema* (1). Se $y eq.not 0$, l'analisi è più efficace se fatta rispetto agli errori relativi.\
+Ovvero, studiamo le amplificazioni di perturbazioni sui dati in ingresso, utilizzando un'*aritmetica esatta*. Lo studio della differenza tra il risultato fornito da (3), invece che dalla (1), costituisce l'*analisi del condizionamento del problema* (1). Se $y eq.not 0$, l'analisi è più efficace se fatta rispetto agli errori relativi.\
 Pertanto, porremo:
 $
   (4) quad
@@ -484,14 +485,23 @@ $
   tilde(y)=y(1+epsilon_y) & =f(x(1+epsilon_x)) = f(tilde(x)) \
   cancel(y)+y epsilon_x & = cancel(f(x))+f'(x)x epsilon_x+ O(epsilon_x^2) \
   & =>epsilon_y approx f'(x)x/y epsilon_x \
-  =>|epsilon_y| <=K dot |epsilon_x|, quad quad "con "K=abs(& (f'(x))/y x) "detto numero di condizione del problema".
+  =>|epsilon_y| <=K dot |epsilon_x|, quad "con "K=abs(& (f'(x))/y x) "detto" #strong[numero di condizione del problema].
 $
+#index("Numero di condizione del problema")
 Diremo, pertanto, che il problema (1) è:
+#index("Ben condizionato")
 - *ben condizionato*, se $K approx 1$;
+#index("Mal condizionato")
 - *mal condizionato*, se $K >> 1$;
 
 #observation()[
-  Se utilizziamo un'aritmetica finita con precisione di macchina $u$, allora avremo che $|epsilon_x|>=u ==> K approx u^(-1)$, ovvero non ho speranza di ottenere risultati con una qualche accuratezza, poiché $|epsilon_y| approx 1$
+  Se lavoriamo in aritmetica finita con precisione di macchina $u$, l'errore relativo sui dati memorizzati soddisfa $|epsilon_x|>=u$. Ciò significa che, anche partendo da dati di ingresso esatti, la loro rappresentazione in memoria introduce inevitabilmente un errore di arrotondamento.
+
+  Supponiamo ora di avere un problema estremamente mal condizionato, con numero di condizionamento $K$ molto grande, in particolare $K approx frac(1, u) = u^(-1)$:
+  $
+    |epsilon_y| approx K dot |epsilon_x| approx frac(1, u) dot u = 1
+  $
+  Ne segue che l'errore relativo sul risultato finale è dell'ordine dell'unità, rendendo l'output completamente inaffidabile e, di fatto, privo di significato numerico.
 ]
 
 Segue l'analisi del condizionamento della operazioni algebriche elementari.
@@ -502,25 +512,28 @@ $
   & y                                && = x_1+x_2 quad quad "che, perturbato, dà" \
   & y(1+epsilon_y)                   && =x_1(1+epsilon_1)+x_2(1+epsilon_2) \
   & cancel(y)+y epsilon_y            && =cancel(x_1+x_2)+x_1epsilon_1+x_2epsilon_2 \
-  & "Divideno membro a membro per "y && =x_1+x_2 "otteniamo:" \
+  & "Dividendo membro a membro per "y && =x_1+x_2 "otteniamo:" \
   & epsilon_y                        && = (x_1epsilon_1x_2epsilon_2)/(x_1+x_2) \
   & "da cui:" \
   & |epsilon_y|                      && <= (|x_1|+|x_2|)/(|x_1+x_2|) dot max{|epsilon_1|,|epsilon_2|}
 $
 Pertanto, il numero di condizione del problema è
 $
-  k=(|x_1|+|x_2|)/(|x_1+x_2|)
+  K=(|x_1|+|x_2|)/(|x_1+x_2|)
 $
 
 Vi sono però dei casi particolari:
-- se *$x_1 dot x_2 >0$ (addendi concordi)* $=>$ $|x_1+x_2|=|x_1|+|x_2| =>k=1$\ da cui si conclude che la *somma di numeri concordi* è *sempre ben condizionata*;
-- se *$x_1 dot x_2 <0$ (addendi discordi)* $=>$ in questo caso il denominatore di k non è limitato superiormente e, quando $x_2 approx -x_1$, k può essere arbitrariamente grande. La somma di numeri discordi è, perciò, *mal condizionata*. Questo malcondizionamento si concretizza nel fenomeno della cosidetta *cancellazione numerica*, in cui anche avendo addendi completamente accurati, il risultato può essere del tutto inaccurato.
+- se *$x_1 dot x_2 >0$ (addendi concordi)* $=>$ $|x_1+x_2|=|x_1|+|x_2| =>K=1$\ da cui si conclude che la *somma di numeri concordi* è *sempre ben condizionata*;
+- se *$x_1 dot x_2 <0$ (addendi discordi)* $=>$ in questo caso il denominatore di $K$ non è limitato superiormente e, quando $x_2 approx -x_1$, $K$ può essere arbitrariamente grande. La somma di numeri discordi è quindi *mal condizionata*. Questo mal condizionamento si concretizza nel fenomeno della cosiddetta #index("Cancellazione numerica") *cancellazione numerica*, in cui anche avendo addendi completamente accurati, il risultato può essere del tutto inaccurato.
 
 #example("Cancellazione numerica")[
-  Come esempio di cancellazione numerica:
+  Consideriamo il problema di calcolare numericamente la derivata prima di una funzione $f(x)$ in un punto $x$ utilizzando il rapporto incrementale:
   $
-    f'(x)=(f(x+epsilon)-f(x))/epsilon + & overbrace((epsilon), "err. di troncamento")
+    f'(x) approx (f(x+epsilon)-f(x))/epsilon
   $
+  L'errore totale commesso è dato dalla somma di:
+  - Errore di Troncamento: dovuto all'approssimazione del limite con un passo finito (diminuisce al diminuire di $epsilon$).
+  - Errore di Arrotondamento (Cancellazione): dovuto alla sottrazione di due numeri molto vicini tra loro, $f(x+epsilon)$ e $f(x)$, al numeratore (aumenta al diminuire di $epsilon$).
   Ad esempio:
   $
     f(x)=x^10, quad quad x=1 => f'(1)=10
@@ -528,33 +541,34 @@ Vi sono però dei casi particolari:
   #align(center, grid(
     columns: 2,
     align: center,
-    column-gutter: 10pt,
     table(
-      columns: 2,
-      [eps], [$((1+"eps")^10-1)\/"eps"$],
-      [1.00e-01], [15.937424601000023],
-      [1.00e-02], [10.462212541120453],
-      [1.00e-03], [10.045120210251168],
-      [1.00e-04], [10.004501200209237],
-      [1.00e-05], [10.000450012070949],
-      [1.00e-06], [10.000044999403102],
-      [1.00e-07], [10.000004506682814],
-      [1.00e-08], [10.000000383314500],
+      columns: 3,
+      align: left,
+      [$epsilon$], [$((1+epsilon)^10-1)\/epsilon$], [Err],
+      [1.00e-01], [15.9374246010000], [$approx 5.93$],
+      [1.00e-02], [10.4622125411204], [$approx 0.46$],
+      [1.00e-03], [10.0451202102511], [$approx 0.04$],
+      [1.00e-04], [10.0045012002092], [$approx 0.004$],
+      [1.00e-05], [10.0004500120709], [$approx 0.00045$],
+      [1.00e-06], [10.0000449994031], [$approx 0.00044$],
+      [1.00e-07], [10.0000045066828], [$approx 0.0000045$],
+      [1.00e-08], [10.0000003833145], [$approx 0.0000003$],
     ),
     table(
-      columns: 2,
-      [eps], [$((1+"eps")^10-1)\/"eps"$],
-      [1.00e-09], [10.000000827403710],
-      [1.00e-10], [10.000000827403710],
-      [1.00e-11], [10.000000827403708],
-      [1.00e-12], [10.000889005823410],
-      [1.00e-13], [9.992007221626409],
-      [1.00e-14], [9.992007221626409],
-      [1.00e-15], [11.102230246251565],
-      [1.00e-16], [0.000000000000000],
+      columns: 3,
+      align: left,
+      [$epsilon$], [$((1+epsilon)^10-1)\/epsilon$], [Err],
+      [1.00e-09], [10.0000008274037], [$approx 0.0000008$],
+      [1.00e-10], [10.0000008274037], [$approx 0.0000008$],
+      [1.00e-11], [10.0000008274037], [$approx 0.0000008$],
+      [1.00e-12], [10.0008890058234], [$approx 0.0008$],
+      [1.00e-13], [9.9920072216264], [$approx 0.008$],
+      [1.00e-14], [9.9920072216264], [$approx 0.008$],
+      [1.00e-15], [11.1022302462515], [$approx 1.102$],
+      [1.00e-16], [0.0000000000000], [$approx 10$],
     ),
   ))
-  Si vede come con $epsilon=1 times e^(-12)$ si perdono 3 cifre di accuratezza.
+  Si vede come con $epsilon=1 times e^(-12)$ si perdono 3 cifre di accuratezza. Quando $epsilon$ diventa troppo piccolo, il computer non ha abbastanza bit per memorizzarlo e quindi viene approssimato a 0 portando il calcolo della derivata a diventare 0.
 ]
 
 #[#set heading(outlined: false, numbering: none)
@@ -572,8 +586,11 @@ Concludiamo che la moltiplicazione è sempre *ben condizionato*, poiché il nume
 #[#set heading(outlined: false, numbering: none)
   === Divisione]
 #observation()[
-  Se $|gamma|<1 => sum_(i>=0) gamma^i = 1/(1-gamma)$\
-  Pertanto $gamma -> - epsilon => 1/(1+epsilon)=sum_(i>=0) (-epsilon)^i = 1 - epsilon+O(epsilon^2)$
+  Ricordiamo da Analisi I che se $|gamma|<1$, allora:
+  $
+    sum_(i>=0)^infinity gamma^i = 1+ gamma + gamma^2 +... = 1/(1-gamma)
+  $
+  Pertanto, se $gamma = - epsilon$, si ha che $ 1/(1+epsilon)=sum_(i>=0) (-epsilon)^i = 1 - epsilon + epsilon^2 ... = 1-epsilon+O(epsilon^2)$
 ]
 
 $
