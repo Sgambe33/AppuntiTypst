@@ -63,7 +63,7 @@ $
 #h(1fr)
 $square$
 
-*Esercizio 5.* Qual'è la molteplicità della radice nulla della funzione $f(x)=x^2 sin(2x)$?. Scrivere la corrispondente iterazione del metodo di Newton modificato.
+*Esercizio 5.* Qual'è la molteplicità della radice nulla della funzione $f(x)=x^2 sin(2x)$? Scrivere la corrispondente iterazione del metodo di Newton modificato.
 
 $overline(x)$ è radice di molteplicità $m$ per $f(x)$ se $f(overline(x))=f'(overline(x))=dots=f^(m-1)(overline(x))=0$ e $f^((m))(overline(x))eq.not 0$.
 - $f(0)=0$
