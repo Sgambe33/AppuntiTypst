@@ -15,7 +15,6 @@
   #include "chapters/chapter2/2-radici-equazione.typ"
   #include "chapters/chapter3/3-sistemi-lineari.typ"
   #include "chapters/extra/algoritmi.typ"
-  #include "chapters/extra/esercizi.typ"
   #include "chapters/extra/glossario.typ"
-  
+
 ]
