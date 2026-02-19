@@ -763,33 +763,23 @@ $
 $
 cioè la convergenza è *lineare* e non quadratica.
 
-Anche se $m$ non è nota, per $i>>1$ possiamo osservare che:
+Anche se $m$ non è nota, per $i>>1$ sappiamo che:
 $
-  (e_(i+1))/e_i approx frac(e_i, e_(i-1)) approx c = frac(m-1, m)
+  (e_(i+1))/e_i approx c
 $
-Da ciò segue che:
-$
-  #box([
-    $e_(i+1) = c dot e_i$
-  ], stroke: 1pt + black, inset: 5pt)
-  " e "
-  #box([
-    $e_i = c dot e_(i-1)$
-  ], stroke: 1pt + black, inset: 5pt)
-$
-Dividendo membro a membro le due relazioni otteniamo:
+ovvero che $e_(i+1) approx c dot e_i$ e $e_i approx c dot e_(i-1)$, da cui otteniamo, dividendo membro a membro, che:
 $
   (e_(i+1))/e_i approx (e_i)/e_(i-1) => e_(i+1) dot e_(i-1) approx e_i^2
 $
-Andando a sostituire $e_i$ con la sua definizione vale che:
+A questo punto, definiamo $x_i^*$ tale che:
 $
-  (x^* - x_(i+1))(x^* -x_(i-1)) = (x^* - x_i)^2
+  (x^*_i - x_(i+1))(x^*_i -x_(i-1)) = (x^*_i - x_i)^2
 $
-Sviluppando entrambi i membri e semplificando, si ottiene un'equazione di secondo grado in $x^*$, dalla quale si ricava:
+Sviluppando entrambi i membri e semplificando, si ottiene un'equazione di secondo grado dalla quale si ricava:
 $
-  cancel((x^*)^2) -(x_(i+1)+x_(i-1)) x^* + x_(i+1) x_(i-1) & = cancel((x^*)^2) - 2x_i x^* + x_i^2 \
-                                -(x_(i+1)+x_(i-1)+2x_i)x^* & = -x_(i+1)x(i-1)+x_i^2 \
-                                                       x^* & = frac(x_(i+1)x(i-1)-x_i^2, x_(i+1)+x_(i-1)+2x_i)
+  cancel((x^*:i)^2) -(x_(i+1)+x_(i-1)) x^*_i + x_(i+1) x_(i-1) & = cancel((x^*_i)^2) - 2x_i x^*_i + x_i^2 \
+                                    -(x_(i+1)+x_(i-1)+2x_i)x^*_i & = -x_(i+1)x_(i-1)+x_i^2 \
+                                                           x^*_i & = frac(x_(i+1)x_(i-1)-x_i^2, x_(i+1)+x_(i-1)+2x_i)
 $
 Questa quantità fornisce una *stima migliorata della radice vera*.
 Il metodo può essere interpretato nel seguente modo:
