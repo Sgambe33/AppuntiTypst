@@ -1,5 +1,6 @@
 #import "../../../dvd.typ": *
 #import "@preview/algo:0.3.6": algo, code, comment, d, i
+#import "@preview/fletcher:0.5.8": diagram, node, edge
 #pagebreak()
 
 = Traduzione guidata dalla sintassi
@@ -43,7 +44,28 @@ Per i simboli non-terminali ci sono due tipi di attributi:
 ]
 
 #example()[
-  #figure(image("images/2025-11-12-17-51-19.png"))
+  #figure(
+  table(
+    stroke: none,
+    columns: (.01fr, .04fr, .45fr, .5fr),
+    align: left,
+    table.hline(start:0),
+    table.header(
+      table.cell([]),
+      table.cell([]),
+      table.cell([*Produzione*]),
+      table.cell([*Regole semantiche*])
+    ),
+    table.hline(start: 0),
+    [ ], [1)], [$L -> E $ *n*     ], [$L.v a l = E.v a l                  $],
+    [ ], [2)], [$E -> E_1 + T$    ], [$E.v a l = E_1.v a l + T.v a l      $],
+    [ ], [3)], [$E -> T$          ], [$E.v a l = T.v a l                  $],
+    [ ], [4)], [$T -> T_1 * F$    ], [$T.v a l = T_1.v a l times F.v a l  $],
+    [ ], [5)], [$T -> F$          ], [$T.v a l = F.v a l                  $],
+    [ ], [6)], [$F ->$ ( _E_ )    ], [$F.v a l = E.v a l                  $],
+    [ ], [7)], [$F ->$ *digit*    ], [$F.v a l = bold("digit").l e x v a l$],
+    table.hline(start: 0)
+  ), caption: "Definizione guidata dalla sintassi di una semplice calcolatrice da tavolo")
   La SDD della figura valuta le espressioni terminate da uno speciale marcatore di fine che indichiamo con $n$. Nella SDD ognuno dei non-terminali ha un unico attributo sintetizzato chiamato *val*. Supponiamo inoltre che il terminale *digit* abbia un attributo sintetizzato *lexval* dato dal valore intero restituito dall'analizzatore lessicale.
   - La regola per la produzione 1, $L -> E n$ assegna a L.val il valore dell'intera espressione E.val.
   - La produzione 2, $E -> E_1 + T$ ha una regola che calcola il valore dell'attributo val della testa della produzione E come somma dei valori associati a $E_1$ e a $T$. A ogni nodo N con etichetta E il valore dell'attributo val associato a E è la somma del valori di val associati ai nodi figli di N etichettati con E e T.
@@ -66,13 +88,102 @@ Per poter valutare un attributo di un nodo dobbiamo valutare prima tutti gli att
 
 #example()[
   Si considerino, per esempio, i non-terminali $A$ e $B$ con attributi $A.s$ e $B.i$, rispettivamente sintetizzato ed ereditato, e la produzione con le corrispondenti regole semantiche:
-  #figure(image("images/2025-11-12-18-20-21.png"))
-  #figure(image("images/2025-11-17-11-42-54.png", height: 10%))
+  #figure(grid(
+    columns: (15em, 15em),
+    align: center,
+    [#block($
+       &"PRODUZIONE" \ 
+       &quad A -> B
+    $)],
+    [#block($
+       &"REGOLE SEMANTICHE" \
+       &quad A.s = B.i; \
+       &quad B.i = A.s + 1; 
+    $)]
+  ))
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    cell-size: 5mm,
+    spacing: 3mm,
+    node((0, 2), $A$, name: <a>),
+    node((0, 4), $B$, name: <b>),
+    
+    node((2, 2), $A.s$, name: <as>, stroke: none),
+    node((2, 4), $B.i$, name: <bi>, stroke: none),
+
+    edge((0, 0), <a>, dash: "dotted"),
+    edge(<a>, <b>, dash: "dotted"),
+    edge(<b>, (2, 6), (-2, 6), <b>),
+
+    edge(<as>, <bi>, "-|>", bend: 45deg),
+    edge(<bi>, <as>, "-|>", bend: 45deg),
+  ))
   Queste regole sono circolari. E' impossibile valutare l'attributo $A.s$ per un nodo N oppure l'attributo $B.i$ per un figlio del nodo N senza prima valutare l'altro.
 ]
 
+#pagebreak()
+
 #example()[
-  #figure(image("images/2025-11-12-18-18-24.png"))
+  #table(
+    stroke: none,
+    columns: (10em, 15em),
+    align: left,
+    table.hline(start:0),
+    table.header(
+      table.cell([*Produzione*]),
+      table.cell([*Regole semantiche*])
+    ),
+    table.hline(start: 0),
+    [$L -> E $ *n*     ], [$L.v a l = E.v a l                  $],
+    [$E -> E_1 + T$    ], [$E.v a l = E_1.v a l + T.v a l      $],
+    [$E -> T$          ], [$E.v a l = T.v a l                  $],
+    [$T -> T_1 * F$    ], [$T.v a l = T_1.v a l times F.v a l  $],
+    [$T -> F$          ], [$T.v a l = F.v a l                  $],
+    [$F ->$ ( _E_ )    ], [$F.v a l = E.v a l                  $],
+    [$F ->$ *digit*    ], [$F.v a l = bold("digit").l e x v a l$],
+    table.hline(start: 0)
+  )
+  #figure(diagram(
+    node-stroke: none,
+    cell-size: 5mm,
+    spacing: 3mm,
+
+    node((2, 0), [_L.val_ $= 19$        ], name: <20>),
+    node((2, 1), [_E.val_ $= 19$        ], name: <21>),
+    node((3, 1), [*n*                   ], name: <31>),
+    node((1, 2), [_E.val_ $= 15$        ], name: <12>),
+    node((2, 2), [$+$                   ], name: <22>),
+    node((3, 2), [_T.val_ $= 4$         ], name: <32>),
+    node((1, 3), [_T.val_ $= 15$        ], name: <13>),
+    node((3, 3), [_F.val_ $= 4$         ], name: <33>),
+    node((0, 4), [_T.val_ $= 3$         ], name: <04>),
+    node((1, 4), [$*$                   ], name: <14>),
+    node((2, 4), [_F.val_ $= 5$         ], name: <24>),
+    node((3, 4), [*digit*_.lexval_ $= 4$], name: <34>),
+    node((0, 5), [_F.val_ $= 3$         ], name: <05>),
+    node((2, 5), [*digit*_.lexval_ $= 5$], name: <25>),
+    node((0, 6), [*digit*_.lexval_ $= 3$], name: <06>),
+
+    edge(<20>, <21>),
+    edge(<20>, <31>),
+    
+    edge(<21>, <12>),
+    edge(<21>, <22>),
+    edge(<21>, <32>),
+    
+    edge(<12>, <13>),
+    edge(<32>, <33>),
+    
+    edge(<13>, <04>),
+    edge(<13>, <14>),
+    edge(<13>, <24>),
+    edge(<33>, <34>),
+    
+    edge(<04>, <05>),
+    edge(<24>, <25>),
+    
+    edge(<05>, <06>),
+  ))
   Albero di parsing annotato per la stringa $3 * 5 + 4 n$, costruito utilizzando la grammatica e le regole viste in precedenza. Si suppone che i valori dell'attributo *lexval* siano forniti dall'analizzatore lessicale. Ogni nodo relativo a una variabile ha un attributo *val*, questi sono calcolati in ordine bottom-up.
 ]
 
@@ -96,13 +207,112 @@ Un grafo delle dipendenze rappresenta il flusso di informazioni attraverso gli a
     E->E_1 + T quad quad quad quad "E.val" = E_1."val" + "T.val"
   $
   Per ogni nodo N con etichetta E (corrispondente alla parte sx della regola) l'attributo sintetizzato val è calcolato utilizzando i valori degli attributi val corrispondenti ai due figli con etichette E e T. La porzione del grafo delle dipendenze corrispondente è:
-  #figure(image("images/2025-11-16-18-25-07.png", width: 50%))
+
+  #figure(diagram(
+    node-stroke: none,
+    cell-size: 5mm,
+    spacing: 3mm,
+
+    node((2, 0), [_E_]  , name: <E>),
+    node((0, 2), $E_1$  , name: <E1>),
+    node((2, 2), $+$    , name: <p>),
+    node((4, 2), [_T_]  , name: <T>),
+    node((3, 0), [_val_], name: <val1>),
+    node((1, 2), [_val_], name: <val2>),
+    node((5, 2), [_val_], name: <val3>),
+
+    edge(<E>, <E1>, dash: "dotted"),
+    edge(<E>, <p>, dash: "dotted"),
+    edge(<E>, <T>, dash: "dotted"),
+    
+    edge(<val2>, <val1>, "-|>"),
+    edge(<val3>, <val1>, "-|>"),
+  ))
 ]
+
+#pagebreak()
 
 #example()[
   //TODO: rifare in typst
   Altro esempio di grafo delle dipendenze ma più complesso:
-  #figure(image("images/2025-11-16-18-31-29.png"))
+  #align(right)[
+      #table(
+      stroke: none,
+      columns: (10em, 15em),
+      align: left,
+      table.hline(start:0),
+      table.header(
+        table.cell([*Produzione*]),
+        table.cell([*Regole semantiche*])
+      ),
+      table.hline(start: 0),
+      [1) $T -> F T'$    ], [$T'.i n h = F.v a l                 $],
+      [               ], [$T.v a l = T'.s y n                 $],
+      [2) $T' -> *F T'_1$], [$T'_1.i n h = T'.i n h times F.v a l$],
+      [               ], [$T'.s y n = T'_1.s y n              $],
+      [3) $T' -> epsilon$], [$T'.s y n = T'.i n h                $],
+      [4) $F ->$ *digit* ], [$F.v a l = bold("digit").l e x v a l$],
+      table.hline(start: 0)
+    )
+  ]
+
+  #figure(diagram(
+    node-stroke: none,
+    cell-size: 5mm,
+    spacing: 3mm,
+
+    // NODES + EDGES: principali //
+
+    node((3, 0), [_T_]    , name: <T>),
+    node((0, 2), [_F_]    , name: <F1>),
+    node((0, 4), [*digit*], name: <digit1>),
+    node((6, 2), [_T'_]   , name: <T-1>),
+    node((3, 4), $*$      , name: <ast>),
+    node((5, 4), [_F_]    , name: <F2>),
+    node((5, 6), [*digit*], name: <digit2>),
+    node((9, 4), [_T'_]   , name: <T-2>),
+    node((9, 6), $epsilon$, name: <eps>),
+
+    edge(<T>, <F1>, dash: "dotted"),
+    edge(<T>, <T-1>, dash: "dotted"),
+    edge(<F1>, <digit1>, dash: "dotted"),
+    edge(<T-1>, <ast>, dash: "dotted"),
+    edge(<T-1>, <F2>, dash: "dotted"),
+    edge(<T-1>, <T-2>, dash: "dotted"),
+    edge(<F2>, <digit2>, dash: "dotted"),
+    edge(<T-2>, <eps>, dash: "dotted"),
+
+    // NODES + EDGES: numerici //
+    
+    node((3.75, 0), [9], name: <9>),
+    node((0.5 , 2), [3], name: <3>),
+    node((5.5 , 2), [5], name: <5>),
+    node((6.5 , 2), [8], name: <8>),
+    node((0.5 , 4), [1], name: <1>),
+    node((5.5 , 4), [4], name: <4>),
+    node((8.5 , 4), [6], name: <6>),
+    node((9.5 , 4), [7], name: <7>),
+    node((5.5 , 6), [2], name: <2>),
+
+    edge(<1>, <3>, "-|>"),
+    edge(<3>, <5>, "-|>", bend: 30deg),
+    edge(<5>, <6>, "-|>"),
+    edge(<2>, <4>, "-|>"),
+    edge(<4>, <6>, "-|>", bend: 30deg),
+    edge(<6>, <7>, "-|>", bend: -45deg),
+    edge(<7>, <8>, "-|>"),
+    edge(<8>, <9>, "-|>"),
+
+    node((4.5, 0), [_val_]   ),
+    node((1   , 2), [_val_]   ),
+    node((5   , 2), [_inh_]   ),
+    node((7.5 , 2), [_syn_]   ),
+    node((1.25, 4), [_lexval_]),
+    node((6   , 4), [_val_]   ),
+    node((8   , 4), [_inh_]   ),
+    node((10  , 4), [_syn_]   ),
+    node((6.25, 6), [_lexval_]),
+  ))
 ]
 
 === Ordine di valutazione degli attributi
@@ -145,7 +355,24 @@ Più precisamente, ogni attributo può essere:
 
 #example()[
   La seguente SDD è L-attribuita:
-  #figure(image("images/2025-11-16-20-06-31.png"))
+  #table(
+    stroke: none,
+    columns: (10em, 15em),
+    align: left,
+    table.hline(start:0),
+    table.header(
+      table.cell([*Produzione*]),
+      table.cell([*Regole semantiche*])
+    ),
+    table.hline(start: 0),
+    [1) $T -> F T'$    ], [$T'.i n h = F.v a l                 $],
+    [               ], [$T.v a l = T'.s y n                 $],
+    [2) $T' -> *F T'_1$], [$T'_1.i n h = T'.i n h times F.v a l$],
+    [               ], [$T'.s y n = T'_1.s y n              $],
+    [3) $T' -> epsilon$], [$T'.s y n = T'.i n h                $],
+    [4) $F ->$ *digit* ], [$F.v a l = bold("digit").l e x v a l$],
+    table.hline(start: 0)
+  )
   - La prima regola definisce l'attributo ereditato T′.inh usando solo l'attributo F.val, e F si trova a sx di T′, come richiesto.
   - La seconda regola definisce l'attributo T′1.inh usando l'attributo ereditato T′.inh associato alla parte sx della regola e F.val associato ad F che compare a sx di T′1 nella parte dx della regola.
 
@@ -165,12 +392,90 @@ Ogni traduzione comporta effetti collaterali, ad esempio stampa di un risultato 
 - vincolare gli ordini di valutazione permessi in modo che la traduzione per ogni ordinamento sia comunque corretta. I vincoli possono essere visti come archi impliciti aggiunti al grafo delle dipendenze.
 
 #example()[
-  #figure(image("images/2025-11-17-10-07-53.png"))
+  #table(
+    stroke: none,
+    columns: (10em, 15em),
+    align: left,
+    table.hline(start:0),
+    table.header(
+      table.cell([*Produzione*]),
+      table.cell([*Regole semantiche*])
+    ),
+    table.hline(start: 0),
+    [1) $D -> T L$      ], [_L.inh_ = _T.type_],
+    [2) $T ->$ *int*    ], [_T.type_ = integer],
+    [3) $T ->$ *float*  ], [_T.type_ = float],
+    [4) $F -> L_1,$ *id*], [$L_1$_.type_ = _L.inh_],
+    [                   ], [_addType_(*id*_.id_entry, L.inh_)],
+    [5) $L ->$ *id*     ], [_addType_(*id*_.id_entry, L.inh_)],
+    table.hline(start: 0)
+  )
   Questa SDD rappresenta la dichiarazione D costituita da un tipo base T (che può essere int o float) seguito da una lista di identificatori L. Per ogni identificatore il tipo viene aggiunto al corrispondente elemento della tavola dei simboli. La variabile T ha un attributo T.type sintetizzato che può assumere i valori integer o float e che rappresenta il tipo della dichiarazione. L ha un attributo ereditato L.inh che serve per far passare il tipo dichiarato attraverso la lista di identificatori. Nella produzione 1 il valore di T.type passa a L.inh. Nella produzione 4 il valore di L.inh viene passato da un nodo padre al nodo figlio, verso il basso.
   Le produzioni 4 e 5 richiamano la funzione addType() con due argomenti
   + id.entry, valore lessicale, puntatore alla tavola dei simboli
   + L.inh , attributo che indica il tipo degli identificatori della lista
-  #figure(image("images/2025-11-17-10-08-37.png"), caption: "Grafo delle dipendenze per float id1, id2, id3")
+  
+  #figure(diagram(
+    node-stroke: none,
+    cell-size: 5mm,
+    spacing: 3mm,
+
+    node(( 0, 0), [_D_]       , name: <d>    ),
+    node((-3, 2), [_T_]       , name: <t>    ),
+    node(( 3, 2), [_L_]       , name: <l1>   ),
+    node(( 0, 4), [_L_]       , name: <l2>   ),
+    node(( 3, 4), [*,*]       , name: <c1>   ),
+    node(( 6, 4), $bold(id)_3$, name: <id1>  ),
+    node((-3, 6), [_L_]       , name: <l3>   ),
+    node(( 0, 6), [*,*]       , name: <c2>   ),
+    node(( 3, 6), $bold(id)_2$, name: <id2>  ),
+    node((-3, 4), [*float*]   , name: <float>),
+    node((-3, 8), $bold(id)_1$, name: <id3>  ),
+
+    edge(<d> , <t>    , dash: "dotted"),
+    edge(<d> , <l1>   , dash: "dotted"),
+    edge(<t> , <float>, dash: "dotted"),
+    edge(<l1>, <l2>   , dash: "dotted"),
+    edge(<l1>, <c1>   , dash: "dotted"),
+    edge(<l1>, <id1>  , dash: "dotted"),
+    edge(<l2>, <l3>   , dash: "dotted"),
+    edge(<l2>, <c2>   , dash: "dotted"),
+    edge(<l2>, <id2>  , dash: "dotted"),
+    edge(<l3>, <id3>  , dash: "dotted"),
+
+    node((-2.25, 2), $4$ , name: <4> ),
+    node(( 2.25, 2), $5$ , name: <5> ),
+    node(( 3.75, 2), $6$ , name: <6> ),
+    node((-0.75, 4), $7$ , name: <7> ),
+    node(( 0.75, 4), $8$ , name: <8> ),
+    node(( 6.75, 4), $3$ , name: <3> ),
+    node((-3.75, 6), $9$ , name: <9> ),
+    node((-2.25, 6), $10$, name: <10>),
+    node(( 3.75, 6), $2$ , name: <2> ),
+    node((-2.25, 8), $1$ , name: <1> ),
+
+    node((-1.50, 2), [_type_]),
+    node(( 1.50, 2), [_inh_]),
+    node(( 4.65, 2), [_entry_]),
+    node((-1.50, 4), [_inh_]),
+    node(( 1.50, 4), [_entry_]),
+    node(( 7.50, 4), [_entry_]),
+    node((-4.50, 6), [_inh_] ),
+    node((-1.50, 6), [_entry_]),
+    node(( 4.50, 6), [_entry_]),
+    node((-1.50, 8), [_entry_]),
+
+    edge(<4>, <5> , "-|>", bend: 30deg),
+    edge(<5>, <6> , "-|>", bend: -45deg),
+    edge(<5>, <7> , "-|>"),
+    edge(<3>, <6> , "-|>"),
+    edge(<7>, <8> , "-|>", bend: -45deg),
+    edge(<7>, <9> , "-|>"),
+    edge(<2>, <8> , "-|>"),
+    edge(<9>, <10>, "-|>", bend: -45deg),
+    edge(<1>, <10>, "-|>"),
+  ), caption: "Grafo delle deipendenze per float " + $i d_1, i d_2, i d_3$)
+  
   6, 8 e 10: attributi fittizi utilizzati per rappresentare le chiamate alla
   funzione addType().
 ]
@@ -180,7 +485,84 @@ Poiché alcuni compilatori usano gli alberi sintattici come rappresentazione int
 === Costruzione degli alberi sintattici
 È utile trasformare una stringa in ingresso in un albero che ne rappresenta la struttura e che può essere utilizzato come rappresentazione per la fase di traduzione. Questo albero viene detto *albero sintattico* ed è diverso dall'albero di parsing che rappresenta la derivazione di una stringa con una particolare grammatica.
 
-#figure(image("images/2025-11-17-10-16-31.png"), caption: "Albero sintattico a sx e alberi di parsing a dx")
+#figure(grid(
+  columns: (.3fr, .35fr, .35fr),
+  [#diagram(
+    node-stroke: 0.9pt,
+    node-shape: circle,
+    cell-size: 5mm,
+    spacing: 3mm,
+    
+    node((1, 0), $+$, name: <P>),
+    node((0, 1), $a$, name: <a>),
+    node((2, 1), $*$, name: <A>),
+    node((1, 2), $b$, name: <b>),
+    node((3, 2), $c$, name: <c>),
+
+    edge(<P>, <a>, "-|>"),
+    edge(<P>, <A>, "-|>"),
+    edge(<A>, <b>, "-|>"),
+    edge(<A>, <c>, "-|>"),
+  )],
+  [#diagram(
+    node-stroke: none,
+    cell-size: 5mm,
+    spacing: 3mm,
+    
+    node((1, 0), $E$, name: <l01>),
+    node((0, 1), $E$, name: <l10>),
+    node((1, 1), $+$, name: <l11>),
+    node((2, 1), $E$, name: <l12>),
+    node((0, 2), $a$, name: <l20>),
+    node((1, 2), $E$, name: <l21>),
+    node((2, 2), $*$, name: <l22>),
+    node((3, 2), $E$, name: <l23>),
+    node((1, 3), $b$, name: <l31>),
+    node((3, 3), $c$, name: <l33>),
+
+    edge(<l01>, <l10>),
+    edge(<l01>, <l11>),
+    edge(<l01>, <l12>),
+    edge(<l10>, <l20>),
+    edge(<l12>, <l21>),
+    edge(<l12>, <l22>),
+    edge(<l12>, <l23>),
+    edge(<l21>, <l31>),
+    edge(<l23>, <l33>),
+  )],
+  [#diagram(
+    node-stroke: none,
+    cell-size: 5mm,
+    spacing: 3mm,
+    
+    node((1, 0), $E$, name: <l01>),
+    node((0, 1), $E$, name: <l10>),
+    node((1, 1), $+$, name: <l11>),
+    node((2, 1), $T$, name: <l12>),
+    node((0, 2), $T$, name: <l20>),
+    node((1, 2), $T$, name: <l21>),
+    node((2, 2), $*$, name: <l22>),
+    node((3, 2), $F$, name: <l23>),
+    node((0, 3), $F$, name: <l30>),
+    node((1, 3), $F$, name: <l31>),
+    node((3, 3), $c$, name: <l33>),
+    node((0, 4), $a$, name: <l40>),
+    node((1, 4), $b$, name: <l41>),
+
+    edge(<l01>, <l10>),
+    edge(<l01>, <l11>),
+    edge(<l01>, <l12>),
+    edge(<l10>, <l20>),
+    edge(<l12>, <l21>),
+    edge(<l12>, <l22>),
+    edge(<l12>, <l23>),
+    edge(<l20>, <l30>),
+    edge(<l21>, <l31>),
+    edge(<l23>, <l33>),
+    edge(<l30>, <l40>),
+    edge(<l31>, <l41>),
+  )],
+), caption: "Albero sintattico a sx e alberi d parsing a dx")
 
 Ogni nodo di un albero sintattico rappresenta un costrutto e i figli di tale nodo rappresentano le parti significative che lo compongono. Un nodo di un albero che rappresenta un'espressione del tipo $E_1 + E_2$ ha come etichetta il simbolo $+$ e come figli due nodi che rappresentano le sottoespressioni $E_1$ e $E_2$. I nodi di un albero sintattico possono essere implementati per mezzo di oggetti con un numero di campi variabile. Ogni oggetto ha un campo `op` che costituisce l'etichetta del nodo.
 - Se il nodo è una foglia, ha un campo aggiuntivo che contiene il valore lessicale associato. Viene creato con un costruttore del tipo `Leaf(op, val)`.
@@ -188,9 +570,99 @@ Ogni nodo di un albero sintattico rappresenta un costrutto e i figli di tale nod
 
 #example()[
   SDD S-attribuita per espressioni con $+$ e $-$ .
-  #figure(image("images/2025-11-17-10-18-06.png"))
+  #figure(
+  table(
+    stroke: none,
+    columns: (.01fr, .04fr, .25fr, .7fr),
+    align: left,
+    table.hline(start:0),
+    table.header(
+      table.cell([]),
+      table.cell([]),
+      table.cell([*Produzione*]),
+      table.cell([*Regole semantiche*])
+    ),
+    table.hline(start: 0),
+    [ ], [1)], [$E -> E_1 + T $   ], [_E.node_ = *new*_ Node_('$+$', $E_1.$_node, T.node_)],
+    [ ], [2)], [$E -> E_1 - T$    ], [_E.node_ = *new*_ Node_('$-$', $E_1.$_node, T.node_)],
+    [ ], [3)], [$E -> T$          ], [_E.node_ = _T.node_],
+    [ ], [4)], [$T -> (E)$        ], [_T.node_ = _E.node_],
+    [ ], [5)], [$T ->$ *id*       ], [_T.node_ = *new* _Leaf_(*id*, *id*._entry_)],
+    [ ], [6)], [$T ->$ *num*    ], [_T.node_ = *new* _Leaf_(*num*, *num*._val_)],
+    table.hline(start: 0)
+  ))
   Ogni volta che si usa la produzione $E -> E_1 + T$ (o $E -> E_1 - T$) la regola semantica crea un nodo con etichetta `op` = '+' (o '-') e i nodi figli $E_1$.node e $T$.node relativi alle due sottoespressioni. La regola associata a $E -> T$ (e a $T -> ( E )$ ) non crea nessun nodo perché $E$.node e $T$.node si riferiscono allo stesso nodo.
 
+  #figure(diagram(
+    node-stroke: none,
+    cell-size: 0mm,
+    spacing: 2mm,
+    
+    node((6, 0), [_E.node_], name: <l60>),
+    
+    node((2, 1), [_E.node_], name: <l21>),
+    node((6, 1), [$+$]     , name: <l61>),
+    node((8, 1), [_T.node_], name: <l81>),
+    
+    node((1, 2), [_E.node_], name: <l12>),
+    node((2, 2), [$-$]     , name: <l22>),
+    node((4, 2), [_T.node_], name: <l42>),
+    node((8, 2), [*id*]    , name: <l82>),
+    
+    node((1, 3), [_T.node_], name: <l13>),
+    node((4, 3), [*num*]   , name: <l43>),
+    
+    node((1, 4), [*id*]    , name: <l14>),
+    node((4, 4), [$+$]     , name: <l44>),
+    node((5, 4), [$"    "$], name: <l54>),
+    node((6, 4), [$"    "$], name: <l64>),
+    node(enclose: (<l44>, <l54>, <l64>), stroke: 0.5pt, inset: 1.5pt, name: <group1>),
+    
+    node((2, 8), [$+$]     , name: <l25>),
+    node((3, 8), [$"    "$], name: <l35>),
+    node((4, 8), [$"    "$], name: <l45>),
+    node(enclose: (<l25>, <l35>, <l45>), stroke: 0.5pt, inset: 1.5pt, name: <group2>),
+    node((8, 6), [*id*]    , name: <l85>),
+    node((9, 6), [$"    "$], name: <l95>),
+    node(enclose: (<l85>, <l95>), stroke: 0.5pt, inset: 1.5pt, name: <group3>),
+
+    node((0, 10), [*id*]    , name: <l06>),
+    node((1, 10), [$"    "$], name: <l16>),
+    node(enclose: (<l06>, <l16>), stroke: 0.5pt, inset: 1.5pt, name: <group4>),
+    node((6, 10), [*num*]   , name: <l66>),
+    node((7, 10), [$4$]     , name: <l76>),
+    node(enclose: (<l66>, <l76>), stroke: 0.5pt, inset: 1.5pt, name: <group5>),
+
+    // GROUP SEPARATORS //
+    edge((4.5, 3.55), (4.5, 4.8 ), dash: "dashed", stroke: gray, snap-to: none),
+    edge((5.5, 3.55), (5.5, 4.8 ), dash: "dashed", stroke: gray, snap-to: none),
+    edge((2.5, 7.3 ), (2.5, 8.7 ), dash: "dashed", stroke: gray, snap-to: none),
+    edge((3.5, 7.3 ), (3.5, 8.7 ), dash: "dashed", stroke: gray, snap-to: none),
+    edge((8.5, 5.3 ), (8.5, 6.7 ), dash: "dashed", stroke: gray, snap-to: none),
+    edge((0.5, 9.3 ), (0.5, 10.7), dash: "dashed", stroke: gray, snap-to: none),
+    edge((6.5, 9.3 ), (6.5, 10.7), dash: "dashed", stroke: gray, snap-to: none),
+    
+    // EDGE a puntini //
+    edge(<l60>, <l21>, dash: "dotted"),
+    edge(<l60>, <l61>, dash: "dotted"),
+    edge(<l60>, <l81>, dash: "dotted"),
+
+    edge(<l21>, <l12>, dash: "dotted"),
+    edge(<l21>, <l22>, dash: "dotted"),
+    edge(<l21>, <l42>, dash: "dotted"),
+    
+    edge(<l12>, <l13>, dash: "dotted"),
+    edge(<l13>, <l14>, dash: "dotted"),
+    
+    edge(<l42>, <l43>, dash: "dotted"),
+    
+    edge(<l81>, <l82>, dash: "dotted"),
+
+    // EDGES trattegiati //
+    edge(<l21>, <2)
+    edge(<l12>, <group4.north-west>, dash: "dashed", "-|>", bend: -30deg),
+    edge(<l13>, (0.2, 10), dash: "dashed", "-|>", bend: -30deg, snap-to: (<l13>, <group4>)),
+  ), caption: "Albero sintattico per a - 4 + c")
   #figure(image("images/2025-11-17-10-18-02.png"), caption: "Albero sintattico per a - 4 + c")
   Se le regole vengono eseguite nell'ordine definito da una visita in postordine dell'albero di parsing o secondo un parsing bottom-up si ha la sequenza di passi
   + `p1 = new Leaf(id, entry-a)`;
