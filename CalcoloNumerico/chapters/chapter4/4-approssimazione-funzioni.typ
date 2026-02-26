@@ -166,3 +166,106 @@ $
 #definition()[
   La (4.3) definisce la *forma di Lagrange* del polinomio interpolante.
 ]
+
+//26.02.2026
+Calcoliamo il suo coefficiente principale: osservando che al denominatore abbiamo $(x-x_0)dot dots dot (x-x_(i-1)) dot (x-x_(i+1))dot dots dot (x-x_n) = x^n+ dots$ che è un *polinomio monico* (con coefficiente principale uguale a 1). Si conclude che il coefficiente principale di $L_(i n)(x)$ è dato da:
+$
+  L_(i n)(x) = product_(j=0 \ j eq.not i)^n frac(x-x_j, x_i-x_j) = frac(product_(j=0\ j eq.not i)^n (x-x_j), product_(j=0\ j eq.not i)^n (x_i-x_j)) = frac(1, product_(j=0\ j eq.not i)^n x_i-x_j) = c_(i n) quad quad (4.4)
+$
+Da questo si deduce che il coefficiente principale di $p_n(x)$ sarà dato da:
+$
+  sum_(i=0)^n c_(i n) f_i = sum_(i=0)^n frac(f_i, product_(j=0\ j eq.not i)^n x_i-x_j) quad quad (4.5)
+$
+
+A questo punto, ci poniamo la seguente domanda: se definiamo $p_r(x) in Pi_r$ il polinomio interpolante $f(x)$ sulle ascisse $underbrace(x_0\, dots\, x_r, r+1)$, è possibile definire definire in modo incrementale $p_r(x)$ a partire da $p_(r-1)(x)$, che è il polinomio interpolante $f(x)$, di grado al più $r-1$, sulle ascisse $underbrace(x_0\, dots\, x_(r-1), r)$?
+
+A questo fine, osserviamo che la base di Lagrange si presta male a questo scopo. Infatti:
+$
+  p_r(x) = sum_(i=0)^r f_i L_(i r)(x), quad L_(i r)(x) =product_(j=0\ j eq.not i)^r frac(x-x_j, x_i-x_j) space i=0,...,r quad quad (4.6)
+$
+mentre
+$
+  p_(r-1)(x) = sum_(i=0)^(r-1) f_i L_(i,r-1)(x), quad L_(i, r-1)(x) =product_(j=0\ j eq.not i)^(r-1) frac(x-x_j, x_i-x_j) space i=0,...,r-1
+$
+Di conseguenza, vogliamo invece cercare di esprimere $p_r(x)$ in forma incrementale, come:
+$
+  p_r(x) = p_(r-1)(x) + overbracket(<\->, "polinomio" \ "di grado" r)
+$
+Con $r=1,...,n$, $p_n (x)$ sarà il polinomio che interpola $f(x)$ su tutte le ascisse.
+
+Per ottenere questo obiettivo, dobbiamo ricorrere ad un'ulteriore base di rappresentazione: la base di Newton. Essa è una base di polinomi nomici ed è definita nel seguente modo:
+$
+  (4.7) quad quad cases(omega_0(x) equiv 1, omega_i(x) = omega_(i-1)(x)(x-x_(i-1))\, space i=1\,2\,dots)
+$
+#observation(multiple: true)[
+  1. Per induzione, otteniamo che $omega_i(x)=product_(j=0)^(i-1) (x-x_j), space i gt.eq 1$, ovvero, $omega_i(x)$ è un polinomio monico di grado esatto $i$, le cui radici sono $underbrace(x_0\,dots\,x_(i-1), i)$.
+  2. $forall i=1,dots,n : space omega_i(x_j)=0, space forall j < i$.
+  4. Avendo $omega_i(x)$ grado esatto $i, space forall i=0, dots, n$, abbiamo che i polinomi sono linearmente indipendenti e costituiscono una base di $Pi_n$. Appunto, la base di *Newton*.
+]
+A questo punto, assegnate le ascisse $x_0,...,x_n$ (distinte tra loro), è possibile costruire in forma incrementale la famiglia di polinomi interpolanti ${p_r (x)}_(r=??)$ tali che, $p_r (x) in Pi_r$ e:
+$
+  forall r = 0,...,n: space p_r (x_i) = f_i space i=0,dots,r
+$
+come segue:
+$
+  (4.8) quad quad cases(
+    p_0(x) equiv f_0,
+    p_r (x) = underbrace(p_(r-1)(x), in Pi_(r-1)) + f[x_0,...,x_r]underbrace(omega_r(x), in Pi_r) space r=1\,...\,n
+  )
+$
+con il coefficiente:
+<4.9>
+$
+  f[x_0, dots, x_r] = sum_(i=0)^r frac(f_i, product_(j=0\j eq.not i)(x_i-x_j)) quad quad (4.9)
+$
+Andiamo a dimostrare che, se
+$
+  p_(r-1)(x_i) = f_i, space i=0,dots,r-1 quad quad (4.10)
+$
+allora è possibile determinare univocamente $f[x_0, dots, x_r]$ nella (4.8), in modo tale che
+$
+  p_r (x_i) = f_i, space i=0, dots,r quad quad (4.11)
+$
+Successivamente dimostreremo che $f[x_0, dots, x_r]$ è riscrivibile nella forma #link(<4.9>)[(4.9)].
+#proof()[
+  Procedendo per induzione, abbiamo che $p_0(x) in product_0$ e $p_0(x_0) = f_0$. Assunto vero (4.10), andiamo a verificare che è possibile determinare $f[x_0, dots, x_r]$, in modo che sia soddisfacibile la (4.11).
+  $
+    p_r(x_i) = p_(r-1)(x_i) + f[x_0,dots,x_r]omega_r(x_i) = cases(
+      i<r: quad f_i+f[x_0,dots,x_r]overbrace(omega_r (x_i), 0)=f_i,
+      i=r: quad p_(r-1)(x_r)+f[x_0,dots,x_r]omega_r (x_r)=f_r
+    )
+  $
+  Da cui otteniamo, considerato che le ascisse sono distinte e, pertanto, $omega_r(x_r)eq.not 0$, che possiamo soddisfare la condizione di interpolazione imponendo:
+  $
+    f[x_0,dots,x_r]=frac(f_r - p_(r-1)(x_r), omega_r(x_r))
+  $
+  Facciamo ora vedere che $f[x_0, dots, x_r]$ si può esprimere nella forma #link(<4.9>)[(4.9)].
+  #observation(multiple: true)[
+    1. $f[x_0,dots,x_r]$ è il coefficiente principale di $p_r(x)$.
+    2. Dalla (4.5), con $n=r$, otteniamo che il secondo mebro della #link(<4.9>)[(4.9)] altri non è che il coefficiente principale di $p_r(x)$ scritto in forma di Lagrange. Pertanto essi devono coincidere.
+  ]
+  Concludiamo che l'espressione #link(<4.9>)[(4.9)] deve valere.
+]
+
+#definition()[
+  $f[x_0,dots,x_r], space r=0,1,dots$, come definita nella #link(<4.9>)[(4.9)], è detta *differenza divisa* di $f(x)$ sulle ascisse $x_0,dots,x_r$.
+]
+#observation()[
+  Dalla (4.8) si ottiene che:
+  <4.12>
+  $
+    p_n(x) = sum_(r=0)^n f[x_0,dots,x_r]omega_r(x) quad quad (4.12)
+  $
+]
+
+#definition()[
+  La #link(<4.12>)[(4.12)] definisce la forma di Newton del polinomio interpolante .
+]
+
+#observation()[
+  Il  polinomio $p_n(x)$, ricordiamo è *unico*. Pertanto:
+  $
+    p_n (x) = sum_(i=0)^n f_i L_(i n)(x) = sum_(i=0)^n f[x_0, dots, x_i] omega_i (x)
+  $
+  ovvero, la forma di Lagrange e quella di Newton del polinomio interpolante sono *algebricamente equivalenti*. _Attenzione: ciò non significa che sono equivalenti dal punto di vista dell'aritmetica finita_
+]
