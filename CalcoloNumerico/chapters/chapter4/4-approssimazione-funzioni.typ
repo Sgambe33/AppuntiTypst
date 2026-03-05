@@ -1,6 +1,12 @@
 #import "../../../dvd.typ": *
 #import "@preview/cetz:0.4.2": canvas, draw
 #import "@preview/cetz-plot:0.1.3": plot
+#import "@preview/in-dexter:0.7.2": *
+#import "@preview/codly:1.3.0": *
+#import "@preview/codly-languages:0.1.1": *
+#show: codly-init.with()
+#set math.equation(block: true)
+#show math.equation: set block(breakable: true)
 
 #pagebreak()
 //25.02.2026
@@ -46,6 +52,7 @@ Dal punto di vista geometrico:
 Obiettivo: costruire una funzione "semplice" che interpola i dati $(x_i, f_i), i=0,1,...,n$. A riguardo, considereremo, tra le varie possibilità, *funzioni interpolanti* che sono polinomi.
 
 #definition()[
+  #index("Polinomio interpolante")
   Diremo che $p(x) in Pi$ è un *polinomio interpolante* le coppie di dati  $(x_i, f_i)$, se:
   $
     p(x_i) = f_i, quad i=0,1,...,n
@@ -121,7 +128,6 @@ Per ovviare al precedente problema, occorrerà utilizzare una differente base po
 ]
 
 == Forma di Lagrange e forma di Newton
-
 La base polinomiale che andiamo a considerare è quella di Lagrange:
 $
   L_(i n)(x) = product_(j=0 \ j eq.not i)^n frac(x-x_j, x_i-x_j), space i=0,...,n
@@ -132,6 +138,7 @@ $
   3. $
       L_(i n)(x_k) = cases(1 "se" k=i, 0 "se" k eq.not i)
     $
+    #index("Delta di Kroenecker")
     Introducendo il *delta di Kroenecker*
     $
       S_(i k) = cases(1 "se" k=i, 0 "se" k eq.not i)
@@ -150,6 +157,7 @@ $
 ]
 
 #lemma()[
+  #index("Forma di Lagrange")
   Il polinomio $p(x) in Pi_n$ tale che $p(x_i)=f_i, space i=0,...,n$ si può rappresentare come:
   $
     p(x) = sum_(i=0)^n f_i L_(i n)(x) quad quad (4.3)
@@ -194,6 +202,7 @@ $
 Con $r=1,...,n$, $p_n (x)$ sarà il polinomio che interpola $f(x)$ su tutte le ascisse.
 
 Per ottenere questo obiettivo, dobbiamo ricorrere ad un'ulteriore base di rappresentazione: la base di Newton. Essa è una base di polinomi nomici ed è definita nel seguente modo:
+<4.7>
 $
   (4.7) quad quad cases(omega_0(x) equiv 1, omega_i(x) = omega_(i-1)(x)(x-x_(i-1))\, space i=1\,2\,dots)
 $
@@ -227,6 +236,7 @@ $
   p_r (x_i) = f_i, space i=0, dots,r quad quad (4.11)
 $
 Successivamente dimostreremo che $f[x_0, dots, x_r]$ è riscrivibile nella forma #link(<4.9>)[(4.9)].
+
 #proof()[
   Procedendo per induzione, abbiamo che $p_0(x) in product_0$ e $p_0(x_0) = f_0$. Assunto vero (4.10), andiamo a verificare che è possibile determinare $f[x_0, dots, x_r]$, in modo che sia soddisfacibile la (4.11).
   $
@@ -248,6 +258,7 @@ Successivamente dimostreremo che $f[x_0, dots, x_r]$ è riscrivibile nella forma
 ]
 
 #definition()[
+  #index("Differenza divisa")
   $f[x_0,dots,x_r], space r=0,1,dots$, come definita nella #link(<4.9>)[(4.9)], è detta *differenza divisa* di $f(x)$ sulle ascisse $x_0,dots,x_r$.
 ]
 #observation()[
@@ -259,6 +270,7 @@ Successivamente dimostreremo che $f[x_0, dots, x_r]$ è riscrivibile nella forma
 ]
 
 #definition()[
+  #index("Forma di Newton")
   La #link(<4.12>)[(4.12)] definisce la forma di Newton del polinomio interpolante .
 ]
 
@@ -269,3 +281,202 @@ Successivamente dimostreremo che $f[x_0, dots, x_r]$ è riscrivibile nella forma
   $
   ovvero, la forma di Lagrange e quella di Newton del polinomio interpolante sono *algebricamente equivalenti*. _Attenzione: ciò non significa che sono equivalenti dal punto di vista dell'aritmetica finita_
 ]
+
+//04.03.2026
+#theorem("Proprietà delle differenze divise")[
+  Valgono le seguenti proprietà delle differenze divise:
+  1.
+  2. se $(i_0,dots,i_r)$ è una permutazione di $(0,dots,r)$, allora:
+    $
+      f[x_(i_0),dots,x_(i_r)] = f[x_0,dots,x_r] quad quad ("simmetria rispetto agli argomenti")
+    $
+  3. sia $f(x)$ un polinomio di grado $k$: $f(x) = sum_(i=0)^k a_i x^i$. Sia $p(x)=sum_(i=0)^n f[x_0,dots,x_i]omega_i(x)$ il suo polinomio interpolante di grado $n$, allora:
+    $
+      f[x_0,dots,x_n]=cases(a_k\, space "se" k=n, 0\, space "se" k<n)
+    $
+  4. se $f(x) in C^(r+1) [a,b]$, allora:
+    $
+      f[x_0, dots, x_r] = frac(f^((r))(xi), r!) quad xi in [min_i x_i, max_i x_i]
+    $
+  5. $
+      f overbrace([x_0, dots, x_r], r+1) = frac(f overbrace([x_1, dots, x_r], r)-f overbrace([x_0, dots, x_(r-1)], r), x_r - x_0)
+    $
+]
+
+#observation()[
+  Nella 3., se $k=n$, per l'unicità del polinomio interpolante, avremo che $f(x)equiv p(x)$. Pertanto, i coefficienti principali, rispettivamente $a_n$ e $f[x_0,dots,x_n]$, devono coincidere:
+  $
+    f[x_0,dots,x_n] = a_n quad quad (n=k)
+  $
+  Tuttavia, se $n>k$, anche ora $p(x) equiv f(x)$. Quest'ultimo può essere riscritto come:
+  $
+    f(x)= sum_(i=0)^k a_i x^i + 0 dot x^(k+1) + dots + 0 dot x^n
+  $
+  //Polinomio interpolante di grado 25 di una parabola --> in realtà è un polinomio di grado 2?
+  _Ricordare che $forall n >= k$, il polinomio di grado $n$ che interpola un polinomio di grado $k$ *coincide con quest'ultimo per l'unicità del polinomio interpolante*._
+]
+
+#observation()[
+  La proprietà 4. continua a valere anche nel caso di ascisse coincidenti. Ad esempio:
+  $
+    f[x_0, x_0] = lim_(x_1 ->x_0) f[x_0, x_1] = lim_(x_1 ->x_0) frac(f(x_1)-f(x_0), x_1-x_0) = f'(x_0)
+  $
+  ovvero utilizzando un procedimento al limite.
+
+  Se tutte le ascisse $x_i -> x_0, space i=1,dots,n$, allora:
+  $
+    f underbrace([x_0,dots,x_0], r+1) = frac(f^((r))(x_0), r!)
+  $
+  inoltre:
+  $
+    omega_r(x) = product_(i=0)^(r-1) (x-x_i) = (x-x_0)^r
+  $
+  Pertanto se $x_0=x_1=dots=x_n$, otteniamo che:
+  $
+    p(x)=sum_(r=0)^n f[x_0,dots,x_0] omega_r(x) = sum_(r=0)^n frac(f^((r))(x_0), r!)(x-x_0)^r
+  $
+  che è il polinomio di Taylor di grado $n$ di $f(x)$, centrato in $x_0$.
+]
+
+
+#observation()[
+  Nella 5., tenendo conto  $f[x_i] =f_i, space i=0,dots,n$ questa proprietà ci consente di calcolare in modo incrementale le differenze divise richieste per il calcolo del polinomio interpolante in forma di Newton
+]
+
+#heading(numbering: none, depth: 3, "Proprietà 1.")
+Se $alpha, beta in RR$ e $f(x), g(x)$ sono funzioni di una variabile reale, allora:
+$
+  (alpha dot f + beta dot g)[x_0,dots,x_i]=alpha dot f[x_0,dots,x_i] + beta dot g[x_0,dots,x_i] quad quad ("linearità")
+$
+#proof()[
+  $
+    frac(1, x_r-x_0)(f[x_1,dots,x_r]-f[x_1,dots,x_(r-1)]) = frac(1, x_r-x_0) (sum_(k=1)^r frac(f_k, product_(j=1\ j eq.not k)^r (x_k-x_j)) - sum_(k=0)^(r-1) frac(f_k, product_(j=0\ j eq.not k)^(r-1) (x_k-x_j)))\
+    = frac(1, x_r-x_0) [frac(f_r, product_(j=1\ j eq.not r)^r (x_r-x_j)) - frac(f_0, product_(j=0\ j eq.not 0)^(r-1) (x_0-x_j)) + sum_(k=1)^(r-1)frac(f_k, product_(j=1\ j eq.not k)^(r-1)(x_k-x_j))(frac(1, x_k-x_r)-frac(1, x_k-x_0))]=(*)\
+    frac(1, x_r-x_0) dot frac(f_r, product_(j=1 \ j eq.not r)^r (x_r-x_j)) = frac(f_r, product_(j=0 \ j eq.not r)^r(x_r-x_j)) quad quad ("giallo")\
+    frac(-1, x_r-x_0) dot frac(f_0, product_(j=0 \ j eq.not 0)^(r-1) (x_0-x_j)) = frac(1, x_0-x_r) dot frac(f_0, product_(j=0 \ j eq.not 0)^(r-1) (x_0-x_j)) = frac(f_0, product_(j=0 \ j eq.not 0)^r (x_0-x_j)) quad quad ("verde")\
+    frac(1, x_r-x_0) dot sum_(k=1)^(r-1) frac(f_k, product_(j=1\ j eq.not k)^(r-1) (x_k-x_j)) dot frac(x_k - x_0 - x_k +x_r, (x_k-x_r)(x_k-x_0)) = sum_(k=1)^(r-1) frac(f_k, product_(j=0\ j eq.not k)^r (x_k-x_j)) quad quad ("blu")\
+    => (*) = sum_(k=0)^r frac(f_k, product_(j=0\ j eq.not k)^r (x_k-x_j)) = f[x_0,dots, x_r]
+  $
+]
+
+Questa proprietà ci consente di calcolare in modo efficiente le differenze divise necessarie per il calcolo del polinomio interpolante in forma di Newton.
+
+#table(
+  columns: 7,
+  align: center + horizon,
+  stroke: none,
+  table.hline(y: 1, stroke: (dash: "solid", thickness: 0.4pt)),
+  table.vline(x: 1, stroke: (dash: "solid", thickness: 0.4pt)),
+  [], [0], [1], [2], [$dots.c$], [$n-1$], [$n$],
+  [$x_0$], [$f[x_0]$], [], [], [], [], [],
+  [$x_1$], [$f[x_1]$], [$f[x_0,x_1]$], [], [], [], [],
+  [$x_2$], [$f[x_2]$], [$f[x_1,x_2]$], [$f[x_0,x_1,x_2]$], [], [], [],
+  [$dots.v$], [$dots.v$], [$dots.v$], [], [], [], [],
+  [$x_(n-1)$], [$f[x_(n-1)]$], [$dots.v$], [], [], [$f[x_0,dots,x_(n-1)]$], [],
+  [$x_n$], [$f[x_n]$], [$f[x_(n-1),x_n]$], [$f[x_(n-2),x_(n-1),x_n]$], [], [$f[x_1,dots,x_n]$], [$f[x_0,dots,x_n]$],
+)
+Quelle sulla diagonale sono le differenze divise necessarie per il calcolo del polinomio in forma di Newton.
+#observation()[
+  Se calcoliamo le colonne di questa matrice triangolare dal basso verso l'alto, possiamo sovrascrivere i risultati negli elementi adiacenti a sinistra. Pertanto sarà sufficiente un vettore di $n+1$ elementi (in realtà 2, uno anche per le ascisse).
+]
+
+//05.03.2026
+Esaminiamo, in dettaglio, il caso $n=2$, prima di derivare una procedura generale per il calcolo delle differenze divise nel caso di $n$ generico.
+
+#table(
+  columns: 4,
+  align: center + horizon,
+  stroke: none,
+  table.hline(y: 1, stroke: (dash: "solid", thickness: 0.4pt)),
+  table.vline(x: 1, stroke: (dash: "solid", thickness: 0.4pt)),
+  [], [0], [1], [2],
+  [$x_0$], [$f[x_0]equiv f_0$], [], [],
+  [$x_1$], [$f[x_1] equiv f_1$], [$f[x_0,x_1]=frac(f[x_1]-f[x_0], x_1-x_0)$], [],
+  [$x_2$],
+  [$f[x_2] equiv f_2$],
+  [$f[x_1,x_2]=frac(f[x_2]-f[x_1], x_2-x_1)$],
+  [$f[x_0,x_1,x_2]=frac(f[x_1\,x_2]-f[x_0\,x_1], x_2-x_0)$],
+)
+Scriviamo ora un codice Matlab che implementa questo algoritmo nel caso generale. Poiché i vettori hanno indicizzazione a partire da 1, i vettori in ingresso saranno $x$ e $f$ di lunghezza $n+1$ (prima e seconda colonna della tabella precedente):
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: false,
+  header: [*Algoritmo 4.1* Calcolo delle differenze divise],
+)
+```matlab
+for j=1:n
+  for i=n+1:-1:j+1
+    f(i)=(f(i)-f(i-1))/(x(i)-x(i-j));
+  end
+end
+```
+#observation()[
+  Questo algoritmo è, evidentemente, funzionante in modo corretto se e solo se il vettore $x$ contiene elementi tra loro *distinti*. Questo controllo va effettuato prima di eseguire le precedenti istruzioni.
+]
+
+- *Occupazione di memoria*: 2 vettori di lunghezza $n+1$ ($x$ e $f$). Pertanto la complessità è *lineare* in $n$.
+- *Numero di operazioni*: abbiamo 3 operazioni elementari nel ciclo più interno. Per questo motivo otteniamo:
+  $
+    3 dot sum_(j=1)^n (n-j+1) = 3 dot sum_(j=1)^n j = 3 dot frac(n(n+1), 2) = O(n^2)
+  $
+  #observation()[
+    $
+      sum_(j=0)^n j^k approx integral_0^n x^k d x = frac(n^(k+1), k+1)
+    $
+  ]
+
+Vediamo adesso come calcolare efficientemente il polinomio $p(x)$. Consideriamo preliminarmente un problema più semplice, ovvero il calcolo di un polinomio di grado $n$ rispetto alla base delle potenze:
+$
+  p(x) = sum_(i=0)^n a_i x^i
+$
+#example()[
+  Con $n=2$ avremo:
+  $
+    p(x)=a_0 + a_1 x + a_2 x^2
+  $
+  - $p=a_2$
+  - $p <-- p dot x + a_1 => p=a_2 x + a_1$
+  - $p <-- p dot x + a_0 => p=a_0+a_1 x +a_2 x^2$
+]
+Questo algoritmo si chiama *algoritmo di Horner*. La sua complessità è $2n$ `flops`. //Possibile domanda parziale
+
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: false,
+  header: [*Algoritmo 4.2* Algoritmo di Horner],
+)
+```matlab
+p=a(n+1);
+for i=n:-1:1
+  p=p*x+a(i);
+end
+```
+#observation()[
+  Se volessimo calcolare il polinomio in un vettore di punti, è sufficiente sostituire l'operazione nel ciclo con `p=p .* x+a(i);` (moltiplicazione elemento per elemento)
+]
+Questo algoritmo può essere generalizzato al caso del polinomio interpolante
+#link(<4.12>, "(4.12)"), utilizzando la definizione incrementale #link(<4.7>, "(4.7)") della base di Newton. In Matlab, se $x$ e $f$ sono i vettori con le ascisse e le differenze divise, mentre $x x$ è il vettore dei punti in cui calcolare il polinomio, allora otteniamo:
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: false,
+  header: none,
+)
+```matlab
+p=f(n+1);
+for i=n:-1:1
+  p=p.*(x-x(i))+f(i);
+end
+```
+dove $.*$ è stato utilizzato per calcolare il polinomio interpolante in un vettore, $x x$, di ascisse. Pertanto, con un costo di $3n$ `flops` per ogni punto in cui viene calcolato il polinomio interpolante.
+
+#figure(image("images/2026-03-05-11-44-54.png"))
+
+$p(x)$ è il polinomio interpolante $f(x)$ nelle ascisse assegnate. Se definiamo $e(x)=f(x)-p(x)$, (funzione dell'errore), da cui, ricordando che $p(x_i)=f(x_i)$, otteniamo che:
+$
+  e(x_i) = 0, space i=0,dots,n
+$
+
+
