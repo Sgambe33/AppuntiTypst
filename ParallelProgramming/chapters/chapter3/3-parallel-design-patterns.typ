@@ -6,15 +6,21 @@ Diversi modelli strutturano l'espressione algoritmica del parallelismo.
 
 === Parallelismo di Controllo e Task
 - *Superscalar sequence:* I task sono ordinati solo in base alle dipendenze dai dati e possono essere eseguiti non appena i dati di input sono pronti.
+  #figure(image("images/2026-02-26-09-36-04.png"))
 - *Loop Level Parallelism:* Assegna le iterazioni di un costrutto iterativo (loop) a unità di esecuzione. Particolarmente utile quando il codice non può essere ristrutturato massicciamente.
+  #figure(image("images/2026-02-26-09-36-59.png"))
 - *Task Parallelism:* Si concentra sulla distribuzione dei task (eseguiti da processi o thread) su diversi nodi paralleli. I thread possono eseguire codice uguale o diverso e comunicano scambiando dati.
 - *Fork-Join Parallelism:* Un processo/thread principale (parent) crea (fork) altri processi/thread e attende (join) che tutti completino la loro porzione di lavoro prima di continuare . Un child non può fare join con il parent finché non ha fatto join con tutti i suoi children .
+#figure(image("images/2026-02-26-09-37-43.png"))
 - *SPMD (Single Program, Multiple Data):* Tutte le unità di esecuzione eseguono lo stesso programma in parallelo, ma ciascuna ha il proprio set di dati . Tipicamente usato in sistemi a memoria distribuita .
 - *Master-Worker (Master-Slave):* Un processo master crea un pool di worker e una borsa di task (spesso gestita con una coda) . I worker rimuovono i task e richiedono nuovo lavoro quando finiscono, bilanciando automaticamente il carico . È appropriato per problemi imbarazzantemente paralleli .
+#figure(image("images/2026-02-26-09-38-07.png"))
 - *Client-Server:* Simile al modello MPMD (Multiple Program, Multiple Data) e originariamente derivante dal calcolo distribuito . Il parallelismo si ottiene elaborando richieste da diversi client concorrentemente o utilizzando più thread per elaborare una singola richiesta complessa .
+#figure(image("images/2026-02-26-09-38-20.png"), caption: "Client-server vs.master-worker")
 - *Task Pool:* Struttura dati che memorizza i task da eseguire . Un numero fisso di thread, creati all'avvio del programma, accede a questa struttura comune per recuperare i task . L'accesso al task pool deve essere sincronizzato per evitare race conditions .
 - *Producer-Consumer:* Thread produttori generano dati che vengono usati come input dai thread consumatori, tipicamente tramite una struttura dati comune come un buffer a lunghezza fissa . Richiede sincronizzazione per la coordinazione corretta . Una *Work Queue* (coda FIFO, LIFO, o prioritaria) è spesso usata in questo paradigma . Per ridurre la contesa, si possono usare più code, permettendo ai processi di eseguire work stealing .
-- *Pipeline:* Utilizza una sequenza di stadi che trasformano un flusso di dati . Può essere visto come una forma speciale di scomposizione funzionale o parallelismo producer-consumer . L'esecuzione parallela si ottiene suddividendo i dati in uno stream che scorre attraverso gli stadi .
+#figure(image("images/2026-02-26-09-38-58.png"), caption: "Task pool vs. producer-consume")
+- *Pipeline:* Utilizza una sequenza di stadi che trasformano un flusso di dati . Può essere visto come una forma speciale di scomposizione funzionale o parallelismo producer-consumer . L'esecuzione parallela si ottiene suddividendo i dati in uno stream che scorre attraverso gli stadi.
 
 #heading(outlined: false, "Parallelismo di Dati", depth: 2)
 

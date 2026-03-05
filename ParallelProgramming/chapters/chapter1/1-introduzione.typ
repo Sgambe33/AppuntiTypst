@@ -87,7 +87,7 @@ Oltre alle CPU, il calcolo parallelo si estende ad altre architetture come:
 
 === Limitazioni Fisiche e Consumo Energetico
 
-Il consumo energetico è un fattore critico. La potenza di una CPU è proporzionale al cubo della frequenza (*P ∝ f³*), mentre l'energia necessaria per un calcolo è proporzionale al quadrato della frequenza (*E ∝ f²*). Il parallelismo può aiutare a conservare energia.
+Il consumo energetico è un fattore critico. La potenza di una CPU è proporzionale al cubo della frequenza (*P $∝ f^3$*), mentre l'energia necessaria per un calcolo è proporzionale al quadrato della frequenza (*E $∝ f^2$*). Il parallelismo può aiutare a conservare energia.
 
 #align(center, image("images/2025-09-20-17-45-34.png"))
 
@@ -120,18 +120,18 @@ Il parallelismo può essere classificato in diversi livelli:
 - *Data Parallelism (Single Instruction Multiple Data)*: esecuzione della stessa operazione su grandi quantità di dati in parallelo. È tipico delle GPU e delle applicazioni multimediali.
 - *Task-Level Parallelism*: suddivisione del lavoro in task distinti. Si basa su due modelli di memoria:
   - *Shared Memory*: tutti i processori accedono a un unico spazio di memoria. È più semplice da programmare ma ha una scalabilità limitata e può portare a race condition.
-  #align(center, image("images/2025-09-20-18-05-23.png"))
+  #align(center, image("images/2025-09-20-18-05-23.png", width: 50%))
   - *Distributed Memory*: ogni processore ha la propria memoria locale e la comunicazione avviene tramite messaggi di rete. È più difficile da programmare ma scala meglio ed è più facile da debuggare.
-  #align(center, image("images/2025-09-20-18-05-40.png"))
+  #align(center, image("images/2025-09-20-18-05-40.png", width: 50%))
 
 Oggi sono comuni i *sistemi eterogenei*, che combinano CPU per la logica di controllo, GPU per l'elaborazione di dati massiva e chip specializzati (TPU, FPGA) per operazioni specifiche.
-#align(center, image("images/2025-09-20-18-06-01.png"))
+#align(center, image("images/2025-09-20-18-06-01.png", width: 50%))
 
 === Tassonomia di Flynn
 
 La tassonomia di Flynn classifica le architetture parallele in base ai flussi di istruzioni e dati:
 //TODO:Rifare tabella?
-#align(center, image("images/2025-09-20-18-06-26.png"))
+#align(center, image("images/2025-09-20-18-06-26.png", width: 60%))
 - *SISD* (Single Instruction, Single Data): computer sequenziale tradizionale (es. Intel Pentium 4).
 - *SIMD* (Single Instruction, Multiple Data): esegue la stessa istruzione su dati diversi (es. istruzioni SSE di x86).
 - *MISD* (Multiple Instruction, Single Data): più istruzioni operano sugli stessi dati. Non esistono esempi reali, anche se gli array sistolici sono talvolta erroneamente classificati come tali.
@@ -139,7 +139,7 @@ La tassonomia di Flynn classifica le architetture parallele in base ai flussi di
 
 Un'estensione comune è *SPMD* (Single Program, Multiple Data), in cui lo stesso programma viene eseguito simultaneamente su più processori con dati di input diversi. È un modello comune per i sistemi MIMD.
 
-#align(center, image("images/2025-09-20-18-07-05.png"))
+#align(center, image("images/2025-09-20-18-07-05.png", width: 70%))
 
 === Modelli di Programmazione e Framework
 
@@ -187,10 +187,10 @@ L'*Efficienza (EP)* misura quanto bene vengono utilizzati i processori, calcolat
 
 === Legge di Amdahl e Legge di Gustafson
 
-La *Legge di Amdahl* (1967) afferma che lo speedup è limitato dalla frazione di codice che deve essere eseguita sequenzialmente (*f*). Lo speedup massimo ottenibile è *1/f*, indipendentemente dal numero di processori. Ad esempio, se il 95% di un programma è parallelizzabile (f=0.05), lo speedup non potrà mai superare 20 volte. Questa legge si applica quando la dimensione del problema è fissa (*strong scaling*).
+#definition()[La *Legge di Amdahl* (1967) afferma che lo speedup è limitato dalla frazione di codice che deve essere eseguita sequenzialmente (*f*). Lo speedup massimo ottenibile è *1/f*, indipendentemente dal numero di processori. Ad esempio, se il 95% di un programma è parallelizzabile (f=0.05), lo speedup non potrà mai superare 20 volte. Questa legge si applica quando la dimensione del problema è fissa (*strong scaling*).]
 
-La *Legge di Gustafson* osserva che, in pratica, all'aumentare delle risorse computazionali, si tende ad aumentare anche la dimensione del problema. In questo scenario (*weak scaling*), la frazione sequenziale del lavoro spesso diminuisce in proporzione, permettendo uno speedup quasi lineare.
-La figura seguente mostra come lo speedup, secondo Gustafson, cambi in funzione della frazione parallelizzabile del codice.
+#definition()[La *Legge di Gustafson* osserva che, in pratica, all'aumentare delle risorse computazionali, si tende ad aumentare anche la dimensione del problema. In questo scenario (*weak scaling*), la frazione sequenziale del lavoro spesso diminuisce in proporzione, permettendo uno speedup quasi lineare.
+La figura seguente mostra come lo speedup, secondo Gustafson, cambi in funzione della frazione parallelizzabile del codice.]
 
 *(Immagine basata sulla Figura 1.4 delle fonti)*
 

@@ -29,7 +29,7 @@ Di norma ci dovrebbero essere almeno tante task quanti saranno i thread che le d
 
 Durante l'analisi di un programma sequenziale potremmo notare che la sua esecuzione è formata principalmente da una sequenza di operazioni su tutti gli elementi di una o più strutture dati. Se quest'ultime sono indipendenti possiamo dividere i dati (in _chunks_) e assegnarne porzioni a task diverse.
 
-#align(center, image("images/2025-09-29-21-27-06.png"))
+#align(center, image("images/2025-09-29-21-27-06.png", width: 70%))
 
 Bisogna fare attenzione a come si suddividono i dati, come si assegnano ai thread e se ogni task potrà accedere ai dati richiesti dalla sua parte di computazione.
 
@@ -43,7 +43,7 @@ Se si riduce la dimensione complessiva del bordo di un chunk, diminuisce anche l
 
 In generale, una buona regola pratica consiste nel cercare di massimizzare il rapporto tra volume e superficie: il volume rappresenta la quantità di dati e quindi il livello di granularità delle computazioni, mentre la superficie corrisponde al bordo del chunk, cioè la parte che richiede comunicazione e scambio di dati con i vicini. Un rapporto elevato implica quindi più calcolo locale e meno comunicazione, rendendo il processo più efficiente.
 
-#align(center, image("images/2025-09-29-21-48-12.png"))
+#align(center, image("images/2025-09-29-21-48-12.png", width: 50%))
 
 #example(
   "Distribuzione dei dati per gli array",
@@ -53,16 +53,16 @@ In generale, una buona regola pratica consiste nel cercare di massimizzare il ra
   + Distribuzione *cyclic*: si assegnano gli elementi ai processi seguendo il _Round Robin_ così che $v_i$ è assegnato a $P_((i-1)mod p+1)$.
   + Distribuzione *block-cyclic*: combinazione dei due precedenti.
 
-  #align(center, image("images/2025-09-29-22-04-13.png"))
+  #align(center, image("images/2025-09-29-22-04-13.png", width: 60%))
 
   Il primo favorisce la *località spaziale* mentre il secondo la *località temporale*.
 ]
 
 Per gli array bidimensionali si utilizzano combinazioni blockwise e cyclic in una o entrambe le dimensioni. La *distribuzione Blockwise Columnwise (o Rowwise)* crea $p$ blocchi di colonne (o righe) contigue. La distribuzione in entrambe le dimensioni può utilizzare *distribuzioni a scacchiera (*checkerboard*)*, dove i processori sono disposti in una mesh virtuale $p_1 dot p_2 = p$.
 
-#figure(image("images/2025-10-07-16-55-28.png"))
+#figure(image("images/2025-10-07-16-55-28.png", width: 60%))
 
-#figure(image("images/2025-10-07-16-55-57.png"))
+#figure(image("images/2025-10-07-16-55-57.png", width: 60%))
 
 == Layout dei Dati e Prestazioni
 
@@ -83,7 +83,7 @@ Ci sono tre tipi di cache misses:
 Due layout comuni sono Array of Structures (AoS) e Structure of Arrays (SoA).
 
 - AoS: può causare problemi di allineamento nella cache sebbene i campi siano vicini tra loro ma è anche difficile da vettorizzare.
-  #figure(image("images/2025-10-07-17-00-55.png"))
+  #figure(image("images/2025-10-07-17-00-55.png", height: 20%))
   #example("RGB")[
     Let us consider a graphics
     application that operates on RGB
@@ -97,12 +97,12 @@ Due layout comuni sono Array of Structures (AoS) e Structure of Arrays (SoA).
     added by the compiler for
     memory alignment of the
     structure
-    #figure(image("images/2025-10-07-17-27-47.png"))
-    #figure(image("images/2025-10-07-17-28-28.png"))
+    #figure(image("images/2025-10-07-17-27-47.png", width: 70%))
+    #figure(image("images/2025-10-07-17-28-28.png", width: 70%))
   ]
 
 - SoA: si allinea facilmente alla cache ed è vettorizzabile.
-  #figure(image("images/2025-10-07-17-01-05.png"))
+  #figure(image("images/2025-10-07-17-01-05.png", width: 40%))
   #example("RGB")[
     Considering RGB values
     now Rs are contiguous,
@@ -115,11 +115,11 @@ Due layout comuni sono Array of Structures (AoS) e Structure of Arrays (SoA).
     are long then it may be a
     problem for CPU caches
     (but not for GPUs)
-    #figure(image("images/2025-10-07-17-28-43.png"))
-    #figure(image("images/2025-10-07-17-28-50.png"))
+    #figure(image("images/2025-10-07-17-28-43.png", width: 70%))
+    #figure(image("images/2025-10-07-17-28-50.png", width: 70%))
   ]
 
-#figure(image("images/2025-10-07-17-00-45.png"))
+#figure(image("images/2025-10-07-17-00-45.png", width: 70%))
 
 - AoSoA: 
   Array of Structures (AoS): 
@@ -185,14 +185,13 @@ L'invio di molti piccoli messaggi può far sì che la latenza domini l'overhead 
 
 La correttezza dei programmi paralleli è più complessa di quella dei programmi sequenziali, data la natura asincrona dei computer moderni.
 
-- *Proprietà di Sicurezza (Safety Properties):* "Niente di male accade mai".
+- *Safety Properties:* "Niente di male accade mai".
   - Esempio: *Mutua Esclusione* (due processi non usano mai una risorsa comune nello stesso momento).
-- *Proprietà di Vivacità (Liveness Properties):* "Qualcosa di buono accade eventualmente".
+- *Liveness:* "Qualcosa di buono accade eventualmente".
   - Esempio: *No Deadlock* (se uno o entrambi i processi vogliono la risorsa, uno la ottiene).
-  - *Starvation Freedom (Assenza di Inedia):* Se un processo vuole la risorsa, la otterrà eventualmente.
+  - *Starvation Freedom:* Se un processo vuole la risorsa, la otterrà eventualmente.
   - *Fault-tolerance:* Cosa succede se un processo in attesa non riesce a ottenere la risorsa perché il processo che la controlla fallisce (problema di attesa implicito nella mutua esclusione).
 
-#heading("Proprietà di Comunicazione (per la Correttezza", outlined: false, depth: 3)
 La comunicazione può essere:
 - *Transient (Transitoria):* Richiede la partecipazione simultanea di entrambe le parti (sincrona, come parlare).
 - *Persistent (Persistente):* Permette al mittente e al destinatario di partecipare in momenti diversi (asincrona, come scrivere). Un protocollo capace di mutua esclusione richiede comunicazione persistente.
