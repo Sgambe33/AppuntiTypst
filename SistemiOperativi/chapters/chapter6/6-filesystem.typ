@@ -120,7 +120,7 @@ Le informazioni nelle tabelle dei file aperti sono gestite così:
 Alcuni SO invece usano *file speciali* che corrispondono a dispositivi di I/O. Sono inclusi nella gerarchia delle directory come qualsiasi altro file, quindi permettono di fare riferimento ad un dispositivo come se fosse un file. Possono essere:
 - A *blocchi* (usati per modellare i dischi).
 - A *caratteri* (usati per modellare dispositivi di I/O seriali, quali terminali, stampanti, reti).
-#figure(image("images/2025-08-17-18-27-08.png"))
+#figure(image("images/2025-08-17-18-27-08.png", width: 50%))
 
 == Metodi di accesso
 
@@ -129,7 +129,7 @@ I metodi di accesso stabiliscono le modalità con cui i processi possono acceder
 === Accesso Sequenziale
 
 I record del file vengono acceduti sequenzialmente, uno dopo l'altro. Il puntatore interno al file è gestito automaticamente dalle operazioni di lettura/scrittura (es. `readnext()`, `writenext()`), ma può essere modificato tramite `seek()`. Questo modello fa riferimento a dispositivi come nastri magnetici e CD-ROM ed è il metodo di accesso più comune, utilizzato da editor di testo e compilatori.
-#figure(image("images/2025-08-17-18-36-37.png"))
+#figure(image("images/2025-08-17-18-36-37.png", width: 60%))
 
 === Accesso Diretto
 
@@ -150,7 +150,7 @@ Ogni record logico del file ha una *chiave d'accesso*. Al file è associato un *
 Il vantaggio principale è che la ricerca nel file indice può essere molto più veloce che nel file stesso, poiché il file può essere molto più grande del suo indice, richiedendo molte operazioni di I/O. L'indice, inoltre, può essere mantenuto in memoria principale (o indicizzato a sua volta se troppo grande).
 *Esempio di uso di indice*:
 #example("Uso di indice")[
-  #figure(image("images/2025-08-17-18-53-50.png"))
+  #figure(image("images/2025-08-17-18-53-50.png", width:60%))
   Un file indice può mappare un "cognome" a un "numero logico del record", che a sua volta punta al record completo nel file relativo, come illustrato in figura.
 ]
 
@@ -172,7 +172,7 @@ I file mappati in memoria offrono diversi vantaggi:
 - *Notevole semplificazione delle operazioni di I/O*: I dati da trasferire possono essere acceduti direttamente nella sezione di memoria mappata, eliminando la necessità di buffer intermedi.
 - *Possibilità di condivisione*: I processi possono mappare lo stesso file in modo concorrente per condividere dati e comunicare. Le scritture di un processo modificano i dati nella memoria virtuale e fisica, rendendoli visibili a tutti gli altri processi che mappano la stessa sezione del file. Può essere supportata anche la funzionalità di *copiatura su scrittura (copy-on-write)*, permettendo ai processi di condividere un file in sola lettura ma di ottenere una propria copia dei dati non appena li modificano.
 
-#figure(image("images/2025-08-17-18-56-32.png"), caption: "Condivisione di file tramite file mappato in memoria")
+#figure(image("images/2025-08-17-18-56-32.png", width: 60%), caption: "Condivisione di file tramite file mappato in memoria")
 L'immagine illustra come più processi possano accedere e condividere lo stesso file attraverso la memoria mappata, semplificando la collaborazione.
 
 == La Directory
@@ -203,14 +203,14 @@ Esistono diverse strutture logiche per le directory, ciascuna con i propri pro e
 L'approccio più semplice prevede una *singola directory per tutti i file di tutti gli utenti*.
 - *Vantaggi*: Ricerca efficiente se il numero di file è limitato.
 - *Svantaggi*: Tutti i file devono avere nomi diversi (problema di naming), non è possibile raggruppare i file logicamente, e presenta limiti notevoli all'aumentare del numero di file o nei sistemi multiutente.
-#figure(image("images/2025-08-17-19-01-11.png"))
+#figure(image("images/2025-08-17-19-01-11.png", width: 60%))
 
 ==== Directory a Due Livelli
 
 Ogni utente ha una *directory separata*.
 - *Vantaggi*: Ricerca efficiente, utenti diversi possono avere file con lo stesso nome.
 - *Svantaggi*: Nessuna capacità di raggruppamento se non a livello di utente. È necessaria la specifica di un *pathname* per individuare un file.
-#figure(image("images/2025-08-17-19-01-27.png"))
+#figure(image("images/2025-08-17-19-01-27.png", width: 60%))
 
 ==== Directory con Struttura ad Albero
 
@@ -220,7 +220,7 @@ Questa è una struttura più complessa in cui ogni utente ha una directory di la
   - *Assoluto*: Dalla radice (es. `/usr/ast/mailbox`).
   - *Relativo*: Dalla PWD (es. `mailbox` se la PWD è `/usr/ast`).
   Il comando UNIX `cp /usr/ast/mailbox /usr/ast/mailbox.bak` e `cp mailbox mailbox.bak` hanno lo stesso effetto se la PWD è `/usr/ast`.
-#figure(image("images/2025-08-17-19-03-22.png"))
+#figure(image("images/2025-08-17-19-03-22.png", width: 60%))
 Le operazioni come la creazione di un nuovo file vengono eseguite relativamente alla directory corrente (`rm <nome-file>`, `mkdir <dir-name>`).
 
 ==== Directory con struttura a grafo aciclico (DAG)
@@ -229,7 +229,7 @@ Rispetto alla struttura ad albero, può essere utile permettere l'aggiunta di �
 - *Differenze Albero vs. DAG*:
   - *Albero*: ogni file è contenuto in un'unica directory.
   - *DAG*: un file può essere contenuto in una o più directory (es. `count`). Esiste un'unica copia del file, quindi ogni modifica è visibile in tutte le directory che lo contengono.
-#figure(image("images/2025-08-17-19-05-26.png"))
+#figure(image("images/2025-08-17-19-05-26.png", width: 60%))
 
 === Condivisione e Collegamenti/Link
 
@@ -256,7 +256,7 @@ Per la massima flessibilità, si può consentire la presenza di cicli, ma poi bi
 ==== Directory con Struttura a Grafo Generico
 
 Se in una directory ad albero si aggiungono collegamenti in modo arbitrario, la struttura si trasforma in un grafo generico, che può contenere cicli.
-#figure(image("images/2025-08-17-19-12-34.png"))
+#figure(image("images/2025-08-17-19-12-34.png", width: 60%))
 - La *ricerca di un file/directory è complicata*: Bisogna implementare l'algoritmo di ricerca in modo da evitare di esplorare ciclicamente la stessa porzione (es. limitando arbitrariamente il numero di directory da accedere).
 - Un algoritmo più semplice prevede di *non percorrere mai i collegamenti* durante l'attraversamento delle directory (come nei DAG), evitando così cicli nell'esplorazione senza costi computazionali aggiuntivi.
 
@@ -305,7 +305,7 @@ L'uso della matrice di protezione è solo concettuale, poiché in pratica compor
 === Liste di Capability (C-list)
 
 Ad ogni processo (P) il sistema associa una *lista di capability*, cioè una lista di file/directory (o risorse in generale) insieme con le operazioni permesse su quelle risorse. Questa lista rappresenta una riga della matrice di protezione.
-#figure(image("images/2025-08-17-23-49-05.png"))
+#figure(image("images/2025-08-17-23-49-05.png", width: 60%))
 
 Una risorsa è tipicamente rappresentata dal suo nome fisico o indirizzo.
 Le capability agiscono anche come nomi per le risorse: un utente/processo non può nemmeno nominare una risorsa che non è riferita da una capability nella sua C-list. Per eseguire un'operazione su una risorsa, il processo invoca l'operazione specificando la capability per la risorsa come parametro, e il semplice possesso della capability indica che l'operazione è autorizzata.
@@ -315,7 +315,7 @@ Sono un meccanismo flessibile, ma è problematico gestire liste di utenti non no
 === Liste di Controllo degli Accessi (ACL)
 
 Ad ogni file/directory (o risorsa in generale) il sistema associa una *ACL*, la quale, per ogni utente, specifica le operazioni che quell'utente è autorizzato a compiere sul file/directory. Questa lista rappresenta una colonna della matrice di protezione e può contenere anche un insieme di operazioni autorizzate di default.
-#figure(image("images/2025-08-17-23-49-47.png"))
+#figure(image("images/2025-08-17-23-49-47.png", width: 60%))
 
 Molti sistemi usano una versione condensata delle ACL, come *UNIX*, che distingue *3 classi di utenti* e *3 modalità di accesso*:
 - *Classi di utenti*:
@@ -400,7 +400,7 @@ La realizzazione delle operazioni del file system richiede diverse strutture dat
 - *Partition/volume control block (volume index, device directory, superblocco)*: Contiene informazioni sulla partizione/volume, come numero e dimensione dei blocchi, posizione dei blocchi liberi e dei FCB liberi.
 - *Struttura della directory*: Tabella i cui elementi associano nomi di file/sottodirectory a FCB. Una per file system.
 - *FCB (File control block o inode UNIX)*: Mantengono i valori degli attributi dei singoli file e informazioni sull'allocazione dei blocchi su disco.
-#figure(image("images/2025-08-18-00-02-33.png"), caption: "Tipico File Control Block")
+#figure(image("images/2025-08-18-00-02-33.png", width: 60%), caption: "Tipico File Control Block")
 
 ==== Strutture Dati in Memoria
 
@@ -424,7 +424,7 @@ Le tabelle dei file aperti di ciascun zprocesso memorizzano informazioni sull'ut
   - Se sì: incrementa il contatore delle aperture associato al file e aggiunge alla tabella dei file aperti del processo richiedente un elemento che punta al corrispondente elemento della tabella generale.
   - Se no: cerca il nome del file nella struttura della directory. Una volta trovato, copia il relativo FCB in un nuovo elemento della tabella generale dei file aperti (con contatore delle aperture a 1). Aggiunge un elemento alla tabella dei file aperti del processo che punta ad esso (includendo un puntatore alla posizione corrente nel file e la modalità di accesso).
   Alla fine, restituisce un *indice* (file descriptor `fd`) alla tabella dei file aperti del processo, cosicché tutte le successive operazioni sul file avverranno tramite tale indice.
-  #figure(image("images/2025-08-18-00-08-54.png"))
+  #figure(image("images/2025-08-18-00-08-54.png", width: 60%))
   L'immagine illustra il percorso di un'operazione `open()`, mostrando come il file descriptor `fd` punti attraverso le tabelle in memoria al descrittore del file e alla sua allocazione su disco.
 ]
 
@@ -461,11 +461,11 @@ Tuttavia, memorizzare direttamente i descrittori (FCB) negli elementi della dire
 
 Per implementare più convenientemente i link, è preferibile tenere attributi e informazioni sull'allocazione in una struttura separata (es. *inode UNIX*). In questo modello, ogni elemento di directory punta all'inode (unico) del file/sottodirectory. L'uso di un *contatore (inserito nell'inode)* facilita la cancellazione di un file con più pathname: la cancellazione effettiva avviene solo quando il contatore si azzera; altrimenti, viene solo eliminato il pathname e decrementato il contatore.
 
-#figure(image("images/2025-08-18-00-12-59.png"))
+#figure(image("images/2025-08-18-00-12-59.png", width: 60%))
 L'immagine illustra questo concetto, mostrando due nomi di file (`f2`, `f2bis`) che puntano allo stesso inode (`inode 15`), che contiene gli attributi, l'allocazione su disco e un `*Contatore link*` che in questo caso è `2`.
 
 #example("Ricerca del file `/usr/ast/mbox` in UNIX")[
-  #figure(image("images/2025-08-18-00-14-09.png"))
+  #figure(image("images/2025-08-18-00-14-09.png", width: 60%))
   L'immagine mostra i passi per la ricerca di un file con pathname assoluto in un file system UNIX, che utilizza gli inode:
   1. Si parte dalla *root directory `/`* e si cerca l'indice dell'inode corrispondente a `usr`, si trova il valore `6`.
   2. Si accede l'*inode `6`* e si trova che la tabella di directory corrispondente a `/usr` si trova nel *blocco dati `132`*.
@@ -504,9 +504,9 @@ Il montaggio può essere effettuato automaticamente dal SO (es. Windows, macOS) 
 In SO come UNIX, i comandi di montaggio sono espliciti. Un file di configurazione del sistema contiene un elenco di dispositivi e punti di montaggio per il montaggio automatico all'avvio, ma altri montaggi possono essere eseguiti manualmente. In UNIX, il montaggio può avvenire in qualsiasi directory.
 Viene implementato impostando un flag nella copia in memoria dell'inode della directory di montaggio, indicando che è un punto di montaggio. Un campo dell'inode punta a un elemento della tabella di montaggio, che contiene un puntatore al superblocco del file system montato.
 
-#figure(image("images/2025-08-18-00-17-15.png"))
+#figure(image("images/2025-08-18-00-17-15.png", width: 60%))
 L'immagine illustra come un volume contenente le home directory degli utenti (b) possa essere montato nella directory `/users` del file system esistente (a), rendendo accessibile una struttura come `/users/gianna`.
-#figure(image("images/2025-08-18-00-17-40.png"))
+#figure(image("images/2025-08-18-00-17-40.png", width: 60%))
 
 === Smontaggio di un File System (Unmounting)
 
@@ -526,7 +526,7 @@ Indicheremo con `Nb` il numero di record logici contenuti in un blocco. Il recor
 
 Ogni file occupa un certo numero di *blocchi contigui su disco*. La porzione allocata a un file è definita dall'indirizzo `B` del blocco iniziale e dal numero di blocchi, informazioni mantenute nel FCB. L'indirizzo del blocco in cui si trova il record logico `i` è `B + ⌊i/Nb⌋`.
 
-#figure(image("images/2025-08-18-12-58-17.png"))
+#figure(image("images/2025-08-18-12-58-17.png", width: 60%))
 
 - *Vantaggi*: Basso costo della ricerca di un blocco, accesso sequenziale e diretto efficienti, alte prestazioni (basta la ricerca del primo blocco per leggere l'intero file).
 - *Svantaggi*:
@@ -535,7 +535,7 @@ Ogni file occupa un certo numero di *blocchi contigui su disco*. La porzione all
   - Costo elevato della ricerca dello spazio libero per l'allocazione di un nuovo file (possono essere usati algoritmi di allocazione dinamica della memoria principale come best-fit, first-fit, worst-fit).
   - Limiti sulle dimensioni dei file.
 
-#figure(image("images/2025-08-18-12-58-36.png"))
+#figure(image("images/2025-08-18-12-58-36.png", width: 60%))
 L'*immagine (a)* mostra l'allocazione contigua dello spazio del disco per sette file.
 L'*immagine (b)* illustra lo stato del disco dopo la cancellazione dei file D e F, evidenziando la frammentazione esterna.
 
@@ -544,13 +544,13 @@ Moderni SO utilizzano spesso uno schema di allocazione contigua modificato chiam
 === Allocazione Concatenata
 
 I blocchi di un file sono organizzati in una *lista concatenata*. Ogni blocco contiene al suo interno (tipicamente in posizione iniziale) un puntatore al blocco successivo. Le informazioni da mantenere nel FCB sono il puntatore al primo blocco e il numero di blocchi (o il puntatore all'ultimo blocco). Per determinare l'indirizzo del blocco `⌊i/Nb⌋` in cui si trova il record logico `i`, è necessario scorrere tutti i blocchi che lo precedono a partire da quello iniziale del file.
-#figure(image("images/2025-08-18-13-00-31.png"))
+#figure(image("images/2025-08-18-13-00-31.png", width: 60%))
 
 - *Vantaggi*: Accesso sequenziale o in modalità 'append' efficienti. Non c'è frammentazione esterna, i blocchi possono essere sparsi. Non è necessario dichiarare preventivamente le dimensioni dei file. Basso costo di ricerca dello spazio libero per nuova allocazione o espansione.
 - *Svantaggi*: Accesso diretto e ricerca di un blocco richiedono molte operazioni di I/O. Bassa efficienza (il puntatore occupa spazio nel blocco, riducendo la quantità di dati). Spazio richiesto dai puntatori (alcuni sistemi allocano cluster di blocchi consecutivi per risparmiare spazio).
   - *Scarsa robustezza*: Se un link viene danneggiato, non è più possibile accedere ai blocchi successivi. Soluzioni includono liste a doppi puntatori o l'uso di una Tabella di Allocazione dei File (FAT).
 
-#figure(image("images/2025-08-18-13-00-55.png"))
+#figure(image("images/2025-08-18-13-00-55.png", width: 60%))
 L'immagine illustra come un file possa essere memorizzato come una lista concatenata di blocchi disco.
 
 ==== Tabella di Allocazione dei File (FAT)
@@ -558,7 +558,7 @@ L'immagine illustra come un file possa essere memorizzato come una lista concate
 Il metodo *FAT (File Allocation Table)*, usato inizialmente da MS-DOS e poi da OS/2 e Windows, è una struttura dati tabellare che descrive la mappa di allocazione di tutti i blocchi. Contiene un elemento per ogni blocco del volume, il cui valore indica se il blocco è libero oppure, se occupato, contiene l'indice dell'elemento della tabella corrispondente al blocco successivo (o un valore speciale per indicare che è l'ultimo blocco di un file).
 La FAT è memorizzata in un'area predefinita del volume (a volte in duplice copia) e memorizza le informazioni sulla lista concatenata in un'unica area di memoria contigua, permettendo ai blocchi dati dei file di non contenere puntatori.
 
-#figure(image("images/2025-08-18-13-01-49.png"))
+#figure(image("images/2025-08-18-13-01-49.png", width: 60%))
 
 - *FAT16*: MS/DOS usava indirizzi a 16 bit, limitando il volume a 2^16 blocchi. Con blocchi di 32 KB, il volume massimo era di 2 GB. Per volumi più grandi, si doveva aumentare la dimensione dei blocchi, aumentando la frammentazione interna.
 - *FAT32*: Ha risolto il problema con indirizzi a 32 bit, permettendo volumi fino a 8 TB (con blocchi da 32 KB, sebbene il numero massimo di blocchi sia 2^28). La dimensione massima dei file è circa 4 GB (limitata dal campo "lunghezza file" nel FCB, di 4 byte).
@@ -570,7 +570,7 @@ La FAT è memorizzata in un'area predefinita del volume (a volte in duplice copi
 
 A ogni file è associata una *tabella indice*, di dimensione prestabilita, in cui sono contenuti gli indirizzi dei blocchi del file. Tutti gli indici dei blocchi sono raggruppati in una sola locazione. L'indirizzo del blocco `⌊i/Nb⌋` (in cui si trova il record logico `i`) è contenuto nell'elemento `⌊i/Nb⌋`-esimo della tabella indice. L'elemento della directory relativo a un file contiene l'indirizzo del blocco contenente la tabella indice del file.
 
-#figure(image("images/2025-08-18-13-02-28.png"))
+#figure(image("images/2025-08-18-13-02-28.png", width: 60%))
 
 - *Vantaggi*: Gli stessi dell'allocazione a lista concatenata, più la possibilità di accesso diretto e maggiore velocità di accesso.
 - *Svantaggi*: Richiede memoria per il blocco indice, scarso utilizzo dei blocchi indice per file di piccole dimensioni, overhead per l'accesso al blocco indice, e le dimensioni del blocco indice limitano le dimensioni del file.
@@ -580,10 +580,10 @@ A ogni file è associata una *tabella indice*, di dimensione prestabilita, in cu
 Il limite di dimensione del blocco indice può limitare le dimensioni dei file (es. con un blocco di 512 parole, si possono indirizzare 512 blocchi, per un max file di 1 MB). Per ovviare a questa restrizione, i SO usano vari metodi:
 - *Liste concatenate di blocchi indice*: Un indirizzo nel blocco indice punta a un blocco indice successivo.
 - *Più livelli di indice (gerarchie ad albero)*: Se i blocchi sono di 4096 byte, un singolo blocco può memorizzare 1024 puntatori. Un solo livello di indice supporta file fino a 4 MB. Un doppio livello di indice può arrivare a 4 GB.
-  #figure(image("images/2025-08-18-13-03-14.png"))
+  #figure(image("images/2025-08-18-13-03-14.png", width: 60%))
   La Figura illustra questa struttura gerarchica, con un indice esterno che punta a tabelle indice del file.
 - *Schema combinato (inode UNIX)*: Utilizza un metodo basato su 3 livelli di indirezione.
-  #figure(image("images/2025-08-18-13-03-55.png"))
+  #figure(image("images/2025-08-18-13-03-55.png", width: 60%))
   La *Figura* mostra la struttura di un inode UNIX, che include:
   - *12 blocchi diretti*: puntano direttamente ai blocchi dati del file.
   - *Indirizzo 13*: punta a un blocco che contiene indirizzi di blocchi dati del file (singola indirezione).
@@ -606,7 +606,7 @@ Il SO mantiene una *lista dei blocchi liberi* allocabili per i dati dei file. Qu
 
 Si usa un *vettore di bit* con tanti elementi quanti sono i blocchi del disco. Un bit `bit[i] = 1` indica che il `blocco[i]` è libero, mentre `0` indica che è occupato.
 
-#figure(image("images/2025-08-18-13-05-36.png"))
+#figure(image("images/2025-08-18-13-05-36.png", width: 60%))
 
 - *Vantaggi*: Semplicità nel determinare il primo blocco libero o `n` blocchi liberi consecutivi. Alcuni processori forniscono istruzioni specifiche per queste ricerche.
 - *Svantaggi*: Efficiente solo se il vettore di bit è caricato in memoria centrale. Richiede spazio extra (es. 1 TB di disco con blocchi da 4KB richiede un vettore di bit di 32 MB). È un'organizzazione ragionevole per dischi di dimensioni non elevate.
@@ -615,14 +615,14 @@ Si usa un *vettore di bit* con tanti elementi quanti sono i blocchi del disco. U
 
 I blocchi liberi sono collegati l'uno all'altro. È sufficiente memorizzare il puntatore al primo blocco. Tuttavia, è difficile trovare blocchi liberi contigui, a meno che la lista non sia mantenuta ordinata.
 
-#figure(image("images/2025-08-18-13-06-11.png"))
+#figure(image("images/2025-08-18-13-06-11.png", height: 30%))
 
 ==== Varianti della Lista Concatenata
 
 - *Conteggio*: Ogni blocco mantiene il numero di blocchi liberi consecutivi che lo seguono e l'indirizzo del primo blocco libero successivo a questi.
 - *Raggruppamento*: Il primo blocco libero memorizza gli indirizzi di altri `n` blocchi liberi. I primi `n-1` blocchi sono effettivamente liberi, e l'`n`-esimo blocco contiene gli indirizzi di altri `n` blocchi liberi, e così via. Questo permette di trovare rapidamente gli indirizzi di un certo numero di blocchi liberi.
 
-#figure(image("images/2025-08-18-13-06-41.png"), caption: "Raggruppamento vs. Bitmap")
+#figure(image("images/2025-08-18-13-06-41.png", width: 60%), caption: "Raggruppamento vs. Bitmap")
 
 ==== Considerazioni su Raggruppamento & Bitmap
 
@@ -641,7 +641,7 @@ Vari fattori influenzano l'uso efficiente del disco:
 === Algoritmi per Allocazione e Gestione Spazio Libero
 
 Gli algoritmi per l'allocazione e la gestione dei blocchi liberi possono ottimizzare le prestazioni. Ad esempio, per ridurre il tempo di ricerca della traccia su cui sono posizionati i blocchi dati, UNIX cerca di mantenere i blocchi con i dati di un file vicini al blocco che ne contiene l'inode.
-#figure(image("images/2025-08-18-13-08-05.png"))
+#figure(image("images/2025-08-18-13-08-05.png", width: 60%))
 La Figura mostra che posizionare gli inode vicini ai blocchi dati dei relativi file dimezza il tempo medio di ricerca rispetto al caso in cui gli inode siano tutti all'inizio del disco.
 
 === Informazioni in Elementi di Directory o FCB
@@ -678,7 +678,7 @@ Inserire nel buffer cache i dati da scrivere su disco è vantaggioso:
 - Eseguendo le operazioni di scrittura su disco in background, l'esecuzione del programma corrente non viene rallentata.
 Tipicamente, circa l'85% dell'I/O dal disco può essere evitato usando un buffer cache.
 
-#figure(image("images/2025-08-18-13-10-28.png"))
+#figure(image("images/2025-08-18-13-10-28.png", width: 60%))
 La *Figura* mostra le strutture dati del buffer cache, con una tabella hash per una ricerca veloce basata su dispositivo e indirizzo del blocco, e una lista bidirezionale (LRU/MRU) per la gestione dei blocchi.
 
 ==== Sostituzione di Blocchi nella Cache
