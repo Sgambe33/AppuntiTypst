@@ -5,8 +5,7 @@
   title: "Appunti Sistemi Operativi",
   author: none,
   subtitle: "Teoria\nCorso 2024/2025",
-  cover-image: image("cover.jpg", height: 100%, width: 100%),
-  
+  cover-image: image("cover.jpg", height: 100%, width: 100%)
 )[
 
   #outline(title: "Contenuti")
