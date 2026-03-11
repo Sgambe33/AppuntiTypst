@@ -480,3 +480,111 @@ $
 $
 
 
+// 11.03.2026
+== Errore di interpolazione
+$
+  e(x) = f(x) - p(x), space x in [a,b]
+$
+#observation()[
+  Nelle ascisse di interpolazione si ha:
+  $
+    e(x_i)=f(x_i)-p(x_i) = 0, space i=0,dots,n
+  $
+  Cosa accade per $x in.not {x_0, dots,x_n}$?
+]
+
+#theorem()[
+  L'errore di interpolazione si può esprimere come:
+  <4.13>
+  $
+    e(x)=f[x_0,dots,x_n,x]omega_(n+1) (x) quad quad (4.13)
+  $
+  con $omega_(n+1) (x) = product_(j=0)^n (x-x_j)$, è il polinomio monico le cui radici sono le ascisse di interpolazione.
+]
+#proof()[
+  Se $x=x_i => e(x_i)=0$, perché $omega_(n+1) (x_i)=0 space forall i=0,dots,n.$ Quindi la #link(<4.13>, [4.13]) è verificata. Se $x=hat(x) in.not {x_0,dots,x_n}$, allora, sfruttando la costruzione incrementale del polinomio interpolante di Newton, possiamo definire $hat(p)(x) in Pi_(n+1)$ che interpola $f(x)$ in $x_0, x_1, dots,x_n$ e $hat(x)$ come:
+  <4.14>
+  $
+    hat(p)(x)=p(x)+f[x_0,dots,x_n,hat(x)] omega_(n+1) (x) quad quad (4.14)
+  $
+  Pertanto: $hat(p)(x_i)=f(x_i), space i=0,...,n$ e $hat(p)(hat(x))=f(hat(x))$, ovvero, tenendo conto della #link(<4.14>, [4.14]):
+  $
+    p(hat(x)) + f[x_0,dots,x_n,hat(x)] omega_(n+1)(hat(x))=f(hat(x))
+  $
+  Da questo otteniamo che:
+  $
+    f[x_0,dots,x_n,hat(x)] omega_(n+1) (hat(x))= f(hat(x))-p(hat(x)) equiv e(hat(x))
+  $
+  Osservando che $hat(x)$ è generico, si ottiene, infine:
+  $
+    e(x)=f[x_0,dots,x_n,x]omega_(n+1) (x)
+  $
+  ovvero la #link(<4.13>, [4.13]).
+]
+
+#corollary()[
+  Se $f in C^((n+1))$ su un intervallo che contiene le ascisse di interpolazione ed il punto $x$ considerato, allora:
+  <4.15>
+  $
+    e(x) = frac(f^((n+1))(xi_x), (n+1)!) omega_(n+1) (x), space xi_x in I(x_0, dots, x_n, x) quad quad (4.15)
+  $
+  avendo denotato con $I(x_0, dots, x_n, x)$ il più piccolo intervallo che contiene le *ascisse in argomento*.
+]
+#proof()[
+  Infatti, #link(<4.15>, [4.15]) deriva dalla #link(<4.13>, [4.13]) considerando che, nelle ipotesi fatte:
+  $
+    f[x_0,dots,x_n,x] = frac(f^((n+1))(xi_x), (n+1)!), "con" xi_x "opportuno."
+  $
+]
+
+#observation()[
+  1. Se $f(x) in Pi_n => f^((n+1))equiv 0 => e(x)=f(x)-p(x)equiv 0$, ovvero, $f(x) equiv p(x)$ per l'unicità del polinomio interpolante, come avevamo già osservato.
+  2. Dalla #link(<4.15>, [4.15]) otteniamo che l'errore  $e(x)$ è dato dal prodotto di due termini:
+    - $frac(f^((n+1))(xi_x), (n+1)!)$: questo dipende da quanto è "buona" la funzione $f(x)$. Ovvero quanto velocemente le derivate diventano piccole al crescere dell'ordine.
+    - $omega_(n+1)(x)=product_(i=0)^n (x-x_i)$: questo dipende esclusivamente dalla scelta delle ascisse di interpolazione. Tuttavia, se $x >> max_i {x_i}$ o $x >> min_i {x_i}$, allora $omega_(n+1)(x) approx x^(n+1)$. Pertanto $p(x)$ è un'approssimazione "spendibile" di $f(x)$ solo se $x$ è prossima (meglio se all'interno) dell' intervallo che contiene le ascisse di interpolazione.
+]
+
+
+// GRAFICO BRUTTO DA RIFARE
+#figure(image("images/2026-03-11-12-02-55.png"))
+
+== Interpolazione di Hermite
+Supponiamo in questo caso, di ricercare il polinomio interpolante, di grado $2n+1$ su $2n+2$ ascisse distinte, che numeriamo come:
+$
+  x_0 < x_(1/2) < x_1 < x_(1+1/2) < dots < x_n < x_(n+1/2)
+$
+Sia $f(x)$ la funzione interpolanda su tali ascisse. Pertanto, sappiamo che $exists p(x) in Pi_(2n+1)$, tale che:
+<4.16>
+$
+  (4.16) quad quad cases(p(x_i)=f(x_i), p(x_(i+1/2))=f(x_(i+1/2))) quad i=0,dots,n
+$
+
+Domanda: cosa succede a $p(x)$ se $forall i = 0,dots, space x_(i+1/2) -> x_i$?
+
+Per rispondere in maniera corrette a questa domanda, riscriviamo la #link(<4.16>, [4.16]), equivalentemente, come:
+<4.17>
+$
+  (4.17) quad quad
+  cases(
+    p(x_i)=f(x_i)\,,
+    frac(p(x_(i+1/2)) - p(x_i), x_(i+1/2)-x_i) = frac(f(x_(i+1/2))-f(x_i), x_(i+1/2)-x_i)\, quad i=0\,dots\,n
+  )
+$
+A questo punto, se facciamo il limite per $x_(i+1/2)-->x_i$, nella seconda espressione delle #link(<4.17>, [4.17]), abbiamo dimostrato che $exists p(x) in Pi_(2n+1)$:
+<4.18>
+$
+  (4.18) quad quad cases(p(x_i)=f(x_i), p'(x_i)=f'(x_i)) quad i=0,dots,n
+$
+
+#definition()[
+  Il polinomio $p(x) in Pi_(2n+1)$ che soddisfa le condizioni di interpolazione (6) è detto polinomio interpolante di Hermite.
+]
+#observation()[
+  In altri termini, il polinomio interpolante di Hermite interpola, nelle ascisse di interpolazione, sia la funzione $f(x)$ che la sua derivata prima. 
+  Pertanto ha la stessa retta tangente nelle ascisse di interpolazione.
+  #figure(image("images/2026-03-11-17-23-24.png", width: 50%))
+]
+#example()[
+  #figure(image("images/2026-03-11-17-23-53.png", width: 50%))
+  Se $f(x)=sin(x)$ e $x_i=i pi, space i=0,1,2$, allora il polinomio interpolante su tali ascisse è $p(x)=0$. Questo non è vero per il polinomio interpolante di Hermite.
+]
