@@ -78,7 +78,7 @@ $
   Una funzione $f: NN^k -> NN$ si dice *$tau$-ricorsiva* quando $exists M$ MdT che calcola $f$
 ]
 
-==== Tesi di church (per le funzioni $tau$-ricorsive)
+== Tesi di church (per le funzioni $tau$-ricorsive)
 La classe delle funzioni computabili coincide con la classe delle funzioni $tau$-ricorsive.
 
 // TODO:AGGIUNGERE IMMAGINI
@@ -139,7 +139,7 @@ La classe delle funzioni computabili coincide con la classe delle funzioni $tau$
   & cal(chi)_S (arrow(x))=cal(chi)_R compose (f compose epsilon_1^(k), dots, f compose epsilon_k^(k))(arrow(x))
 $]
 
-==== MDT come accettatori di linguaggi
+== MDT come accettatori di linguaggi
 Accettazione di una stringa per stati finali:
 - $Q$: insieme degli stati di una MDT
 - $F subset.eq Q$: insieme degli stati finali
@@ -150,19 +150,118 @@ Accettazione di una stringa per stati finali:
 #definition()[
   $L subset.eq Sigma^*$ si dice *accettato per stati finali* da una MDT _M_ quando $w in L$ sse _M_ accetta _w_ per stati finali $--> L = L(M)$
 ]
+#definition()[
+  Se _L_ è t.c. $exists M$ MDT per cui $L = L(M)$ (_L_ è il linguaggio delle M), _L_ si dice *ricorsivamente enumerabile*
+]
 
 #observation()[
-  - Se _L_ è t.c. $exists M$ MDT per cui $L = L(M))$, _L_ si dice *ricorsivamente enumerabile*
-  - Se _M_ è una MDT che termina su ogni input, allora $L(M)$ si dice *ricorsivo*
+  Se _M_ è una MDT che termina su ogni input, allora $L(M)$ si dice *ricorsivo*
 
-  #underline("Via tesi di church"): *ric. enum. $<-->$ semidecidibile *e* ricorsivo $<-->$ decidibile*
+  #block($
+    #underline("Via tesi di church"): &bold("ric. enum." <--> "semidecidibile")\ 
+                                      &bold("ricorsivo" <--> "decidibile")
+        $)
 ]
 
 
 #example(multiple: true)[
-  +) MDT che accetta il linguaggio $(a|b)^* a a(a|b)^*$
-  #image("/assets/image.png")
+  + MDT che accetta il linguaggio $(a|b)^* a a(a|b)^*$
+    $
+      #grid(
+        columns: 14,
+        rows: 1,
+        stroke: .5pt,
+        inset: 5pt,
+        [\*], [b], [b], [b], [a], [b], [b], [a], [
+        #place(top + center, dy: -20pt)[
+          #set text(size: 8pt)
+          #stack(
+            dir: ttb,
+            spacing: 2pt,
+            $q_3$,
+            sym.triangle.b.small
+          )
+        ]
+        a
+      ],
+      [b], [a], [a], [a], [b]
+      )\
+      #grid(
+        columns: (0.025fr, 0.6fr, 0.3fr, 0.075fr),
+        rows: 2,
+        stroke: none,
+        [],
+        grid.cell(rowspan: 2, diagram( 
+          node-stroke: 0.9pt,
+          cell-size: 5mm,
+          spacing: 3mm,
+
+          node((0, 0), $q_0$, name: <0>),
+          node((2, 0), $q_1$, name: <1>),
+          node((4, 0), $q_2$, name: <2>),
+          node((6, 0), $q_3$, name: <3>, extrude: (-2, 0)),
+
+          edge(<0>, <1>, "-|>", $*\/D$),
+          edge(<1>, <1>, "<|-", bend: 130deg, $b\/D$, loop-angle: 70deg, label-anchor: "south-east", label-pos: 60%),
+          edge(<1>, <2>, "-|>", bend: 30deg , $a\/D$),
+          edge(<2>, <1>, "-|>", bend: 30deg , $b\/D$),
+          edge(<2>, <3>, "-|>", $a\/a$),
+        )),
+        grid.cell(rowspan: 2, align: (left+horizon), $
+                                &Q = {q_0, q_1, q_2, q_3}\ \
+                                &F = {q_3}
+                              $)
+      )
+    $
+    //#image("/assets/image.png")
+  + MdT che accetta il linguaggio ${a^i b^i c^i | i >= 0} subset.eq {a, b, c}^*$
+    #grid(
+      rows: 7,
+      columns: (8pt, .4fr, .6fr),
+      [], grid.cell([
+        #grid(columns: 10, stroke: .5pt, inset: 5pt, [\*], [a], [a], [a], [b], [b], [b], [c], [c], [c])
+      ]),
+      grid.cell(rowspan: 7, align: center+horizon, diagram(
+        node-stroke: 0.9pt,
+        cell-size: 1mm,
+        node-inset: 4pt,
+        spacing: 3mm,
+        label-size: 7.5pt,
+
+        node((2, 0), $q_0$, name: <0>),
+        node((4, 0), $q_1$, name: <1>),
+        node((6, 0), $q_2$, name: <2>),
+        node((8, 0), $q_3$, name: <3>),
+        node((8, 3), $q_4$, name: <4>),
+        node((6, 3), $q_5$, name: <5>),
+        node((4, 3), $q_6$, name: <6>),
+        node((1, 3), $q_7$, name: <7>),
+        node((1, 6), $q_8$, name: <8>, extrude: (-2, 0)),
+
+        edge(<0>, <1>, "-|>", $*\/D$, bend: 30deg),
+        edge(<1>, <1>, "-|>", $a\/x$, bend: 130deg),
+        edge(<1>, <2>, "-|>", $x\/D$, label-side: right),
+        edge(<1>, <7>, "-|>", $y\/D$, bend: -15deg, label-pos: 65%),
+        edge(<1>, <8>, "-|>", $*\/*$, bend: -20deg, label-side: left, label-pos: 65%),
+        edge(<2>, <2>, "-|>", $x\/D$, bend: 130deg),
+        edge(<2>, <3>, "-|>", $b\/y$, label-side: right),
+        edge(<3>, <4>, "-|>", $y\/D$, label-side: left),
+        edge(<4>, <4>, "-|>", $b\/D$, bend: -130deg, loop-angle: 135deg),
+        edge(<4>, <5>, "-|>", $c\/z$),
+        edge(<5>, <6>, "-|>", $z\/S$),
+        edge(<6>, <6>, "-|>", $a, b, y, z\/S$, bend: -130deg),
+        edge(<6>, <1>, "-|>", $x\/D$, label-side: left),
+        edge(<7>, <7>, "-|>", $y, z\/D$, bend: 130deg, loop-angle: 180deg),
+        edge(<7>, <8>, "-|>", $*\/*$),
+      )),
+      [$$], [],
+      [], grid.cell([
+        #grid(columns: 10, stroke: .5pt, inset: 5pt, [\*], [x], [x], [x], [y], [y], [y], [z], [z], [z])
+      ]),
+    )
 ]
+
+
 
 //TODO: AGGIUNGERE ULTIMA LEZIONE E SISTEMARE TUTTA LA PARTE NUOVA
 
@@ -178,7 +277,7 @@ Accettazione di una stringa per stati finali:
   M' MDT che accetta L per stai finali is ottiene da M eliminando tutte le transizioni uscenti dagli stati finali.
 ]
 
-==== MDT multitraccia
+== MDT multitraccia
 
 #definition()[
   MDT multitraccia con:
@@ -199,7 +298,7 @@ Accettazione di una stringa per stati finali:
   \ $==>)$ M MdT a k-tracce che accetta L, posso ottenere una MdT M' che accetta L a una traccia semplicemente sostituendo l'alfabeto $Sigma$ di M con $Sigma^k$, eseguendo  le medesime transizioni (Se in M si legge, dal basso verso l'alto, a, b, a, \*, a in 5 celle diverse, in M' si leggerà la quintupla (a, b, a, \*, a) in una sola cella)
 ]
 
-==== MDT limitata a sinistra
+== MDT limitata a sinistra
 
 #definition()[
   MdT *limitata a sinistra*
@@ -223,7 +322,7 @@ Accettazione di una stringa per stati finali:
   In questo modo, a una transizione di $M'$ che  fa spostare la testina a sinistra della posizione 0 corrisponde una  transizione di $M'$ che fa spostare la testina sulla seconda traccia. Spostamenti verso sinistra sono quindi convertiti in spostamenti verso destra e viceversa.
 ]
 
-==== MDT multinastro
+== MDT multinastro
 
 #definition()[
   Una Macchina di Turing multinastro è una _MdT_ che opera su più nastri di lettura/scrittura indipendenti tra di loro, con una testina per ogni nastro.
@@ -299,4 +398,102 @@ Accettazione di una stringa per stati finali:
 
   //TODO Rifare il grafico
   #figure(image("images/2026-03-11-16-18-25.png"))
+]
+
+== MdT non deterministiche
+
+#definition()[
+  Una MdT si dice *non deterministica* quando le transizionoi non sono necessariamente funzionali nei primi due argomenti.
+]
+#observation()[
+  Le MdT deterministichee (o standard) *sono* MdT non deterministiche, ma il viceversa non è sempre vero.
+]
+
+#definition()[
+  Data una stringa _w_ e una MdT non deterministica M, diciamo che M *accetta* _w_ quando esiste una computazione di M che accetta _w_.
+]
+
+#example()[
+  Dato l'alfabeto $Sigma={a, b, c}$ e un linguaggio _L_ definito su tale alfabeto ($L={w in Sigma^* | exists$ $"un'occorrenza di "c"immediatamente preceduta da "a b" oppure immediatamente"$$"seguita da " a b}$)
+  #image("/assets/image-1.png")
+  Nell'immagine cambiare i passaggi da q3 a q4 in b/b e da q6 a q7 a a/a
+]
+
+#definition()[
+  Consideriamo una MdT M non deterministicae tutte le sue transizioni in cui i primi due simboli sono fissati e gli ultimi due variabili, ovvero:
+  $
+    {accent(q, tilde), accent(x, tilde), alpha, q | alpha in Sigma union {D, S}, q in Q}
+  $
+  Il grado di non determinismo di M corrisponde al valore:
+  $
+    delta = max({accent(q, tilde), accent(x, tilde), alpha, q | alpha in Sigma union {D, S}, q in Q})
+  $
+  Calcolato al variare di $accent(q, tilde) in Q, accent(x, tilde) in Sigma$
+]
+Questo significa che il grado di non determinismo corrisponde al numero massimo di svolte che la macchina M può prendere in un unica transizione, leggendo lo stesso input.
+
+Applichiamo il tutto all'esempio precedente. \ 
+Dato $q in Q, x in Sigma$, codifichiamo le transizioni di M MdT non deterministica, aventi _qx_ come primi 2 elementi, utilizzando gli interi da 1 a $delta$, possibilmente codifichiamo la stessa transizione con più etichette:
+
+#grid(
+  columns: (.30fr, 0.20fr, 0.20fr, 0.3fr),
+  row-gutter: 5pt,
+  align: (left, left, left, left),
+  stroke: none,
+
+  [$$], [$1: q_1 c D q_1$], [$1, 2, 3: q_1 a D q_1$], [$$],
+  [$$], [$2: q_1 c D q_2$], [$1, 2, 3: q_0 * D q_1$], [$$],
+  [$$], [$3: q_1 c S q_5$], [$$],                     [$$],
+)
+
+Di seguito alcuni esempi di possibili computazioni sulla stringa $w = a c a b$:
+- $(1 1 1 1 1) --> $ termina in uno stato non finale;
+- $(1 1 2 1 1) --> $ termina in uno stato finale e dice che _w_ è accettata;
+- $(2 2 3 2 2) --> $ termina prematuramente, cioè che l'ultima transazione non viene eseguita;
+
+#proposition()[
+  _L_ è accettato da una MdT standard $<==>$ _L_ è accettato da una MdT non deterministica
+]
+#proof()[
+  \ $==>$) M MdT standard che accetta _L_ poiché ogni MdT deterministica è anche una MdT non deterministica, _L_ è accettato da una MdT non deterministica.
+  \ $<==$) M MdT non deterministica che accetta _L_ per arresto, con grado di non determinismo uguale a $delta$. Descriviamo una MdT standard che accetta _L_ per arresto a 3 nastri. I nastri sono: // TODO: disegnare i nastri
+  + Input
+  + Simulazione delle computazioni di M  (contenuto per disegno: $*"copio l'input ed elenco"$$(m_1,dots,m_k)$)
+  + Generazione delle computazioni di M  (contenuto per disegno: $m_1*m_2*dots*m_k$ con $1 <= m_1*m_2*dots*m_k <= delta$)
+]
+
+
+#definition()[
+  Dati due insiemi _A_ e _B_, una funzione $f$ si dice *funzione parziale* da _A_ a _B_ quando esiste un sottoinsieme di A $exists D subset.eq A$ tale che $f: D --> B$ è una funzione
+]
+
+#definition()[
+  Dati due insiem _A_ e _B_, una funzione $f$ si dice *funzione totale* da _A_ a _B_ quando $forall x in A, forall y in B, f(x) = y ==> D = A$
+]
+
+#definition()[
+  Una funzione parziale $f: A --> B$ si dice *parziale computabile* quando $exists M$ algoritmo t.c. $forall x in A:$
+  - Se $x in D o m(f)$, M eseguito su _x_ restituisce in output $f(x) --> x in D o m(f):f "converge su "x, f(x)arrow.b$
+  - Se $x in.not D o m(f)$, M su _x_ non termina $--> x in.not D o m(f):f "diverge su "x, f(x)arrow.t$
+]
+
+Lavoriamo su $NN$ in codifica unaria
+#definition()[
+  Una funzione parziale $f: NN^k --> NN$ si dice *parziale $tau$-ricorsiva* quando $exists M$ MdT che, $forall accent(x, arrow) in NN^k:$
+  - Se $f(accent(x, arrow))arrow.b$, allora l'esecuzione di M su $accent(x, arrow)$ termina con $f(accent(x, arrow)) + 1$ "uni" (1) sul nastro.
+  - Se $f(accent(x, arrow))arrow.t$, M non termina su $accent(x, arrow)$.
+]
+
+=== Tesi di Church per funzioni parziali $tau$-ricorsive
+La classe delle funzioni parziali computabili coincide con la classe delle funzioni parziali $tau$-ricorsive
+
+#proposition()[
+  $forall M$ MdT standard, $forall k in NN$\
+  $exists! $ funzione parziale computabile $f$ t.c. M calcola $f: NN^k --> NN$
+]
+#proof()[
+  Definisco $f$ funzione parziale da $NN^k$ in $NN$ come segue:\
+  $forall accent(x, arrow) in NN^k$, eseguo M su $accent(x, arrow)$:
+  - Se M termina, $f(accent(x, arrow))$ è dato in unario dal numero di "uni" che si trovano sul nastro al termine dell'esecuzione.
+  - Se M non termina, $f(accent(x, arrow))arrow.t$
 ]
