@@ -474,14 +474,202 @@ dove $.*$ è stato utilizzato per calcolare il polinomio interpolante in un vett
 
 #figure(image("images/2026-03-05-11-44-54.png"))
 
-$p(x)$ è il polinomio interpolante $f(x)$ nelle ascisse assegnate. Se definiamo $e(x)=f(x)-p(x)$, (funzione dell'errore), da cui, ricordando che $p(x_i)=f(x_i)$, otteniamo che:
+=== Interpolazione di Hermite
+Supponiamo in questo caso, di ricercare il polinomio interpolante, di grado $2n+1$ su $2n+2$ ascisse distinte, che numeriamo come:
 $
-  e(x_i) = 0, space i=0,dots,n
+  x_0 < x_(1/2) < x_1 < x_(1+1/2) < dots < x_n < x_(n+1/2)
 $
+Sia $f(x)$ la funzione interpolanda su tali ascisse. Pertanto, sappiamo che $exists p(x) in Pi_(2n+1)$, tale che:
+<4.16>
+$
+  (4.16) quad quad cases(p(x_i)=f(x_i), p(x_(i+1/2))=f(x_(i+1/2))) quad i=0,dots,n
+$
+
+Domanda: cosa succede a $p(x)$ se $forall i = 0,dots, space x_(i+1/2) -> x_i$?
+
+Per rispondere in maniera corrette a questa domanda, riscriviamo la #link(<4.16>, [4.16]), equivalentemente, come:
+<4.17>
+$
+  (4.17) quad quad
+  cases(
+    p(x_i)=f(x_i)\,,
+    frac(p(x_(i+1/2)) - p(x_i), x_(i+1/2)-x_i) = frac(f(x_(i+1/2))-f(x_i), x_(i+1/2)-x_i)\, quad i=0\,dots\,n
+  )
+$
+A questo punto, se facciamo il limite per $x_(i+1/2)-->x_i$, nella seconda espressione delle #link(<4.17>, [4.17]), abbiamo dimostrato che $exists p_H(x) in Pi_(2n+1)$:
+<4.18>
+$
+  (4.18) quad quad cases(p_H(x_i)=f(x_i), p'_H(x_i)=f'(x_i)) quad i=0,dots,n
+$
+
+#definition()[
+  Il polinomio $p_H (x) in Pi_(2n+1)$ che soddisfa le condizioni di interpolazione (6) è detto polinomio interpolante di Hermite.
+]
+#observation()[
+  In altri termini, il polinomio interpolante di Hermite interpola, nelle ascisse di interpolazione, sia la funzione $f(x)$ che la sua derivata prima.
+  Pertanto ha la stessa retta tangente nelle ascisse di interpolazione.
+  #figure(image("images/2026-03-11-17-23-24.png", width: 50%))
+]
+#example()[
+  #figure(image("images/2026-03-11-17-23-53.png", width: 50%))
+  Se $f(x)=sin(x)$ e $x_i=i pi, space i=0,1,2$, allora il polinomio interpolante su tali ascisse è $p(x)=0$. Questo non è vero per il polinomio interpolante di Hermite.
+]
+
+//12.03.2026
+Per derivare la *forma di Newton* di questo polinomio, facciamo un passo indietro considerando, formalmente, le $2n+2$ ascisse:
+$
+  a lt.eq x_0 < x_(1/2) < x_1 < x_(1+1/2) < dots < x_n < x_(n+1/2) lt.eq b
+$
+Se fissiamo, ad esempio, il caso $n=2$, abbiamo ch eil relativo polinomio interpolante è dato da:
+$
+  p(x)= & f[x_0] \
+      + & f[x_0, x_(1/2)](x-x_0)+f[x_0, x_(1/2), x_1](x-x_0)(x-x_(1/2)) \
+      + & f[x_0, x_(1/2), x_1, x_(1+1/2)](x-x_0)(x-x_(1/2))(x-x_1) \
+      + & f[x_0, x_(1/2), x_1, x_(3/2),x_2](x-x_0)(x-x_(1/2))(x-x_1)(x-x_(3/2)) \
+      + & f[x_0, x_(1/2), x_1, x_(3/2),x_2,x_(5/2)](x-x_0)(x-x_(1/2))(x-x_1)(x-x_(3/2))(x-x_2)
+$
+Se adesso poniamo $x_(1/2)=x_0, x_(3/2)=x_1, x_(5/2)=x_2$, otteniamo la forma di Newton del polinomio di Hermite
+$
+  p_H (x)= & f[x_0] \
+         + & f[x_0, x_0](x-x_0)+f[x_0, x_0, x_1](x-x_0)(x-x_0) \
+         + & f[x_0, x_0, x_1, x_1](x-x_0)(x-x_0)(x-x_1) \
+         + & f[x_0, x_0, x_1, x_1,x_2](x-x_0)(x-x_0)(x-x_1)(x-x_1) \
+         + & f[x_0, x_0, x_1, x_1,x_2,x_2](x-x_0)(x-x_0)(x-x_1)(x-x_1)(x-x_2)
+$
+#observation(multiple: true)[
+  1. Il calcolo del polinomio, note le differenze divise, si può fare agevolmente mediante l'algoritmo di Horner generalizzato, semplicemente duplicando le ascisse di interpolazione.
+  2. Il calcolo delle differenze divise, visto che ci sono ascisse ripetute in argomento, richiede invece qualche modifica dell'algoritmo classico visto per il polinomio interpolante.
+]
+A questo fine, costruiamo la tabella (formalmente) triangolare, per il calcolo delle differenze divise. Per semplicità, consideriamo il caso $n=1$:
+#table(
+  columns: 4,
+  align: center + horizon,
+  stroke: none,
+  table.hline(y: 1, stroke: (dash: "solid", thickness: 0.4pt)),
+  table.vline(x: 1, stroke: (dash: "solid", thickness: 0.4pt)),
+  [], [0], [1], [2],
+  [$x_0$], [], [], [],
+  [$x_0$], [$f[x_0,x_0]$], [], [],
+  [$x_1$], [$f[x_0,x_1]$], [$f[x_0,x_0,x_1]$], [],
+  [$x_1$], [$f[x_1,x_1]$], [$f[x_0,x_1,x_1]$], [$f[x_0,x_0,x_1,x_1]$],
+)
+
+Partendo dall'ultima colonna, abbiamo che:
+$
+  f[x_0,x_0,x_1,x_1] = frac(f[x_0,x_1,x_1]-f[x_0,x_0,x_1], x_1-x_0)
+$
+Passando, quindi, alla penultima colonna, abbiamo che:
+$
+  & f[x_0,x_0,x_1] = frac(f[x_0,x_1]-f[x_0,x_0], x_1-x_0) \
+  & f[x_0,x_1,x_1] = frac(f[x_1,x_1]-f[x_0,x_1], x_1-x_0)
+$
+Infine, nella prima colonna:
+$
+  & f[x_0,x_0] = ? \
+  & f[x_0,x_1] = frac(f[x_1]-f[x_0], x_1-x_0) \
+  & f[x_1,x_1] = ?
+$
+In conclusione, qualunque sia il valore di $n$ considerato, abbiamo che il problema, nel calcolo delle differenze divise, si manifesta nel calcolo di $f[x_i, x_i], space i=0,dots,n$. Quest'ultime sono definite come segue:
+$
+  f[x_i,x_i] = lim_(h->0) f[x_i+h, x_i] = lim_(h->0) frac(f[x_i+h, x_i]-f[x_i], h) = lim_(h->0) frac(f(x_i+h)-f(x_i), h) = f'(x_i)
+$
+che è un dato del problema. Possiamo, a questo punto, formulare un algoritmo modificato per il calcolo delle differenze divise della forma di Newton del polinomio di Hermite. Necessitiamo di 2 vettori, di lunghezza $2n+2$, che contengono i dati del problema:
+$
+  & f=[f_0,f'_0,f_1,f'_1,dots,f_n,f'_n] \
+  & x=[x_0,x_0,x_1,x_1,dots,x_n,x_n]
+$
+Ricordiamo che nella prima colonna non vanno calcolate le posizioni pari?
+
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: false,
+  header: none,
+)
+```matlab
+for i=2*n+1:-2:3 %Colonna 1
+  f(i)=(f(i)-f(i-2))/(x(i)-x(i-1));
+end
+
+for j=2:2*n+1 %Colonna 2?
+  for i=2*n+2:-1:j+1
+    f(i)=(f(i)-f(i-1))/(x(i)-x(i-j));
+  end
+end
+```
+
+Vediamo come calcolare polinomio e la sua derivata prima, espresso nella base di Newton. Avevamo visto l'algoritmo di Horner generalizzato per il calcolo:
+
+#import "@preview/lovelace:0.3.1": *
+#pseudocode-list[
+  + *p1 = 0*
+  + p = $a_n$
+  + for i=n-1
+    + *p1=p1\*$(x-x_i)$*
+    + p=p\*$(x-x_i)+a_i$
+  + end
+]
+Come abbiamo visto, `p` alla fine conterrà il valore di $p(x)$. Aggiungiamo, *in grassetto*, nel precedente pseudocodice, il calcolo di *p1* che, alla fine, conterrà il valore di $p'(x)$. In questo modo, nello stesso ciclo, si calcola sia il valore di $p(x)$ che della sua derivata prima.
+
+=== Forma di Lagrange del polinomio interpolante di Hermite
+$
+  a lt.eq x_0 < x_1 < dots < x_n < lt.eq b\
+  f_i=f(x_i)\
+  f'_i = f'(x_i), space i=0,dots,n
+$
+Abbiamo detto che $exists p_H (x) in Pi_(2n+1)$ tale che:
+$
+  & p_H (x_i) = f_i, \
+  & p'_H (x_i) = f'_i, space i=0,dots,n
+$
+Vediamo come ottenere la forma di Lagrange. A questo fine, ricordiamo i polinomi di Lagrange di grado n:
+$
+  L_(i n) (x) = product_(j=0\ j eq.not i)^n frac(x-x_j, x_i-x_j), space i=0,dots,n
+$
+Ricordiamo, inoltre, che:
+$
+  L_(i n) (x_k) = S_(i k) = cases(1\, i=k, 0\, i eq.not k)
+$
+Definiamo, quindi, i seguenti polinomi di grado $2n+1$:
+$
+  (2) quad quad cases(Phi_(i n) (x) = L_(i n)^2 (x) [1-2(x-x_i) L'_(i n) (x_i)], psi_(i n) (x) = (x-x_i) L_(i n)^2 (x) \, space i=0\,dots\,n)
+$
+
+#example()[
+  Calcolare l'espressione di $L_(i n) (x_i)$
+]
+
+Valgono le seguenti proprietà:
+#theorem()[
+  Con riferimento ai polinomi in (2), vale che:
+  $
+    (3) quad quad cases(Phi_(i n) (x_j) = S_(i j)\, space Phi'_(i n) (x_j)=0, psi_(i n) (x_j)=0\, space psi'_(i n) (x_j) = S_(i j)\, space forall j = 0\,dots\,n)
+  $
+]
+dimostrare per esercizio (certo certo)
+Dalla proprietà precedente, discende che:
+$
+  p_H (x) = sum_(i=0)^n f_i Phi_(i n) (x)+f'_i psi_(i n) (x) quad quad (4)
+$
+Infatti, $forall j=0, dots, n$:
+$
+  p_H (x_j) = sum_(i=0)^n f_i Phi_(i n) (x_j)+f'_i psi_(i n) (x_j) = f_j
+$
+e inoltre:
+$
+  p'_H (x_j) = sum_(i=0)^n f_i Phi'_(i n) (x)+f'_i psi'_(i n) (x) = f'_j
+$
+Pertanto, sono verificate le condizioni di interpolazione. La (4) è  la forma di Lagrange del polinomio interpolante di Hermite.
+
+
 
 
 // 11.03.2026
 == Errore di interpolazione
+$p(x)$ è il polinomio interpolante $f(x)$ nelle ascisse assegnate. Se definiamo $e(x)=f(x)-p(x)$, (funzione dell'errore), da cui, ricordando che $p(x_i)=f(x_i)$, otteniamo che:
+$
+  e(x_i) = 0, space i=0,dots,n
+$
 $
   e(x) = f(x) - p(x), space x in [a,b]
 $
@@ -547,44 +735,3 @@ $
 
 // GRAFICO BRUTTO DA RIFARE
 #figure(image("images/2026-03-11-12-02-55.png"))
-
-== Interpolazione di Hermite
-Supponiamo in questo caso, di ricercare il polinomio interpolante, di grado $2n+1$ su $2n+2$ ascisse distinte, che numeriamo come:
-$
-  x_0 < x_(1/2) < x_1 < x_(1+1/2) < dots < x_n < x_(n+1/2)
-$
-Sia $f(x)$ la funzione interpolanda su tali ascisse. Pertanto, sappiamo che $exists p(x) in Pi_(2n+1)$, tale che:
-<4.16>
-$
-  (4.16) quad quad cases(p(x_i)=f(x_i), p(x_(i+1/2))=f(x_(i+1/2))) quad i=0,dots,n
-$
-
-Domanda: cosa succede a $p(x)$ se $forall i = 0,dots, space x_(i+1/2) -> x_i$?
-
-Per rispondere in maniera corrette a questa domanda, riscriviamo la #link(<4.16>, [4.16]), equivalentemente, come:
-<4.17>
-$
-  (4.17) quad quad
-  cases(
-    p(x_i)=f(x_i)\,,
-    frac(p(x_(i+1/2)) - p(x_i), x_(i+1/2)-x_i) = frac(f(x_(i+1/2))-f(x_i), x_(i+1/2)-x_i)\, quad i=0\,dots\,n
-  )
-$
-A questo punto, se facciamo il limite per $x_(i+1/2)-->x_i$, nella seconda espressione delle #link(<4.17>, [4.17]), abbiamo dimostrato che $exists p(x) in Pi_(2n+1)$:
-<4.18>
-$
-  (4.18) quad quad cases(p(x_i)=f(x_i), p'(x_i)=f'(x_i)) quad i=0,dots,n
-$
-
-#definition()[
-  Il polinomio $p(x) in Pi_(2n+1)$ che soddisfa le condizioni di interpolazione (6) è detto polinomio interpolante di Hermite.
-]
-#observation()[
-  In altri termini, il polinomio interpolante di Hermite interpola, nelle ascisse di interpolazione, sia la funzione $f(x)$ che la sua derivata prima. 
-  Pertanto ha la stessa retta tangente nelle ascisse di interpolazione.
-  #figure(image("images/2026-03-11-17-23-24.png", width: 50%))
-]
-#example()[
-  #figure(image("images/2026-03-11-17-23-53.png", width: 50%))
-  Se $f(x)=sin(x)$ e $x_i=i pi, space i=0,1,2$, allora il polinomio interpolante su tali ascisse è $p(x)=0$. Questo non è vero per il polinomio interpolante di Hermite.
-]
