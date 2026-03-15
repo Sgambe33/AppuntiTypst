@@ -140,6 +140,7 @@ La classe delle funzioni computabili coincide con la classe delle funzioni $tau$
 $]
 
 == MDT come accettatori di linguaggi
+=== Accettazione per stati finali
 Accettazione di una stringa per stati finali:
 - $Q$: insieme degli stati di una MDT
 - $F subset.eq Q$: insieme degli stati finali
@@ -216,12 +217,12 @@ Accettazione di una stringa per stati finali:
     //#image("/assets/image.png")
   + MdT che accetta il linguaggio ${a^i b^i c^i | i >= 0} subset.eq {a, b, c}^*$
     #grid(
-      rows: 7,
+      rows: 4,
       columns: (8pt, .4fr, .6fr),
       [], grid.cell([
         #grid(columns: 10, stroke: .5pt, inset: 5pt, [\*], [a], [a], [a], [b], [b], [b], [c], [c], [c])
       ]),
-      grid.cell(rowspan: 7, align: center+horizon, diagram(
+      grid.cell(rowspan: 4, align: center+horizon, diagram(
         node-stroke: 0.9pt,
         cell-size: 1mm,
         node-inset: 4pt,
@@ -258,12 +259,61 @@ Accettazione di una stringa per stati finali:
       [], grid.cell([
         #grid(columns: 10, stroke: .5pt, inset: 5pt, [\*], [x], [x], [x], [y], [y], [y], [z], [z], [z])
       ]),
+      // TODO: chiedere a Lorenzi se è errore o altro
+      [$$], grid.cell(align: bottom+left, [L'importante è che ad ogni errore corrisponda uno stato, non che ogni stato preveda errori $->$ la macchina è costruita per andare avanti soltanto se tutto funziona]),
     )
 ]
 
+=== Accettazione per arresto
+#definition()[
+  Una MdT M accetta per arresto quando M, eseguita su _w_, termina.
+]
+L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato da M per arresto
 
+#proposition()[
+  Dato un linguaggio L:
+  #grid(
+    columns: (0.15fr, 100pt, 40pt, 100pt, 0.15fr),
+    align: (right, right, center+horizon, left, left),
+    [], 
+    [$exists$ MdT M che accetta L per stati finali],
+    [$<==>$],
+    [$exists$ MdT M che accetta L per arresto],
+    []
+  )
+]
 
-//TODO: AGGIUNGERE ULTIMA LEZIONE E SISTEMARE TUTTA LA PARTE NUOVA
+#proof()[
+  \ $<==)$ Sia N MdT che accetta L per arresto. La MdT ottenuta da N, designando ogni stato come finale, è una MdT che accetta L per stati finali.
+  \ $==>)$ M MdT che accetta L per stati finali. Su input _w_ ci sono 3 casi: 
+  - M termina su uno stato finale (OK, anche per arresto)
+  - M non termina (OK, non accettata in entrambi i modi)
+  - M termina ma in uno stato non finale: costruiamo una MdT N in questo modo. N ha le stesse transizioni di M più le seguenti:
+    + $forall q in Q \\ F, forall x in Sigma t.c. $ non ci sono transizioni di M con $underbrace("configurazione", "coppia(stato, simbolo)")$ $q x$, aggiungiamo le transizioni $q x x accent(q, ~)$, $ accent(q, ~) x x accent(q, ~)$ (dove $accent(q, ~)$ è un nuovo stato).
+
+  #figure(diagram(
+      node-stroke: 0.9pt,
+      cell-size: 5mm,
+      spacing: 3mm,
+      label-size: 10pt,
+
+      node((0, 0), $q$, name: <0>),
+      node((3, 0), $accent(q, ~)$, name: <1>),
+
+      edge(<0>, <1>, "-|>", $x\/x$),
+      edge(<1>, <1>, "-|>", $x\/x$, bend: 130deg, loop-angle: 0deg),
+  ))
+]
+
+#example(multiple: true, "Esercizi esame")[
+  + L è accetato per *unico stato finale* quando $exists M$ MdT con un solo stato finale che accetta L. Dimostrare L accettato per stati finali *sse* L è accettato pre unico stato finale.
+    \ Risposta:
+    \ $<==)$ Ovvio,
+    \ $==>)$ M MdT che accetta L per stati finali. Costruiamo N aggiugendo un nuovo stato $accent(q, ~)$ che M raggiungerà ogni volta che termina in uno stato finale (insoltr $accent(q, ~)$ sarà l'unico stato finale di N).
+  
+  + M accetta _w_ *per ingresso* quando, durante l'esecuzione di M su un input _w_, la MdT centra in uno stato finale. Un linguaggio L è accettato da M per ingresso quando $exists$ M MdT  che accetta tutte e sole le stringhe di L per ingresso.
+    \ DIM che L è accettato per stati finali sse L è accettato per ingresso.
+]
 
 // Lezione 11/03/26
 #definition()[
