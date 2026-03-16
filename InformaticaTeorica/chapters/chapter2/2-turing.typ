@@ -158,10 +158,12 @@ Accettazione di una stringa per stati finali:
 #observation()[
   Se _M_ è una MDT che termina su ogni input, allora $L(M)$ si dice *ricorsivo*
 
-  #block($
-    #underline("Via tesi di church"): &bold("ric. enum." <--> "semidecidibile")\ 
-                                      &bold("ricorsivo" <--> "decidibile")
-        $)
+  #block(
+    $
+      #underline("Via tesi di church"): & bold("ric. enum." <--> "semidecidibile") \
+                                        & bold("ricorsivo" <--> "decidibile")
+    $,
+  )
 ]
 
 
@@ -173,26 +175,33 @@ Accettazione di una stringa per stati finali:
         rows: 1,
         stroke: .5pt,
         inset: 5pt,
-        [\*], [b], [b], [b], [a], [b], [b], [a], [
-        #place(top + center, dy: -20pt)[
-          #set text(size: 8pt)
-          #stack(
-            dir: ttb,
-            spacing: 2pt,
-            $q_3$,
-            sym.triangle.b.small
-          )
-        ]
-        a
-      ],
-      [b], [a], [a], [a], [b]
+        [\*],
+        [b],
+        [b],
+        [b],
+        [a],
+        [b],
+        [b],
+        [a],
+        [
+          #place(top + center, dy: -20pt)[
+            #set text(size: 8pt)
+            #stack(dir: ttb, spacing: 2pt, $q_3$, sym.triangle.b.small)
+          ]
+          a
+        ],
+        [b],
+        [a],
+        [a],
+        [a],
+        [b],
       )\
       #grid(
         columns: (0.025fr, 0.6fr, 0.3fr, 0.075fr),
         rows: 2,
         stroke: none,
         [],
-        grid.cell(rowspan: 2, diagram( 
+        grid.cell(rowspan: 2, diagram(
           node-stroke: 0.9pt,
           cell-size: 5mm,
           spacing: 3mm,
@@ -204,25 +213,30 @@ Accettazione di una stringa per stati finali:
 
           edge(<0>, <1>, "-|>", $*\/D$),
           edge(<1>, <1>, "<|-", bend: 130deg, $b\/D$, loop-angle: 70deg, label-anchor: "south-east", label-pos: 60%),
-          edge(<1>, <2>, "-|>", bend: 30deg , $a\/D$),
-          edge(<2>, <1>, "-|>", bend: 30deg , $b\/D$),
+          edge(<1>, <2>, "-|>", bend: 30deg, $a\/D$),
+          edge(<2>, <1>, "-|>", bend: 30deg, $b\/D$),
           edge(<2>, <3>, "-|>", $a\/a$),
         )),
-        grid.cell(rowspan: 2, align: (left+horizon), $
-                                &Q = {q_0, q_1, q_2, q_3}\ \
-                                &F = {q_3}
-                              $)
+        grid.cell(rowspan: 2, align: (left + horizon), $ & Q = {q_0, q_1, q_2, q_3} \
+        \
+        & F = {q_3} $),
       )
     $
-    //#image("/assets/image.png")
+  //#image("/assets/image.png")
   + MdT che accetta il linguaggio ${a^i b^i c^i | i >= 0} subset.eq {a, b, c}^*$
     #grid(
       rows: 4,
       columns: (8pt, .4fr, .6fr),
-      [], grid.cell([
-        #grid(columns: 10, stroke: .5pt, inset: 5pt, [\*], [a], [a], [a], [b], [b], [b], [c], [c], [c])
+      [],
+      grid.cell([
+        #grid(
+          columns: 10,
+          stroke: .5pt,
+          inset: 5pt,
+          [\*], [a], [a], [a], [b], [b], [b], [c], [c], [c],
+        )
       ]),
-      grid.cell(rowspan: 4, align: center+horizon, diagram(
+      grid.cell(rowspan: 4, align: center + horizon, diagram(
         node-stroke: 0.9pt,
         cell-size: 1mm,
         node-inset: 4pt,
@@ -256,11 +270,21 @@ Accettazione di una stringa per stati finali:
         edge(<7>, <8>, "-|>", $*\/*$),
       )),
       [$$], [],
-      [], grid.cell([
-        #grid(columns: 10, stroke: .5pt, inset: 5pt, [\*], [x], [x], [x], [y], [y], [y], [z], [z], [z])
+      [],
+      grid.cell([
+        #grid(
+          columns: 10,
+          stroke: .5pt,
+          inset: 5pt,
+          [\*], [x], [x], [x], [y], [y], [y], [z], [z], [z],
+        )
       ]),
       // TODO: chiedere a Lorenzi se è errore o altro
-      [$$], grid.cell(align: bottom+left, [L'importante è che ad ogni errore corrisponda uno stato, non che ogni stato preveda errori $->$ la macchina è costruita per andare avanti soltanto se tutto funziona]),
+      [$$],
+      grid.cell(
+        align: bottom + left,
+        [L'importante è che ad ogni errore corrisponda uno stato, non che ogni stato preveda errori $->$ la macchina è costruita per andare avanti soltanto se tutto funziona],
+      ),
     )
 ]
 
@@ -274,34 +298,30 @@ L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato
   Dato un linguaggio L:
   #grid(
     columns: (0.15fr, 100pt, 40pt, 100pt, 0.15fr),
-    align: (right, right, center+horizon, left, left),
-    [], 
-    [$exists$ MdT M che accetta L per stati finali],
-    [$<==>$],
-    [$exists$ MdT M che accetta L per arresto],
-    []
+    align: (right, right, center + horizon, left, left),
+    [], [$exists$ MdT M che accetta L per stati finali], [$<==>$], [$exists$ MdT M che accetta L per arresto], [],
   )
 ]
 
 #proof()[
   \ $<==)$ Sia N MdT che accetta L per arresto. La MdT ottenuta da N, designando ogni stato come finale, è una MdT che accetta L per stati finali.
-  \ $==>)$ M MdT che accetta L per stati finali. Su input _w_ ci sono 3 casi: 
+  \ $==>)$ M MdT che accetta L per stati finali. Su input _w_ ci sono 3 casi:
   - M termina su uno stato finale (OK, anche per arresto)
   - M non termina (OK, non accettata in entrambi i modi)
   - M termina ma in uno stato non finale: costruiamo una MdT N in questo modo. N ha le stesse transizioni di M più le seguenti:
-    + $forall q in Q \\ F, forall x in Sigma t.c. $ non ci sono transizioni di M con $underbrace("configurazione", "coppia(stato, simbolo)")$ $q x$, aggiungiamo le transizioni $q x x accent(q, ~)$, $ accent(q, ~) x x accent(q, ~)$ (dove $accent(q, ~)$ è un nuovo stato).
+    + $forall q in Q \\ F, forall x in Sigma t.c.$ non ci sono transizioni di M con $underbrace("configurazione", "coppia(stato, simbolo)")$ $q x$, aggiungiamo le transizioni $q x x accent(q, ~)$, $accent(q, ~) x x accent(q, ~)$ (dove $accent(q, ~)$ è un nuovo stato).
 
   #figure(diagram(
-      node-stroke: 0.9pt,
-      cell-size: 5mm,
-      spacing: 3mm,
-      label-size: 10pt,
+    node-stroke: 0.9pt,
+    cell-size: 5mm,
+    spacing: 3mm,
+    label-size: 10pt,
 
-      node((0, 0), $q$, name: <0>),
-      node((3, 0), $accent(q, ~)$, name: <1>),
+    node((0, 0), $q$, name: <0>),
+    node((3, 0), $accent(q, ~)$, name: <1>),
 
-      edge(<0>, <1>, "-|>", $x\/x$),
-      edge(<1>, <1>, "-|>", $x\/x$, bend: 130deg, loop-angle: 0deg),
+    edge(<0>, <1>, "-|>", $x\/x$),
+    edge(<1>, <1>, "-|>", $x\/x$, bend: 130deg, loop-angle: 0deg),
   ))
 ]
 
@@ -310,7 +330,7 @@ L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato
     \ Risposta:
     \ $<==)$ Ovvio,
     \ $==>)$ M MdT che accetta L per stati finali. Costruiamo N aggiugendo un nuovo stato $accent(q, ~)$ che M raggiungerà ogni volta che termina in uno stato finale (insoltr $accent(q, ~)$ sarà l'unico stato finale di N).
-  
+
   + M accetta _w_ *per ingresso* quando, durante l'esecuzione di M su un input _w_, la MdT centra in uno stato finale. Un linguaggio L è accettato da M per ingresso quando $exists$ M MdT  che accetta tutte e sole le stringhe di L per ingresso.
     \ DIM che L è accettato per stati finali sse L è accettato per ingresso.
 ]
@@ -482,7 +502,7 @@ L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato
 ]
 Questo significa che il grado di non determinismo corrisponde al numero massimo di svolte che la macchina M può prendere in un unica transizione, leggendo lo stesso input.
 
-Applichiamo il tutto all'esempio precedente. \ 
+Applichiamo il tutto all'esempio precedente. \
 Dato $q in Q, x in Sigma$, codifichiamo le transizioni di M MdT non deterministica, aventi _qx_ come primi 2 elementi, utilizzando gli interi da 1 a $delta$, possibilmente codifichiamo la stessa transizione con più etichette:
 
 #grid(
@@ -493,13 +513,13 @@ Dato $q in Q, x in Sigma$, codifichiamo le transizioni di M MdT non deterministi
 
   [$$], [$1: q_1 c D q_1$], [$1, 2, 3: q_1 a D q_1$], [$$],
   [$$], [$2: q_1 c D q_2$], [$1, 2, 3: q_0 * D q_1$], [$$],
-  [$$], [$3: q_1 c S q_5$], [$$],                     [$$],
+  [$$], [$3: q_1 c S q_5$], [$$], [$$],
 )
 
 Di seguito alcuni esempi di possibili computazioni sulla stringa $w = a c a b$:
-- $(1 1 1 1 1) --> $ termina in uno stato non finale;
-- $(1 1 2 1 1) --> $ termina in uno stato finale e dice che _w_ è accettata;
-- $(2 2 3 2 2) --> $ termina prematuramente, cioè che l'ultima transazione non viene eseguita;
+- $(1 1 1 1 1) -->$ termina in uno stato non finale;
+- $(1 1 2 1 1) -->$ termina in uno stato finale e dice che _w_ è accettata;
+- $(2 2 3 2 2) -->$ termina prematuramente, cioè che l'ultima transazione non viene eseguita;
 
 #proposition()[
   _L_ è accettato da una MdT standard $<==>$ _L_ è accettato da una MdT non deterministica
@@ -539,11 +559,152 @@ La classe delle funzioni parziali computabili coincide con la classe delle funzi
 
 #proposition()[
   $forall M$ MdT standard, $forall k in NN$\
-  $exists! $ funzione parziale computabile $f$ t.c. M calcola $f: NN^k --> NN$
+  $exists!$ funzione parziale computabile $f$ t.c. M calcola $f: NN^k --> NN$
 ]
 #proof()[
   Definisco $f$ funzione parziale da $NN^k$ in $NN$ come segue:\
   $forall accent(x, arrow) in NN^k$, eseguo M su $accent(x, arrow)$:
   - Se M termina, $f(accent(x, arrow))$ è dato in unario dal numero di "uni" che si trovano sul nastro al termine dell'esecuzione.
   - Se M non termina, $f(accent(x, arrow))arrow.t$
+]
+
+#proposition()[
+  L'insieme delle MdT è *enumerabile*.
+]
+#proof()[
+  La strategia che si utilizza è quella di trovare una codifica binaria per le MdT in questo modo:
+  - *Codifica degli stati*: ogni stato viene codificato con il suo indice scritto in unario.
+  $
+    Q = {q_0, q_1, dots} arrow.squiggly q_i --> underbrace(11 dots 1, i+1)
+  $
+  - *Codifica dei simboli dell’alfabeto*: ogni simbolo viene codificato con il suo indice scritto in unario.
+  $
+    Sigma = {a_0, a_1, a_2, dots, a_n} arrow.squiggly a_i --> underbrace(11 dots 1, i+1)
+  $
+  - *Codifica di ${D, S}$*:
+  $
+    D --> underbrace(11 dots 1, n+2) quad S --> underbrace(11 dots 1, n+3)
+  $
+  - *Codifica di una transizione*:
+  $
+    q_h a_i alpha q_k --> underbrace(11 dots 1, h+1) 0 underbrace(11 dots 1, i+1) 0 underbrace(11 dots 1, ?) 0 underbrace(11 dots 1, k+1)
+  $
+  - Lo 0 è l’elemento separatore tra gli elementi della quadrupla:
+    - 1 zero separa i simboli;
+    - 2 zeri separano le transizioni;
+    - 3 zeri inizio e fine della codifica della MdT.
+
+  Definita la codifica, è possibile definire un algoritmo di enumerazione per le MdT: genera in ordine lessicografico e per lunghezza crescente tutte le stringhe binarie su ${0,1}$, per ognuna di esse effettua un controllo sintattico, se rappresenta una MdT, la scrivo.
+
+  #observation()[
+    Questo algoritmo può essere visto come un algoritmo per enumerare le funzioni unari parziali computabili ($tau$-ricorsive):
+    $
+      &M_1, &&M_2, &&&M_3, &&&&dots, &&&&&M_n, dots\
+      &#rotate(90deg, [$<-->$])
+      &&#rotate(90deg, [$<-->$])
+      &&&#rotate(90deg, [$<-->$])
+      &&&&
+      &&&&&#rotate(90deg, [$<-->$])\
+      &f_1
+      &&f_2
+      &&&f_3
+      &&&&
+      &&&&&f_n
+    $
+  ]
+]
+#example("Codifica dell'intera MdT")[
+  - $q_0 * D q_0$
+  - $q_0 1 D q_0$
+  - $q_1 1 D q_1$
+  $
+    q_0 <-> 1 space q_1 <-> 11 space 1<->1 space *<->11 space D<->111 space S<->1111
+  $
+  La MdT viene codificata come:
+  $
+    000 1011011101 00 1010111011 00 11010111011 000
+  $
+]
+
+#theorem()[
+  Sia $K= { a in NN | M_a (a)↓ }$, con $M_a$ che rappresenta la $a$-esima
+  MdT prodotta dall'algoritmo di enumerazione precedente ($M_a (a)↓$
+  equivale a dire che $f_a (a) ↓$ ).
+  1. K è semidecidibile
+  2. K non è decidibile.
+]
+#proof()[
+  1. Dato $a in NN$, eseguo l'algoritmo di enumerazione delle MdT per ottenere $M_a$, quindi eseguo $M_a$ su $a$:
+    - Se 𝑀𝑎(𝑎) ↓, allora 𝑎 ∈ 𝑘 𝐾 ;
+    - Altrimenti, l’esecuzione di 𝑀𝑎 su 𝑎 non termina.
+    Questo è un algoritmo di semidecisione per 𝐾.
+
+  2. Supponiamo per assurdo che 𝐾 sia decidibile. Definiamo la funzione unaria f: ℕ → ℕ in questo modo:
+  $
+    f(n) = cases(
+      f_n (n)+1 & "se" n in K,
+      0 & "se" n in.not K
+    )
+  $
+  Poiché sto supponendo che 𝐾 sia decidibile, allora $f$ è computabile (grazie all'algoritmo di decisione per $K$). Dunque $f$ deve comparire nella lista delle funzioni parziali computabili unarie, cioè $exists overline(n) in NN: f=f_(overline(n))$.\
+  Calcolo $f(overline(n))$:
+  - $overline(n) in K: f_(overline(n)) (overline(n)) + 1 = f(overline(n)) = f_(overline(n))$ che è assurdo.
+
+  - $overline(n) in.not K: f(overline(n))=0$ (usando la definizione di $f$) ma abbiamo anche visto che $f=f_(overline(n))$ e quindi  $f(overline(n)) =f_(overline(n))$ che è un altro assurdo.
+]
+
+== Problema dell'arresto
+#definition("Problema dell'arresto")[
+  Data una macchina di Turing M e un numero naturale $n$, determinare se M su input $n$ termina.
+]
+
+#theorem("Teorema dell'arresto V1")[
+  (Il problema dell'arresto è indecidibile) L'insieme $R={(n,m) in NN^2 | M_n "termina su" m}$ è semidecidibile ma non è decidibile.
+]
+#proof()[\
+  Se per assurdo $R$ fosse decidibile, allora potrei decidere, in particolare, se $(n,n) in RR space (forall n in NN)$. Ma tale "sottoproblema" è equivalente al problema di decisione per $K$, che abbiamo dimostrato essere indecidibile.
+]
+
+Un'alternativa definizione del problema dell'arresto è:
+#definition()[
+  Data una Macchina di Turing 𝑀 e una stringa 𝑤, determinare se 𝑀 su
+input 𝑤 termina.
+]
+Tale definizione è equivalente perché:
+- Ogni numero naturale si può codificare come stringa di un opportuno alfabeto,
+- Ogni stringa su un alfabeto può essere codificata da un numero naturale.
+Questo risultato è dato da:
+#definition("Funzione di Gödelizzazione")[
+  Dato l'insieme dei numeri primi $P={2,3,5,7,dots}={p_1,p_2,p_3,dots}$ e l'alfabeto numerabile (finito) $Sigma={a_1,a_2,a_3,dots}$, definisco *funzione di Gödelizzazione* la funzione $accent(g, dot.double): Sigma^* -> NN$ che associa a una stringa costituita dai simboli di $Sigma$ un numero:
+  $
+    a_i_1 a_i_2 dots a_i_k --> p_1^i_1 p_2^i_2 dots p_k^i_k
+  $
+  Allora possiamo dire che:
+  1. $accent(g, dot.double)$ è computabile.
+  2. $accent(g, dot.double)$ è iniettiva.
+  3. Se $m in accent(g, dot.double)(Sigma^*)$, esiste un algoritmo per calcolare $w in Sigma^*$ tale che $accent(g, dot.double)(w)=m$ 
+]
+
+//TODO: disegno degli insiemi dei problemi:
+// tutti i problemi -> semidecidibili -> decidibili (cerchio più interno)
+
+#definition()[
+  Sia $cal(L)_("Halt")$ il *linguaggio del problema dell'arresto* definito nel seguente modo:
+  $
+    cal(L)_("Halt") = {(underbrace(R(M), "codifica di M")w)|M "termina su" w}
+  $
+]
+#observation()[
+  Il problema dell'arresto è il problema di decisione per $cal(L)_("Halt")$.
+]
+
+#theorem("Teorema dell'arresto V2")[
+  $cal(L)_("Halt")$ è semidecidibile ma non decidibile.
+]
+
+#proposition()[
+  $cal(L)_("Halt")^c$ (complementare di $cal(L)_("Halt")$) non è semidecidibile
+]
+#proof()[
+  Supponiamo per assurdo che $cal(L)_("Halt")^c$ sia decidibile. Noi sappiamo che $cal(L)_("Halt")$ è decidibile. Dalle prime definizioni/proposizioni sappiamo anche che se un linguaggio e il suo complementare sono decidibili, allora il linguaggio stesso è decidibile che è un assurdo.
 ]
