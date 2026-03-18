@@ -23,7 +23,11 @@ Questo per diversi motivi, come ad esempio:
   $
 In generale si ricerca l'approssimazione di $f(x)$ in una classe di funzioni abbastanza semplici da manipolare, come ad esempio quella dei polinomi.
 == Interpolazione polinomiale
-Date $n+1$ ascisse distinte nell'intervallo $[a,b], quad a lt.eq x_0 < x_1 < ... < x_n lt.eq b$ in cui è noto il valore della funzione $f(x)$: ovvero sono assegnate $n+1$ coppie di dati $(x_i, f_i), space i=0,...,n$, dove abbiamo denotato $f_i equiv f(x_i), space i =0,...,n$.
+Date $n+1$ ascisse distinte nell'intervallo $[a,b]$ ordinate in modo tale che
+$
+  a lt.eq x_0 < x_1 < ... < x_n lt.eq b
+$
+In corrispondenza di tali punti assumiamo di conoscere i valori di una funzione $f(x)$. In altre parole, ci sono assegnate $n+1$ coppie di dati $(x_i, f_i), space i=0,...,n$, dove poniamo per comodità $f_i equiv f(x_i), space i =0,...,n$.
 
 Dal punto di vista geometrico:
 #figure(
@@ -34,14 +38,18 @@ Dal punto di vista geometrico:
       x-tick-step: 1,
       y-tick-step: 1,
       y-min: 0,
-      y-max: 10,
+      y-max: 11,
       plot-style: (stroke: black),
       min: 0,
       {
-        let func = x => 2 * calc.sqrt(x) + 2
-        plot.add(func, domain: (0, 10), label: $f(x)$, style: (stroke: blue))
+        let func = x => 0.0208333 * calc.pow(x, 3) - 0.375 * calc.pow(x, 2) + 2.66667 * x
+
+        let func2 = x => 0.0248192 * calc.pow(x, 3) - 0.443478 * calc.pow(x, 2) + 3.01555 * x - 0.699204
+        plot.add(func, domain: (1, 10), label: $f(x)$, style: (stroke: blue))
+        plot.add(func2, domain: (1, 10), label: $f(x)$, style: (stroke: red))
+
         plot.add-hline(0, style: (stroke: black))
-        plot.add-vline(1, 3, 5, 10, min: -0.01, max: 0.01)
+        plot.add-vline(1, 3, 5, 11, min: -0.01, max: 0.01)
         plot.annotate({
           content((.55, .025), $x^*$)
         })
@@ -662,8 +670,6 @@ $
 Pertanto, sono verificate le condizioni di interpolazione. La (4) è  la forma di Lagrange del polinomio interpolante di Hermite.
 
 
-
-
 // 11.03.2026
 == Errore di interpolazione
 $p(x)$ è il polinomio interpolante $f(x)$ nelle ascisse assegnate. Se definiamo $e(x)=f(x)-p(x)$, (funzione dell'errore), da cui, ricordando che $p(x_i)=f(x_i)$, otteniamo che:
@@ -735,3 +741,313 @@ $
 
 // GRAFICO BRUTTO DA RIFARE
 #figure(image("images/2026-03-11-12-02-55.png"))
+
+//18.03.2026
+Se $f$ ha derivate uniformemente limitate ($exists M > 0: |f^((n+1))(x)| lt.eq M, space forall x in [a,b])$), allora $forall x in [a,b]$:
+$
+  abs(e(x)) lt.eq M frac(abs(omega_(n+1) (x)), (n+1)!) lt.eq M frac((b-a)^(n+1), (n+1)!) --> 0 " per " n --> infinity
+$
+Pertanto, in questo caso, ci aspettiamo che, al crescere del numero delle ascisse di interpolazione, la famiglia di polinomi interpolanti $f(x)$ su tali ascisse, converga uniformemente alla funzione interpolanda.
+Se però andiamo ad approssimare $f(x)$ "buona" sul calcolatore, possiamo avere qualche sorpresa.
+
+#example()[
+  Consideriamo la seguente funzione, nota come *funzione di Runge*:
+  $
+    f(x) = frac(1, 1+x^2), space x in [-5,5]
+  $
+  - $f(x)=f(-x) gt.eq 0$ ovvero simmetrica rispetto all'asse $x=0$.
+  - $f(x) -> 0, space x->plus.minus infinity$
+  - $f(0)=1 equiv max_(x in RR) f(x)$
+
+  #figure(
+    canvas({
+      import draw: content
+      plot.plot(
+        size: (10, 5),
+        x-tick-step: 1,
+        y-tick-step: 1,
+        y-min: 0,
+        y-max: 1.25,
+        plot-style: (stroke: black),
+        min: 0,
+        {
+          let func = x => 1 / (1 + calc.pow(x, 2))
+
+          plot.add(func, domain: (-5, 5), style: (stroke: blue), samples: 100)
+
+          plot.add-hline(0, style: (stroke: black))
+          plot.add-vline(-6, -5, -3, -1, 1, 3, 5, 6, min: -0.01, max: 0.01)
+        },
+      )
+    }),
+  )
+  Per approssimarla, consideriamo $n+1$ ascisse equidistanti in $[-5,5]$, $n$ pari, in modo che 0 sia una delle ascisse di interpolazione:
+  $
+    x_i = -5 + i/n 10, space i=0,dots,n
+  $
+  #observation()[
+    Se avessimo un generico intervallo $[a,b]$, avremmo:
+    $
+      x_i = a + (b-a)/n
+    $
+  ]
+
+  #grid(
+    rows: 2,
+    columns: 2,
+    figure(canvas({
+      import draw: content
+      plot.plot(
+        size: (5, 5),
+        x-tick-step: 1,
+        y-tick-step: 1,
+        y-min: 0,
+        y-max: 1.25,
+        plot-style: (stroke: black),
+        min: 0,
+        {
+          let func = x => 1 / (1 + calc.pow(x, 2))
+          let nodes_2 = (
+            (-5, 0.0384615),
+            (0, 1),
+            (5, 0.0384615),
+          )
+          let poly_2 = x => (
+            -0.0384615 * calc.pow(x, 2) + 1
+          )
+
+          plot.add(func, domain: (-5, 5), style: (stroke: blue), samples: 100)
+          plot.add(poly_2, domain: (-6, 6), style: (stroke: (paint: red, dash: "dashed")), samples: 100)
+
+          plot.add(nodes_2, style: (stroke: none), mark: "o")
+
+          plot.add-hline(0, style: (stroke: black))
+          plot.add-vline(-6, -5, -3, -1, 1, 3, 5, 6, min: -0.01, max: 0.01)
+        },
+      )
+    })),
+    figure(canvas({
+      import draw: content
+      plot.plot(
+        size: (5, 5),
+        x-tick-step: 1,
+        y-tick-step: 1,
+        y-min: -.25,
+        y-max: 1.25,
+        plot-style: (stroke: black),
+        min: 0,
+        {
+          let func = x => 1 / (1 + calc.pow(x, 2))
+          let nodes_5 = (
+            (-5, 0.0384615),
+            (-3, 0.1),
+            (-1, 0.5),
+            (1, 0.5),
+            (3, 0.1),
+            (5, 0.0384615),
+          )
+          let poly_5 = x => (
+            0.00192308 * calc.pow(x, 4) - 0.0692308 * calc.pow(x, 2) + 0.567308
+          )
+
+          plot.add(func, domain: (-5, 5), style: (stroke: blue), samples: 100)
+          plot.add(poly_5, domain: (-6, 6), style: (stroke: (paint: red, dash: "dashed")), samples: 100)
+
+          plot.add(nodes_5, style: (stroke: none), mark: "o")
+
+          plot.add-hline(0, style: (stroke: black))
+          plot.add-vline(-6, -5, -3, -1, 1, 3, 5, 6, min: -0.01, max: 0.01)
+        },
+      )
+    })),
+
+    figure(canvas({
+      import draw: content
+      plot.plot(
+        size: (5, 5),
+        x-tick-step: 1,
+        y-tick-step: 1,
+        y-min: -1.25,
+        y-max: 3.25,
+        plot-style: (stroke: black),
+        min: 0,
+        {
+          let func = x => 1 / (1 + calc.pow(x, 2))
+          let nodes_10 = (
+            (-5, 0.0384615),
+            (-4, 0.0588235),
+            (-3, 0.1),
+            (-2, 0.2),
+            (-1, 0.5),
+            (0, 1),
+            (1, 0.5),
+            (2, 0.2),
+            (3, 0.1),
+            (4, 0.0588235),
+            (5, 0.0384615),
+          )
+          let poly_10 = x => (
+            -0.0000226244 * calc.pow(x, 10)
+              + 0.00126697 * calc.pow(x, 8)
+              - 0.0244118 * calc.pow(x, 6)
+              + 0.197376 * calc.pow(x, 4)
+              - 0.674208 * calc.pow(x, 2)
+              + 1
+          )
+
+          plot.add(func, domain: (-5, 5), style: (stroke: blue), samples: 100)
+          plot.add(poly_10, domain: (-6, 6), style: (stroke: (paint: red, dash: "dashed")), samples: 100)
+
+          plot.add(nodes_10, style: (stroke: none), mark: "o")
+
+          plot.add-hline(0, style: (stroke: black))
+          plot.add-vline(-6, -5, -3, -1, 1, 3, 5, 6, min: -0.01, max: 0.01)
+        },
+      )
+    })),
+    figure(canvas({
+      import draw: content
+      plot.plot(
+        size: (5, 5),
+        x-tick-step: 1,
+        y-tick-step: 1,
+        y-min: -1.25,
+        y-max: 5.25,
+        plot-style: (stroke: black),
+        min: 0,
+        {
+          let func = x => 1 / (1 + calc.pow(x, 2))
+          let nodes_18 = (
+            (-5, 0.0384615),
+            (-4.44444, 0.0481856),
+            (-3.88889, 0.0620214),
+            (-3.33333, 0.0825688),
+            (-2.77778, 0.114731),
+            (-2.22222, 0.168399),
+            (-1.66667, 0.264706),
+            (-1.11111, 0.447514),
+            (-0.555556, 0.764151),
+            (0, 1),
+            (0.555556, 0.764151),
+            (1.11111, 0.447514),
+            (1.66667, 0.264706),
+            (2.22222, 0.168399),
+            (2.77778, 0.114731),
+            (3.33333, 0.0825688),
+            (3.88889, 0.0620214),
+            (4.44444, 0.0481856),
+            (5, 0.0384615),
+          )
+          let poly_18 = x => (
+            -1.65986e-08 * calc.pow(x, 18)
+              + 1.47666e-06 * calc.pow(x, 16)
+              - 5.35702e-05 * calc.pow(x, 14)
+              + 0.0010293 * calc.pow(x, 12)
+              - 0.0114138 * calc.pow(x, 10)
+              + 0.0749912 * calc.pow(x, 8)
+              - 0.291487 * calc.pow(x, 6)
+              + 0.667313 * calc.pow(x, 4)
+              - 0.944449 * calc.pow(x, 2)
+              + 1
+          )
+
+          plot.add(func, domain: (-5, 5), style: (stroke: blue), samples: 100)
+          plot.add(poly_18, domain: (-6, 6), style: (stroke: (paint: red, dash: "dashed")), samples: 100)
+
+          plot.add(nodes_18, style: (stroke: none), mark: "o")
+
+          plot.add-hline(0, style: (stroke: black))
+          plot.add-vline(-6, -5, -3, -1, 1, 3, 5, 6, min: -0.01, max: 0.01)
+        },
+      )
+    })),
+  )
+
+  Si osserva come all'aumentare di $n$, agli estremi della funzione, la funzione interpolante oscilla assumendo valori molto distanti da quelli della funzione interpolata.
+]
+Quanto osservato è legato al *condizionamento del problema*.
+
+== Condizionamento del problema
+assegnate le ascisse di interpolazione.....
+vogliamo vedere, posto che:
+1. $p(x)$ è il polinomio interpolante $f(x)$ su tali ascisse;
+2. $tilde(p)(x)$ è il polinomio interpolante $tilde(f)(x)$ sulle stesse ascisse, essendo $tilde(f)(x)$ una perturbazione di $f(x)$;
+come la differenza $f(x)-tilde(f)(x)$ influisce sulla differenza $p(x)-tilde(p)(x)$.
+
+Per misurare queste differenze, introduciamo la seguente norma nello spazio vettoriale delle funzione continue sull'intervallo $[a,b]$:
+<4.19>
+$
+  forall g in phi[a,b] : norm(g) = max_(a lt.eq x lt.eq b) abs(g(x)) quad quad (4.19)
+$
+#observation()[
+  1. #link(<4.19>)[(4.19)] è ben definita, perché se $g in phi[a,b] => abs(g) in phi[a,b] => abs(g)$ ha estremo superiore ($max$) per il teorema di Weierstrass.
+  2. #link(<4.19>)[(4.19)] definisce effettivamente una norma in $phi[a,b]$:
+    - $norm(g) gt.eq 0 and norm(g)=0 => g(x) equiv 0$;
+    - $forall alpha in RR: norm(alpha g) = abs(alpha) dot norm(g)$;
+    - $forall f, g in phi[a,b]: norm(f+g) lt.eq norm(f) + norm(g)$;
+]
+Ricordiamo che lo studio del condizionamento di un problema si fa in aritmetica esatta. Pertanto, potremo considerare una qualunque forma del polinomio interpolante, perché tra loro algebricamente equivalenti. In particolare, risulta conveniente, ai fini di questa analisi, l'utilizzo della forma di Lagrange di $p(x)$ e $tilde(p)(x)$. Quindi:
+<4.20>
+$
+  & p(x) = sum_(i=0)^n f(x_i) L_("in")(x) quad quad (4.20) \
+  & tilde(p)(x) = sum_(i=0)^n tilde(f)(x_i) L_("in")(x) quad quad (4.21)
+$
+<4.21>
+
+dove, ricordiamo, $L_("in")(x) = product_(j=0\ j eq.not i)^n frac(x-x_j, x_i - x_j), space i = 0,dots,n$.
+
+Infatti, nelle #link(<4.20>)[(4.20)] e #link(<4.21>)[(4.21)] il ruolo di $f(x)$ e $tilde(f)(x)$ è facilmente identificabile. Sottraendo, membro a membro la #link(<4.21>)[(4.21)] dalla #link(<4.20>)[(4.20)], otteniamo:
+$
+  p(x) - tilde(p)(x) = sum_(i=0)^n (f(x_i)-tilde(f)(x_i)) L_("in") (x)
+$
+Passando ai valori assoluti, otteniamo che:
+$
+  abs(p(x) - tilde(p)(x)) & = abs(sum_(i=0)^n (f(x_i)-tilde(f)(x_i)) L_("in")(x)) \
+                          & lt.eq sum_(i=0)^n abs(L_("in")(x)) dot abs(f(x_i)-tilde(f)(x_i)) \
+                          & lt.eq norm(f-tilde(f)) dot sum_(i=0)^n abs(L_("in")(x)) \
+                          & equiv norm(f-tilde(f)) dot lambda_n (x)
+$
+dove $lambda_n (x)$ è detta *funzione di Lebesgue* (ləbɛɡ).
+
+#observation()[
+  $lambda_n gt.eq 0, forall x in [a,b]$ e dipende solo dalla scelta delle ascisse di interpolazione.
+]
+
+Ricapitolando, abbiamo ottenuto che:
+$
+  forall x in [a,b] : abs(p(x)-tilde(p)(x)) lt.eq lambda_n (x) dot norm(f -tilde(f))
+$
+
+Se consideriamo, infine, il massimo, per $x in [a,b]$, di ciascun membro della diseguaglianza, otteniamo che:
+$
+  norm(p-tilde(p)) lt.eq underbrace(lambda_n, Lambda_n) dot norm(f-tilde(f))
+$
+con $Lambda_n$ detta *costante di Lebesgue*. La conclusione della nostra analisi è quindi che:
+<4.22>
+$
+  norm(p-tilde(p)) lt.eq Lambda_n dot norm(f-tilde(f)) quad quad (4.22)
+$
+
+#observation()[
+  Nella (4.22):
+  - $norm(f-tilde(f))$ è una misura della perturbazione del dato in ingresso;
+  - $norm(p-tilde(p))$ è una misura della perturbazione sul risultato finale;
+  - $Lambda_n$ è il fattore che misura di quanto l'errore sui dati in ingresso si può amplificare sul risultato finale;
+]
+Pertanto, la costante di Lebesgue $Lambda_n$ definisce il numero di condizionamento del problema dell'interpolazione polinomiale.
+
+Esaminiamo alcune sue proprietà:
+1. $Lambda_n = =norm(lambda_n)$ e $lambda_n (x)$ dipende solo dalla *scelta delle ascisse di interpolazione*;
+2. Più precisamente, essa dipende dalla *distribuzione* delle ascisse $x_0, dots, x_n in [a,b]$, ma non dallo specifico intervallo $[a,b]$. Infatti, se $x in [a,b] => x=a+c(b-a), space c in [0,1]$. Inoltre, $lambda_n (x) = sum_(i=0)^n abs(L_("in")(x))$, essendo $x_i = 0a+c_i (b-a), space i=0,dots,n$, le ascisse di interpolazione. Pertanto:
+  $
+    L_("in")(x) & = L_("in")(a+c(a+b)) \
+    & = product_(j=0 \ j eq.not i)^n frac([a+c(b-a)]-[a+c_j (b-a)], [a+c_i (b-a)]-[a+c_j (b-a)]) \
+    & = product_(j=0 \ j eq.not i)^n frac((c-c_j) (b-a), (c_i -c_j) (b-a))
+    & = problem_(j=0 \ j eq.not i)^n frac(c-c_j, c_i-c_j) equiv hat(L)_("in") (c)
+  $
+
+3. $forall n gt.eq 1: Lambda_n gt.eq O(ln(n))-->infinity "per" n-->infinity$;
+4. Nel caso di ascisse equidistanti, $Lambda_n approx 2^n, n gt.eq 1$. Pertanto abbiamo una crescita esponenziale invece che logaritmica;
+
+In conclusione, il malcondizionamento del problema spiega quanto abbiamo osservato numericamente.
+
