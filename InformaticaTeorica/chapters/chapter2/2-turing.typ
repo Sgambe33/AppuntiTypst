@@ -708,3 +708,134 @@ Questo risultato è dato da:
 #proof()[
   Supponiamo per assurdo che $cal(L)_("Halt")^c$ sia decidibile. Noi sappiamo che $cal(L)_("Halt")$ è decidibile. Dalle prime definizioni/proposizioni sappiamo anche che se un linguaggio e il suo complementare sono decidibili, allora il linguaggio stesso è decidibile che è un assurdo.
 ]
+
+#definition()[
+  Una *MdT universale* è una MdT che, su input $R(m)w$, simula l'esecuzione di M su _w_.
+]
+#proposition()[
+  Esiste una MdT universale che calcola le funzioni parziali computabili unarie.
+]
+
+#definition()[
+  $L_1, L_2$ linguaggi, $L_1 subset.eq Sigma_1^*, L_2 subset.eq Sigma_2^*$
+  \ Diciamo che $L_1$ è *riducibile* a $L_2$ quando $exists f:Sigma_1^* --> Sigma_2^* t.c.$
+  + $f$ è computabile
+  + $forall w in Sigma_1^*, w in L_1 <==> f(w) in L_2$
+]
+
+#proposition()[
+  + $f$ è una riduzione da $L_1$ a $L_2$ e $L_2$ è decidibile $=> L_1$ decidibile
+    \ (vale anche se semidecidibile $=>$ semidecidibile)
+  + $f$ è una riduzione da $L_1$ a $L_2$ e $K_1$ è indecidibile $=> L_2$ indecidibile
+]
+
+#proof()[
+  + #grid(
+    columns: (.1fr, .3fr, .49fr, .1fr),
+    align: (left, left, left, left),
+    rows: 2,
+    row-gutter: 10pt,
+    // TODO: aggiungere linea verticale separatrice
+    [], [$F$ MdT che calcola $f$   ], grid.cell(rowspan: 2, [
+      MdT che decide $L_1$ su $w in Sigma_1^*$:
+        \ $dot$ uso _F_ per calcolare $f(w) in Sigma_2^*$;
+        \ $dot$ uso $M_2$ per decidere se $f(w) in L_2$
+    ]), [],
+    [], [$M_2$ MdT che decide $L_2$], [], [],
+  )
+]
+
+#pagebreak()
+#example(multiple: true)[
+  +   $L_1 = {u u | u = a^i b^i c^i, i>=0} subset.eq {a,b,c}^*$
+    \ $L_2 = {a^i b^i c^i, i>=0} subset.eq {a,b,c}^* quad quad$ (decidible) $M_2$ MdT che decide $L_1$
+    \ MdT che realizza (calcola) una riduzione da $L_1$ a $L_2$ su input $w in {a,b,c}^*$:
+    - controlliamo se $w = u u$, per qualche $u in {a,b,c}^*$
+    - se non è così, cancello _w_ e scrivo _a_
+    - se $w = u u$, cancello la seconda metà di _w_, mantenendo solo _u_
+  
+  +   $Sigma_1 = {x,y}, Sigma_2 = {a}$
+    \ $L = {(x y^n) in Sigma_1^*| n >= 0}, Q={a^(2n) in Sigma_2^* | n >= 0}$
+    #figure(diagram(
+      node-stroke: 0.9pt,
+      cell-size: 5mm,
+      spacing: 3mm,
+      label-size: 7pt,
+
+      node((0 ,  0), $q_0$, name: <0>),
+      node((3 ,  0), $q_1$, name: <1>),
+      node((6 ,  0), $q_2$, name: <2>),
+      node((3 ,  3), $q_3$, name: <3>),
+      node((9 , -1), $q_4$, name: <4>),
+      node((12, -1), $q_5$, name: <5>),
+      node((12,  1), $q_6$, name: <6>),
+      node((9 ,  3), $q_7$, name: <7>),
+      node((12,  3), $q_8$, name: <8>),
+
+      edge(<0>, <1>, "-|>", $*\/D$),
+      edge(<1>, <2>, "-|>", $x\/D$, bend: 30deg),
+      edge(<2>, <1>, "-|>", $y\/D$, bend: 30deg),
+      edge(<1>, <3>, "-|>", $*\/S$),
+      edge(<3>, <3>, "-|>", $x,y\/a\ a\/S$, bend: 130deg, loop-angle: 180deg),
+
+      edge(<1>, <4>, "-|>", $x\/D$, bend: -75deg),
+      edge(<2>, <4>, "-|>", $*\/D$, bend: -30deg),
+      edge(<2>, <4>, "-|>", $y\/D$),
+
+      edge(<4>, <4>, "-|>", $x,y\/D$, bend: 130deg),
+      edge(<4>, <5>, "-|>", $*\/S$),
+      edge(<5>, <6>, "-|>", $x,y\/*$, bend: -30deg),
+      edge(<5>, <7>, "-|>", $*\/D$  , bend: -30deg),
+      edge(<6>, <5>, "-|>", $*\/S$  , bend: -30deg),
+      edge(<7>, <7>, "-|>", $*\/a$  , bend: 130deg, loop-angle: -135deg),
+      edge(<7>, <8>, "-|>", $a\/b$),
+    ))
+]
+
+== Problema del nastro vuoto (BTP)
+#problem()[
+  Data una MdT M, determinare se l'esecuzione di M termina su nastro vuoto.
+]
+
+#proposition()[
+  BTP è indecidibile
+]
+
+#proof()[
+  Descriviamo una riduzione dal problema dell'arresto al problema del nastro vuoto
+  #block($
+    cal(L)_("HALT")={R(M)w | M "termina su" w}; cal(L)_("BTP") = {R(M) | M "termina su nastro vuoto"}
+  $)
+  data _x_ stringa:
+  - se _x_ *non* è della forma $R(M)w$, restituisco 0 (slide dice $f(x) = 1$))
+  - altrimenti, se $x = R(M)w$, costruisco la stringa $R(N)$, con $N$ MdT, t.c. N opera come segue, su input _y_:
+    - se $y != epsilon$, N si comporta come M
+    - se $y = epsilon$, scrivo _w_ sul nastro ed eseguo M su _w_ 
+
+    Osserviamo che:
+    - se M termina su _w_ $==>$ N termina su $epsilon$
+    - se M non termina su _w_ $==>$ N non termina su $epsilon$
+    $ R(M)w in cal(L)_("HALT") <==> R(N) in cal(L)_("BTP") $
+]
+
+Restringiamo la classe dei linguaggi semidecidibili:
+- La stringa vuota appartiene al linguaggio?\ 
+  $cal(L)_epsilon={R(M) | epsilon in L(M)}$
+- Il linguaggio è vuoto?\ 
+  $cal(L)_emptyset={R(M) | L(M) = emptyset}$
+- Il linguaggio è $Sigma^*$?\ 
+  $cal(L)_(Sigma^*)={R(M) | L(M) = Sigma^*}$
+- Il linguaggio è regolare?
+  $cal(L)_"REG" = {R(M) | L(M) "è regolare"}$
+
+#definition()[
+  Indichiamo con $cal(P)$ una qualunque *proprietà di un linguaggio semidecidibile* e con $cal(L)_cal(P)$ l'insieme di linguaggi semidicidibile che soffisfano $cal(P)$, cioé
+  $
+    &cal(L)_cal(P)= { L "semidecidibile" | L "soddisfa" cal(P)} "o, equivalentemente"\
+    &cal(L)_cal(P)={R(M) | L(M) "soddisfa" cal(P)}
+  $
+
+  Allora $cal(P)$ si dice *banale* quando:
+  - $forall$ linguaggio $L$ semidecidibile, $L in cal(L)_cal(P)$(ovvero tutti i linguaggi semidecidibili hanno la proprietà $cal(P)$), oppure
+  - $cal(L)_cal(P) = emptyset$ (ovvero nessun linguaggio semidecidibile ha la proprietà $cal(P)$)
+]
