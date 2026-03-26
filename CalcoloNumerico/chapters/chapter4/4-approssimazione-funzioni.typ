@@ -1193,8 +1193,7 @@ in quanto $norm(omega_(n+1)) = 2^(-n)$. Inoltre, con questa scelta, si può dimo
   $
     f(x) = 1/(1+x^2), space x in [-5,5]
   $
-  ora le cose vanno bene, scegliendo le ascisse come in (8).
-  //TODO: grafici runge con chebyscev\
+  ora le cose vanno bene, scegliendo le ascisse come in (4.28).
   #align(center, grid(
     rows: 2,
     columns: 2,
@@ -1366,3 +1365,236 @@ in quanto $norm(omega_(n+1)) = 2^(-n)$. Inoltre, con questa scelta, si può dimo
     })),
   ))
 ]
+
+//25.03.2026
+//TODO: riscrivere meglio le seguenti conclusioni
+
+Ricapitolando:
+$
+  Lambda_n = norm(lambda_n), quad lambda_n (x) = sum_(i=0)^n abs(L_("in") (x))
+$
+
+- $Lambda_n gt.eq O(log(n))$
+- $Lambda_n gt.eq 2^n$ (ascisse equidistanti)
+- $Lambda_n gt.eq 2/pi log(n)$ (ascisse di Chebyshev)
+
+Se andiamo ad utilizzare queste ascisse per approssimare la funzione di Runge, allora possiamo valutare quale delle due forme del polinomio interpolante dia un migliore "performance" quando utilizziamo la doppia precisione IEEE di Matlab. Per stimare l'errore di approssimazione, al crescere di $n$ ($n$ pari) calcoliamo:
+$
+  norm(e_n) = norm(f-p_n) approx max_(i=0,dots,10^4) abs(f(xi_i) - p(xi_i))
+$
+con $xi_i = -5 + frac(i dot 10, 10^4) = -5 + frac(i, 10^3), i=0,dots,10^4$.
+
+Se grafichiamo $norm(e_n)$ rispetto al grado $n$ del polinomio interpolante, otteniamo quanto segue:
+
+#figure(image("images/2026-03-25-16-47-22.png", width: 70%))
+#figure(image("images/2026-03-25-16-47-28.png", width: 70%))
+
+Pertanto, possiamo concludere che se sono necessari polinomi di grado elevato, per approssimare una funzione, è necessario, in primis, utilizzare ascisse che diano una crescita ottimale del condizionamento del problema (ad esempio, le ascisse di Chebyshev). In secondo luogo, si osserva che la forma di Lagrange ha una prognosi? più favorevole, riguardo alla propagazione degli errori di round-off, ovvero legati all'utilizzo dell'aritmetica finita.
+
+#observation()[
+  Supponiamo di scegliere le ascisse di interpolazione in modo opportuno ($<=> Lambda_n$ cresce in modo ottimale) allora:
+  $
+    e_n (x) = f[x_0,dots,x_n,x] overbrace(omega_(n+1) (x), product_(i=0)^k (x-x_i)) = (f in C^((n+1))[a,b])=frac(f^((n+1))(xi_x), (n+1)!) omega_(n+1) (x)
+  $
+]
+
+#observation()[
+  Se $f$ non ha regolarità molto elevata, allora le sue derivate di ordine elevato non sono definite. Quindi possiamo al più dire che:
+  $
+    norm(e_n) lt.eq norm(f[x_0,dots,x_n, dot]) dot norm(omega_(n+1)) lt.eq norm(f[x_0,dots,x_n, dot]) dot (b-a)^(n+1)
+  $
+]
+
+Se vogliamo che l'errore decresca, con $n$ fissato, una possibilità è diminuire $(b-a)$. Questo approccio è esattamente alla base dell'interpolazione mediante *funzioni spline*.
+
+== Interpolazione mediante funzioni spline
+
+Assegnata una *partizione* dell'intervallo $[a,b]$:
+<4.30>
+$
+  Delta = {a=x_0 < x_1 < x_2 < dots < x_n = b} quad quad (4.30)
+$
+
+#observation(multiple: true)[
+  1. Poiché $Delta$ è una partizione di $[a,b]$, essa individua *$n$ sottointervalli*:
+    $
+      [x_(i-1), x_i], space i=1,dots,n
+    $
+    a due a due contigui.
+  2. Il punto di contiguità tra $[x_(i-1), x_i]$ e $[x_i, x_(i+1)]$ è $x_i, space i=1,dots,n-1$
+    #figure(image("images/2026-03-25-17-00-08.png"))
+]
+
+Ciò premesso, diamo la seguente definizione.
+#definition()[
+  Diremo che $S_m (x)$ è la (funzione) *spline di grado $m$ sulla partizione $Delta$* definita in #link(<4.30>, [(4.30)]), se soddisfa le seguenti due proprietà:
+  1. $S_m bar_([x_(i-1), x_i])(x)?? in Pi_m, space forall i=1,dots,n$.
+  2. $S_m (x) in C^((m-1))[a,b]$
+]
+
+#observation()[
+  1. $
+      forall i=1,dots,n-1 space space forall j =0,dots,m-1: S_m^((j)) bar_[x_(i-1), x_i] (x_i) = S_m^((j)) bar_[x_i, x_(i+1)] (x_i)
+    $
+  2. Un polinomio di grado $m$ è una spline di grado $m$. In generale, l'inverso non vale.
+]
+
+#definition()[
+  Una spline di grado $m$ sulla partizione $Delta$ definita in #link(<4.30>, [(4.30)]), si dirà interpolante una funzione $f:[a,b]->RR$ se:
+  <4.31>
+  $
+    S_m (x_i) = f(x_i), space i=0,dots,n quad quad (4.31)
+  $
+]
+
+Il problema che ora ci poniamo è quello di stabilire se le $n+1$ condizioni di interpolazione #link(<4.31>, [(4.31)]) siano sufficienti ad individuare la spline interpolante di grado $m$ cercata. Per rispondere a questo, introduciamo l'insieme:
+<4.32>
+$
+  cal(L)_m (Delta) = {S_m (x): "spline di grado" m "su" Delta} quad quad (4.32)
+$
+Osserviamo che:
+$
+  forall alpha, beta in RR, space forall S_m (x), hat(S)_m (x) in cal(L)_m (Delta)
+$
+abbiamo che:
+$
+  alpha dot S_m (x) + beta dot hat(S)_m (x) in cal(L)_m (Delta)
+$
+Pertanto, $cal(L)_m (Delta)$ *è uno spazio vettoriale*. A riguardo, si dimostra il seguente risultato:
+
+#theorem()[
+  $S_m (Delta)$, definito come in (4.30 - 4.32), è uno spazio vettoriale di dimensione $m+n$.
+]
+
+#observation()[
+  Una spline di grado 2 è detta *quadratica*, una di grado 3 è detta *cubica*, ecc.
+]
+
+#corollary()[
+  Le $n+1$ condizioni di interpolazione #link(<4.31>, [(4.31)]) permettono di calcolare univocamente solo la spline interpolante di grado 1 ($<=>$ spline lineare).
+]
+
+#observation()[
+  Dimostrare che se $S_m (x)$ è una spline di grado $m>1$ su $Delta$, allora $S'_m (x)$ è una spline di grado $m-1$ su $Delta$.
+  #figure(image("images/2026-03-25-17-34-55.png", width: 70%))
+  Da questo argomento, si deduce come la spline lineare interpolante $f(x)$ sia la *spezzata che unisce i punti $(x_i, f_i), space i=0,dots,n$*. Pertanto otteniamo che:
+  $
+    forall i=1,dots,n: S_1 (x) = frac(f_i (x-x_(i-1)) +f_(i-1)(x_i -x), x_i - x_(i-1)), space x in [x_(i-1), x_i]
+  $
+  è l'espressione della spline lineare interpolante, ristretta al generico sottointervallo della partizione.
+]
+
+//26.03.2026
+
+Al fine di ottenere spline interpolanti che si raccordino in maniera "smooth" nei punti di interpolazione, occorre utilizzare spline di grado più elevato. Tra queste, le più utilizzate sono le *spline cubiche* ($m=3$). Pertanto, in questo caso, per individuare univocamente una spline cubica interpolante una data funzione su $Delta$, *occorrono $n+3$ condizioni*. Di queste condizioni, $n+1$ sono le condizioni di interpolazione:
+$
+  S_3 (x_i) = f_i, space i=0,dots,n quad quad (1)
+$
+Rimangono quindi da imporre 2 ulteriori condizioni: ciascuna scelta di queste condizioni, darà origine ad una spline cubica interpolante *diversa*. Vediamo le scelte più comuni.
+
+=== Spline cubica naturale
+In questo caso, le due ulteriori condizioni, sono :
+$
+  S''_3 (a)=0, space S_3^k (b) = 0, quad quad (a=x_0, b=x_n) quad quad (2)
+$
+
+=== Spline cubica completa
+in questo caso, se sono note $f'(a)$ e $f'(b)$, le condizioni aggiuntive sono:
+$
+  S'_3 (a) = f'(a), space S'_3 (b)=f'(b) quad quad (3)
+$
+
+=== Spline cubica periodica
+Questa particolare funzione spline ha senso nel momento in cui $f(x)$ è una funzione periodica in $[a,b]$.
+In questo caso abbiamo che:
+$
+  frac(d^(j), d x^j) sin(x) bar_(x=0) = frac(d^(j), d x^j) sin(x) bar_(x=2 pi), space forall j=0,1,dots
+$
+Se questo è vero per una generica funzione $f(x)$, periodica in $[a,b]$ avremo, in particolare, assumendo $C^((2))[a,b]$, che:
+$
+  f^((j)) (a) = f^((j)) (b), space j=0,1,2, quad quad (4)
+$
+Pertanto, la condizione:
+$
+  S_3 (a) = S_3(b)
+$
+deriva già dalle condizioni di interpolazione. Le 2 condizioni aggiuntive sono pertanto derivate dalla (4) come:
+$
+  S'_3 (a) = S'_3 (b) quad quad S''_3 (a) = S''_3 (b) quad quad (5)
+$
+#observation()[
+  Quindi una spline cubica periodica vuole essere un'approssimazione *qualitativa veramente simile* alla funzione approssimata.
+]
+=== Spline not-a-not
+Questa spline, implementata nella function spline di Matlab, è costruita in modo tale che le condizioni di interpolazione, siano sufficienti ad individuarla. Le due condizioni aggiunte si ottengono, implicitamente, imponendo che lo stesso polinomio di grado 3 rappresenti la restrizione della spline in
+$
+  [x_0, x_1] " e " [x_1, x_2 ] quad quad (6)
+$
+e simmetricamente, lo stesso polinomio idi grado 3 rappresenti lo stesso polinomio di grado 3 rappresenti la restrizione della spline in
+$
+  [x_(n-1), x_(n-1)] " e " [x_(n-1), x_n] quad quad (7)
+$
+Ragioniamo per la (6), in quanto la (7) si ottiene per simmetria. Osserviamo che, per ogni spline cubica, si ottiene che:
+$
+  S^((j))_3 bar_([x_0, x_1]) (x_1) = S^((j))_3 bar_([x_1, x_2]) (x_1), j=0,1,2 quad quad (8)
+$
+
+Affinché i dui polinomi siano tra loro identici, si dovrà imporre che, oltre alle (8), valga anche:
+$
+  S^((3))_3 bar_([x_0, x_1]) (x_1) = S^((3))_3 bar_([x_1, x_2]) (x_1) quad quad (9)
+$
+Essendo la derivata terza di un polinomio di grado 3 una costante, otteniamo che la (9) può essere riscritta equivalentemente come segue:
+$
+  frac(S''_3 (x_1) - S''_3 (x_0), x_1-x_0) = frac(S''_3 (x_2) - S''_3 (x_1), x_2-x_1) quad quad (10)
+$
+Simmetricamente, la (7) si declina come:
+$
+  frac(S''_3 (x_(n-1)) - S''_3 (x_(n-2)), x_(n-1) - x_(n-2)) = frac(S''_3 (x_(n)) - S''_3 (x_(n-1)), x_(n) - x_(n-1)) quad quad (11)
+$
+
+Al fine di ottenere un algoritmo efficiente per il calcolo di un a spline cubica interpolante, dobbiamo esaminare un modo efficiente per risolvere un *sistema linare tri-diagonale*. Si tratta di risolvere il sistema lineare:
+$
+  A uu(x) = uu(z), space uu(x)=mat(x_1; dots.v; x_n), space uu(z)=mat(z_1; dots.v; z_n) quad quad (12)
+$
+rispettivamente il vettore delle incognite e quello dei termini noti, mentre la matrice dei coefficienti è tridiagonale:
+$
+  A = mat(a_1, c_1; b_2, a_2, c_2; , b_3, a_3, c_3; , , , , , , c_(n-1); , , , , , b_n, a_n; delim: "[") in RR^(n times n) quad quad (13)
+$
+in cui: $b_i, a_i, c_i$ sono gli elementi della sottodiagonale, diagonale principale e sopradiagonale sulla riga i-esima. Per memorizzare $A$, di fatto necessitiamo solo di 3 vettori che contengono gli elementi delle 3 diagonali.
+
+#observation()[
+  $A$ è un esempio di matrice *sparsa*, ovvero una matrice in cui il numero di elementi non nulli è proporzionale a $n$ (dimensione di $A$), invece che essere una frazione di $n^2$ (numero di elementi di una generica matrice $n times n$)
+]
+
+Nel seguito, supporremo che la matrice $A$ in (12-13) sia fattorizzabile LU (ad esempio diagonale dominante). In questo caso, verifichiamo che $A = L U$ con:
+$
+  L=mat(1; l_2, 1; , l_3, 1; delim: "[") U = mat(d_1, c_1; , d_2, c_2; ; , , , c_(n-1); , , , , d_n; delim: "[")
+$
+Si tratta, dunque, di derivare l' espressione degli $l_i$ e dei $d_i$. Esaminiamo, per semplicità, il caso $n=3$:
+$
+  mat(1; l_2, 1; , l_3, 1; delim: "[")mat(d_1, c_1; , d_2, c_2; , , d_3; delim: "[") = mat(d_1, c_1; l_2 d_1, d_2 + l_2 c_1, c_2; 0, l_3 d_2, l_3 c_2 + d_3; delim: "[") equiv mat(a_1, c_1, ; b_2, a_2, c_2; , b_3, a_3; delim: "[")
+$
+Uguagliando i termini omologhi, otteniamo:
+$
+  cases(d_1=a_1, l_i=b_i / d_(i-1), d_i = a_i - l_i c_(i-1)\, space i=2\, 3\, dots \, n)
+$
+
+#observation(multiple: true)[
+  1. Possiamo sovrascrivere $uu(b)$ e $uu(a)$ con $uu(l)$ e $uu(d)$ ($uu(c)$ rimane invariata).
+  2. costo della fattorizzazione $approx 3n$ `flops`.
+]
+Vediamo come risolvere per i fattori $L$ ed $U$: $L uu(y) = uu(z) and U uu(x) = uu(y)$.
+$
+  (a) quad cases(y_1 = z_1, y_i =z_i - l_i z_(i-1)\, space i=2\, dots \, n)
+  quad quad (b) quad
+  cases(x_n = y_n / d_n, x_i = (x_i - c_i dot x_(i+1)) / d_i \, space i=n-1\, dots \, 1)
+$
+#observation()[
+  1. In (a), nel secondo passaggio, impieghiamo $2n$ `flops` ed inoltre possiamo sovrascrivere $uu(z)$ con $uu(y)$.
+  2. in (b), nel secondo passaggio, impieghiamo $3n$ `flops` ed inoltre possiamo sovrascrivere $uu(y)$ con $uu(x)$.
+]
+
+In conclusione, per risolvere il sistema tridiagonale (12-13) occorrono:
+1. Quattro vettori di lunghezza $n$;
+2. $8n$ `flops`.
+Pertanto la complessità è *lineare*.
