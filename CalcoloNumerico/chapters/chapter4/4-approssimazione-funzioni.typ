@@ -32,26 +32,34 @@ In corrispondenza di tali punti assumiamo di conoscere i valori di una funzione 
 Dal punto di vista geometrico:
 #figure(
   canvas({
-    import draw: content
+    import draw: *
     plot.plot(
       size: (15, 8),
       x-tick-step: 1,
       y-tick-step: 1,
       y-min: 0,
-      y-max: 11,
+      y-max: 9,
+      x-min: 0,
+      x-max: 10,
       plot-style: (stroke: black),
-      min: 0,
       {
-        let func = x => 0.0208333 * calc.pow(x, 3) - 0.375 * calc.pow(x, 2) + 2.66667 * x
+        let func = x => -0.05 * calc.pow(x, 3) + 0.55 * calc.pow(x, 2) - 1.3 * x + 5
+        let poly = x => -0.2 * calc.pow(x, 2) + 2 * x + 1
 
-        let func2 = x => 0.0248192 * calc.pow(x, 3) - 0.443478 * calc.pow(x, 2) + 3.01555 * x - 0.699204
-        plot.add(func, domain: (1, 10), label: $f(x)$, style: (stroke: blue))
-        plot.add(func2, domain: (1, 10), label: $f(x)$, style: (stroke: red))
+        plot.add(func, domain: (0.5, 9.5), label: $f(x)$, style: (stroke: blue))
+        plot.add(poly, domain: (0.5, 9.5), label: $p_n(x)$, style: (stroke: red))
 
         plot.add-hline(0, style: (stroke: black))
-        plot.add-vline(1, 3, 5, 11, min: -0.01, max: 0.01)
+
+        let nodes = ((2, 4.2), (5, 6), (8, 4.2))
+        plot.add(nodes, style: (stroke: none), mark: "o")
+
+
+        plot.add-vline(2, 5, 8, min: 0, max: 0.2, style: (stroke: black))
         plot.annotate({
-          content((.55, .025), $x^*$)
+          content((2, 0.8), $x_0$)
+          content((5, 0.8), $x_1$)
+          content((8, 0.8), $x_2$)
         })
       },
     )
@@ -68,8 +76,8 @@ Obiettivo: costruire una funzione "semplice" che interpola i dati $(x_i, f_i), i
 ]
 
 Vale a riguardo il seguente risultato.
-
-#theorem()[
+<unicità-polinomio-interpolante>
+#theorem("Unicità del polinomio interpolante")[
   Date le $n+1$ coppie di dati $(x_i, f_i), space i=0,...,n$, con $x_i eq.not x_j$ se $i eq.not j$ (ascisse distinte), allora *esiste ed è unico* $p(x) in Pi_n$ (insieme dei polinomi di grado $n$):
   $
     p(x_i) = f_i, space i=0,...,n
@@ -149,11 +157,11 @@ $
     #index("Delta di Kroenecker")
     Introducendo il *delta di Kroenecker*
     $
-      S_(i k) = cases(1 "se" k=i, 0 "se" k eq.not i)
+      delta_(i k) = cases(1 "se" k=i, 0 "se" k eq.not i)
     $
     abbiamo quindi che
     $
-      L_("in")(x_k) = S_(i k)
+      L_("in")(x_k) = delta_(i k)
     $
 ]
 
@@ -175,7 +183,7 @@ $
   Infatti:
   $
     p(x_k) & = sum_(i=0)^n f_i L_("in")(x_k) \
-           & = sum_(i=0)^n f_i S_(i k) = f_k S_(k k) = f_k quad forall k=0,...,n.
+           & = sum_(i=0)^n f_i delta_(i k) = f_k delta_(k k) = f_k quad forall k=0,...,n.
   $
 ]
 
@@ -184,17 +192,19 @@ $
 ]
 
 //26.02.2026
-Calcoliamo il suo coefficiente principale: osservando che al denominatore abbiamo
+Calcoliamo il suo coefficiente principale: osservando che al *numeratore* abbiamo
 $
   (x-x_0)dot dots dot (x-x_(i-1)) dot (x-x_(i+1))dot dots dot (x-x_n) = x^n+ dots
 $
 che è un *polinomio monico* (con coefficiente principale uguale a 1). Si conclude che il coefficiente principale di $L_("in")(x)$ è dato da:
+<4.4>
 $
-  L_("in")(x) = product_(j=0 \ j eq.not i)^n frac(x-x_j, x_i-x_j) = frac(product_(j=0\ j eq.not i)^n (x-x_j), product_(j=0\ j eq.not i)^n (x_i-x_j)) = frac(1, product_(j=0\ j eq.not i)^n x_i-x_j) = c_(i n) quad quad (4.4)
+  c_(i n) = frac(1, product_(j=0\ j != i)^n (x_i-x_j)) quad quad (4.4)
 $
-Da questo si deduce che il coefficiente principale di $p_n (x)$ sarà dato da:
+Da questo si deduce che il coefficiente principale del polinomio interpolante $p_n (x)$ sarà dato da:
+<4.5>
 $
-  sum_(i=0)^n c_(i n) f_i = sum_(i=0)^n frac(f_i, product_(j=0\ j eq.not i)^n x_i-x_j) quad quad (4.5)
+  sum_(i=0)^n c_(i n) f_i = sum_(i=0)^n frac(f_i, product_(j=0\ j eq.not i)^n (x_i-x_j)) quad quad (4.5)
 $
 
 A questo punto, ci poniamo la seguente domanda: se definiamo $p_r (x) in Pi_r$ il polinomio interpolante $f(x)$ sulle ascisse $underbrace(x_0\, dots\, x_r, r+1)$, è possibile definire definire in modo incrementale $p_r (x)$ a partire da $p_(r-1)(x)$, che è il polinomio interpolante $f(x)$, di grado al più $r-1$, sulle ascisse $underbrace(x_0\, dots\, x_(r-1), r)$?
@@ -209,7 +219,7 @@ $
 $
 Di conseguenza, vogliamo invece cercare di esprimere $p_r (x)$ in forma incrementale, come:
 $
-  p_r (x) = p_(r-1)(x) + overbracket(<\->, "polinomio" \ "di grado" r)
+  p_r (x) = p_(r-1)(x) + overbracket(q_r(x), "polinomio" \ "di grado" r)
 $
 Con $r=1,...,n$, $p_n (x)$ sarà il polinomio che interpola $f(x)$ su tutte le ascisse.
 
@@ -223,7 +233,7 @@ $
   2. $forall i=1,dots,n : space omega_i (x_j)=0, space forall j < i$.
   4. Avendo $omega_i (x)$ grado esatto $i, space forall i=0, dots, n$, abbiamo che i polinomi sono linearmente indipendenti e costituiscono una base di $Pi_n$. Appunto, la base di *Newton*.
 ]
-A questo punto, assegnate le ascisse $x_0,...,x_n$ (distinte tra loro), è possibile costruire in forma incrementale la famiglia di polinomi interpolanti ${p_r (x)}_(r=??)$ tali che, $p_r (x) in Pi_r$ e:
+A questo punto, assegnate le ascisse $x_0,...,x_n$ (distinte tra loro), è possibile costruire in forma incrementale la famiglia di polinomi interpolanti ${p_r (x)}_(r=0,dots,n)$ tali che, $p_r (x) in Pi_r$ e:
 $
   forall r = 0,...,n: space p_r (x_i) = f_i, space i=0,dots,r
 $
@@ -238,7 +248,7 @@ $
 con il coefficiente:
 <4.9>
 $
-  f[x_0, dots, x_r] = sum_(i=0)^r frac(f_i, product_(j=0\j eq.not i)(x_i-x_j)) quad quad (4.9)
+  f[x_0, dots, x_r] = sum_(i=0)^r frac(f_i, product_(j=0\ j eq.not i)^r (x_i-x_j)) quad quad (4.9)
 $
 Andiamo a dimostrare che, se
 $
@@ -258,16 +268,22 @@ Successivamente dimostreremo che $f[x_0, dots, x_r]$ è riscrivibile nella forma
       i=r: quad p_(r-1)(x_r)+f[x_0,dots,x_r]omega_r (x_r)=f_r
     )
   $
-  Da cui otteniamo, considerato che le ascisse sono distinte e, pertanto, $omega_r(x_r)eq.not 0$, che possiamo soddisfare la condizione di interpolazione imponendo:
+  Da cui otteniamo, considerato che le ascisse sono distinte e, pertanto, $omega_r (x_r)eq.not 0$, che possiamo soddisfare la condizione di interpolazione imponendo:
   $
     f[x_0,dots,x_r]=frac(f_r - p_(r-1)(x_r), omega_r (x_r))
   $
-  Facciamo ora vedere che $f[x_0, dots, x_r]$ si può esprimere nella forma #link(<4.9>)[(4.9)].
-  #observation(multiple: true)[
-    1. $f[x_0,dots,x_r]$ è il coefficiente principale di $p_r (x)$.
-    2. Dalla (4.5), con $n=r$, otteniamo che il secondo mebro della #link(<4.9>)[(4.9)] altri non è che il coefficiente principale di $p_r (x)$ scritto in forma di Lagrange. Pertanto essi devono coincidere.
-  ]
-  Concludiamo che l'espressione #link(<4.9>)[(4.9)] deve valere.
+  Facciamo ora vedere che $f[x_0, dots, x_r]$ si può esprimere esplicitamente nella forma #link(<4.9>)[(4.9)].
+
+  Il ragionamento si basa sul #link(<unicità-polinomio-interpolante>, [*teorema di unicità del polinomio interpolante*]): poiché esiste un unico polinomio $p_r (x)$ di grado al più $r$ che interpola i dati assegnati, le sue diverse rappresentazioni (forma di Newton e forma di Lagrange) descrivono la stessa identica funzione. Di conseguenza, il coefficiente del termine di grado massimo (il *coefficiente principale* associato a $x^r$) deve essere lo stesso in entrambe le formulazioni.
+
+  1. *Nella forma di Newton (incrementale):*\
+    Dalla #link(<4.8>)[(4.8)] abbiamo $p_r (x) = p_(r-1)(x) + f[x_0, dots, x_r] omega_r (x)$. Poiché $p_(r-1)(x)$ ha grado al più $r-1$, esso non contribuisce al termine $x^r$. Il polinomio $omega_r (x) = product_(j=0)^(r-1) (x-x_j)$ è un polinomio monico di grado $r$ (inizia con $1 dot x^r$). Di conseguenza, l'unico termine in $x^r$ di tutta l'equazione è generato dal prodotto $f[x_0, dots, x_r] dot x^r$. Ne deduciamo che il coefficiente principale di $p_r (x)$ è esattamente la differenza divisa $f[x_0, dots, x_r]$.
+
+  2. *Nella forma di Lagrange:*\
+    Come abbiamo già dimostrato nella #link(<4.5>, [(4.5)]), calcolando $p_r (x)$ (ossia ponendo $n=r$), il coefficiente principale del polinomio interpolante espresso nella base di Lagrange è dato dalla sommatoria:
+    $ sum_(i=0)^r frac(f_i, product_(j=0\ j eq.not i)^r (x_i - x_j)) $
+
+  Essendo $p_r (x)$ lo stesso polinomio in entrambi i casi, i due coefficienti principali appena calcolati devono necessariamente coincidere. Uguagliandoli, si ottiene esattamente l'espressione #link(<4.9>)[(4.9)], che risulta così dimostrata.
 ]
 
 #definition()[
@@ -278,13 +294,13 @@ Successivamente dimostreremo che $f[x_0, dots, x_r]$ è riscrivibile nella forma
   Dalla #link(<4.8>)[(4.8)] si ottiene che:
   <4.12>
   $
-    p_n (x) = sum_(r=0)^n f[x_0,dots,x_r]omega_r(x) quad quad (4.12)
+    p_n (x) = sum_(r=0)^n f[x_0,dots,x_r]omega_r (x) quad quad (4.12)
   $
 ]
 
 #definition()[
   #index("Forma di Newton")
-  La #link(<4.12>)[(4.12)] definisce la forma di Newton del polinomio interpolante .
+  #link(<4.12>)[(4.12)] definisce la forma di Newton del polinomio interpolante .
 ]
 
 #observation()[
@@ -303,16 +319,6 @@ Se $alpha, beta in RR$ e $f(x), g(x)$ sono funzioni di una variabile reale, allo
 $
   (alpha dot f + beta dot g)[x_0,dots,x_i]=alpha dot f[x_0,dots,x_i] + beta dot g[x_0,dots,x_i] quad quad ("linearità")
 $
-#proof()[
-  $
-    frac(1, x_r-x_0)(f[x_1,dots,x_r]-f[x_1,dots,x_(r-1)]) = frac(1, x_r-x_0) (sum_(k=1)^r frac(f_k, product_(j=1\ j eq.not k)^r (x_k-x_j)) - sum_(k=0)^(r-1) frac(f_k, product_(j=0\ j eq.not k)^(r-1) (x_k-x_j)))\
-    = frac(1, x_r-x_0) [frac(f_r, product_(j=1\ j eq.not r)^r (x_r-x_j)) - frac(f_0, product_(j=0\ j eq.not 0)^(r-1) (x_0-x_j)) + sum_(k=1)^(r-1)frac(f_k, product_(j=1\ j eq.not k)^(r-1)(x_k-x_j))(frac(1, x_k-x_r)-frac(1, x_k-x_0))]=(*)\
-    frac(1, x_r-x_0) dot frac(f_r, product_(j=1 \ j eq.not r)^r (x_r-x_j)) = frac(f_r, product_(j=0 \ j eq.not r)^r(x_r-x_j)) quad quad ("giallo")\
-    frac(-1, x_r-x_0) dot frac(f_0, product_(j=0 \ j eq.not 0)^(r-1) (x_0-x_j)) = frac(1, x_0-x_r) dot frac(f_0, product_(j=0 \ j eq.not 0)^(r-1) (x_0-x_j)) = frac(f_0, product_(j=0 \ j eq.not 0)^r (x_0-x_j)) quad quad ("verde")\
-    frac(1, x_r-x_0) dot sum_(k=1)^(r-1) frac(f_k, product_(j=1\ j eq.not k)^(r-1) (x_k-x_j)) dot frac(x_k - x_0 - x_k +x_r, (x_k-x_r)(x_k-x_0)) = sum_(k=1)^(r-1) frac(f_k, product_(j=0\ j eq.not k)^r (x_k-x_j)) quad quad ("blu")\
-    => (*) = sum_(k=0)^r frac(f_k, product_(j=0\ j eq.not k)^r (x_k-x_j)) = f[x_0,dots, x_r]
-  $
-]
 
 #heading(numbering: none, depth: 3, "Proprietà 2.", outlined: false)
 Se $(i_0,dots,i_r)$ è una permutazione di $(0,dots,r)$, allora:
@@ -321,12 +327,13 @@ $
 $
 
 #heading(numbering: none, depth: 3, "Proprietà 3.", outlined: false)
-Sia $f(x)$ un polinomio di grado $k$: $f(x) = sum_(i=0)^k a_i x^i$. Sia $p(x)=sum_(i=0)^n f[x_0,dots,x_i]omega_i (x)$ il suo polinomio interpolante di grado $n$, allora:
+Siano $f(x)$ un polinomio di grado $k$ e $p(x)$ il suo polinomio interpolante di grado $n$, allora:
 $
+  f(x) = sum_(i=0)^k a_i x^i quad quad p(x)=sum_(i=0)^n f[x_0,dots,x_i]omega_i (x)\
   f[x_0,dots,x_n]=cases(a_k\, space "se" k=n, 0\, space "se" k<n)
 $
 #observation()[
-  Nella 3., se $k=n$, per l'unicità del polinomio interpolante, avremo che $f(x)equiv p(x)$. Pertanto, i coefficienti principali, rispettivamente $a_n$ e $f[x_0,dots,x_n]$, devono coincidere:
+  Dalla 3., se $k=n$, per l'unicità del polinomio interpolante, avremo che $f(x)equiv p(x)$. Pertanto, i coefficienti principali, rispettivamente $a_n$ e $f[x_0,dots,x_n]$, devono coincidere:
   $
     f[x_0,dots,x_n] = a_n quad quad (n=k)
   $
@@ -334,8 +341,7 @@ $
   $
     f(x)= sum_(i=0)^k a_i x^i + 0 dot x^(k+1) + dots + 0 dot x^n
   $
-  //Polinomio interpolante di grado 25 di una parabola --> in realtà è un polinomio di grado 2?
-  _Ricordare che $forall n >= k$, il polinomio di grado $n$ che interpola un polinomio di grado $k$ *coincide con quest'ultimo per l'unicità del polinomio interpolante*._
+  _Ricordare che $forall n >= k$, il polinomio di grado $n$ che interpola un polinomio di grado $k$ *coincide con quest'ultimo per l'unicità del polinomio interpolante*._ Se ad esempio vogliamo calcolare il polinomio interpolante di grado 25 di una parabola (polinomio di grado 2), vedremo che il risultato sarà anch'esso un polinomio di grado 2!
 ]
 
 #heading(numbering: none, depth: 3, "Proprietà 4.", outlined: false)
@@ -356,11 +362,11 @@ $
   $
   inoltre:
   $
-    omega_r(x) = product_(i=0)^(r-1) (x-x_i) = (x-x_0)^r
+    omega_r (x) = product_(i=0)^(r-1) (x-x_i) = (x-x_0)^r
   $
   Pertanto se $x_0=x_1=dots=x_n$, otteniamo che:
   $
-    p(x)=sum_(r=0)^n f[x_0,dots,x_0] omega_r(x) = sum_(r=0)^n frac(f^((r))(x_0), r!)(x-x_0)^r
+    p(x)=sum_(r=0)^n f[x_0,dots,x_0] omega_r (x) = sum_(r=0)^n frac(f^((r))(x_0), r!)(x-x_0)^r
   $
   che è il polinomio di Taylor di grado $n$ di $f(x)$, centrato in $x_0$.
 ]
@@ -369,14 +375,29 @@ $
 $
   f overbrace([x_0, dots, x_r], r+1) = frac(f overbrace([x_1, dots, x_r], r)-f overbrace([x_0, dots, x_(r-1)], r), x_r - x_0)
 $
+#proof()[
+  #let colfuchsia(x) = text(fill: fuchsia, $#x$)
+  #let colgreen(x) = text(fill: green, $#x$)
+  #let colblue(x) = text(fill: blue, $#x$)
+  $
+    frac(1, x_r-x_0)(f[x_1,dots,x_r]-f[x_0,dots,x_(r-1)]) = frac(1, x_r-x_0) (sum_(k=1)^r frac(f_k, product_(j=1\ j eq.not k)^r (x_k-x_j)) - sum_(k=0)^(r-1) frac(f_k, product_(j=0\ j eq.not k)^(r-1) (x_k-x_j)))\
+    = frac(1, x_r-x_0) [colfuchsia(frac(f_r, product_(j=1\ j eq.not r)^r (x_r-x_j))) colgreen(- frac(f_0, product_(j=0\ j eq.not 0)^(r-1) (x_0-x_j))) + colblue(sum_(k=1)^(r-1)frac(f_k, product_(j=1\ j eq.not k)^(r-1)(x_k-x_j))(frac(1, x_k-x_r)-frac(1, x_k-x_0)))]=(*)\
+    colfuchsia(frac(1, x_r-x_0) dot frac(f_r, product_(j=1 \ j eq.not r)^r (x_r-x_j)) = frac(f_r, product_(j=0 \ j eq.not r)^r (x_r-x_j)))\
+    colgreen(frac(-1, x_r-x_0) dot frac(f_0, product_(j=0 \ j eq.not 0)^(r-1) (x_0-x_j)) = frac(1, x_0-x_r) dot frac(f_0, product_(j=0 \ j eq.not 0)^(r-1) (x_0-x_j)) = frac(f_0, product_(j=0 \ j eq.not 0)^r (x_0-x_j)))\
+    colblue(frac(1, x_r-x_0) dot sum_(k=1)^(r-1) frac(f_k, product_(j=1\ j eq.not k)^(r-1) (x_k-x_j)) dot frac(x_k - x_0 - x_k +x_r, (x_k-x_r)(x_k-x_0)) = sum_(k=1)^(r-1) frac(f_k, product_(j=0\ j eq.not k)^r (x_k-x_j)))\
+    => (*) = sum_(k=0)^r frac(f_k, product_(j=0\ j eq.not k)^r (x_k-x_j)) = f[x_0,dots, x_r]
+  $
+]
+
+
 #observation()[
   Nella 5., tenendo conto  $f[x_i] =f_i, space i=0,dots,n$ questa proprietà ci consente di calcolare in modo incrementale le differenze divise richieste per il calcolo del polinomio interpolante in forma di Newton
 ]
 
 
-La proprietà 1 ci consente di calcolare in modo efficiente le differenze divise necessarie per il calcolo del polinomio interpolante in forma di Newton.
+La proprietà 5. ci consente di calcolare in modo efficiente le differenze divise necessarie per il calcolo del polinomio interpolante in forma di Newton.
 
-#table(
+#align(center, table(
   columns: 7,
   align: center + horizon,
   stroke: none,
@@ -386,10 +407,16 @@ La proprietà 1 ci consente di calcolare in modo efficiente le differenze divise
   [$x_0$], [$f[x_0]$], [], [], [], [], [],
   [$x_1$], [$f[x_1]$], [$f[x_0,x_1]$], [], [], [], [],
   [$x_2$], [$f[x_2]$], [$f[x_1,x_2]$], [$f[x_0,x_1,x_2]$], [], [], [],
-  [$dots.v$], [$dots.v$], [$dots.v$], [], [], [], [],
-  [$x_(n-1)$], [$f[x_(n-1)]$], [$dots.v$], [], [], [$f[x_0,dots,x_(n-1)]$], [],
-  [$x_n$], [$f[x_n]$], [$f[x_(n-1),x_n]$], [$f[x_(n-2),x_(n-1),x_n]$], [], [$f[x_1,dots,x_n]$], [$f[x_0,dots,x_n]$],
-)
+  [$dots.v$], [$dots.v$], [$dots.v$], [$dots.v$], [$dots.down$], [], [],
+  [$x_(n-1)$], [$f[x_(n-1)]$], [$dots.v$], [$dots.v$], [$dots$], [$f[x_0,dots,x_(n-1)]$], [],
+  [$x_n$],
+  [$f[x_n]$],
+  [$f[x_(n-1),x_n]$],
+  [$f[x_(n-2),x_(n-1),x_n]$],
+  [$dots$],
+  [$f[x_1,dots,x_n]$],
+  [$f[x_0,dots,x_n]$],
+))
 Quelle sulla diagonale sono le differenze divise necessarie per il calcolo del polinomio in forma di Newton.
 #observation()[
   Se calcoliamo le colonne di questa matrice triangolare dal basso verso l'alto, possiamo sovrascrivere i risultati negli elementi adiacenti a sinistra. Pertanto sarà sufficiente un vettore di $n+1$ elementi (in realtà 2, uno anche per le ascisse).
@@ -398,7 +425,7 @@ Quelle sulla diagonale sono le differenze divise necessarie per il calcolo del p
 //05.03.2026
 Esaminiamo, in dettaglio, il caso $n=2$, prima di derivare una procedura generale per il calcolo delle differenze divise nel caso di $n$ generico.
 
-#table(
+#align(center, table(
   columns: 4,
   align: center + horizon,
   stroke: none,
@@ -411,7 +438,7 @@ Esaminiamo, in dettaglio, il caso $n=2$, prima di derivare una procedura general
   [$f[x_2] equiv f_2$],
   [$f[x_1,x_2]=frac(f[x_2]-f[x_1], x_2-x_1)$],
   [$f[x_0,x_1,x_2]=frac(f[x_1\,x_2]-f[x_0\,x_1], x_2-x_0)$],
-)
+))
 Scriviamo ora un codice Matlab che implementa questo algoritmo nel caso generale. Poiché i vettori hanno indicizzazione a partire da 1, i vettori in ingresso saranno $x$ e $f$ di lunghezza $n+1$ (prima e seconda colonna della tabella precedente):
 #codly(
   languages: codly-languages,
@@ -482,12 +509,23 @@ Questo algoritmo può essere generalizzato al caso del polinomio interpolante
 ```matlab
 p=f(n+1);
 for i=n:-1:1
-  p=p.*(x-x(i))+f(i);
+  p=p.*(xx-x(i))+f(i);
 end
 ```
 dove $.*$ è stato utilizzato per calcolare il polinomio interpolante in un vettore, $x x$, di ascisse. Pertanto, con un costo di $3n$ `flops` per ogni punto in cui viene calcolato il polinomio interpolante.
 
 #figure(image("images/2026-03-05-11-44-54.png"))
+
+Sia $p(x)$ il polinomio interpolante $f(x)$ nelle ascisse assegnate. Se definiamo:
+$
+  e(x) = f(x) - p(x) quad quad text("[funzione dell'errore]")
+$
+da cui, ricordando che $p(x_i) = f(x_i)$, otteniamo che l'errore si annulla esattamente sui nodi:
+$
+  e(x_i) = 0, quad i=0, dots, n.
+$
+
+*Domanda:* Cosa succede se $x in.not \{x_0, dots, x_n\}$?
 
 === Interpolazione di Hermite
 Supponiamo in questo caso, di ricercare il polinomio interpolante, di grado $2n+1$ su $2n+2$ ascisse distinte, che numeriamo come:
@@ -511,14 +549,14 @@ $
     frac(p(x_(i+1/2)) - p(x_i), x_(i+1/2)-x_i) = frac(f(x_(i+1/2))-f(x_i), x_(i+1/2)-x_i)\, quad i=0\,dots\,n
   )
 $
-A questo punto, se facciamo il limite per $x_(i+1/2)-->x_i$, nella seconda espressione delle #link(<4.17>, [4.17]), abbiamo dimostrato che $exists p_H(x) in Pi_(2n+1)$:
+A questo punto, se facciamo il limite per $x_(i+1/2)-->x_i$, nella seconda espressione delle #link(<4.17>, [4.17]), abbiamo dimostrato che $exists p_H (x) in Pi_(2n+1)$:
 <4.18>
 $
-  (4.18) quad quad cases(p_H(x_i)=f(x_i), p'_H(x_i)=f'(x_i)) quad i=0,dots,n
+  (4.18) quad quad cases(p_H (x_i)=f(x_i), p'_H (x_i)=f'(x_i)) quad i=0,dots,n
 $
 
 #definition()[
-  Il polinomio $p_H (x) in Pi_(2n+1)$ che soddisfa le condizioni di interpolazione (6) è detto polinomio interpolante di Hermite.
+  Il polinomio $p_H (x) in Pi_(2n+1)$ che soddisfa le condizioni di interpolazione (4.18) è detto polinomio interpolante di Hermite.
 ]
 #observation()[
   In altri termini, il polinomio interpolante di Hermite interpola, nelle ascisse di interpolazione, sia la funzione $f(x)$ che la sua derivata prima.
@@ -526,8 +564,33 @@ $
   #figure(image("images/2026-03-11-17-23-24.png", width: 50%))
 ]
 #example()[
-  #figure(image("images/2026-03-11-17-23-53.png", width: 50%))
-  Se $f(x)=sin(x)$ e $x_i=i pi, space i=0,1,2$, allora il polinomio interpolante su tali ascisse è $p(x)=0$. Questo non è vero per il polinomio interpolante di Hermite.
+  #figure(
+    canvas({
+      import draw: *
+      plot.plot(
+        size: (12, 6),
+        y-min: -1.5,
+        y-max: 1.5,
+        plot-style: (stroke: black),
+        {
+          let func = x => calc.sin(x)
+          plot.add(
+            func,
+            domain: (0, 2 * calc.pi),
+            style: (stroke: blue),
+          )
+
+          // I tre nodi di interpolazione
+          plot.add(
+            ((0, 0), (3.14, 0), (6.28, 0)),
+            style: (stroke: none),
+            mark: "o",
+          )
+        },
+      )
+    }),
+  )
+  Se $f(x)=sin(x)$ e $x_i=i pi, space i=0,1,2$, allora il polinomio interpolante su tali ascisse è $p(x)=0$, ovvero la retta passante per i tre punti: l'informazione sulle "onde" della funzione andrebbe persa. Questo non è vero per il polinomio interpolante di Hermite, il quale prenderà in considerazione la pendenza della funzione in ogni punto.
 ]
 
 //12.03.2026
@@ -535,7 +598,7 @@ Per derivare la *forma di Newton* di questo polinomio, facciamo un passo indietr
 $
   a lt.eq x_0 < x_(1/2) < x_1 < x_(1+1/2) < dots < x_n < x_(n+1/2) lt.eq b
 $
-Se fissiamo, ad esempio, il caso $n=2$, abbiamo ch eil relativo polinomio interpolante è dato da:
+Se fissiamo, ad esempio, il caso $n=2$, abbiamo che il relativo polinomio interpolante è dato da:
 $
   p(x)= & f[x_0] \
       + & f[x_0, x_(1/2)](x-x_0)+f[x_0, x_(1/2), x_1](x-x_0)(x-x_(1/2)) \
@@ -543,7 +606,7 @@ $
       + & f[x_0, x_(1/2), x_1, x_(3/2),x_2](x-x_0)(x-x_(1/2))(x-x_1)(x-x_(3/2)) \
       + & f[x_0, x_(1/2), x_1, x_(3/2),x_2,x_(5/2)](x-x_0)(x-x_(1/2))(x-x_1)(x-x_(3/2))(x-x_2)
 $
-Se adesso poniamo $x_(1/2)=x_0, x_(3/2)=x_1, x_(5/2)=x_2$, otteniamo la forma di Newton del polinomio di Hermite
+Se adesso poniamo $x_(1/2)=x_0, x_(3/2)=x_1, x_(5/2)=x_2$, otteniamo la forma di Newton del polinomio di Hermite:
 $
   p_H (x)= & f[x_0] \
          + & f[x_0, x_0](x-x_0)+f[x_0, x_0, x_1](x-x_0)(x-x_0) \
@@ -557,16 +620,16 @@ $
 ]
 A questo fine, costruiamo la tabella (formalmente) triangolare, per il calcolo delle differenze divise. Per semplicità, consideriamo il caso $n=1$:
 #align(center, table(
-  columns: 4,
+  columns: 5,
   align: center + horizon,
   stroke: none,
   table.hline(y: 1, stroke: (dash: "solid", thickness: 0.4pt)),
   table.vline(x: 1, stroke: (dash: "solid", thickness: 0.4pt)),
-  [], [0], [1], [2],
-  [$x_0$], [], [], [],
-  [$x_0$], [$f[x_0,x_0]$], [], [],
-  [$x_1$], [$f[x_0,x_1]$], [$f[x_0,x_0,x_1]$], [],
-  [$x_1$], [$f[x_1,x_1]$], [$f[x_0,x_1,x_1]$], [$f[x_0,x_0,x_1,x_1]$],
+  [], [0], [1], [2], [3],
+  [$x_0$], [$f[x_0]$], [], [], [],
+  [$x_0$], [$f[x_0]$], [$f[x_0,x_0]$], [], [],
+  [$x_1$], [$f[x_1]$], [$f[x_0,x_1]$], [$f[x_0,x_0,x_1]$], [],
+  [$x_1$], [$f[x_1]$], [$f[x_1,x_1]$], [$f[x_0,x_1,x_1]$], [$f[x_0,x_0,x_1,x_1]$],
 ))
 
 Partendo dall'ultima colonna, abbiamo che:
@@ -593,7 +656,7 @@ $
   & f=[f_0,f'_0,f_1,f'_1,dots,f_n,f'_n] \
   & x=[x_0,x_0,x_1,x_1,dots,x_n,x_n]
 $
-Ricordiamo che nella prima colonna non vanno calcolate le posizioni pari?
+Ricordiamo che nella prima colonna non vanno calcolate le posizioni pari.
 
 #codly(
   languages: codly-languages,
@@ -606,7 +669,7 @@ for i=2*n+1:-2:3 %Colonna 1
   f(i)=(f(i)-f(i-2))/(x(i)-x(i-1));
 end
 
-for j=2:2*n+1 %Colonna 2?
+for j=2:2*n+1 %Colonna 2
   for i=2*n+2:-1:j+1
     f(i)=(f(i)-f(i-1))/(x(i)-x(i-j));
   end
@@ -620,7 +683,7 @@ Vediamo come calcolare polinomio e la sua derivata prima, espresso nella base di
   + *p1 = 0*
   + p = $a_n$
   + for i=n-1
-    + *p1=p1\*$(x-x_i)$*
+    + *p1=p1\*$(x-x_i)$+p*
     + p=p\*$(x-x_i)+a_i$
   + end
 ]
@@ -628,7 +691,7 @@ Come abbiamo visto, `p` alla fine conterrà il valore di $p(x)$. Aggiungiamo, *i
 
 === Forma di Lagrange del polinomio interpolante di Hermite
 $
-  a lt.eq x_0 < x_1 < dots < x_n < lt.eq b\
+  a lt.eq x_0 < x_1 < dots < x_n lt.eq b\
   f_i=f(x_i)\
   f'_i = f'(x_i), space i=0,dots,n
 $
@@ -643,22 +706,18 @@ $
 $
 Ricordiamo, inoltre, che:
 $
-  L_("in") (x_k) = S_(i k) = cases(1\, i=k, 0\, i eq.not k)
+  L_("in") (x_k) = delta_(i k) = cases(1\, i=k, 0\, i eq.not k)
 $
 Definiamo, quindi, i seguenti polinomi di grado $2n+1$:
 $
   (2) quad quad cases(Phi_(i n) (x) = L_("in")^2 (x) [1-2(x-x_i) L'_(i n) (x_i)], psi_(i n) (x) = (x-x_i) L_("in")^2 (x) \, space i=0\,dots\,n)
 $
 
-#example()[
-  Calcolare l'espressione di $L_("in") (x_i)$
-]
-
 Valgono le seguenti proprietà:
 #theorem()[
   Con riferimento ai polinomi in (2), vale che:
   $
-    (3) quad quad cases(Phi_(i n) (x_j) = S_(i j)\, space Phi'_(i n) (x_j)=0, psi_(i n) (x_j)=0\, space psi'_(i n) (x_j) = S_(i j)\, space forall j = 0\,dots\,n)
+    (3) quad quad cases(Phi_(i n) (x_j) = delta_(i j)\, space Phi'_(i n) (x_j)=0, psi_(i n) (x_j)=0\, space psi'_(i n) (x_j) = delta_(i j)\, space forall j = 0\,dots\,n)
   $
 ]
 dimostrare per esercizio (certo certo)
@@ -1485,7 +1544,7 @@ Pertanto, $cal(L)_m (Delta)$ *è uno spazio vettoriale*. A riguardo, si dimostra
 ]
 
 //26.03.2026
-
+== Spline cubiche
 Al fine di ottenere spline interpolanti che si raccordino in maniera "smooth" nei punti di interpolazione, occorre utilizzare spline di grado più elevato. Tra queste, le più utilizzate sono le *spline cubiche* ($m=3$). Pertanto, in questo caso, per individuare univocamente una spline cubica interpolante una data funzione su $Delta$, *occorrono $n+3$ condizioni*. Di queste condizioni, $n+1$ sono le condizioni di interpolazione:
 $
   S_3 (x_i) = f_i, space i=0,dots,n quad quad (1)
@@ -1525,8 +1584,8 @@ $
 #observation()[
   Quindi una spline cubica periodica vuole essere un'approssimazione *qualitativa veramente simile* alla funzione approssimata.
 ]
-=== Spline not-a-not
-Questa spline, implementata nella function spline di Matlab, è costruita in modo tale che le condizioni di interpolazione, siano sufficienti ad individuarla. Le due condizioni aggiunte si ottengono, implicitamente, imponendo che lo stesso polinomio di grado 3 rappresenti la restrizione della spline in
+=== Spline not-a-knot
+Questa spline, implementata nella function `spline` di Matlab, è costruita in modo tale che le condizioni di interpolazione, siano sufficienti ad individuarla. Le due condizioni aggiunte si ottengono, implicitamente, imponendo che lo stesso polinomio di grado 3 rappresenti la restrizione della spline in
 $
   [x_0, x_1] " e " [x_1, x_2 ] quad quad (6)
 $
@@ -1552,6 +1611,7 @@ $
   frac(S''_3 (x_(n-1)) - S''_3 (x_(n-2)), x_(n-1) - x_(n-2)) = frac(S''_3 (x_(n)) - S''_3 (x_(n-1)), x_(n) - x_(n-1)) quad quad (11)
 $
 
+== Calcolo di una spline cubica
 Al fine di ottenere un algoritmo efficiente per il calcolo di un a spline cubica interpolante, dobbiamo esaminare un modo efficiente per risolvere un *sistema linare tri-diagonale*. Si tratta di risolvere il sistema lineare:
 $
   A uu(x) = uu(z), space uu(x)=mat(x_1; dots.v; x_n), space uu(z)=mat(z_1; dots.v; z_n) quad quad (12)
@@ -1572,7 +1632,7 @@ $
 $
 Si tratta, dunque, di derivare l' espressione degli $l_i$ e dei $d_i$. Esaminiamo, per semplicità, il caso $n=3$:
 $
-  mat(1; l_2, 1; , l_3, 1; delim: "[")mat(d_1, c_1; , d_2, c_2; , , d_3; delim: "[") = mat(d_1, c_1; l_2 d_1, d_2 + l_2 c_1, c_2; 0, l_3 d_2, l_3 c_2 + d_3; delim: "[") equiv mat(a_1, c_1, ; b_2, a_2, c_2; , b_3, a_3; delim: "[")
+  mat(1; l_2, 1; , l_3, 1; delim: "[")mat(d_1, c_1; , d_2, c_2; , , d_3; delim: "[") = mat(d_1, c_1; l_2 d_1, d_2 + l_2 c_1, c_2; 0, l_3 d_2, l_3 c_2 + d_3; delim: "[", augment: #(vline: (1, 2), stroke: (dash: "dotted", thickness: 0.4pt))) equiv mat(a_1, c_1, ; b_2, a_2, c_2; , b_3, a_3; delim: "[")
 $
 Uguagliando i termini omologhi, otteniamo:
 $
@@ -1598,3 +1658,349 @@ In conclusione, per risolvere il sistema tridiagonale (12-13) occorrono:
 1. Quattro vettori di lunghezza $n$;
 2. $8n$ `flops`.
 Pertanto la complessità è *lineare*.
+
+//01.04.2026
+Nel seguito occorrerà individuare i valori della derivata seconda di $S_3 (x)$ nei nodi della partizione $Delta$. Pertanto denotiamo con
+$
+  m_i = S''_3 (x_i), space i=0,dots,n quad quad (1)
+$
+Pertanto, per una spline cubica naturale avremo che:
+$
+  m_0 = m_n = 0 quad quad (2)
+$
+Invece, per una spline cubica not-a-knot, avremo:
+$
+  cases(frac(m_1 - m_0, h_1) = frac(m_2 - m_1, h_2), frac(m_(n-1) - m_(n-2), h_(n-1)) = frac(m_(n) - m_(n-1), h_(n)))
+$
+ovvero:
+$
+  cases(
+    m_1 (h_1 + h_2) = m_2 h_1 + m_0 h_2,
+    m_(n-1)(h_(n-1) + h_(n)) = m_(n-2) h_n + m_n h_(n-1)
+  ) quad quad (3)
+$
+
+Ricordiamo che se $S_3 (x)$ è una spline cubica su $Delta$, allora la sua derivata prima è una spline quadratica su $Delta$ e, inoltre, $S''_3 (x)$ è una spline lineare su $Delta$. Pertanto:
+$
+  (4) quad quad S''_3 (x) = frac(m_i (x - x_(i-1) ) + m_(i-1) (x_i - x), h_1), space x in [x_(i-1), x_i], space i=1,dots,n
+$
+Ovvero, $S''_3 (x)$ è univocamente determinata una volta che i valori ${m_i}$ definiti in (1) siano noti. Vediamo come calcolarli. Integrando membro a membro la (4), otteniamo che:
+$
+  (5) quad quad S'_(3) = frac(m_i (x-x-(i-1))^2 - m_(i-1)(x_i - x)^2, 2 h_i) + q_i, space i=1,dots,n
+$
+essendo $q_i$ una costante di integrazione. Se integriamo nuovamente, otteniamo che, per $x in [x_(i-1), x_i]$:
+$1
+(6) quad quad S_(3) = frac(m_i (x-x_(i-1))^3 - m_(i-1)(x_i - x)^3, 6 h_i) + q_i(x-x_(i-1)) + r_i, space i=1,dots,n$
+essendo, al solito, $r_i$ una ulteriore costante di integrazione. Imponendo le condizioni di interpolazione in $x_(i-1)$ e $x_i$, dalla (6) otteniamo:
+$
+  S_3 (x_(i-1)) = f_(i-1) =m_(i-1) frac(h_i^2, 6) + r_i
+$
+Da cui si ottiene:
+$
+  r_i = f_(i-1) - m_(i-1) frac(h_i^2, 6), space i=1,dots,n quad quad (7)
+$
+Similmente:
+$
+  S_3 (x_i) = f_i = m_i h_i^2 / 6 + q_i h_i + r_i
+$
+da cui otteniamo:
+$
+  q_i = -m_i h_i / 6 - r_i / h_i + f_i / h_i
+$
+Ovvero:
+$
+  q_i = -m_i h_i/6 + f_1 / h_i - f_(i-1) / h_i + m_(i-1) h_i/6 \
+  = frac(f(x_i)-f(x_(i-1)), x_i - x_(i-1)) - h_i/6 (m_i - m_(i-1)) => \
+  q_i = f[x_(i-1), x_i] - h_i / 6 (m_i - m_(i-1)), space i=1,dots,n quad quad (8)
+$
+
+#observation(multiple: true)[
+  1. Dalle (6-8) possiamo concludere che, se conoscessimo i valori ${m_0, dots, m_n}$, conosceremmo la spline cubica interpolante.
+  2. Nell'intervallo $[x_(i-1), x_i]$ della partizione, si utilizza solo informazione locale, ovvero relativa all'intervallo considerato, per il calcolo di $S_3 (x)$.
+]
+
+Infine, per determinare gli $n+1$ valori di $m_i space i=0,dots,n$, imponiamo che $S'_3(x) in C^((2))[a,b]$. Ovvero:
+$
+  (9) quad quad S'_3 bar_([x_(i-1),x_i]) (x_i) = S'_3 bar_([x_i,x_(i+19]) (x_i), space i=1,dots,n-1
+$
+Queste $n-1$ condizioni, unite alle (2) permetteranno di ottenere la *spline cubica naturale interpolante*. Similmente, se invece delle (2) si considerano le (3), otterremo la *spline cubica not-a-knot interpolante*.
+
+Riscriviamo le $n-1$ condizioni (9) tenendo conto della (5) e della (8):
+$
+  m_i h_1 / 2 +q_i = -m_i h_(i+1) / 2 + q_(i+1)
+$
+ovvero:
+$
+  m_i h_i/ 2 + f[x_(i-1),x_i]-h_i/6 (m_i - m_(i-1)) = \
+  - m_i h_(i+1)/2 + f[x_i, x_(i+1)] - h_(i+1)/6 (m_(i+1) - m_i), space i=1,dots,n-1
+$
+e, quindi:
+$
+  m_(i-1)/6 h_i + m_i / 6 2(h_i + h_(i+1)) + m_(i+1) / 6 h_(i+1) = f[x_i,x_(i+1)]-f[x_(i-1), x_i], space i=1, dots, n-1
+$
+Moltiplicando membro a membro, per 6 e dividendo per $h_i + h_(i+1)=x_i - x_(i-1) + x_(i+1) - x_i= x_(i+1) -x_(i-1)$, otteniamo:
+$
+  m_(i-1) underbracket(frac(h_i, h_i+h_(i+1)), phi_i) + 2m_i + m_(i+1) underbracket(frac(h_(i+1), h_i + h_(i+1)), xi_i) = 6 frac(f[x_i\,x_(i+1)]-f[x_(i-1)\,x_i], x_(i+1)-x_(i-1))
+$
+ovvero:
+$
+  (10) quad quad phi_i m_(i-1) + 2 m_i + xi_i m_(i+1) = 6 f[x_(i-1),x_i, x_(i+1)], space i=1,dots,n-1
+$
+
+Le (10) sono la riformulazione algebrica delle (9), che costituiscono un sistema lineare di $n-1$ equazioni in $n+1$ incognite. Ora, nel caso di una spline cubica naturale, $m_0 = m_n = 0$ e, pertanto, le incognite diventano $n-1$. Quindi le (10) individuano univocamente le rimanenti incognite $m_1, dots, m_(n-1)$, che riscriviamo in forma vettoriale come:
+$
+  mat(
+    2, xi_1;
+    phi_2, 2, xi_2;
+    , phi_3, 2, xi_3;
+    , , dots.down, dots.down, dots.down;
+    , , , dots.down, dots.down, dots.down;
+    , , , , dots.down, dots.down, dots.down;
+    , , , , , phi_(n-2), 2, xi_(n-2);
+    , , , , , , phi_(n-1), 2; delim: "[", augment: #(vline: (1, 2, 3, 4, 5, 6, 7), stroke: (dash: "dotted", thickness: 0.4pt))
+  ) dot mat(m_1; m_2; m_3; dots.v; dots.v; dots.v; m_(n-2); m_(n-1)) = 6 dot mat(f[x_0,x_1,x_2]; f[x_1,x_2,x_3]; f[x_2,x_3,x_4]; dots.v; dots.v; dots.v; f[x_(n-3),x_(n-2),x_(n-1)]; f[x_(n-2),x_(n-1),x_n];)
+$
+Abbiamo quindi un sistema lineare tridiagonale di $n-1$ equazioni in $n-1$ incognite. Inoltre, sulla riga i-esima, i coefficienti diversi da zero sono:
+$
+  phi_i -> "sottodiagonale"\
+  2 -> "diagonale"\
+  xi_i -> "sopradiagonale"
+$
+con:
+$
+  phi_i = frac(h_i, h_i + h_(i+1)) > 0\
+  xi_i = frac(h_i, h_i + h_(i+1)) > 0 \
+  phi_i + xi_i = 1
+$
+Pertanto la matrice dei coefficienti è diagonale dominante per righe e, quindi, fattorizzabile LU con complessità lineare.
+
+//09.04.2026
+//TODO: cercare di unire le due lezioni
+
+La spline in questione $S_3(x)$, definita sulla partizione $Delta = {a=x_0<x_1<dots<x_n=b}$. Inoltre, abbiamo denotato con:
+
+- $h_i = x_i - x_(i-1), space i=1,dots,n-1$
+- $,_i = S''_3(x_i), space i=0,dots,n$
+- $phi_i = frac(h_i, h_i + h_(i+1)), space xi_i = frac(h_i, h_i + h_(i+1)), space i=1,dots,n-1$
+
+Per $x in [x_(i-1), x_i]$:
+$
+  s_3(x) = frac(m_i (x-x_(i-1))^3 + m_(i-1)(x_i-x)^3, 6h_i) + q_i (x-x_(i-1)) + r_i, space i=1,dots,n
+$
+con:
+- $r_i = f_(i-1)-m_(i-1) h_i^2/6$
+- $q_i = f[x_(i-1), x_i] - h_i/6 (m_i - m_(i-1))$
+essendo $f_i = f(x_i), space i=0,dots,n$.
+Inoltre, gli ${m_i}$ soddisfano le $n-1$ equazioni:
+$
+  (1) quad quad phi_i m_(i-1) + 2 m_(i) + xi_i m_(i+1) = 6 f[x_(i-1), x_i, x_(i+1)], space i=1,dots,n-1
+$
+che si completano con le due condizioni aggiuntive che caratterizzano la spline. Nel caso di una spline not-a-knot, le equazioni (1) si completano con:
+$
+  cases(
+    m_1 (h_1+h_2) = m_2 h_1 + m_0 h_2,
+    m_(n-1) (h_(n-1) +h_n) = m_(n-2) h_n + m_n h_(n-1)
+  )
+$
+ovvero:
+$
+  (2) quad quad & m_0 xi_1 - m_1 + m_2 phi_1 = 0, \
+                & xi_(n-1) m_(m-2)-m_(n-1)+m_n phi_(n-1) = 0
+$
+Scriviamo in forma vettoriale (1) + (2):
+$
+  mat(
+    x_1, -1, phi_1;
+    phi_1, 2, xi_1;
+    , phi_2, 2, xi_2;
+    , , dots.down, dots.down, dots.down;
+    , , , dots.down, dots.down, dots.down;
+    , , , , dots.down, dots.down, dots.down;
+    , , , , , phi_(n-1), 2, xi_(n-1);
+    , , , , , xi_(n-1), -1, phi_(n-1); delim: "[", augment: #(vline: (1, 2, 3, 4, 5, 6, 7), stroke: (dash: "dotted", thickness: 0.4pt))
+  ) dot mat(m_0; m_1; m_2; dots.v; dots.v; dots.v; m_(n-1); m_n) = 6 dot mat(0; f[x_0,x_1,x_2]; f[x_1,x_2,x_3]; dots.v; dots.v; dots.v; f[x_(n-2),x_(n-1),x_(n)]; 0)
+$
+Sommando le prime 2 equazioni, e sostituendole alla prima, e sommando le ultime 2 equazioni, e sostituendole all'ultima, si ottiene:
+$
+  mat(
+    1, 1, 1;
+    phi_1, 2, xi_1;
+    , phi_2, 2, xi_2;
+    , , dots.down, dots.down, dots.down;
+    , , , dots.down, dots.down, dots.down;
+    , , , , dots.down, dots.down, dots.down;
+    , , , , , phi_(n-1), 2, xi_(n-1);
+    , , , , , 1, 1, 1; delim: "[", augment: #(vline: (1, 2, 3, 4, 5, 6, 7), stroke: (dash: "dotted", thickness: 0.4pt))
+  ) dot mat(m_0; m_1; m_2; dots.v; dots.v; dots.v; m_(n-1); m_(n)) = 6 dot mat(f[x_0,x_1,x_2]; f[x_0,x_1,x_2]; f[x_1,x_2,x_3]; dots.v; dots.v; dots.v; f[x_(n-2),x_(n-1),x_(n)]; f[x_(n-2),x_(n-1),x_(n)])
+$
+sistema lineare che indichiamo con:
+$
+  A uu(m) = uu(f) quad quad (3)
+$
+Sottraendo la prima colonna dalla seconda e dalla terza, si ottiene:
+$
+  mat(
+    1, 1, 1;
+    phi_1, 2, xi_1;
+    , phi_2, 2, xi_2;
+    , , dots.down, dots.down, dots.down;
+    , , , dots.down, dots.down, dots.down;
+    , , , , dots.down, dots.down, dots.down;
+    , , , , , phi_(n-1), 2, xi_(n-1);
+    , , , , , 1, 1, 1; delim: "[", augment: #(vline: (1, 2, 3, 4, 5, 6, 7), stroke: (dash: "dotted", thickness: 0.4pt))
+  )
+  -->
+  mat(
+    1, 0, 0;
+    phi_1, (2-phi_1), (xi_1-phi_1);
+    , phi_2, 2, xi_2;
+    , , dots.down, dots.down, dots.down;
+    , , , dots.down, dots.down, dots.down;
+    , , , , dots.down, dots.down, dots.down;
+    , , , , , phi_(n-1), 2, xi_(n-1);
+    , , , , , 1, 1, 1; delim: "[", augment: #(vline: (1, 2, 3, 4, 5, 6, 7), stroke: (dash: "dotted", thickness: 0.4pt))
+  )
+$
+Similmente, se sottraiamo l'ultima colonna dalla penultima e dalla terzultima, otteniamo:
+$
+  mat(
+    1, 0, 0;
+    phi_1, (2-phi_1), (xi_1-phi_1);
+    , phi_2, 2, xi_2;
+    , , dots.down, dots.down, dots.down;
+    , , , dots.down, dots.down, dots.down;
+    , , , , phi_(n-2), 2, xi_(n-2);
+    , , , , , (phi_(n-1)-xi_(n-1)), (2-xi_(n-1)), xi_(n-1);
+    , , , , , 0, 0, 1;
+    delim: "[", augment: #(vline: (1, 2, 3, 4, 5, 6, 7), stroke: (dash: "dotted", thickness: 0.4pt))
+  ) equiv B
+$
+Algebricamente, abbiamo che:
+$
+  B = A dot F equiv A dot mat(
+    1, -1, -1;
+    , 1, ;
+    , , 1, ;
+    , , , dots.down, ;
+    , , , , dots.down, , ;
+    , , , , , dots.down, , ;
+    , , , , , , 1, ;
+    , , , , , -1, -1, 1; delim: "["
+  )
+$
+Pertanto abbiamo che (3) è equivalente a:
+$
+  overbrace(A dot \( F, =B) dot F^(-1)) uu(m) = f <=> B dot (F^(-1) uu(m)) = f
+$
+Su può verificare, ma non lo faremo, che:
+$
+  F^(-1) = mat(
+    1, 1, 1;
+    , 1, ;
+    , , 1, ;
+    , , , dots.down, ;
+    , , , , dots.down, , ;
+    , , , , , dots.down, , ;
+    , , , , , , 1, ;
+    , , , , , 1, 1, 1; delim: "["
+  )
+$
+Pertanto:
+$
+  F^(-1) uu(m) = mat(
+    m_0 + m_1 +m_2;
+    m_1;
+    dots.v;
+    dots.v;
+    m_(n-1);
+    m_(n-2) + m_(n-1) + m_n
+  )
+$
+In conclusione, il sistema lineare (3) si può riscrivere come:
+$
+  mat(
+    1, , , ;
+    phi_1, (2-phi_1), (xi_1-phi_1);
+    , phi_2, 2, xi_2;
+    , , dots.down, dots.down, dots.down;
+    , , , dots.down, dots.down, dots.down;
+    , , , , phi_(n-2), 2, xi_(n-2);
+    , , , , , (phi_(n-1)-xi_(n-1)), (2-xi_(n-1)), xi_(n-1);
+    , , , , , , , 1;
+    delim: "[", augment: #(vline: (1, 2, 3, 4, 5, 6, 7), stroke: (dash: "dotted", thickness: 0.4pt))
+  ) dot mat(m_0 + m_1 + m_2; m_1; m_2; dots.v; dots.v; m_n; m_(n-2) + m_(n-1) + m_1) = 6 mat(f[x_0,x_1,x_2]; f[x_0,x_1,x_2]; dots.v; dots.v; f[x_(n-2), x_(n-1), x_n]; f[x_(n-2), x_(n-1), x_n])
+$
+
+Pertanto, dalla prima equazione, si ricava che:
+$
+  m_0 + m_1 + m_2 = 6 f[x_0, x_1, x_2] quad quad (4)
+$
+Similmente, dall'ultima equazione si ricava che:
+$
+  m_(n-2) + m_(n-1) + m_n = 6 f[x_(n-1), x_(n-1), x_n] quad quad (5)
+$
+Le altre componenti, si ottengono risolvendo il sistema lineare tridiagonale, e a diagonale dominante per righe:
+$
+  mat(
+    (2-phi_1), (xi_1-phi_1);
+    phi_2, 2, xi_2;
+    , dots.down, dots.down, dots.down;
+    , , dots.down, dots.down, dots.down;
+    , , , phi_(n-2), 2, xi_(n-2);
+    , , , , (phi_(n-1)-xi_(n-1)), (2-xi_(n-1));
+    delim: "[", augment: #(vline: (1, 2, 3, 4, 5), stroke: (dash: "dotted", thickness: 0.4pt))
+  ) dot mat(m_1; m_2; dots.v; dots.v; dots.v; m_(n-1)) = 6 mat(xi_1 f[x_0,x_1,x_2]; f[x_1,x_2,x_3]; dots.v; dots.v; f[x_(n-3), x_(n-2), x_(n-1)]; phi_(n-1) f[x_(n-2), x_(n-1), x_n])
+$
+Risolto questo, $m_0$ e $m_n$ si ottengono per differenza della (4) e (5), rispettivamente.
+
+
+
+== Approssimazione polinomiale ai minimi quadrati
+//TODO: dare contesto a queste immagini
+#figure(image("images/2026-04-19-22-30-47.png"))
+#figure(image("images/2026-04-19-22-30-52.png"))
+Il problema è il seguente: supponiamo di avere $n+1$ coppie di dati $(x_i, y_i), space i=0,dots,n$ che sono misurazioni (rumorose) id un fenomeno descritto da un polinomio $p(x) in Pi_m$, con $m<<n$. Il problema è calcolare il polinomio $p(x)$ che meglio approssima i dati assegnati. Un modo per definire $p(x)$ è quello di richiedere che $p(x)$ minimizzi:
+$
+  r^2 := sum_(i=0)^n (y_i - p(x_i))^2
+$
+ovvero la somma dei quadrati delle differenze tra il dato $y_i$ e quello predetto dal modello polinomiale in $x_i$. Per questo motivo, si parla di polinomio di approssimazione ai minimi quadrati.
+#observation()[
+  Il grado $m$ del polinomio è dettato dalla derivazione fisica del problema.
+]
+Nel seguito, assumeremo che almeno $m+1$ delle ascisse ${x_i}$ siano tra loro distinte. Sotto queste ipotesi è possibile dimostrare il seguente risultato.
+
+#theorem()[
+  Se almeno $m+1$ delle ascisse ${x_i}$ sono tra loro distinte, il polinomio di approssimazione di grado $m$ ai minimi quadrati esiste ed è unico.
+]
+#proof()[
+  Se $p(x) in Pi_m => p(x) = sum_(j=0)^m a_j x^j$, per coefficienti (al momento incogniti) opportuni. A questo punto, osserviamo che:
+  $
+    r^2 = norm(
+      mat(
+        x_0^(0), x_0^(1), dots, x_0^(m);
+        dots.v, , , dots.v;
+        dots.v, , , dots.v;
+        x_n^(0), x_n^(1), dots, x_n^(m);
+        delim: "["
+      )
+      mat(a_0; a_1; dots.v; a_n) - mat(y_0; y_1; dots.v; y_n)
+    )^2_2 = norm(V uu(a) - uu(y))^2_2
+  $
+  con $V in RR^((n+1) times (m+1))$ tipo Vandermonde, $uu(a) in RR^(m+1)$ con coefficienti incogniti, e $uu(y) in RR^(n+1)$ con le osservazioni nei vari punti. Pertanto, minimizzare $r^2$ equivale a risolvere il sistema lineare sovradeterminato:
+  $
+    V uu(a) = uu(y) quad quad (6)
+  $
+  nel senso dei minimi quadrati. A questo punto, la tesi segue osservando che, avendo almeno $m+1$ ascisse ${x_i}$ distinte, le corrispondenti righe di $V$ costituiscono una matrice di Vandermonde quadrata ($m+1 times m+1$) non singolare. Pertanto, $V$ ha rango massimo e possiamo risolvere (6) mediante la fattorizzazione QR di $V$.
+]
+#observation()[
+  La funzione `polyfit` di Matlab calcola esattamente i coefficienti del polinomio di approssimazione ai minimi quadrati (`help polyfit`).
+]
+
+Per il problema proposto inizialmente ($n=1000, m=3$), si ottiene il grafico sottostante (rosso=polinomio originario, nero=polinomio minimi quadrati).
+#figure(image("images/2026-04-19-22-45-12.png"))
+
+//15.04.2026
+
+
+
+//16.04.2026
