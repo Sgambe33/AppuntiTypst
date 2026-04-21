@@ -1,4 +1,7 @@
 #import "../../../dvd.typ": *
+#import "@preview/cetz:0.4.2": canvas, draw
+#import "@preview/cetz-plot:0.1.3": plot
+
 #pagebreak()
 #show math.equation: set block(breakable: true)
 //15.04.2026
@@ -71,7 +74,53 @@ $
   I_1 (f) = underbrace(b-a, =h) frac(f(a)+f(b), 2)
 $
 Geometricamente, stiamo approssimando l'area sottesa dal grafico di $f(x)$ con l'area del trapezio rettangolo individuato dai vertici $(a,0), (b,0), (b,f(b))$ e $(a,f(a))$. Per questo motivo, la formula prende il nome di *metodo dei trapezi*.
-#figure(image("images/2026-04-20-10-12-17.png"))
+
+
+#figure(
+  canvas({
+    import draw: *
+    plot.plot(
+      size: (10, 5),
+      x-tick-step: 1,
+      y-tick-step: 1,
+      y-min: -2,
+      x-min: 0,
+      x-max: 14,
+      y-max: 8,
+      plot-style: (stroke: black),
+      min: 0,
+      {
+        let func = x => 4 + 1 / 2 * (x - 2) - 9 / 221 * (x - 2) * (x - 4) + 139 / 13260 * (x - 2) * (x - 4) * (x - 10.5)
+        let func2 = x => 0.3 * x + 3.4
+        plot.add(
+          func,
+          domain: (2, 12),
+          label: $f(x)$,
+          style: (stroke: green, fill: yellow.transparentize(80%)),
+          fill: true,
+          fill-type: "axis",
+        )
+        plot.add(func2, domain: (2, 12), style: (stroke: orange))
+
+        let nodes = ((2, 4), (12, 7))
+        plot.add(nodes, style: (stroke: none), mark: "o")
+
+        plot.add-hline(0, min: 0, max: 14, style: (stroke: black))
+
+
+        plot.add-vline(2, min: 0, max: 3.8, style: (stroke: blue))
+        plot.add-vline(12, min: 0, max: 6.8, style: (stroke: blue))
+
+        plot.add-hline(4, min: 0, max: 1.8, style: (stroke: red))
+        plot.add-hline(7, min: 0, max: 11.8, style: (stroke: red))
+        plot.annotate({
+          content((2, -0.5), $a$)
+          content((12, -0.5), $b$)
+        })
+      },
+    )
+  }),
+)
 
 *Caso $n=2$ (Metodo di Simpson)* \
 Imponendo nuovamente la #link(<5.4>, "(5.4)") otteniamo $c_(02) = c_(22)$ e, dalla #link(<5.3>, "(5.3)"), ricaviamo la condizione $c_(02) + c_(12) + c_(22) = 2$. È sufficiente calcolare esplicitamente un solo peso, ad esempio $c_(22)$, per poter determinare tutti gli altri:
@@ -129,20 +178,63 @@ Ricordando la condizione di normalizzazione #link(<5.3>, "(5.3)"), si deduce che
 $
   (K_n)/K = 1 quad "se" quad c_(i n) >= 0, quad forall i=0,dots,n quad quad (5.7)
 $
-
-A questo punto, osserviamo il rapporto:
-$
-  (K_n)/K = 1/n sum_(i=0)^n abs(c_(i n))
-$
-dalla proprietà (3) otteniamo che:
-
 In presenza di pesi negativi, invece, risulta $(K_n)/K > 1$. È noto in letteratura che la condizione #link(<5.7>, "(5.7)") è verificata esclusivamente per i seguenti gradi:
 <5.8>
 $
   n in {1, dots, 7, 9} quad quad (5.8)
 $
 Per i restanti valori (ovvero $n=8$ e $n >= 10$), la presenza di pesi negativi fa crescere il rapporto $(K_n)/K$ in modo estremamente rapido. Di conseguenza, per evitare grave instabilità numerica ed errori di cancellazione, nella pratica le formule di Newton-Cotes si utilizzano *solo* per i valori di $n$ indicati nella #link(<5.8>, "(5.8)").
-#figure(image("images/2026-04-20-11-15-59.png"))
+#figure(
+  canvas({
+    let raw-data = (
+      (1, 1),
+      (2, 1),
+      (3, 1),
+      (4, 1),
+      (5, 1),
+      (6, 1),
+      (7, 1),
+      (8, 1.45),
+      (9, 1),
+      (10, 3.1),
+      (11, 1.6),
+      (12, 7.5),
+      (13, 3.2),
+      (14, 20),
+      (15, 8.5),
+      (16, 60),
+      (17, 24),
+      (18, 180),
+      (19, 65),
+      (20, 500),
+    )
+
+    let plot-data = raw-data.map(pt => (pt.at(0), calc.log(pt.at(1), base: 10)))
+    import draw: *
+    plot.plot(
+      size: (12, 9),
+      x-label: [$n$],
+      y-label: [$K_n / K$],
+      x-min: 1,
+      x-max: 20,
+      x-tick-step: 2,
+      y-min: 0, // corrisponde a 10^0
+      y-max: 3, // corrisponde a 10^3
+      y-tick-step: none,
+      y-ticks: (
+        (0, [$10^0$]),
+        (1, [$10^1$]),
+        (2, [$10^2$]),
+        (3, [$10^3$]),
+      ),
+      {
+        plot.add(
+          plot-data,
+        )
+      },
+    )
+  }),
+)
 
 
 //16.04.2026
