@@ -93,3 +93,111 @@ Si suppone adesso di avere dei problemi decidibili, cioè dei problemi per cui a
 ]
 
 #figure(image("images/2026-03-30-13-14-10.png"))
+
+#definition()[
+  Data una MdT _M_ non deterministica, la *complessità in tempo* di _M_ è determinata dalla funzione:
+  $
+    t c_M = &\# "transizioni eseguite da una computeazione di M su una stringa di lunghezza "n\
+    &"nel caso perggiore".
+  $
+]
+
+#proposition()[
+  Sia _M_ MdT non deterministica che accetta il linguaggio _L_:
+  $
+    &t c_M(n) = f(n)=> exists M' "MdT deterministica che accetta "L space t.c.\
+    &t c_M'(n)=Omicron(f(n) dot cal(S)^f(n))
+  $
+]
+
+#proof()[
+  _M'_ MdT che deterministica equivalente a _M_
+
+  #grid(
+        columns: (0.05fr, 0.1fr, 0.3fr, 0.3fr, 0.3fr, 0.05fr),
+        rows: 3,
+        row-gutter: 5pt,
+        stroke: none,
+        [], [3], [Computazioni di M], [$(m_1, m_2, dots, m_f(n))$], [$1 <= m_1, dots, m_f(n) <= cal(S)$], [],
+        [], [2], [Simulazione di M], [], [], [],
+        [], [1], [INPUT], [], [], [],
+  )
+
+  - Numero di computazioni di M di lunghezza $f(n)$ su input di lunghezza $n <= cal(S)^f(n)$
+  - Numero di transizioni eseguite da M su una stringha di lunghezza $n <= f(n)$
+
+  Quindi: $t c_M'=Omicron(f(n) dot cal(S)^f(n))$
+]
+
+#pagebreak()
+#example()[
+  #image("images/2026-04-01-11-50-50.png")
+  // TODO: CORREGGERE L'ESEMPIO, CASO PEGGIORE: NON ACCETTA LA STRINGA
+  #image("images/2026-04-01-11-55-00.png")
+
+  Caso peggiore: rifiuto, precisamente la commputazione in cui copio tutta la stringa sul secondo nastro.
+  #block($
+           t c_M(n)= 1 + 2n
+         $)
+]
+
+#definition()[
+  $bold(P)={L "linguaggio" | exists M "MdT det. che accetta "L space t.c. t c_M(n)=Omicron(n^r), exists r in NN}$
+]
+#definition()[
+  $bold(N P)={L "linguaggio" | exists M "MdT non det. che accetta "L space t.c. t c_M(n)=Omicron(n^r), exists r in NN}$
+]
+
+#observation()[
+  $P subset N P$, perché le MdT deterministiche sono un caso particlare di MdT non deterministiche.
+]
+
+#problem()[
+  Il problema aperto attualmente più importante in informatica teorica è:
+  $
+    P limits(=)^? N P
+  $
+]
+
+=== Problema del circuito hamiltonian
+
+Dato un grafo orientato $G=(V, E)$, con:
+- _V_ = insieme dei vertici,
+- _E_ = insieme degli archi
+- $|V|=n=$ cardinalità dell'insieme dei vertici
+
+
+#definition()[
+  Dato un grafo orientato $G=(V, E)$, un *circuito hamiltoniano* in _G_ è una sequenza $(x_1,x_2, dots, x_(n-1), x_n, x_1)$ di vertici t.c.
+  $
+    forall i (x_i, x_(i+1)) in E quad quad ((x_n, x_1) in E) "e" V={x_1, dots, x_n}
+  $
+
+  In parole povere, un *circuito hamiltoniano* è un  ciclo che passa una e una sola volta da tutti i vertici di un grafo.
+]
+
+Codifica di $G=(V,E), V={1, 2, dots, n}$:
+
+- Codifica dei vertici: uso la codifica binaria;
+- Codifica degli archi: $(x_i, x_j) arrow.squiggly x_1\#x_j$;
+- Codifica del grafo: Codifica della lista degli archi $+ n$. Per separare gli archi nella codifica si usa \#\# e per separare *$n$* si usa \#\#\#.
+
+$
+  dots space x_i\#x_j\#\#x_(i+1)\#x_(j+1)\#\# space dots space \#\#\#n
+$
+
+Per fare ciò si usa una MdT a 4 nastri:
++ Contiene la rappresentazione del grafo in input;
++ Contiene le sequenze dei nodi generati (che iniziano e terminano con il nodo *1*);
++ È quello di lavoro, cioè quello che si usa per vedere se la sequenza è hamiltoniana: ci si scrive tutti i nodi che passano il controllo;
++ È il nastro di fine computazione, serve per indicare quando devo smettere di generare sequenze perché contiene l'ultima sequenza da controllare;
+
+Si può fare anche con 3 nastri confrontando il contenuto del nastro 2 con la n nel nastro 1
+
+- Scrivo sul nastro 4 la stringa da generare ($1 **$)
+- Sul nastro 2 genero una dopo l'altra, in ordine lessicografico, le stringhe di lunghezza $n+1$ di vertici di V che iniziano e finiscono con _1_ (il nodo)
+- Confronto la stringa generata sul nastro 2 col contenuto del nastro 4: se sono uguali, RIFIUTO
+- Scorro la sequenza sul nastro 2 e $forall j$:
+  - controllo che $i_j$ non compaia tra gli elementi $i_k$, con $k < j$
+  - controllo che $(i_(j-1), i_j) in E$
+- Se entrambi i controlli sono passati, scrivo $i_j$ sul nastro 3, ALTRIMENTI produco la prossima sequenza al passo 1 (si torna al passo 1)

@@ -825,8 +825,28 @@ Restringiamo la classe dei linguaggi semidecidibili:
   $cal(L)_emptyset={R(M) | L(M) = emptyset}$
 - Il linguaggio è $Sigma^*$?\ 
   $cal(L)_(Sigma^*)={R(M) | L(M) = Sigma^*}$
-- Il linguaggio è regolare?
+- Il linguaggio è regolare?\ 
   $cal(L)_"REG" = {R(M) | L(M) "è regolare"}$
+
+#proposition()[
+  $cal(L)_(Sigma^*)$ non è decidibile
+]
+#proof()[
+  Descriviamo una riduzione da $cal(L)_"HALT"$ a $cal(L)_(Sigma^*)$\ 
+  $
+    R(M)w arrow.long.squiggly R(N)
+  $
+  Comportamento di _N_ su _y_:
+  - cancello _y_;
+  - scrivo _w_;
+  - eseguo _M_ su _w_;
+]
+#observation(multiple: true)[
+  + $R(M)w in cal(L)_"HALT" (M "termina su" w)$\
+    $N "termina su" y, forall y => R(N) in cal(L)_(Sigma^*)$
+  + $R(M)w in.not cal(L)_"HALT" (M "non termina su" w)$\
+    $N "non termina su" y, forall y => R(N) in.not cal(L)_(Sigma^*)$
+]
 
 #definition()[
   Indichiamo con $cal(P)$ una qualunque *proprietà di un linguaggio semidecidibile* e con $cal(L)_cal(P)$ l'insieme di linguaggi semidicidibile che soffisfano $cal(P)$, cioé
@@ -838,4 +858,31 @@ Restringiamo la classe dei linguaggi semidecidibili:
   Allora $cal(P)$ si dice *banale* quando:
   - $forall$ linguaggio $L$ semidecidibile, $L in cal(L)_cal(P)$(ovvero tutti i linguaggi semidecidibili hanno la proprietà $cal(P)$), oppure
   - $cal(L)_cal(P) = emptyset$ (ovvero nessun linguaggio semidecidibile ha la proprietà $cal(P)$)
+]
+
+#theorem("di Rice")[
+  $cal(P)$ proprietà non banale
+  $
+    cal(L)_cal(P)={R(M) | L(M) "soddisfa" cal(P)} ==> cal(L)_cal(P) "non è decidibile"
+  $
+]
+#proof()[
+  + $cal(P)$ proprietà non banale. Supponiamo che il linguaggio vuoto $emptyset$ non soddisfa la proprietà $cal(P)$ e sia _L_ linguaggio semidecidibile che soddisfa $cal(P)$, con $L eq.not emptyset$ Sia $M_L$ MdT che accetta L.\ 
+    Descriviamo una riduzione da $cal(L)_"HALT"$ a $cal(L)_cal(P)$\
+    $ R(M)w arrow.long.squiggly R(N) $
+    Comportamento di _N_ su _y_:
+    // TODO: disegnare nastro
+    - scrivo _w_ a destra di _y_;
+    - eseguo _M_ su _w_:
+      + se _M_ termina su _w_, eseguo _N_ su _y_ e si comporta come $M_L$, quindi:\ 
+        $L(N)=L(M_L)=L$, e _L_ soddisfa $cal(P)$\
+        $R(M)w in cal(L)_"HALT" => R(N) in cal(L)_cal(P)$
+      + se _M_ non termina su _w_, _N_ non accetta nessuna stringa _y_, quindi:\ 
+        $L(N)=emptyset in.not cal(L)_cal(P)$\
+        $R(M)w in.not cal(L)_"HALT" => R(N) in.not cal(L)_cal(P)$
+
+  + $cal(P)$ proprietà non banale\
+    Supponiamo che il linguaggio vuoto $emptyset$ soddisfi la proprietà $cal(P)$, allora  $emptyset$ non soddisfa $not cal(P)$ e, per la dimostrazione precedente, $cal(L)_(not cal(P))$ non è decidibile
+
+    Per assurdo: $cal(L)_cal(P)$ è decidibile $=> cal(L)_(not cal(P)) union {"stringhe che non codificano MdT"} "decidibile" => cal(L)_(not cal(P)) "decidibile, assurdo"$
 ]
