@@ -1,6 +1,9 @@
 #import "../../../dvd.typ": *
 #import "@preview/cetz:0.4.2": canvas, draw
 #import "@preview/cetz-plot:0.1.3": plot
+#import "@preview/codly:1.3.0": *
+#import "@preview/codly-languages:0.1.1": *
+#show: codly-init.with()
 
 #pagebreak()
 #show math.equation: set block(breakable: true)
@@ -253,6 +256,11 @@ $
 
 Questa scomposizione è la chiave per calcolare i pesi in modo esatto al calcolatore. In Matlab, possiamo sfruttare l'algebra dei polinomi per ricavare $alpha_(i n)$ e $d_(i n)$. Fissato il grado $n$ e un generico indice $i$, la procedura vettorizzata è la seguente:
 
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: true,
+)
 ```matlab
 % 1. Vettore delle radici (escluso l'indice i)
 ind = [0:i-1, i+1:n];
@@ -377,6 +385,11 @@ Anche per il caso generale, per $n -> infinity$ l'errore decade a $0$.
 Da un punto di vista algoritmico, è cruciale *evitare valutazioni funzionali ridondanti* nei punti di intersezione tra i sottointervalli (come i nodi interni $x_1, x_2, dots$ che compaiono in più termini prima della semplificazione).
 In Matlab, tutti i valori necessari possono essere precalcolati simultaneamente in modo vettoriale. Supponendo che `fun` sia la function che implementa la funzione integranda:
 
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: true,
+)
 ```matlab
 x = linspace(a, b, n+1); % Generazione degli n+1 nodi equidistanti
 f = fun(x);              % Valutazione vettoriale
@@ -466,6 +479,199 @@ Il vettore `f` restituisce esattamente tutti i valori $f_i$ richiesti per implem
   )
 ]
 
+
+//22.04.2026
+Vediamo come, partendo dalla #link(<5.11>, "(5.11)"), si possa ottenere una stima dell'errore di quadratura a costo quasi nullo. Se supponiamo che $n$ sia un *multiplo pari del grado $k$* (ovvero $n = 2 k ell$), possiamo applicare la formula composita in due modi: sia utilizzando tutti gli $n+1$ nodi, sia scartando i nodi dispari e utilizzando solo la metà dei sottointervalli.
+
+#example("Formula di Simpson")[
+  Con $k=2$, prendiamo ad esempio $n=4$.
+  Abbiamo a disposizione i nodi: $x_0, x_1, x_2, x_3, x_4$. Possiamo applicare la formula di Simpson in due varianti:
+  1. Su tutti i nodi, coprendo l'intero dominio $x_0 -- x_4$.
+  2. Su un numero dimezzato di sottointervalli (passo doppio), applicandola prima ai punti $x_0, x_1, x_2$ e poi a $x_2, x_3, x_4$.
+]
+
+Valutando l'errore sull'intervallo con passo doppio ($n/2$ sottointervalli), dalla #link(<5.11>, "(5.11)") otteniamo che, per un opportuno $hat(xi) in [a,b]$ (in generale $hat(xi) != xi$):
+<5.12>
+$
+  I(f) - I_k^((n/2))(f) = nu_k (b-a)/k f^((k+mu)) (hat(xi)) ((b-a)/(n/2))^(k+mu) quad quad (5.12)
+$
+Assumendo per continuità che $hat(xi) approx xi$ (valido per $h$ sufficientemente piccolo), sottraiamo la #link(<5.11>, "(5.11)") dalla #link(<5.12>, "(5.12)") membro a membro:
+$
+  I_k^((n))(f) - I_k^((n/2))(f) approx nu_k (b-a)/k f^((k+mu)) (xi) ((b-a)/n)^(k+mu) (2^(k + mu)-1)
+$
+Dividendo tutto per la costante $2^(k + mu) - 1$, isoliamo il termine dell'errore asintotico, definendo così lo *stimatore a posteriori dell'errore*:
+$
+  hat(E)_k^((n)) (f) = frac(I_k^((n))(f) - I_k^((n/2))(f), 2^(k + mu)-1) &approx nu_k (b-a)/k f^((k+mu)) (xi) ((b-a)/n)^(k+mu) \
+  &= I(f) - I_k^((n))(f) = E_k^((n)) (f)
+$
+Così facendo, otteniamo una stima computazionale dell'errore (detta estrapolazione di Richardson) senza conoscere la soluzione esatta. La stima diventa sempre più accurata al crescere di $n$.
+
+#example("Verifica delle stime")[
+  Riconsideriamo l'integrale $I(f) = integral_0^pi sin(x) d x = 2$.
+  Utilizzando le formule composite dei trapezi ($k=1, mu=1 =>$ diviso 3) e di Simpson ($k=2, mu=2 =>$ diviso 15), otteniamo la seguente tabella degli errori reali $E$ e stimati $hat(E)$:
+
+  #show figure: set block(breakable: true)
+  #figure(
+    kind: table,
+    {
+      let a = 0.0
+      let b = calc.pi
+      let exact = 2.0
+      let f(x) = calc.sin(x)
+
+      let n_values = (2, 4, 8, 10, 12, 14, 16, 18, 20)
+
+      let fmt_exp_str(x, digits: 4) = {
+        if x == 0 { return "0" }
+        let abs_x = calc.abs(x)
+        let exponent = calc.floor(calc.ln(abs_x) / calc.ln(10))
+        let mantissa = x / calc.pow(10, exponent)
+        let m_rounded = calc.round(mantissa, digits: digits)
+        if calc.abs(m_rounded) >= 10 {
+          m_rounded = m_rounded / 10
+          exponent += 1
+        }
+        return str(m_rounded) + "e" + str(exponent)
+      }
+
+      let fmt(x) = str(calc.round(x, digits: 4))
+
+      let cells = n_values
+        .map(n => {
+          let h = (b - a) / n
+          let n_half = int(n / 2)
+          let h_half = (b - a) / n_half
+
+          // --- Calcolo I1 (Trapezi n) ---
+          let sum_trap = 0.0
+          for i in range(1, n) { sum_trap += f(a + i * h) }
+          let I1 = (h / 2.0) * (f(a) + 2.0 * sum_trap + f(b))
+          let E1 = calc.abs(exact - I1)
+
+          // --- Calcolo I1_half (Trapezi n/2) ---
+          let sum_trap_half = 0.0
+          for i in range(1, n_half) { sum_trap_half += f(a + i * h_half) }
+          let I1_half = (h_half / 2.0) * (f(a) + 2.0 * sum_trap_half + f(b))
+
+          // Stima errore Trapezi
+          let hat_E1 = calc.abs(I1 - I1_half) / 3.0
+
+          // --- Calcolo I2 (Simpson n) ---
+          let sum_simp = 0.0
+          for i in range(1, n) {
+            if calc.rem(i, 2) == 0 { sum_simp += 2.0 * f(a + i * h) } else { sum_simp += 4.0 * f(a + i * h) }
+          }
+          let I2 = (h / 3.0) * (f(a) + sum_simp + f(b))
+          let E2 = (exact - I2)
+
+          // --- Calcolo I2_half e Stima Simpson (solo se n/2 è pari) ---
+          let hat_E2_str = "-"
+          if calc.rem(n_half, 2) == 0 {
+            let sum_simp_half = 0.0
+            for i in range(1, n_half) {
+              if calc.rem(i, 2) == 0 { sum_simp_half += 2.0 * f(a + i * h_half) } else {
+                sum_simp_half += 4.0 * f(a + i * h_half)
+              }
+            }
+            let I2_half = (h_half / 3.0) * (f(a) + sum_simp_half + f(b))
+            let hat_E2 = (I2 - I2_half) / 15.0
+            hat_E2_str = fmt_exp_str(hat_E2)
+          }
+
+          return (str(n), fmt(I1), fmt_exp_str(E1), fmt_exp_str(hat_E1), fmt(I2), fmt_exp_str(E2), hat_E2_str)
+        })
+        .flatten()
+
+      table(
+        columns: 7,
+        align: center,
+        stroke: 0.5pt,
+        table.header(
+          [*$n$*],
+          [*$I_1^((n))$*],
+          [*$E_1^((n))$*],
+          [*$hat(E)_1^((n))$*],
+          [*$I_2^((n))$*],
+          [*$E_2^((n))$*],
+          [*$hat(E)_2^((n))$*],
+        ),
+        ..cells,
+      )
+    },
+  )
+]
+
 == Formule adattive
+Possiamo specializzare ulteriormente questo stimatore per ottenere delle *formule di quadratura di tipo adattivo*. 
+Talora si presentano integrali definiti da una funzione che varia in modo drastico solo in un piccolo sottointervallo del dominio. In questi casi, utilizzare una griglia di nodi uniforme è computazionalmente inefficiente. Conviene invece utilizzare punti distribuiti in modo non uniforme, "addensandoli" localmente solo dove il comportamento della funzione $f(x)$ lo richiede, al fine di soddisfare un prescritto criterio di accuratezza con il minor numero di valutazioni possibili.
 
+#example("Necessità dell'adattività")[
+  Consideriamo il calcolo del seguente integrale:
+  $
+    integral_(1/2)^100 -2x^(-3) cos(x^(-2)) d x equiv sin(10^(-4)) - sin(4)
+  $
+  #figure(image("images/2026-04-22-16-45-45.png"))
+  Come si evince dal grafico, questa funzione oscilla violentemente vicino a $x=1/2$ (a causa del termine $x^(-2)$ che diverge), per poi appiattirsi quasi istantaneamente procedendo verso $x=100$. Un metodo a passo fisso costringerebbe a usare un $h$ minuscolo su tutto il dominio $[1/2, 100]$ solo per catturare le oscillazioni iniziali, sprecando milioni di valutazioni inutili nella zona piatta.
+]
 
+Illustriamo il concetto di adattamento automatico del passo con la formula dei trapezi, sebbene la logica si estenda facilmente a formule di grado superiore.
+
+#problem()[
+  Calcolare $I(f)$ su un intervallo globale con una tolleranza `tol` prescritta in input.
+]
+Applicando la formula dei trapezi sull'intero intervallo $[a,b]$ (un solo trapezio) e poi la formula composita con $n=2$ (due trapezi), otteniamo:
+$
+  I_1 &= (b-a)/2 (f(a) + f(b)) \
+  I_2 &= (b-a)/4 (f(a) + 2f(x_1) + f(b)), quad quad "con" x_1 = (a+b)/2
+$
+Come dimostrato precedentemente, la stima dell'errore su questo specifico passo è ottenibile come:
+$
+  E_(12) = abs(I_2 - I_1)/3
+$
+A questo punto si imposta un controllo algoritmico:
++ Se $E_(12) <= "tol"$, l'accuratezza è soddisfatta: l'algoritmo si ferma e restituisce $I_2$.
++ Altrimenti, l'intervallo viene diviso a metà. Si riapplica ricorsivamente l'intera procedura sui due sottointervalli $[a, x_1]$ e $[x_1, b]$, ma richiedendo a ciascuno una tolleranza dimezzata pari a $"tol"/2$.
+
+L'accortezza fondamentale nell'implementare questa procedura è *evitare valutazioni funzionali ridondanti*. Nel calcolo di $I_2$, i valori $f(a)$, $f(x_1)$ e $f(b)$ sono già stati determinati e devono essere passati alle chiamate ricorsive successive per non ricalcolarli inutilmente.
+
+Ad esempio, impostando `tol` = $10^(-3)$, un'implementazione Matlab posizionerà automaticamente i nodi in questo modo (notare l'addensamento a sinistra):
+#figure(image("images/2026-04-22-16-48-09.png"))
+
+#codly(
+  languages: codly-languages,
+  zebra-fill: none,
+  breakable: true,
+)
+```matlab
+function I2 = trapead(fun, a, b, tol, fa, fb)
+    % Approssimazione integrale con formula dei trapezi adattiva
+    % Input:
+    %   fun - function handle dell'integranda
+    %   a, b - estremi di integrazione
+    %   tol - tolleranza richiesta
+    %   fa, fb - (opzionali) valori della funzione già precalcolati
+    
+    if nargin == 4
+        fa = fun(a);
+        fb = fun(b);
+    end
+    
+    % Punto medio e nuova valutazione funzionale (l'unica necessaria)
+    x1 = (a + b) / 2;
+    f1 = fun(x1);
+    
+    % Calcolo delle due approssimazioni (h è la metà dell'intervallo)
+    h = (b - a) / 2;
+    I1 = h * (fa + fb);
+    I2 = (h / 2) * (fa + 2*f1 + fb);
+    
+    % Stima dell'errore di Richardson
+    err = abs(I2 - I1) / 3;
+    
+    if err > tol
+        % Criterio fallito: divisione e chiamate ricorsive (tolleranza dimezzata)
+        % Passiamo i valori di fa, f1 e fb per evitare di ricalcolarli
+        I2 = trapead(fun, a, x1, tol/2, fa, f1) + trapead(fun, x1, b, tol/2, f1, fb);
+    end
+return
+```
