@@ -2,6 +2,7 @@
 #import "@preview/cetz:0.4.2" as cetz: canvas, draw
 #import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 #import "@preview/in-dexter:0.7.2": *
+#show math.equation: set block(breakable: true)
 
 #[
   #set heading(numbering: none)
@@ -80,25 +81,51 @@ Se il metodo è convergente e, per un opportuno indice $n > 0$, utilizziamo $x_n
   #let x = 2.0
   #let steps = 6
 
-  #let cells = (
+  #let cells1 = (
     [$n$],
     [$x_n$],
     [$sqrt(a) - x_n$],
   )
 
-  #for n in range(steps + 1) {
+  #let cells2 = (
+    [$n$],
+    [$x_n$],
+    [$sqrt(a) - x_n$],
+  )
+
+  #for n in range(0, 3) {
     let error = calc.sqrt(a) - x
-    cells.push([#n])
-    cells.push([#calc.round(x, digits: 8)])
-    cells.push([#calc.round(error, digits: 8)])
+    cells1.push([#n])
+    cells1.push([#calc.round(x, digits: 8)])
+    cells1.push([#calc.round(error, digits: 8)])
     x = 0.5 * (x + a / x)
   }
 
-  #table(
-    columns: 3,
-    rows: 7,
-    ..cells
-  )
+  #for n in range(3, 6) {
+    let error = calc.sqrt(a) - x
+    cells2.push([#n])
+    cells2.push([#calc.round(x, digits: 8)])
+    cells2.push([#calc.round(error, digits: 8)])
+    x = 0.5 * (x + a / x)
+  }
+
+  #align(center, grid(
+    columns: 2,
+    column-gutter: 3pt,
+    table(
+      columns: 3,
+      rows: 4,
+      ..cells1
+    ),
+    table(
+      columns: 3,
+      rows: 4,
+      ..cells2
+    ),
+  ))
+
+
+
 ]
 
 == Errori di round-off
@@ -150,7 +177,7 @@ $
 Ne consegue che, essendo $b^s >> 1$, allora $nu approx frac(b^s, 2) space (5)$.
 Riguardo alla mantissa abbiamo che:
 $
-  1 lt.eq rho lt.eq (b-1) times overbrace((b-1) ... (b-1), m-1) = b(1-b^(-m)) < b space space space (6)
+  1 lt.eq rho lt.eq (b-1) times overbrace((b-1) ... (b-1), m-1) = (b-b^(1-m)) < b space space space (6)
 $
 ovvero essa risulta essere *normalizzata* (semplicemente compresa tra 1 e $b$).
 
@@ -166,11 +193,11 @@ ovvero essa risulta essere *normalizzata* (semplicemente compresa tra 1 e $b$).
   - Dalla scelta dello shift $nu$ (5), segue che $cal(M)$ contiene (segno a parte) praticamente lo stesso numero di numeri di macchina in [0,1] e (1, $+infinity$)
   - Il più piccolo numero di macchina *positivo* è:
     $
-      r_1 = b^(-nu)
+      r_1 = 1 dot b^(0 - nu) = b^(-nu)
     $
-    Similmente, il più grande numero di macchina si ottiene quando  $alpha_i = (b-1)?$ con $i = 1,...,m$ e $beta_j = (b-1)$ con  $j=1,...,s$. Così facendo si ottiene:
+    Similmente, il più grande numero di macchina si ottiene quando  $alpha_i = (b-1)$ con $i = 1,...,m$ e $beta_j = (b-1)$ con  $j=1,...,s$. Così facendo si ottiene:
     $
-      r_2 =(1-b^(-m)) b^(b^s - nu) approx b^(b^s -nu)
+      r_2 = b(1-b^(-m))b^(b^s-1-nu) approx b^(b^s -nu)
     $
 ]
 
@@ -215,20 +242,19 @@ A questo punto esistono 2 modi di implementare la funzione floating:
   ],
 )
 
-Riguardo all'errore di rappresentazione vale i seguente risultato:
+Riguardo all'errore di rappresentazione vale il seguente risultato:
 #theorem()[
   Per i numeri di $cal(I)$ positivi vale che l'errore relativo di rappresentazione:
   $
     f l(x) = tilde(x) = x (1+epsilon_x) quad abs(epsilon_x) lt.eq u
   $
-]
-#definition()[
   #index("Precisione di macchina")
   $u$ è detta *precisione di macchina dell'aritmetica finita*. _E' la maggiorazione uniforme dell'errore relativo di rappresentazione_.
   $
     u = cases(b^(1-m) ", troncamento", 1/2 b^(1-m) ", arrotondamento")
   $
 ]
+
 #proof()[
   Per brevità, si riporta la dimostrazione nel solo caso della rappresentazione con troncamento. Simili argomenti si applicano al caso della rappresentazione con arrotondamento. Siano:
   $
@@ -295,7 +321,7 @@ Lo standard prevede due tipi di numeri reali:
 In questo caso vengono allocati un totale di 4 byte (o 32 bit ripartiti nel seguente modo):
 - 1 bit per il segno dell mantissa;
 - 8 bit per l'esponente (s = 8);
-- 23 bit per la frazione $f$ (m = 24).
+- 23 bit per la frazione $f$ (m = 24, in quanto il primo bit è 1 per via della normalizzazione).
 $
   #let cells = ()
   #for n in range(32) {
@@ -348,7 +374,7 @@ $
 In questo caso vengono utilizzati 8 byte (64 bit) per rappresentare un numero in doppia precisione. Questi sono così ripartiti:
 - 1 bit per il segno della mantissa;
 - 11 bit per l'esponente (s = 11);
-- 52 bit per la frazione $f$ (m = 53).
+- 52 bit per la frazione $f$ (m = 53 in quanto il primo bit è 1 per via della normalizzazione).
 
 $
   #let cells = ()
@@ -509,13 +535,13 @@ Segue l'analisi del condizionamento della operazioni algebriche elementari.
 #set heading(outlined: false, numbering: none)
 === Somma algebrica
 $
-  & y                                && = x_1+x_2 quad quad "che, perturbato, dà" \
-  & y(1+epsilon_y)                   && =x_1(1+epsilon_1)+x_2(1+epsilon_2) \
-  & cancel(y)+y epsilon_y            && =cancel(x_1+x_2)+x_1epsilon_1+x_2epsilon_2 \
+  & y                                 && = x_1+x_2 quad quad "che, perturbato, dà" \
+  & y(1+epsilon_y)                    && =x_1(1+epsilon_1)+x_2(1+epsilon_2) \
+  & cancel(y)+y epsilon_y             && =cancel(x_1+x_2)+x_1epsilon_1+x_2epsilon_2 \
   & "Dividendo membro a membro per "y && =x_1+x_2 "otteniamo:" \
-  & epsilon_y                        && = (x_1epsilon_1x_2epsilon_2)/(x_1+x_2) \
+  & epsilon_y                         && = (x_1epsilon_1x_2epsilon_2)/(x_1+x_2) \
   & "da cui:" \
-  & |epsilon_y|                      && <= (|x_1|+|x_2|)/(|x_1+x_2|) dot max{|epsilon_1|,|epsilon_2|}
+  & |epsilon_y|                       && <= (|x_1|+|x_2|)/(|x_1+x_2|) dot max{|epsilon_1|,|epsilon_2|}
 $
 Pertanto, il numero di condizione del problema è
 $
@@ -590,7 +616,7 @@ Concludiamo che la moltiplicazione è sempre *ben condizionato*, poiché il nume
   $
     sum_(i>=0)^infinity gamma^i = 1+ gamma + gamma^2 +... = 1/(1-gamma)
   $
-  Pertanto, se $gamma = - epsilon$, si ha che $ 1/(1+epsilon)=sum_(i>=0) (-epsilon)^i = 1 - epsilon + epsilon^2 ... = 1-epsilon+O(epsilon^2)$
+  Pertanto, se $gamma = - epsilon$, si ha che $1/(1+epsilon)=sum_(i>=0) (-epsilon)^i = 1 - epsilon + epsilon^2 ... = 1-epsilon+O(epsilon^2)$
 ]
 
 $

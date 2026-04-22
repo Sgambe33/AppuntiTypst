@@ -14,8 +14,8 @@
   #include "chapters/chapter1/1-errori-aritmetica.typ"
   #include "chapters/chapter2/2-radici-equazione.typ"
   #include "chapters/chapter3/3-sistemi-lineari.typ"
+  #include "chapters/chapter4/4-approssimazione-funzioni.typ"
+  #include "chapters/chapter5/5-formule-quadratura.typ"
   #include "chapters/extra/algoritmi.typ"
-  #include "chapters/extra/esercizi.typ"
   #include "chapters/extra/glossario.typ"
-  
 ]

@@ -512,7 +512,7 @@ ovvero, l'ordine di convergenza del metodo di Newton diventa *lineare*, come con
 //21.10.2025
 == Convergenza locale
 
-Facciamo prima un riepilogo dei metodi appena visti per la degli zeri di una funzione.
+Facciamo prima un riepilogo dei metodi appena visti per la ricerca degli zeri di una funzione.
 - Metodo di bisezione:
   - applicabile se $f in C[a,b] and f(a)f(b)<0$;
   - ordine di convergenza lineare;
@@ -638,7 +638,7 @@ che garantisce che, se raggiungiamo la radice, ci fermiamo. Questo significa che
   Se $exists delta > 0 : forall x in overbrace([x^*-delta, x^*+delta], =I(x^*))$, $abs(Phi'(x)) lt.eq L<1$, allora $x_(i+1)=Phi(x_i)$ converge a $x^*$, per $i-> infinity$.
 ]
 #proof()[
-  $forall x,y in I(x^*)$ e per lo sviluppo di Taylor con resto al primo ordine segue dunque:
+  $forall x,y in I(x^*)$ e per lo sviluppo di Taylor centrato in $x$ ma calcolato in $y$ con resto al primo ordine segue dunque:
   $
     abs(Phi(x)-Phi(y)) = abs(cancel(Phi(x)) - cancel(Phi(x)) - Phi'(epsilon)(x-y)) = abs(Phi'(epsilon)) dot abs(x-y) < L abs(x-y), space "con " L<1
   $
@@ -741,10 +741,7 @@ Vediamo come ovviare al degrado dell'ordine di convergenza del metodo di Newton 
 - Molteplicità radice nota.
 - Molteplicità radice incognita.
 
-#[
-  #set heading(numbering: none, outlined: false)
-  === La molteplicità della radice è nota
-]
+=== Metodo di Newton modificato
 Se $f(x)$ ha una radice $x^*$ di molteplicità $m>1$, ciò significa che $f(x^*)=f'(x^*)=...=f^(m-1)(x^*)=0$ e $f^m (x^*)eq.not 0$. In questo caso si può vedere che :
 $
   f(x) = (x-x^*)^m g(x)
@@ -759,52 +756,42 @@ $
 $
 Nel caso generale, si dimostra che l'iterazione (primi due passaggi del blocco precedente) ripristina la convergenza quadratica del metodo di Newton. Essa è quella del *metodo di Newton modificato*. Osserviamo che il costo di iterazione rimane lo stesso di quello del metodo di Newton (ovvero 1 valutazione di $f(x)$ + 1 di $f'(x)$).
 
-#[
-  #set heading(numbering: none, outlined: false)
-  === La molteplicità della radice è incognita
-]
+=== Metodo di accelerazione di Aitken
 Supponiamo di voler calcolare la radice $x^*$ di una funzione $f$, ma di non conoscere la molteplicità della radice. Indichiamo con $e_i=x^*-x_i$ l'errore al passo i-esimo. Sappiamo che, se la radice ha molteplicità $m$, allora per il metodo di Newton vale:
 $
   lim_(i->infinity) (e_(i+1))/e_i = (m-1)/m " con" m "molteplicità incognita di "x^*
 $
 cioè la convergenza è *lineare* e non quadratica.
 
-Anche se $m$ non è nota, per $i>>1$ possiamo osservare che:
+Anche se $m$ non è nota, per $i>>1$ sappiamo che:
 $
-  (e_(i+1))/e_i approx frac(e_i, e_(i-1)) approx c = frac(m-1, m)
+  (e_(i+1))/e_i approx c
 $
-Da ciò segue che:
-$
-  #box([
-    $e_(i+1) = c dot e_i$
-  ], stroke: 1pt + black, inset: 5pt)
-  " e "
-  #box([
-    $e_i = c dot e_(i-1)$
-  ], stroke: 1pt + black, inset: 5pt)
-$
-Dividendo membro a membro le due relazioni otteniamo:
+ovvero che $e_(i+1) approx c dot e_i$ e $e_i approx c dot e_(i-1)$, da cui otteniamo, dividendo membro a membro, che:
 $
   (e_(i+1))/e_i approx (e_i)/e_(i-1) => e_(i+1) dot e_(i-1) approx e_i^2
 $
-Andando a sostituire $e_i$ con la sua definizione vale che:
+A questo punto, definiamo $x_i^*$ tale che:
 $
-  (x_i^* - x_(i+1))(x_i^* -x_(i-1)) = (x_i^* - x_i)^2
+  (x^*_i - x_(i+1))(x^*_i -x_(i-1)) approx (x^*_i - x_i)^2
 $
-Sviluppando entrambi i membri e semplificando, si ottiene un’equazione di secondo grado in $x^*$, dalla quale si ricava:
+Sviluppando entrambi i membri e semplificando, si ottiene un'equazione di secondo grado dalla quale si ricava:
 $
-  cancel((x_i^*)^2) -(x_(i+1)+x_(i-1)) dot x_i^* + x_(i+1) dot x_(i-1) = cancel((x_i^*)^2) - 2x_i x_i^* + x_i^2\
-  x_i^*=frac(x_(i+1) dot x_(i-1)-x_i^2, x_(i+1)-2x_i+x_(i-1))
+  cancel((x^*:i)^2) -(x_(i+1)+x_(i-1)) x^*_i + x_(i+1) x_(i-1) & approx cancel((x^*_i)^2) - 2x_i x^*_i + x_i^2 \
+                                  -(x_(i+1)+x_(i-1)+2x_i)x^*_i & approx -x_(i+1)x_(i-1)+x_i^2 \
+                                                         x^*_i & approx frac(x_(i+1)x_(i-1)-x_i^2, x_(i+1)+x_(i-1)+2x_i)
 $
 Questa quantità fornisce una *stima migliorata della radice vera*.
 Il metodo può essere interpretato nel seguente modo:
 + Si applicano due passi del metodo di Newton, ottenendo $x_(i-1), x_i, x_(i+1)$.
 + Usando questi tre valori, si costruisce una nuova approssimazione $x_i^*$ tramite la formula precedente.
 + Il processo può essere ripetuto utilizzando di nuovo il metodo di Newton.
+#index("Metodo di Aitken")Questa procedura definisce il *metodo di accelerazione di Aitken*.
+
 #observation()[
   Il costo per iterazione è doppio rispetto al metodo di Newton _standard_. Il vantaggio è che si può dimostrare che la successione ${x_i^*}$ converge quadraticamente a $x^*$ (anche se la convergenza rimane di tipo locale).
 ]
-#index("Metodo di Aitken")Questa procedura definisce il *metodo di accelerazione di Aitken*.
+
 #example()[
   Esempio di come Newton modificato e Aitken portino ad ottenere il valore della radice più velocemente del metodo di Newton standard.
   #figure(
@@ -867,10 +854,9 @@ $
   f'(x_i) = lim_(h->infinity) frac(f(x_i+h)-f(x_i), h)
 $
 Se approssimiamo $f'(x_i)$ con $frac(f(x_i+h)-f(x_i), h)$ con $h$ fissato, otterremo un'approssimazione del metodo di Newton: si parla, in questo caso, di un metodo *"quasi" Newton*. Nello specifico, otterremmo un metodo "quasi" Newton che ha un costo di 2 valutazioni funzionali per iterazione. Per migliorare questo approccio, procediamo come segue.
-#[
-  #set heading(numbering: none, outlined: false)
-  === Metodo delle secanti
-]
+
+=== Metodo delle secanti
+
 #index("Metodo delle secanti")
 #figure(
   canvas({
@@ -930,10 +916,7 @@ $
     La convergenza verso radici multiple è, al pari del metodo di Newton, *solo lineare*. Trattandosi di un approssimazione del metodo di Newton, la sua convergenza è, generalmente, locale.
 ]
 
-#[
-  #set heading(numbering: none, outlined: false)
-  === Metodo delle corde
-]
+=== Metodo delle corde
 #index("Metodo delle corde")
 #figure(
   canvas({
