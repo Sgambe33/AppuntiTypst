@@ -281,6 +281,7 @@
     [ #thmname[#name] ]
   }
   thmtitle[.]
+  linebreak()
   body
   h(1fr)
   $square$
