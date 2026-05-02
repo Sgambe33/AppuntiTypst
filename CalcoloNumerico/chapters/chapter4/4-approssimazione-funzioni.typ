@@ -1,6 +1,7 @@
 #import "../../../dvd.typ": *
 #import "@preview/cetz:0.4.2": canvas, draw
 #import "@preview/cetz-plot:0.1.3": plot
+#import "@preview/suiji:0.5.1": *
 #import "@preview/in-dexter:0.7.2": *
 #import "@preview/codly:1.3.0": *
 #import "@preview/codly-languages:0.1.1": *
@@ -34,7 +35,7 @@ Dal punto di vista geometrico:
   canvas({
     import draw: *
     plot.plot(
-      size: (15, 8),
+      size: (10, 4),
       x-tick-step: 1,
       y-tick-step: 1,
       y-min: 0,
@@ -42,6 +43,7 @@ Dal punto di vista geometrico:
       x-min: 0,
       x-max: 10,
       plot-style: (stroke: black),
+      legend: "inner-north-east",
       {
         let func = x => -0.05 * calc.pow(x, 3) + 0.55 * calc.pow(x, 2) - 1.3 * x + 5
         let poly = x => -0.2 * calc.pow(x, 2) + 2 * x + 1
@@ -514,8 +516,6 @@ end
 ```
 Come si evince dal ciclo interno, ad ogni iterazione vengono eseguite 3 operazioni vettoriali: una sottrazione `(xx - x(i))`, una moltiplicazione `.*`, e un'addizione `+ f(i)`. Pertanto, il costo computazionale sale a $3n$ `flops` per ogni singolo punto in cui viene calcolato il polinomio interpolante.
 
-#figure(image("images/2026-03-05-11-44-54.png", width: 60%))
-
 *Domanda:* Cosa succede se $x in.not \{x_0, dots, x_n\}$?
 
 // 11.03.2026
@@ -623,7 +623,7 @@ Cosa accade per $x in.not {x_0, dots,x_n}$?
       let nodi = ((1, 2), (3, 5), (5, 6), (7, 1))
 
       plot.plot(
-        size: (12, 6),
+        size: (10, 4),
         x-min: 0,
         x-max: 8,
         y-min: -4,
@@ -646,7 +646,7 @@ Cosa accade per $x in.not {x_0, dots,x_n}$?
   3. *Estrapolazione:* il polinomio interpolante è tracciato e ha senso solo all'interno dell'intervallo $[x_0, x_n]$. Come avevamo osservato, se provassimo a estrapolare il dato all'esterno di questo intervallo, il polinomio (che diverge all'infinito per $x -> oo$) si allontanerebbe drasticamente dalla curva arancione, rendendo l'approssimazione del tutto inaffidabile.
 ]
 
-=== Interpolazione di Hermite
+== Interpolazione di Hermite
 Supponiamo in questo caso, di ricercare il polinomio interpolante, di grado $2n+1$ su $2n+2$ ascisse distinte, che numeriamo come:
 $
   x_0 < x_(1/2) < x_1 < x_(1+1/2) < dots < x_n < x_(n+1/2)
@@ -686,7 +686,6 @@ $
   In altri termini, il polinomio interpolante di Hermite interpola, nelle ascisse assegnate, sia i valori della funzione $f(x)$ che i valori della sua derivata prima $f'(x)$.
 
   Geometricamente, questo significa che il polinomio $p_H (x)$ e la funzione originaria $f(x)$ condividono la *stessa retta tangente* in tutti i nodi di interpolazione.
-  #figure(image("images/2026-03-11-17-23-24.png", width: 50%))
 ]
 #example()[
   #figure(
@@ -1568,7 +1567,120 @@ con $xi_i = -5 + frac(i dot 10, 10^4) = -5 + frac(i, 10^3), i=0,dots,10^4$.
 
 Se grafichiamo $norm(e_n)$ rispetto al grado $n$ del polinomio interpolante, otteniamo quanto segue:
 
-#figure(image("images/2026-03-25-16-47-28.png", width: 70%))
+#align(center)[
+  #canvas({
+    import draw: *
+
+    // 1. Setup Canvas Dimensions
+    let width = 10
+    let height = 6
+
+    // 2. Draw the outer bounding box
+    rect((0, 0), (width, height), stroke: black + 0.5pt)
+
+    // Helper functions to map data to canvas space
+    // X goes from 0 to 200
+    // Y (log10) goes from -16 to 1 (17 decades)
+    let map-x(x) = (x / 200) * width
+    let map-y(y) = ((y + 16) / 17) * height
+
+    // 3. X-axis ticks & labels
+    for i in range(11) {
+      let x = i * 20
+      let cx = map-x(x)
+      line((cx, 0), (cx, 0.15), stroke: black + 0.5pt)
+      line((cx, height), (cx, height - 0.15), stroke: black + 0.5pt)
+      content((cx, -0.4), text(size: 8pt)[#str(x)])
+    }
+
+    // 4. Y-axis Major Ticks (every 2 decades)
+    for i in range(9) {
+      let y = -16 + i * 2
+      let cy = map-y(y)
+      line((0, cy), (0.15, cy), stroke: black + 0.5pt)
+      line((width, cy), (width - 0.15, cy), stroke: black + 0.5pt)
+      content((-0.6, cy), text(size: 8pt)[$10^#y$])
+    }
+
+    // 5. Y-axis Minor Ticks (Logarithmic spacing)
+    for decade in range(-16, 1) {
+      for j in range(2, 10) {
+        let y = decade + calc.log(j, base: 10)
+        if y <= 1 {
+          let cy = map-y(y)
+          line((0, cy), (0.07, cy), stroke: black + 0.3pt)
+          line((width, cy), (width - 0.07, cy), stroke: black + 0.3pt)
+        }
+      }
+    }
+
+    // 6. Axis Titles
+    content((width / 2, -0.9), [$n$])
+    content((-1.4, height / 2), [$||e_n||$], angle: 90deg)
+
+    // 7. Generate Data
+    let lagrange-pts = ()
+    let newton-pts = ()
+
+    // Colors matching default MATLAB styles
+    let blue-color = rgb("#0072BD")
+    let orange-color = rgb("#D95319")
+
+    for i in range(100) {
+      let n = i * 2
+      
+      // Lagrange curve: linear descent in log-space until it hits the floor
+      let log-l = calc.max(-0.08125 * n, -14.3)
+      
+      // Simulate machine precision noise floor
+      if log-l <= -14.3 {
+         log-l = -14.3 + 0.08 * calc.sin(n * 50deg) + 0.04 * calc.cos(n * 130deg)
+      }
+      lagrange-pts.push((map-x(n), map-y(log-l)))
+
+      // Newton curve: follows Lagrange initially, then diverges exponentially
+      let log-n = log-l
+      if n > 44 {
+         log-n = -0.08125 * 44 + 0.25 * (n - 44)
+      }
+      
+      // Only plot points that fit within the bounding box
+      if log-n <= 0.9 {
+         newton-pts.push((map-x(n), map-y(log-n)))
+      }
+    }
+
+    // 8. Draw Line Strips
+    line(..lagrange-pts, stroke: blue-color + 0.7pt)
+    line(..newton-pts, stroke: orange-color + 0.7pt)
+
+    // 9. Draw Circular Markers (with white fill to overlap lines)
+    for pt in lagrange-pts {
+      circle(pt, radius: 0.06, fill: white, stroke: blue-color + 0.7pt)
+    }
+    for pt in newton-pts {
+      circle(pt, radius: 0.06, fill: white, stroke: orange-color + 0.7pt)
+    }
+
+    // 10. Draw Legend
+    let leg-x = width - 2.5
+    let leg-y = height - 0.2
+    let leg-w = 2.3
+    let leg-h = 0.9
+    
+    rect((leg-x, leg-y), (leg-x + leg-w, leg-y - leg-h), stroke: black + 0.3pt, fill: white)
+    
+    // Legend entry: Lagrange
+    line((leg-x + 0.2, leg-y - 0.35), (leg-x + 0.7, leg-y - 0.35), stroke: blue-color + 0.7pt)
+    circle((leg-x + 0.45, leg-y - 0.35), radius: 0.06, fill: white, stroke: blue-color + 0.7pt)
+    content((leg-x + 1.4, leg-y - 0.35), text(size: 8pt)[Lagrange])
+
+    // Legend entry: Newton
+    line((leg-x + 0.2, leg-y - 0.65), (leg-x + 0.7, leg-y - 0.65), stroke: orange-color + 0.7pt)
+    circle((leg-x + 0.45, leg-y - 0.65), radius: 0.06, fill: white, stroke: orange-color + 0.7pt)
+    content((leg-x + 1.35, leg-y - 0.65), text(size: 8pt)[Newton])
+  })
+]
 
 Pertanto, possiamo concludere che se sono necessari polinomi di grado elevato, per approssimare una funzione, è necessario, in primis, utilizzare ascisse che diano una crescita ottimale del condizionamento del problema (ad esempio, le ascisse di Chebyshev). In secondo luogo, si osserva che la forma di Lagrange ha un andamento più favorevole, riguardo alla propagazione degli errori di round-off, ovvero legati all'utilizzo dell'aritmetica finita.
 
@@ -1663,10 +1775,58 @@ Pertanto, $cal(L)_m (Delta)$ *è uno spazio vettoriale*. A riguardo, si osserva 
     Dalla definizione di spline, sappiamo che:
     + $S_m (x)$ ristretta a ogni sotto-intervallo $[x_(i-1), x_i]$ è un polinomio di grado $m$. Derivando un polinomio di grado $m$, si ottiene banalmente un polinomio di grado $m-1$.
     + Globalmente, la spline richiede una regolarità $S_m (x) in C^((m-1))[a,b]$. Se deriviamo l'intera funzione, il grado di continuità "scala" di uno, ottenendo $S'_m (x) in C^((m-2))[a,b]$.
-    Queste due condizioni soddisfano esattamente la definizione di una spline di grado $m-1$.
+    Queste due condizioni soddisfano la definizione di una spline di grado $m-1$.
   ]
 
-  #figure(image("images/2026-03-25-17-34-55.png", width: 70%))
+  #figure(canvas({
+    import draw: *
+
+    // 2. Axes (Blue)
+    line((0, 0), (10, 0), mark: (end: ">"))
+    line((0, 0), (0, 5), mark: (end: ">"))
+
+    // 3. Define the data points
+    let p0 = (1.0, 2.0)
+    let p1 = (3.0, 4.0)
+    let p2 = (5.5, 3.0)
+    let p3 = (8.5, 4.0)
+
+    // 4. Draw the linear spline connecting the points (Green)
+    line(p0, p1, p2, p3, stroke: rgb("#008a5e") + 1.5pt)
+
+    // 5. Draw the scatter points (Red)
+    let r = 0.08
+    circle(p0, radius: r, fill: red, stroke: none)
+    circle(p1, radius: r, fill: red, stroke: none)
+    circle(p2, radius: r, fill: red, stroke: none)
+    circle(p3, radius: r, fill: red, stroke: none)
+
+    // 6. X-axis tick marks and labels (Red)
+    let tick-y = -0.15
+    let label-y = -0.5
+
+    line((p0.at(0), 0), (p0.at(0), tick-y))
+    content((p0.at(0), label-y), [$x_0$])
+
+    line((p1.at(0), 0), (p1.at(0), tick-y))
+    content((p1.at(0), label-y), [$x_1$])
+
+    line((p2.at(0), 0), (p2.at(0), tick-y))
+    content((p2.at(0), label-y), [$x_2$])
+
+    line((p3.at(0), 0), (p3.at(0), tick-y))
+    content((p3.at(0), label-y), [$x_3$])
+
+    // 7. Point coordinate labels (Black)
+    content((p0.at(0) + 0.7, p0.at(1) - 0.5), [$(x_0, f_0)$])
+    content((p1.at(0) + 0.6, p1.at(1) + 0.5), [$(x_1, f_1)$])
+    content((p2.at(0) - 0.1, p2.at(1) - 0.6), [$(x_2, f_2)$])
+    content((p3.at(0) + 0.8, p3.at(1) - 0.2), [$(x_3, f_3)$])
+
+    // 8. Annotations
+    // "n = 3" in the top right
+    content((9.2, 5.5), text(fill: black, weight: "bold")[$n=3$])
+  }))
 
   Da questi concetti si deduce che la spline lineare interpolante sui nodi $(x_i, f_i)$ per $i=0, dots, n$ non è altro che la *spezzata che unisce i punti consecutivi*.
 
@@ -1974,7 +2134,7 @@ Nel caso di una *spline not-a-knot*, le equazioni si completano con le condizion
 <4.56>
 $
   (4.56) quad quad & m_0 xi_1 - m_1 + m_2 phi_1 = 0, \
-                & xi_(n-1) m_(m-2)-m_(n-1)+m_n phi_(n-1) = 0
+                   & xi_(n-1) m_(m-2)-m_(n-1)+m_n phi_(n-1) = 0
 $
 Scriviamo in forma vettoriale #link(<4.55>, [(4.55)]) + #link(<4.47>, [(4.47)]):
 $
@@ -2089,7 +2249,7 @@ $
 $
 In conclusione, il sistema lineare #link(<4.57>, [(4.57)]) si può riscrivere come:
 $
-B dot (F^(-1) uu(m)) = uu(f)\
+  B dot (F^(-1) uu(m)) = uu(f)\
   mat(
     1, 0, 0, ;
     phi_1, (2-phi_1), (xi_1-phi_1);
@@ -2127,11 +2287,136 @@ Risolto questo, $m_0$ e $m_n$ si ottengono per differenza della #link(<4.58>, [(
 
 
 == Approssimazione polinomiale ai minimi quadrati
+#let ok_interpolation(width, height) = figure(
+  canvas({
+    import draw: *
+
+    rect((0, 0), (width, height), stroke: black + 0.5pt)
+
+    let map-x(x) = (x + 1) / 2 * width
+    let map-y(y) = (y + 1) / 2 * height
+
+    // 3. Draw ticks and labels
+    for i in range(11) {
+      let v = -1 + i * 0.2
+
+      // X-axis ticks & labels
+      let cx = map-x(v)
+      line((cx, 0), (cx, 0.1), stroke: black + 0.5pt)
+      line((cx, height), (cx, height - 0.1), stroke: black + 0.5pt)
+      content((cx, -0.4), text(size: 8pt)[#str(calc.round(v, digits: 1))])
+
+      // Y-axis ticks & labels
+      let cy = map-y(v)
+      line((0, cy), (0.1, cy), stroke: black + 0.5pt)
+      line((width, cy), (width - 0.1, cy), stroke: black + 0.5pt)
+      content((-0.5, cy), text(size: 8pt)[#str(calc.round(v, digits: 1))])
+    }
+
+    // 4. Axis Titles
+    content((width / 2, -1), [*x*])
+    content((-1.2, height / 2), [*y*], angle: 90deg)
+
+    // 5. Generate and draw trend lines (Cubic function simulation)
+    let pts-black = ()
+    let pts-red = ()
+    for i in range(101) {
+      let x = -1 + i * 0.02
+      let y-base = x * x * x * 0.8 - x * 0.1
+      pts-black.push((map-x(x), map-y(y-base)))
+
+      pts-red.push((map-x(x), map-y(y-base + 0.015 * calc.sin(x * 15))))
+    }
+
+    // Draw the generated line-strips
+    line(..pts-black, stroke: black + 1pt)
+    line(..pts-red, stroke: red + 1pt)
+
+    let rng = gen-rng-f(42)
+    let v = ()
+
+    for i in range(700) {
+      (rng, v) = uniform-f(rng, low: -1.0, high: 1.0, size: 2)
+
+      let x = v.at(0)
+      let noise = v.at(1) * 0.25
+      let y = x * x * x * 0.8 - x * 0.1 + noise
+
+      if y >= -1 and y <= 1 {
+        circle((map-x(x), map-y(y)), radius: 0.02, fill: rgb("1f77b4"), stroke: none)
+      }
+    }
+  }),
+)
+
+#let bad_interpolation(width, height) = figure(canvas({
+  import draw: *
+
+  // 2. Draw the outer bounding box
+  rect((0, 0), (width, height), stroke: black + 0.5pt)
+
+  // Helper functions to map data space [-1, 1] to canvas space
+  let map-x(x) = (x + 1) / 2 * width
+  let map-y(y) = (y + 1) / 2 * height
+
+  // 3. Draw ticks and labels
+  for i in range(11) {
+    let v = -1 + i * 0.2
+
+    // X-axis ticks & labels
+    let cx = map-x(v)
+    line((cx, 0), (cx, 0.1), stroke: black + 0.5pt)
+    line((cx, height), (cx, height - 0.1), stroke: black + 0.5pt)
+    content((cx, -0.4), text(size: 8pt)[#str(calc.round(v, digits: 1))])
+
+    // Y-axis ticks & labels
+    let cy = map-y(v)
+    line((0, cy), (0.1, cy), stroke: black + 0.5pt)
+    line((width, cy), (width - 0.1, cy), stroke: black + 0.5pt)
+    content((-0.5, cy), text(size: 8pt)[#str(calc.round(v, digits: 1))])
+  }
+
+  // 4. Axis Titles
+  content((width / 2, -1), [*x*])
+  content((-1.2, height / 2), [*y*], angle: 90deg)
+
+  // 5. Generate data points using suiji
+  let rng = gen-rng-f(42)
+  let v = ()
+  let raw-pts = ()
+
+  for i in range(700) {
+    // Generate uniform random floats between -1.0 and 1.0
+    (rng, v) = uniform-f(rng, low: -1.0, high: 1.0, size: 2)
+
+    let x = v.at(0)
+    let noise = v.at(1) * 0.25
+    let y = x * x * x * 0.8 - x * 0.1 + noise
+
+    // Clamp y to stay within bounds
+    if y >= -1 and y <= 1 {
+      raw-pts.push((x, y))
+    }
+  }
+
+  // 6. Sort points by X-coordinate to draw the continuous jagged line correctly
+  let sorted-pts = raw-pts.sorted(key: pt => pt.at(0))
+  let mapped-pts = sorted-pts.map(pt => (map-x(pt.at(0)), map-y(pt.at(1))))
+
+  // 7. Draw the jagged red line connecting all points
+  line(..mapped-pts, stroke: red + 0.5pt)
+
+  // 8. Draw the blue scatter points on top
+  for pt in mapped-pts {
+    circle(pt, radius: 0.025, fill: blue, stroke: none)
+  }
+}))
+
 #grid(
-    columns: (1fr, 1fr),
-    gutter: 10pt,
-    [#image("images/2026-04-19-22-30-47.png")Approssimazione ai minimi quadrati con $m << n$. Il polinomio di grado basso filtra il rumore e cattura il trend fisico.],
-    [#image("images/2026-04-19-22-30-52.png")Se il grado $m$ è troppo alto ($m approx n$), il polinomio inizia a interpolare il rumore, generando oscillazioni instabili.]
+  columns: (1fr, 1fr),
+  gutter: 10pt,
+  [#ok_interpolation(6, 4) Approssimazione ai minimi quadrati con $m << n$. Il polinomio di grado basso filtra il rumore e cattura il trend fisico.],
+  [#bad_interpolation(6, 4) Se il grado $m$ è troppo alto ($m approx n$), il polinomio inizia a interpolare il rumore, generando oscillazioni instabili.],
 )
 
 Il problema è il seguente: supponiamo di avere $n+1$ coppie di dati $(x_i, y_i)$ per $i=0, dots, n$, che rappresentano misurazioni (rumorose) di un fenomeno fisico descritto da un polinomio $p(x) in Pi_m$, con $m << n$.
@@ -2155,8 +2440,7 @@ Nel seguito, assumeremo che almeno $m+1$ delle ascisse $x_i$ siano tra loro dist
 
   Definiamo il residuo $i$-esimo come la differenza tra il valore predetto dal polinomio e il valore effettivamente osservato nell'ascissa $x_i$:
   $
-    r_i = y_i - p(x_i) =  y_i - sum_(j=0)^m a_j x_i^j , quad quad "per" i=0, dots, n\
-
+    r_i = y_i - p(x_i) = y_i - sum_(j=0)^m a_j x_i^j , quad quad "per" i=0, dots, n\
     r^2 = sum_(i=0)^n r_i^2 = sum_(i=0)^n (y_i - sum_(j=0)^m a_j x_i^j)^2
   $
 
@@ -2192,6 +2476,3 @@ Nel seguito, assumeremo che almeno $m+1$ delle ascisse $x_i$ siano tra loro dist
 #observation()[
   In Matlab, la function `polyfit(x, y, m)` implementa esattamente questo algoritmo: costruisce la matrice di Vandermonde e risolve il problema ai minimi quadrati per restituire i coefficienti del polinomio approssimante.
 ]
-
-Per il problema proposto inizialmente ($n=1000, space m=3$), si ottiene il grafico sottostante (in rosso il polinomio originario/ideale, in nero il polinomio calcolato ai minimi quadrati a partire dai dati rumorosi).
-#figure(image("images/2026-04-19-22-45-12.png", width: 70%))
