@@ -92,10 +92,10 @@ $u$ clausola di $p$
 == Problema del Vertex Cover (VC)
 
 #definition()[
-  Dato $G=(V, E)$ grafo non orientato, un *vertex cover* di G è un sottoinsieme $c subset.eq V$ t.c. $forall{x,y} in E, x in C "oppure" y in C$
+  Dato $G=(V, E)$ grafo non orientato, un *vertex cover* di G è un sottoinsieme $C subset.eq V$ t.c. $forall{x,y} in E, x in C "oppure" y in C$
 ]
 #problem()[
-  Dato G grafo non orientatoe $k in NN$, esiste un VC $C "di" G$ con $abs(C) = k?$
+  Dato G grafo non orientato e $k in NN$, esiste un VC $C "di" G$ con $abs(C) = k?$
 ]
 #observation()[
   VC $in$ NP
