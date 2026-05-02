@@ -141,3 +141,83 @@
 ]
 
 #fatt-qr
+
+///////////////////////////////////////////////////////////////
+#pagebreak()
+
+== Ascisse di Chebyshev
+#let ascisse_chebyshev-data = read("scriptMATLAB/ascisse_chebyshev.m")
+#let ascisse_chebyshev = [
+  #codly(header: [Ascisse di Chebyshev ])
+  #raw(block: true, lang: "matlab", ascisse_chebyshev-data)
+]
+
+#ascisse_chebyshev
+
+///////////////////////////////////////////////////////////////
+#pagebreak()
+
+== Sistema tridiagonale
+#let tridiag-data = read("scriptMATLAB/tridiag.m")
+#let tridiag = [
+  #codly(header: [Sistema tridiagonale])
+  #raw(block: true, lang: "matlab", tridiag-data)
+]
+
+#tridiag
+
+///////////////////////////////////////////////////////////////
+#pagebreak()
+
+== Formula trapezi composita
+#let trapezi_composita-data = read("scriptMATLAB/trapezi_composita.m")
+#let trapezi_composita = [
+  #codly(header: [Formula trapezi composita])
+  #raw(block: true, lang: "matlab", trapezi_composita-data)
+]
+
+#trapezi_composita
+
+///////////////////////////////////////////////////////////////
+#pagebreak()
+
+== Formula trapezi adattiva
+#let trapezi_adattiva-data = read("scriptMATLAB/trapezi_adattiva.m")
+#let trapezi_adattiva = [
+  #codly(header: [Formula trapezi adattiva])
+  #raw(block: true, lang: "matlab", trapezi_adattiva-data)
+]
+
+#trapezi_adattiva
+
+///////////////////////////////////////////////////////////////
+#pagebreak()
+
+== Formula Simpson composita
+#let simpson_composita-data = read("scriptMATLAB/simpson_composita.m")
+#let simpson_composita = [
+  #codly(header: [Formula Simpson composita])
+  #raw(block: true, lang: "matlab", simpson_composita-data)
+]
+
+#simpson_composita
+
+///////////////////////////////////////////////////////////////
+#pagebreak()
+
+== Formula Simpson adattiva
+#let simpson_adattiva-data = read("scriptMATLAB/simpson_adattiva.m")
+#let simpson_adattiva = [
+  #codly(header: [Formula Simpson adattiva])
+  #raw(block: true, lang: "matlab", simpson_adattiva-data)
+]
+
+#simpson_adattiva
+
+///////////////////////////////////////////////////////////////
+
+
+ascisse chebyshev grado k
+
+sistema tridiagonale
+
