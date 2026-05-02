@@ -1,5 +1,5 @@
 #import "../../../dvd.typ": *
-#import "@preview/cetz:0.4.2": canvas, draw
+#import "@preview/cetz:0.5.0": canvas, draw
 #import "@preview/cetz-plot:0.1.3": plot
 #import "@preview/codly:1.3.0": *
 #import "@preview/codly-languages:0.1.1": *
@@ -78,20 +78,20 @@ $
 $
 Geometricamente, stiamo approssimando l'area sottesa dal grafico di $f(x)$ con l'area del trapezio rettangolo individuato dai vertici $(a,0), (b,0), (b,f(b))$ e $(a,f(a))$. Per questo motivo, la formula prende il nome di *metodo dei trapezi*.
 
-
 #figure(
   canvas({
     import draw: *
     plot.plot(
-      size: (10, 5),
+      size: (10, 6),
+      axis-style: "school-book",
       x-tick-step: 1,
       y-tick-step: 1,
-      y-min: -2,
+      y-min: -1,
       x-min: 0,
-      x-max: 14,
+      x-max: 12,
       y-max: 8,
       plot-style: (stroke: black),
-      min: 0,
+      legend: "inner-north-east",
       {
         let func = x => 4 + 1 / 2 * (x - 2) - 9 / 221 * (x - 2) * (x - 4) + 139 / 13260 * (x - 2) * (x - 4) * (x - 10.5)
         let func2 = x => 0.3 * x + 3.4
@@ -108,17 +108,14 @@ Geometricamente, stiamo approssimando l'area sottesa dal grafico di $f(x)$ con l
         let nodes = ((2, 4), (12, 7))
         plot.add(nodes, style: (stroke: none), mark: "o")
 
-        plot.add-hline(0, min: 0, max: 14, style: (stroke: black))
-
-
         plot.add-vline(2, min: 0, max: 3.8, style: (stroke: blue))
         plot.add-vline(12, min: 0, max: 6.8, style: (stroke: blue))
 
         plot.add-hline(4, min: 0, max: 1.8, style: (stroke: red))
         plot.add-hline(7, min: 0, max: 11.8, style: (stroke: red))
         plot.annotate({
-          content((2, -0.5), $a$)
-          content((12, -0.5), $b$)
+          content((2.3, 0.5), $a$)
+          content((11.7, 0.5), $b$)
         })
       },
     )
@@ -280,7 +277,7 @@ Approfondiamo la logica matematica dietro il calcolo del numeratore. In Matlab, 
 $
   p(t) = a_1 t^n + a_2 t^(n-1) + dots + a_n t + a_(n+1)
 $
-Il nostro obiettivo è calcolarne l'integrale. Per le regole base dell'integrazione, ogni termine $t^m$ diventa $frac(t^(m+1),m+1)$. Se applichiamo questa regola a tutto il polinomio, otteniamo la sua funzione primitiva:
+Il nostro obiettivo è calcolarne l'integrale. Per le regole base dell'integrazione, ogni termine $t^m$ diventa $frac(t^(m+1), m+1)$. Se applichiamo questa regola a tutto il polinomio, otteniamo la sua funzione primitiva:
 $
   integral p(t) d t = a_1/(n+1) t^(n+1) + a_2/n t^n + dots + a_n/2 t^2 + a_(n+1)/1 t + C
 $
@@ -322,10 +319,7 @@ Per superare questo paradosso, si introducono le formule di *Newton-Cotes compos
   #set heading(outlined: false, numbering: none)
   === Formula composita dei trapezi
 ]
-Per illustrare il concetto, applichiamo iterativamente la formula dei trapezi.
-#figure(image("images/2026-04-20-12-00-59.png"))
-
-L'integrale complessivo viene approssimato come somma delle aree dei singoli trapezi (in questo caso $n$ rappresenta il numero di sottointervalli creati):
+Per illustrare il concetto, applichiamo iterativamente la formula dei trapezi. L'integrale complessivo viene approssimato come somma delle aree dei singoli trapezi (in questo caso $n$ rappresenta il numero di sottointervalli creati):
 $
   I(f) = integral_a^b f(x) d x & = sum_(i=1)^n integral_(x_(i-1))^x_i f(x) d x \
                                & approx sum_(i=1)^n underbrace((b-a)/n, =h) (frac(f_(i-1)+f_i, 2)) \
@@ -610,7 +604,8 @@ Talora si presentano integrali definiti da una funzione che varia in modo drasti
   $
     integral_(1/2)^100 -2x^(-3) cos(x^(-2)) d x equiv sin(10^(-4)) - sin(4)
   $
-  #figure(image("images/2026-04-22-16-45-45.png"))
+  
+  #figure(image("images/2026-04-22-16-45-45.png", width: 60%))
   Come si evince dal grafico, questa funzione oscilla violentemente vicino a $x=1/2$ (a causa del termine $x^(-2)$ che diverge), per poi appiattirsi quasi istantaneamente procedendo verso $x=100$. Un metodo a passo fisso costringerebbe a usare un $h$ minuscolo su tutto il dominio $[1/2, 100]$ solo per catturare le oscillazioni iniziali, sprecando milioni di valutazioni inutili nella zona piatta.
 ]
 
@@ -635,4 +630,4 @@ A questo punto si imposta un controllo algoritmico:
 L'accortezza fondamentale nell'implementare questa procedura è *evitare valutazioni funzionali ridondanti*. Nel calcolo di $I_1^((2))$, i valori $f(a)$, $f(x_1)$ e $f(b)$ sono già stati determinati e devono essere passati alle chiamate ricorsive successive per non ricalcolarli inutilmente.
 
 Ad esempio, impostando `tol` = $10^(-3)$, un'implementazione Matlab posizionerà automaticamente i nodi in questo modo (notare l'addensamento a sinistra):
-#figure(image("images/2026-04-22-16-48-09.png"))
+#figure(image("images/2026-04-22-16-48-09.png", width: 60%))
