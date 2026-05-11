@@ -489,9 +489,10 @@ Questo procedimento prende il nome di *algoritmo di Horner*. La sua complessità
   header: [*Algoritmo 4.2* Algoritmo di Horner],
 )
 ```matlab
-p = a(n+1);
-for i = n:-1:1
-  p = p * x + a(i);
+n = length(a)-1;
+p= a(n+1);
+for i = n: -1 : 1
+    p = p * x + a(i);
 end
 ```
 #observation()[
@@ -509,9 +510,9 @@ In Matlab, supponendo che `x` sia il vettore contenente le ascisse dei nodi, `f`
   header: none,
 )
 ```matlab
-p = f(n+1);
-for i = n:-1:1
-  p = p .* (xx - x(i)) + f(i);
+p= a(n+1) * ones(size(xx));
+for i = n: -1 : 1
+    p = p .* (xx - x(i)) + f(i);
 end
 ```
 Come si evince dal ciclo interno, ad ogni iterazione vengono eseguite 3 operazioni vettoriali: una sottrazione `(xx - x(i))`, una moltiplicazione `.*`, e un'addizione `+ f(i)`. Pertanto, il costo computazionale sale a $3n$ `flops` per ogni singolo punto in cui viene calcolato il polinomio interpolante.
@@ -1628,25 +1629,25 @@ Se grafichiamo $norm(e_n)$ rispetto al grado $n$ del polinomio interpolante, ott
 
     for i in range(100) {
       let n = i * 2
-      
+
       // Lagrange curve: linear descent in log-space until it hits the floor
       let log-l = calc.max(-0.08125 * n, -14.3)
-      
+
       // Simulate machine precision noise floor
       if log-l <= -14.3 {
-         log-l = -14.3 + 0.08 * calc.sin(n * 50deg) + 0.04 * calc.cos(n * 130deg)
+        log-l = -14.3 + 0.08 * calc.sin(n * 50deg) + 0.04 * calc.cos(n * 130deg)
       }
       lagrange-pts.push((map-x(n), map-y(log-l)))
 
       // Newton curve: follows Lagrange initially, then diverges exponentially
       let log-n = log-l
       if n > 44 {
-         log-n = -0.08125 * 44 + 0.25 * (n - 44)
+        log-n = -0.08125 * 44 + 0.25 * (n - 44)
       }
-      
+
       // Only plot points that fit within the bounding box
       if log-n <= 0.9 {
-         newton-pts.push((map-x(n), map-y(log-n)))
+        newton-pts.push((map-x(n), map-y(log-n)))
       }
     }
 
@@ -1667,9 +1668,9 @@ Se grafichiamo $norm(e_n)$ rispetto al grado $n$ del polinomio interpolante, ott
     let leg-y = height - 0.2
     let leg-w = 2.3
     let leg-h = 0.9
-    
+
     rect((leg-x, leg-y), (leg-x + leg-w, leg-y - leg-h), stroke: black + 0.3pt, fill: white)
-    
+
     // Legend entry: Lagrange
     line((leg-x + 0.2, leg-y - 0.35), (leg-x + 0.7, leg-y - 0.35), stroke: blue-color + 0.7pt)
     circle((leg-x + 0.45, leg-y - 0.35), radius: 0.06, fill: white, stroke: blue-color + 0.7pt)

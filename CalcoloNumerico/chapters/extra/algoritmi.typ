@@ -145,6 +145,30 @@
 ///////////////////////////////////////////////////////////////
 #pagebreak()
 
+== Algoritmo di Horner
+#let horner-data = read("scriptMATLAB/horner.m")
+#let horner = [
+  #codly(header: [Algoritmo di Horner])
+  #raw(block: true, lang: "matlab", horner-data)
+]
+
+#horner
+
+///////////////////////////////////////////////////////////////
+#pagebreak()
+
+== Algoritmo di Horner-Newton
+#let horner_newton-data = read("scriptMATLAB/horner_newton.m")
+#let horner_newton = [
+  #codly(header: [Algoritmo di Horner-Newton])
+  #raw(block: true, lang: "matlab", horner_newton-data)
+]
+
+#horner_newton
+
+///////////////////////////////////////////////////////////////
+#pagebreak()
+
 == Ascisse di Chebyshev
 #let ascisse_chebyshev-data = read("scriptMATLAB/ascisse_chebyshev.m")
 #let ascisse_chebyshev = [
