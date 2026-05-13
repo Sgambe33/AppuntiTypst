@@ -233,7 +233,6 @@ Un grafo delle dipendenze rappresenta il flusso di informazioni attraverso gli a
 #pagebreak()
 
 #example()[
-  //TODO: rifare in typst
   Altro esempio di grafo delle dipendenze ma più complesso:
   #align(right)[
       #table(
@@ -598,10 +597,10 @@ Ogni nodo di un albero sintattico rappresenta un costrutto e i figli di tale nod
     cell-size: 0mm,
     spacing: 2mm,
     
-    node((6, 0), [_E.node_], name: <l60>),
+    node((5, 0), [_E.node_], name: <l50>),
     
     node((2, 1), [_E.node_], name: <l21>),
-    node((6, 1), [$+$]     , name: <l61>),
+    node((5, 1), [$+$]     , name: <l51>),
     node((8, 1), [_T.node_], name: <l81>),
     
     node((1, 2), [_E.node_], name: <l12>),
@@ -612,40 +611,44 @@ Ogni nodo di un albero sintattico rappresenta un costrutto e i figli di tale nod
     node((1, 3), [_T.node_], name: <l13>),
     node((4, 3), [*num*]   , name: <l43>),
     
-    node((1, 4), [*id*]    , name: <l14>),
-    node((4, 4), [$+$]     , name: <l44>),
-    node((5, 4), [$"    "$], name: <l54>),
-    node((6, 4), [$"    "$], name: <l64>),
+    node((1, 4), [*id*]      , name: <l14>),
+    node((4, 4), [$" "+$]    , name: <l44>),
+    node((5, 4), []          , name: <l54>),
+    node((6, 4), [$"      "$], name: <l64>),
     node(enclose: (<l44>, <l54>, <l64>), stroke: 0.5pt, inset: 1.5pt, name: <group1>),
     
-    node((2, 8), [$+$]     , name: <l25>),
-    node((3, 8), [$"    "$], name: <l35>),
-    node((4, 8), [$"    "$], name: <l45>),
+    node((2, 8), [$-$]    , name: <l25>),
+    node((3, 8), []       , name: <l35>),
+    node((4, 8), [$"   "$], name: <l45>),
     node(enclose: (<l25>, <l35>, <l45>), stroke: 0.5pt, inset: 1.5pt, name: <group2>),
-    node((8, 6), [*id*]    , name: <l85>),
-    node((9, 6), [$"    "$], name: <l95>),
+    node((8, 8), [*id*]  , name: <l85>),
+    node((9, 8), [$"  "$], name: <l95>),
     node(enclose: (<l85>, <l95>), stroke: 0.5pt, inset: 1.5pt, name: <group3>),
 
-    node((0, 10), [*id*]    , name: <l06>),
-    node((1, 10), [$"    "$], name: <l16>),
+    node((8.5, 10), [$"all'elemento per "c$], name: <elC>),
+
+    node((0, 12), [*id*]    , name: <l06>),
+    node((1, 12), [$"  "$], name: <l16>),
     node(enclose: (<l06>, <l16>), stroke: 0.5pt, inset: 1.5pt, name: <group4>),
-    node((6, 10), [*num*]   , name: <l66>),
-    node((7, 10), [$4$]     , name: <l76>),
+    node((6, 12), [*num*]   , name: <l66>),
+    node((7, 12), [$4" "$]     , name: <l76>),
     node(enclose: (<l66>, <l76>), stroke: 0.5pt, inset: 1.5pt, name: <group5>),
+
+    node((0.5, 14), [$"all'elemento per "a$], name: <elA>),
 
     // GROUP SEPARATORS //
     edge((4.5, 3.55), (4.5, 4.8 ), dash: "dashed", stroke: gray, snap-to: none),
     edge((5.5, 3.55), (5.5, 4.8 ), dash: "dashed", stroke: gray, snap-to: none),
     edge((2.5, 7.3 ), (2.5, 8.7 ), dash: "dashed", stroke: gray, snap-to: none),
     edge((3.5, 7.3 ), (3.5, 8.7 ), dash: "dashed", stroke: gray, snap-to: none),
-    edge((8.5, 5.3 ), (8.5, 6.7 ), dash: "dashed", stroke: gray, snap-to: none),
-    edge((0.5, 9.3 ), (0.5, 10.7), dash: "dashed", stroke: gray, snap-to: none),
-    edge((6.5, 9.3 ), (6.5, 10.7), dash: "dashed", stroke: gray, snap-to: none),
+    edge((8.5, 7.3 ), (8.5, 8.7 ), dash: "dashed", stroke: gray, snap-to: none),
+    edge((0.5, 11.3), (0.5, 12.7), dash: "dashed", stroke: gray, snap-to: none),
+    edge((6.5, 11.3), (6.5, 12.7), dash: "dashed", stroke: gray, snap-to: none),
     
     // EDGE a puntini //
-    edge(<l60>, <l21>, dash: "dotted"),
-    edge(<l60>, <l61>, dash: "dotted"),
-    edge(<l60>, <l81>, dash: "dotted"),
+    edge(<l50>, <l21>, dash: "dotted"),
+    edge(<l50>, <l51>, dash: "dotted"),
+    edge(<l50>, <l81>, dash: "dotted"),
 
     edge(<l21>, <l12>, dash: "dotted"),
     edge(<l21>, <l22>, dash: "dotted"),
@@ -659,11 +662,26 @@ Ogni nodo di un albero sintattico rappresenta un costrutto e i figli di tale nod
     edge(<l81>, <l82>, dash: "dotted"),
 
     // EDGES trattegiati //
-    edge(<l21>, <2)
+    edge(<l50>, <l64>, dash: "dashed", "-|>", bend: 15deg),
+    edge(<l21>, <l25.north>, dash: "dashed", "-|>", bend: -30deg),
+    edge(<l81>, <l95>, dash: "dashed", "-|>", bend: 30deg),
     edge(<l12>, <group4.north-west>, dash: "dashed", "-|>", bend: -30deg),
-    edge(<l13>, (0.2, 10), dash: "dashed", "-|>", bend: -30deg, snap-to: (<l13>, <group4>)),
+    edge(<l13>, <l06>, dash: "dashed", "-|>", bend: -25deg),
+    // Loopty loop
+    edge(<l42>   , (4.0, 6), dash: "dashed", bend: -94deg),
+    edge((4.0, 6), (5.5, 6), dash: "dashed", bend: 15deg),
+    edge((5.5, 6), <l76> , dash: "dashed", "-|>", bend: 35deg),
+
+    // EDGES normali //
+    edge(<l54>, <group2.north>, "-|>"),
+    edge(<l64.center>, <group3.north>, "-|>"),
+    edge(<l35>, <group4.north>, "-|>"),
+    edge(<l45.center>, <group5.north>, "-|>"),
+    edge(<l16.west>, (0.8, 14), "-|>"),
+    edge(<l95.west>, (8.8, 10), "-|>"),
+
   ), caption: "Albero sintattico per a - 4 + c")
-  #figure(image("images/2025-11-17-10-18-02.png"), caption: "Albero sintattico per a - 4 + c")
+  //#figure(image("images/2025-11-17-10-18-02.png"), caption: "Albero sintattico per a - 4 + c")
   Se le regole vengono eseguite nell'ordine definito da una visita in postordine dell'albero di parsing o secondo un parsing bottom-up si ha la sequenza di passi
   + `p1 = new Leaf(id, entry-a)`;
   + `p2 = new Leaf(num, 4)`;
@@ -675,10 +693,119 @@ Ogni nodo di un albero sintattico rappresenta un costrutto e i figli di tale nod
 
 #example()[
   SDD L-attribuita per espressioni con + e - per la stringa a - 4 + c.
-  #figure(image("images/2025-11-17-10-20-07.png"))
+    #figure(
+  table(
+    stroke: none,
+    columns: (.01fr, .04fr, .25fr, .7fr),
+    align: left,
+    table.hline(start:0),
+    table.header(
+      table.cell([]),
+      table.cell([]),
+      table.cell([*Produzione*]),
+      table.cell([*Regole semantiche*])
+    ),
+    table.hline(start: 0),
+    [ ], [1)], [$E -> T E'$   ], [_E.node_     = _$E'$.syn_                          ],
+    [ ], [  ], [$$            ], [_$E'$.inh_   = _T.node_                            ],
+    [ ], [2)], [$E'-> +T E'_1$], [_$E'_1$.inh_ = *new* _Node($'+'$, E\'.inh, T.node)_],
+    [ ], [  ], [$$            ], [_E\'.syn_    = _$E'_1$.syn_                        ],
+    [ ], [3)], [$E -> -T E'_1$], [_$E'_1$.inh_ = *new* _Node($'-'$, E\'.inh, T.node)_],
+    [ ], [  ], [$$            ], [_E\'.syn_    = _$E'_1$.syn_                        ],
+    [ ], [4)], [$E'-> epsilon$], [_E'.syn_     = _E'.inh_                            ],
+    [ ], [5)], [$T -> (E)$    ], [_T.node_     = _E.node_                            ],
+    [ ], [6)], [$T ->$ *id*   ], [_T.node_     = *new* _Leaf_(*id*, *id*._entry_)    ],
+    [ ], [7)], [$T ->$ *num*  ], [_T.node_     = *new* _Leaf_(*num*, *num*._val_)    ],
+    table.hline(start: 0)
+  ))
+  //#figure(image("images/2025-11-17-10-20-07.png"))
   Questa grammatica, adatta per il parsing top-down, produce lo stesso risultato, con gli stessi passi. Si ottiene lo stesso albero sintattico anche se l'albero di parsing è molto diverso. La variabile $E'$ ha un attributo ereditato *inh* e un attributo sintetizzato *syn*. L'attributo ereditato $E'$.inh rappresenta la porzione di albero sintattico costruita fino ad un certo punto, cioè la radice del sottoalbero corrispondente al prefisso della stringa d'ingresso relativa alla porzione di albero che si trova a sinistra di $E'$. Al nodo 5 del grafo delle dipendenze $E'$.inh rappresenta la radice del sottoalbero sintattico corrispondente all'identificatore $a$. Al nodo 6 $E'$.inh indica la radice del sottoalbero sintattico corrispondente alla stringa $a - 4$. Al nodo 9 $E'$.inh rappresenta l'albero sintattico corrispondente alla stringa $a - 4 + c$. Poiché la stringa in ingresso è terminata, $E'$.inh al nodo 9 punta alla radice dell'intero albero sintattico. L'attributo syn propaga tale valore fino all'attributo $E$.node.
 
-  #figure(image("images/2025-11-17-10-20-25.png"), caption: "Grafo delle dipendenze per a - 4 + c")
+  #figure(diagram(
+    node-stroke: none,
+    cell-size: 5mm,
+    spacing: 3mm,
+    
+    node((3.00, 0), $E$     , name: <E0> ),
+    node((3.50, 0), $13$    , name: <N01>),
+    node((4.25, 0), [_node_], name: <S01>),
+    
+    node((0.00, 2.00), $T$     , name: <T1> ),
+    node((0.50, 2.00), $2$     , name: <N11>),
+    node((1.25, 2.00), [_node_], name: <S11>),
+    node((4.50, 2.15), [_inh_] , name: <S12>),
+    node((5.00, 2.00), $5$     , name: <N12>),
+    node((5.75, 2.00), $E'$    , name: <E1> ),
+    node((6.50, 2.00), $12$    , name: <N13>),
+    node((7.00, 1.85), [_syn_] , name: <S13>),
+
+    node((0.00, 4.00), [*id*]   , name: <S21>),
+    node((0.50, 4.00), $1$      , name: <N21>),
+    node((1.25, 4.00), [_entry_], name: <S22>),
+    node((3.25, 4.00), $-$      , name: <S23>),
+    node((4.25, 4.00), $T$      , name: <T2> ),
+    node((5.00, 4.00), $4$      , name: <N22>),
+    node((5.75, 4.00), [_node_] , name: <S24>),
+    node((7.50, 4.15), [_inh_]  , name: <S25>),
+    node((8.00, 4.00), $6$      , name: <N23>),
+    node((8.75, 4.00), $E'$     , name: <E2> ),
+    node((9.50, 4.00), $11$     , name: <N24>),
+    node((10.0, 3.85), [_syn_]  , name: <S26>),
+
+    node((4.250, 6.00), [*num*]  , name: <S31>),
+    node((5.000, 6.00), $3$      , name: <N31>),
+    node((5.750, 6.00), [_val_]  , name: <S32>),
+    node((6.750, 6.00), $+$      , name: <S33>),
+    node((7.500, 6.00), $T$      , name: <T3> ),
+    node((8.000, 6.00), $8$      , name: <N32>),
+    node((8.750, 6.00), [_node_] , name: <S34>),
+    node((10.50, 6.15), [_inh_]  , name: <S35>),
+    node((11.00, 6.00), $9$      , name: <N33>),
+    node((11.75, 6.00), $E'$     , name: <E3> ),
+    node((12.50, 6.00), $10$     , name: <N34>),
+    node((13.00, 5.85), [_syn_]  , name: <S36>),
+
+    node((7.500, 8), [*id*]   , name: <S41>),
+    node((8.000, 8), $7$      , name: <N41>),
+    node((8.750, 8), [_entry_], name: <S42>),
+    node((11.75, 8), $epsilon$, name: <S43>),
+
+    // EDGES puntini //
+    edge(<E0>, <T1>, dash: "loosely-dotted"),
+    edge(<E0>, <E1>, dash: "loosely-dotted"),
+    
+    edge(<T1>, <S21>, dash: "loosely-dotted"),
+    edge(<E1>, <S23>, dash: "loosely-dotted"),
+    edge(<E1>, <T2> , dash: "loosely-dotted"),
+    edge(<E1>, <E2> , dash: "loosely-dotted"),
+    
+    edge(<T2>, <S31>, dash: "loosely-dotted"),
+    edge(<E2>, <S33>, dash: "loosely-dotted"),
+    edge(<E2>, <T3> , dash: "loosely-dotted"),
+    edge(<E2>, <E3> , dash: "loosely-dotted"),
+
+    edge(<T3>, <S41>, dash: "loosely-dotted"),
+    edge(<E3>, <S43>, dash: "loosely-dotted"),
+
+    // EDGES freccie //
+    edge(<N21>, <N11>, "-|>"),
+    edge(<N11>, <N12>, "-|>", bend: 30deg),
+
+    edge(<N12>, <N23>, "-|>"),
+    edge(<N31>, <N22>, "-|>"),
+    edge(<N22>, <N23>, bend: 30deg),
+    
+    edge(<N23>, <N33>, "-|>"),
+    edge(<N41>, <N32>, "-|>"),
+    edge(<N32>, <N33>, bend: 30deg),
+
+    edge(<N33>, <N34>, "-|>", bend: -30deg),
+
+    edge(<N34>, <N24>, "-|>"),
+    edge(<N24>, <N13>, "-|>"),
+    edge(<N13>, <N01>, "-|>"),
+  ), caption: "Grafo delle dipendenze per a - 4 + c")
+  //#figure(image("images/2025-11-17-10-20-25.png"), caption: "Grafo delle dipendenze per a - 4 + c")
 ]
 
 
@@ -707,20 +834,28 @@ Quando la grammatica può essere analizzata con una tecnica bottom-up e la SDD �
 ]
 
 #example()[
-  #figure(image("images/2025-11-19-18-55-32.png"))
-  //TODO: convertire
-  #table(
-    columns: 2,
+  //#figure(image("images/2025-11-19-18-55-32.png"))
+  #figure(
+  table(
     stroke: none,
-    [Produzioni], [Azioni semantiche],
-    [$L->E n$], [{print(E.val);}],
-    [$E-> E_1 +T$], [{E.val = $E_1$.val + T.val}],
-    [$E-> T$], [],
-    [$T-> T_1 * F$], [],
-    [$T->F$], [],
-    [$F->(E)$], [],
-    [$F->"digit"$], [],
-  )
+    columns: (.4fr, .6fr),
+    align: left,
+    table.hline(start:0),
+    table.header(
+      table.cell([*Produzione*]),
+      table.cell([*Azioni semantiche*])
+    ),
+    table.hline(start: 0),
+    [Produzioni   ], [Azioni semantiche                     ],
+    [$L->E$*n*    ], [{print(_E.val_);}                     ],
+    [$E-> E_1 +T$ ], [{_E.val_ = _$E_1$.val + T.val_;}      ],
+    [$E-> T$      ], [{_E.val_ = _T.val_;}                  ],
+    [$T-> T_1 * F$], [{_T.val_ = _$T_1$.val $times$ F.val_:}],
+    [$T->F$       ], [{_T.val_ = _F.val_;}                  ],
+    [$F->(E)$     ], [{_F.val_ = _E.val_;}                  ],
+    [$F->"digit"$ ], [{_F.val_ = *digit*._lexval_;}         ],
+    table.hline(start: 0)
+  ))
   Questo è il SDT postfisso che implementa la SDD della calcolatrice, con l'unica differenza di stampare un valore. La grammatica è LR e la SDD è S-attribuita, quindi le azioni semantiche dello SDT possono essere eseguite contestualmente alle riduzioni del parser.
 ]
 
