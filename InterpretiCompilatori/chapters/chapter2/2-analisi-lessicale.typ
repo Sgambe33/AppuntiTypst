@@ -11,10 +11,10 @@
   Le espressioni regolari sono una notazione sintetica per i linguaggi regolari ed operano sui simboli dell'alfabeto.
   - Un simbolo $t$ rappresenta il linguaggio composto dal simbolo stesso: ${t}$;
   - $epsilon$ rappresenta ${epsilon}$;
-  - $emptyset$ rappresennta $emptyset$;
+  - $emptyset$ rappresenta $emptyset$;
 ]
 
-Se $x$ e $y$ sono due espressioni regolari e $L_x$ e $L_y$ i linguaggi corrispondenti, gli operatori applicabili in ordine di priorità decrescente sono:
+Se $x$ e $y$ sono due espressioni regolari e $L_x$ e $L_y$ i linguaggi regolari corrispondenti, gli operatori applicabili in ordine di priorità decrescente sono:
 
 #set math.cases(reverse: true)
 $display(
@@ -24,49 +24,55 @@ $display(
   )
 )
 x^+=x x^* =x^* x$
-
 #set math.cases(reverse: false)
 
-3. concatenazione di x e y, $x y$, indica $L_x L_y$
-+ unione di x e y, $x + y$ oppure $x | y$, indica $L_x union L_y$
-+ opzionalità di x, $[x]$ oppure $x?$, indica $L_x union {epsilon} ==> x? = x | epsilon$
+3. concatenazione di $x$ e $y$, $x y$, indica $L_x L_y$
+4. unione di $x$ e $y$, $x + y$ oppure $x | y$, indica $L_x union L_y$
+5. opzionalità di $x$, $[x]$ oppure $x?$, indica $L_x union {epsilon} ==> x? = x | epsilon$
 
 === Proprietà
 
-- #text(red)[Unione]:
+- *Unione*:
   + Commutativa: $x | y = y | x$;
   + Associativa: $x | (y | z) = (x | y) | z$.
-- #text(red)[Concatenazione]:
+- *Concatenazione*:
   + Distributiva rispetto all'unione: $x(y | z) = x y | x z$;
   + Associativa: $x (y z) = (x y) z$;
   + Elemento neutro: $epsilon x = x epsilon = x$;
-- #text(red)[Chiusura]:
+- *Chiusura*:
   + $epsilon in x^* quad x^*=(x | epsilon)^*$
   + Idempotenza: $(x^*)^* = x^*$
+
 #example()[
   + $(a a)^*$: corrisponde a una stringa con $n space a$, dove $n>=0$ è pari\
   + $(a a)^+$: uguale alla precedente, però stavolta niente stringa vuota. $(n>0)$
   + $(a | b)^*$: una qualsiasi sequenza di $a$, $b$ o stringa vuota
-  + $(b | a b)^*$: non ci sono $a$ consecutive
-  + $((a | b)(a | b))^* => (a(a | b) | b(a | b))^* => (a a | a b | b a | b b)^*$: tutte stringhe di lunghezza pari
+  + $(b | a b)^* (a | epsilon)$: non ci sono $a$ consecutive
+  + $((a | b)(a | b))^* => (a a | a b | b a | b b)^*$: tutte stringhe di lunghezza pari
 ]
 
 #example()[
-  + ${a, b}$, contengono $a b a quad ==> (a bar b)^* a b a (a bar b)^*$
-  + ${a, b}$, non contengono $a b a quad ==> (b bar a^+ b b)^*(epsilon bar a^+ | a^+ b)$
-  + ${a, b}$, ogni $a$ è preceuta o seguita ad $b quad ==> (b bar a b | b a)^* => ((epsilon bar a)b bar (epsilon | a) b a)^* =$$=> ((epsilon bar a) (b bar b a))^*$
-  + ${a, b}$, in cui il terzultimo carattere è $b quad ==> (a bar b)^*b bar (a bar b)(a bar b)$
+  + ${a, b}$, contengono $a b a ==> (a bar b)^* a b a (a bar b)^*$
+  + ${a, b}$, non contengono $a b a ==> (b bar a^+ b b)^*(epsilon bar a^+ | a^+ b)$
+  + ${a, b}$, ogni $a$ è preceduta o seguita da $b$
+    $
+      (b bar a b | b a)^* => ((epsilon bar a)b bar (epsilon | a) b a)^* ==> ((epsilon bar a) (b bar b a))^*
+    $
+  + ${a, b}$, in cui il terzultimo carattere è $b ==> (a bar b)^*b bar (a bar b)(a bar b)$
   + ${a, b}$, con numero pari di $a$ e un numero pari di $b$\
   $
-    (a a | b b | (a b | b a) (a a | b b)(a b | b a))^*
+    (a a | b b | (a b | b a) (a a | b b)^* (a b | b a))^*
   $
   6. ${a, b}$, con numero pari di $a$ o un numero dispari di $b$
   $
     b^*(a b^* a b^*)^* | a^* b a^* (b a^* b a^*)^*
   $
-  7. ${a, b}$, stringhe di lunghezza dispari che contengono esattamenet 2 $b$
+  7. ${a, b}$, stringhe di lunghezza dispari che contengono esattamente 2 $b$
   $
-    a(a a)^* b a(a a)^* b (a a)^* | (a a)^* b a(a a)^* b (a a)^* | (a a)^* b (a a)^* b a(a a) | a(a a)^* b (a a)^* b a(a a)^*
+    underbrace(a(a a)^* b a(a a)^* b a(a a)^*, text("3 slot dispari")) |
+    underbrace(a(a a)^* b (a a)^* b (a a)^*, text("1° dispari")) |
+    underbrace((a a)^* b a(a a)^* b (a a)^*, text("2° dispari")) |
+    underbrace((a a)^* b (a a)^* b a(a a)^*, text("3° dispari"))
   $
   8. ${a, b}$, stringhe dove $a a$ occorre una sola volta
   $
@@ -77,65 +83,70 @@ x^+=x x^* =x^* x$
 === Definizioni regolari
 
 #definition()[
-  Una *definizione regolare* è una sequenza finita di definizioni come segue:
+  Una *definizione regolare* è una sequenza finita di definizioni della forma:
   $
-    d_1 -> r_1 \
-    d_2 -> r_2 \
-    dots.v \
-    d_8 -> r_8 \
-    d_9 -> r_9 \
-    dots.v \
-    d_n -> r_n \
+    d_1 & -> r_1 \
+    d_2 & -> r_2 \
+        & space dots.v \
+    d_n & -> r_n
   $
-  dove $d_i$ è un simbolo nuovo rispetto a $Sigma (d_i in.not Sigma)$ e ogni $r_i$ è un'espressione regolare su $Sigma union {d_1, dots, d_(i-1)}$ con $i = 1,dots,n$
+  dove ogni $d_i$ è un simbolo nuovo rispetto all'alfabeto di base $Sigma$ ($d_i in.not Sigma$) e ogni $r_i$ è un'espressione regolare sull'alfabeto $Sigma union {d_1, dots, d_(i-1)}$ per $i = 1,dots,n$.
 ]
 
-Sia $Sigma={A,B,dots,Z,a,b,dots,z,0,1,dots,9,\_}$ l'alfabeto di tutti i caratteri che possono essere contenuti in un identificatore di variabile. L'espressione regolare necessaria per verificare la correttezza di un identificatore è la seguente.
+Sia $Sigma={A,B,dots,Z,a,b,dots,z,0,1,dots,9,\_}$ l'alfabeto di tutti i caratteri che possono essere contenuti in un identificatore di variabile. L'espressione regolare estesa per verificare la correttezza di un identificatore è la seguente.
 $
   (A|B|dots|Z|a|b|dots|z|0|1|dots|9|\_)(A|B|dots|Z|a|b|dots|z|\_|0|1|dots|9)^*
 $
 
-Usando le definizioni regolari si può ottimizzare:
-- letter $=> A|B|dots|Z|a|b|dots|z|\_$
-- digit  $=> 0|1|dots|9$
-- $id =>$ $"letter"("letter"|"digit")^*$
+Usando le definizioni regolari, la scrittura si ottimizza enormemente diventando modulare:
+- $mtext("letter") -> A|B|dots|Z|a|b|dots|z|\_$
+- $mtext("digit") -> 0|1|dots|9$
+- $mtext("id") -> mtext("letter") (mtext("letter") | mtext("digit"))^*$
 
 #example()[
-  Per validare le *costanti numeriche senza segno* possiamo usare:\
-  $Sigma={0|1|dots|9|.|+|-|"E"}$\
-  $"digit" -> 0|1|dots|9$\
-  $"digits" -> cancel("digit digit"^*) space space "digit"^+$\
-  $"optionalFraction" -> epsilon | ."digits"$\
-  $"optionalExponent" -> epsilon | "E"(epsilon,+,-)"digits"$\
-  $"number" -> "digits optionalFraction optionalExponent"$
+  Per validare le *costanti numeriche senza segno* (es. interi, decimali e notazione scientifica) possiamo usare:\
+  $
+    Sigma = {0, 1, dots, 9, ., +, -, E}
+  $
+  $
+               mtext("digit") & -> 0|1|dots|9 \
+              mtext("digits") & -> mtext("digit")^+ \
+    mtext("optionalFraction") & -> epsilon | . mtext("digits") \
+    mtext("optionalExponent") & -> epsilon | E (epsilon | + | -) mtext("digits") \
+              mtext("number") & -> mtext("digits") space mtext("optionalFraction") space mtext("optionalExponent")
+  $
 ]
 
 === Estensioni delle espressioni regolari
 
-Dopo l'introduzione delle espressione regolari sono state proposte ed introdotte estensioni utili a migliorare la capacità espressiva delle espressioni regolari.
-Alcune delle estensioni introdotte da alcuni programmi UNIX sono:
-+ *Una o più occorrenze*: l'operatore unitario post-fisso '+' indica la chiusura positiva di un'espressione regolare e del linguaggio ad essa associato $(r: "espressione regolare", r^+ " denota "L(r)^+)$. Si può anche vedere com'è legata alla chiusura di Kleene dalle leggi algebriche:
+Dopo l'introduzione delle espressioni regolari di base, sono state proposte delle estensioni utili a migliorarne la leggibilità e la capacità espressiva.
+Alcune delle estensioni più comuni introdotte da programmi UNIX sono:
+
++ *Una o più occorrenze*: l'operatore unario postfisso '$+$' indica la chiusura positiva di un'espressione regolare e del linguaggio ad essa associato ($r$: espressione regolare, $r^+$ denota $L(r)^+$). Si può notare come sia legata alla chiusura di Kleene dalle seguenti leggi algebriche:
   - $r^* = r^+ | epsilon$
-  - $r^+=r r^* = r^* r$
+  - $r^+ = r r^* = r^* r$
   L'operatore '$+$' ha la stessa precedenza e associatività dell'operatore '$*$';
 
   #observation()[
-    $r^+=r r^* = r^* r$ è una propietà importante delle espressioni regolari che può essere dimostrata.
+    L'identità $r^+ = r r^* = r^* r$ è una proprietà fondamentale delle espressioni regolari che può essere dimostrata formalmente.
 
     #proof()[
       Ricordando le definizioni di chiusura di Kleene e chiusura positiva:
       $
-        r^* = {epsilon} union r union r r union r r r union ...= union.big_(n gt.eq 0) r^n \
-        r^+ = r union r r union r r r union ...= union.big_(n gt 0) r^n
+        r^* & = {epsilon} union r union r r union r r r union ... = union.big_(n >= 0) r^n \
+        r^+ & = r union r r union r r r union ... = union.big_(n > 0) r^n
       $
-      + $r r^* = r dot union.big_(n gt.eq 0) r^n = union.big_(n gt.eq 0) r dot r^n = union.big_(n gt.eq 0) r^(n+1) = union.big_(m gt 0) r^m = r^+$
-      + $r^*r = (union.big_(n gt.eq 0) r^n) r= union.big_(n gt.eq 0) r^n dot r = union.big_(n gt.eq 0) r^(n+1) = union.big_(m gt 0) r^m = r^+$
+      Applicando le proprietà della concatenazione sull'unione infinita:
+      1. $r r^* = r (union.big_(n >= 0) r^n) = union.big_(n >= 0) (r dot r^n) = union.big_(n >= 0) r^(n+1) = union.big_(m > 0) r^m = r^+$
+
+      2. $r^* r = (union.big_(n >= 0) r^n) r = union.big_(n >= 0) (r^n dot r) = union.big_(n >= 0) r^(n+1) = union.big_(m > 0) r^m = r^+$
     ]
   ]
 
 
-+ *Zero o una occorrenza*: l'operatore unitario post-fisso '?' indica l'opzionale presenza dell'operando a cui viene applicato (Quindi: $r? " equivale a " r|epsilon " oppure " L(r)?=L(r) union L(epsilon)$). Come il precedente, ha la stesa precedenza e associatività dell'operatore '$*$';
-+ *Classi di caratteri*: un'espressione regolare come $a_1 bar a_2 bar ... bar a_n$ in cui i simboli $a_i$ appratengono all'alfabeto $Sigma$ può essere sostituita dalla forma compatta $[a_1, a_2, ..., a_n]$. Inoltre, quando i simboli formano una sequenza logica, per esempio lettere maiuscole, lettere minuscole o cifre, si può ulteriormente sintetizzare l'espressione scrivendola come $a_1 - a_n$.
++ *Zero o una occorrenza*: l'operatore unario postfisso '$?$' indica l'opzionale presenza dell'operando a cui viene applicato. Quindi $r?$ equivale a $r | epsilon$ (in termini di linguaggi: $L(r?) = L(r) union {epsilon}$). Come il precedente, ha la stessa precedenza e associatività dell'operatore '$*$'.
+
++ *Classi di caratteri*: un'espressione regolare formata da un'unione di singoli caratteri come $a_1 | a_2 | ... | a_n$, in cui i simboli $a_i$ appartengono all'alfabeto $Sigma$, può essere sostituita dalla forma compatta $[a_1 a_2 ... a_n]$. Inoltre, quando i simboli formano una sequenza logica (per esempio lettere maiuscole, lettere minuscole o cifre in base alla codifica ASCII), si può ulteriormente sintetizzare l'espressione indicando il range: $[a_1 - a_n]$.
 
 #example()[
   $
@@ -143,19 +154,18 @@ Alcune delle estensioni introdotte da alcuni programmi UNIX sono:
   $
   Se i caratteri formano una sequenza logica:
   $
-    "allora: "[A-Z] "sta per" A|B|dots|Z\
-    "es." [0-9] "sta per" [0 1 2 dots 9] "che sta per" 0|1|dots|9\
-    "es." [a-z] "sta per" [a b c dots z] "che sta per" a|b|dots|z
+    "es. " [A-Z] & "sta per" [A B dots Z] && "che equivale a" A|B|dots|Z \
+    "es. " [0-9] & "sta per" [0 1 2 dots 9] && "che equivale a" 0|1|dots|9 \
+    "es. " [a-z] & "sta per" [a b c dots z] && "che equivale a" a|b|dots|z
   $
 ]
 
-Adesso possiamo allora ridefinire digit, digits e number:
+Sfruttando queste estensioni, possiamo ridefinire le definizioni regolari per validare i numeri in notazione scientifica in modo molto compatto:
 $
-  "digit" => [0-9]\
-  "digits" => "digit"^+\
-  "number" => "digits"(."digits")?(E[+-]?"digits")?
+   "digit" & -> [0-9] \
+  "digits" & -> "digit"^+ \
+  "number" & -> "digits" ("." "digits")? ("E" [+-]? "digits")?
 $
-#pagebreak()
 
 == Buffering dell'ingresso
 
@@ -165,11 +175,10 @@ Uno dei sistemi più utilizzati si basa su due buffer di dimensione $N$, dove $N
 
 Per la gestione del buffer si usano due puntatori:
 - _*lexemeBegin*_: indica l'indirizzo del lessema corrente, la cui lunghezza deve essere determinata.
-- _*forward*_: si sposta in avanti finché non si riconosce un lessema corrispondente a un pattern.0-9
+- _*forward*_: si sposta in avanti finché non si riconosce un lessema corrispondente a un pattern.
 
 Una volta individuato il lessema, si sposta il puntatore _forward_ sul carattere immediatamente alla destra del lessema stesso. Quindi, dopo che tale lessema è stato memorizzato come attributo di token, il puntatore _lexemeBegin_ viene spostato immediatamente dopo il lessema appena trovato.
 
-//TODO: Aggiungere frecce o copiare immagini da libro
 $
   #let elements = ("A", none, none, none, "E", none, "=", none, "M", $"*"$, "C", [$"*"$#pin(1)], $"*"$, [2#pin(2)], "eof", none, none, none, none, none)
   #cetz.canvas(length: 25pt, {
@@ -214,9 +223,6 @@ $
 $
 
 Per poter spostare avanti il puntatore _forward_ è necessario prima verificare se si è raggiunta la fine di uno dei due buffer. In questo caso si deve ricaricare l'altro buffer con i caratteri letti dal file sorgente e spostare _forward_ all'inizio del buffer appena riempito. Affinché ciò avvenga senza problemi è necessario che la lunghezza di un lessema più il numero di caratteri letti in anticipo non superi la dimensione $N$ di ogni buffer, in caso contrario si sovrascriverebbe l'inizio di un lessema prima di avere finito di riconoscerlo.
-
-
-
 
 === Sentinelle
 

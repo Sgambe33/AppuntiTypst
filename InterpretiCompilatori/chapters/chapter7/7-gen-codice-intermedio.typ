@@ -138,7 +138,7 @@ Come si nota dalla figura (b), il campo `result` è utilizzato principalmente da
   L'albero sintattico e le triple della figura corrispondono alle quadruple e al codice a tre indirizzi mostrato nella figura ancora precedente. Secondo la rappresentazione basata sulle triple della figura (b), l'istruzione di copia `a= t5` è codificata ponendo `a` nel campo `arg1` il valore numerico `(4)` nel campo `arg2`.
 ]
 
-Uno dei vantaggi delle quadruple rispetto alle triple emerge considerando i compilatori ottimizzanti, in cui spesso le istruzioni vengono riorganizzate e spostate. Usando le quadruple, infatti, se spostiamo un'istruzione che calcola una variabile temporanea t, le istruzioni che utilizzano t non richiedono alcuna modifica. Usando le triple, invece, ci si riferisce al risultato di un'operazione mediante la sua posizione nel codice, percid spostare un istruzione richiede una modifica a tutte le triple che fanno riferimento al risultato che questa calcola. Tale problema, tuttavia, pud essere risolto grazie alle triple indirette.
+Uno dei vantaggi delle quadruple rispetto alle triple emerge considerando i compilatori ottimizzanti, in cui spesso le istruzioni vengono riorganizzate e spostate. Usando le quadruple, infatti, se spostiamo un'istruzione che calcola una variabile temporanea t, le istruzioni che utilizzano t non richiedono alcuna modifica. Usando le triple, invece, ci si riferisce al risultato di un'operazione mediante la sua posizione nel codice, percid spostare un istruzione richiede una modifica a tutte le triple che fanno riferimento al risultato che questa calcola. Tale problema, tuttavia, può essere risolto grazie alle triple indirette.
 
 Le triple indirette consistono in una lista di puntatori a triple, piuttosto che in una lista delle triple stesse. Possiamo per esempio usare un array instruction per memorizzare i puntatori alle triple nell'ordine desiderato. In tal caso, le triple della Figura 6.11(b) potrebbero essere rappresentate come nella Figura 6.12.
 #figure(image("images/2025-11-30-21-33-49.png"))
@@ -183,11 +183,15 @@ Altre istruzioni a tre indirizzi sono costruite in modo simile, applicando la fu
 
 #example()[
   La definizione guidata dalla sintassi della Figura 6.19 traduce l'assegnamento a = b+~-c; nella seguente sequenza di codice a tre indirizzi:
-  #figure(image("images/2025-12-02-17-15-53.png"))
+  #align(center, [
+    `t1 = minus c`\
+    `t2 = b + t1`\
+    `a = t2`\
+  ])
 ]
 
 === Traduzione incrementale
-Come sappiamo gli attributi che rappresentano codice possono essere stringhe di notevoli dimensioni. Per questa ragione tali stringhe sono solitamente generate in modo incrementale, come visto nel Paragrafo 5.5.2. Quindi, invece di costruire E.code secondo le regole riportate nella Figura 6.19, possiamo fare in modo di generare solamente le nuove istruzioni a tre indirizzi, secondo lo schema di traduzione della Figura 6.20. Secondo un approccio incrementale, la funzione gen() non solo costruisce un'istruzione a tre indirizzi, ma aggiunge anche tale istruzione alla sequenza di istruzioni generata fino a quel punto. La sequenza pud essere sia mantenuta in memoria per una eventuale elaborazione successiva, sia stampata incrementalmente. Lo schema di traduzione della Figura 6.20 genera lo stesso codice prodotto dalla definizione guidata dalla sintassi della Figura 6.19. Seguendo l'approccio incrementale, attributo code diventa superfluo poiché la sequenza di istruzioni generata da chiamate successive alla funzione gen() @ unica. Per esempio, la regola semantica nella Figura 6.20 relativa alla produzione E — E+E richiama la funzione gen() per generare solamente l'istruzione di somma, poiché le istruzioni che calcolano E) e assegnano il risultato a E,.addr e quelle che calcolano E2 e assegnano il risultato a E».addr sono gia state generate. L'approccio presentato nella Figura 6.20 puod essere utilizzato anche per la costruzione di alberi sintattici. In tal caso, Pazione semantica relativa alla produzione E — E+E, creerebbe un nuovo nodo utilizzando il costruttore Node(). Tale azione avrebbe la forma seguente
+Come sappiamo gli attributi che rappresentano codice possono essere stringhe di notevoli dimensioni. Per questa ragione tali stringhe sono solitamente generate in modo incrementale, come visto nel Paragrafo 5.5.2. Quindi, invece di costruire E.code secondo le regole riportate nella Figura 6.19, possiamo fare in modo di generare solamente le nuove istruzioni a tre indirizzi, secondo lo schema di traduzione della Figura 6.20. Secondo un approccio incrementale, la funzione gen() non solo costruisce un'istruzione a tre indirizzi, ma aggiunge anche tale istruzione alla sequenza di istruzioni generata fino a quel punto. La sequenza può essere sia mantenuta in memoria per una eventuale elaborazione successiva, sia stampata incrementalmente. Lo schema di traduzione della Figura 6.20 genera lo stesso codice prodotto dalla definizione guidata dalla sintassi della Figura 6.19. Seguendo l'approccio incrementale, attributo code diventa superfluo poiché la sequenza di istruzioni generata da chiamate successive alla funzione gen() @ unica. Per esempio, la regola semantica nella Figura 6.20 relativa alla produzione E — E+E richiama la funzione gen() per generare solamente l'istruzione di somma, poiché le istruzioni che calcolano E) e assegnano il risultato a E,.addr e quelle che calcolano E2 e assegnano il risultato a E».addr sono gia state generate. L'approccio presentato nella Figura 6.20 puod essere utilizzato anche per la costruzione di alberi sintattici. In tal caso, Pazione semantica relativa alla produzione E — E+E, creerebbe un nuovo nodo utilizzando il costruttore Node(). Tale azione avrebbe la forma seguente
 
 S.addr = new Node('=', id, E.addr)
 E > EB, +E, { E.addr = new Node('+', Ey.addr, Ey.addr); }
@@ -198,7 +202,7 @@ in cui l'attributo addr rappresenta l'indirizzo di un nodo e non quello di una v
 === Indirizzamento degli elementi di un array
 E possibile accedere in modo semplice agli elementi di un array se questi sono memorizzati in un blocco di locazioni di memoria contigue. In C e in Java gli elementi di un array di dimensione n sono numerati da 0 an—1. Se la larghezza di ogni elemento @ pari a w, allora l'i-esimo elemento dell'array inizia alla locazione di memoria base +i x w (6.2)
 
-in cui base & l'indirizzo relativo dell'inizio della zona di memoria riservata all'array. In altre parole base coincide con Vindirizzo dell'elemento A[0}. a L'Equazione (6.2) pud essere generalizzata al caso degli array multidimensionali. Per gli array a due dimensioni, in C e in Java indichiamo con Ali:}[é2] Velemento in posizione ig nella riga i;. ndicando con w, la larghezza di una riga e con we quella di un elemento della riga, l'indirizzo relativo dell'elemento A[i;][i2] @ dato dalla relazione: base
+in cui base & l'indirizzo relativo dell'inizio della zona di memoria riservata all'array. In altre parole base coincide con Vindirizzo dell'elemento A[0}. a L'Equazione (6.2) può essere generalizzata al caso degli array multidimensionali. Per gli array a due dimensioni, in C e in Java indichiamo con Ali:}[é2] Velemento in posizione ig nella riga i;. ndicando con w, la larghezza di una riga e con we quella di un elemento della riga, l'indirizzo relativo dell'elemento A[i;][i2] @ dato dalla relazione: base
 
 + i, X wy +12 X We (6.3)
 
@@ -269,6 +273,13 @@ base e spiazzamento in una nuova variabile temporanea indicata da E.addr.
   Esempio 6.12 Sia a un array di interi di dimensione 2 x3 e siano c, i e j tre variabili intere. Il tipo di a & dunque array(2, array(3, integer)) e la sua larghezza, assumendo che la larghezza di un intero sia 4, @ pari a 24. Il tipo di a[i] @ array(3, integer) e la sua larghezza  w; = 12. Il tipo di a[i] [j] é@ infine integer. La Figura 6.23 mostra un albero di parsing annotato relativo all'espressione c+a[il][j]. Tale espressione viene tradotta nel codice a tre indirizzi riportato nella Figura 6.24, in cui abbiamo utilizzato, come di consueto, i nomi dei simboli per riferirci ai corrispondenti elementi nella tabella dei simboli. Oo
   #figure(image("images/2025-12-02-17-18-18.png"))
   #figure(image("images/2025-12-02-17-18-37.png"))
+  #align(center, [
+    `t1 = i * 12`\
+    `t2 = j * 4`\
+    `t3 = t1 + t2`\
+    `t4 = a [ t3 ]`\
+    `t5 = c + t4`\
+  ])
 ]
 
 //10.12.2025
@@ -280,11 +291,11 @@ Il controllo dei tipi può portare all’individuazione di errori nel programma.
 
 === Regole per il controllo dei tipi
 
-Il controllo dei tipi pud assumere due forme: *sintesi* e *inferenza*. La sintesi dei tipi prevede la costruzione di un tipo di un’espressione a partire dal tipo delle sue sottoespressioni. Tale approccio richiede che tutti i nomi siano dichiarati prima di poter essere utilizzati. Il tipo di un’espressione come $E_1 + E_2$ è definito in base al tipo di $E_1$ e a quello di $E_2$. Una tipica regola che si incontra nella sintesi dei tipi ha la forma:
-#align(center, [
+Il controllo dei tipi può assumere due forme: *sintesi* e *inferenza*. La sintesi dei tipi prevede la costruzione di un tipo di un’espressione a partire dal tipo delle sue sottoespressioni. Tale approccio richiede che tutti i nomi siano dichiarati prima di poter essere utilizzati. Il tipo di un’espressione come $E_1 + E_2$ è definito in base al tipo di $E_1$ e a quello di $E_2$. Una tipica regola che si incontra nella sintesi dei tipi ha la forma:
+#algo()[
   *if* $f$ è di tipo $s->t$ *and* $x$ è di tipo $s$,\
   *then* l’espressione $f(x)$ è di tipo $t$
-])
+]
 In questa regola, che si riferisce a funzioni con un solo argomento, $f$ e $x$ indicano espressioni e la scrittura $s -> t$ indica una funzione da $s$ a $t$.
 
 L'inferenza di tipo determina il tipo di un costrutto del linguaggio in base al modo in cui esso è utilizzato. Sia `null()` una funzione che verifica se una lista è vuota. In tal caso, in base a un suo utilizzo nelle forma `null(x)` possiamo concludere che $x$ deve essere una lista. Il tipo degli elementi della lista, tuttavia, non è noto; al momento si può soltanto stabilire che $x$ è una lista di elementi di tipo ignoto.
@@ -294,10 +305,10 @@ L'inferenza di tipo determina il tipo di un costrutto del linguaggio in base al 
 ]
 
 Una tipica regola per l’inferenza di tipo ha la forma seguente:
-#align(center, [
+#algo()[
   *if* $f(x)$ è un’espressione,\
   *then* per qualche $alpha$ e $beta$, $f$ è di tipo $alpha-> beta$ *and* $x$ è di tipo $alpha$
-])
+]
 
 Considereremo il controllo dei tipi delle espressioni, ma le regole per il controllo degli statement sono simili. Per esempio, interpreteremo il costrutto *if*($E$) $S$; come se si trattasse dell’applicazione di una funzione _if()_ agli operandi $E$ ed $S$. Indichiamo inoltre con il tipo speciale _void_ l’assenza di un valore. In conclusione, quindi, possiamo dire che lo statement condizionale *if* può essere visto come una funzione _if()_ che richiede un argomento di tipo _boolean_ e uno di tipo _void_ e restituisce il tipo _void_.
 
@@ -309,11 +320,11 @@ Consideriamo l’espressione $x+i$ in cui $x$ è di tipo floating-point mentre $
 ])
 
 Illustreremo la sintesi dei tipi estendendo lo schema di traduzione del Paragrafo 6.4.2 relativo alle espressioni. A tale scopo aggiungiamo il nuovo attributo _E.type_ il cui valore può essere _integer_ oppure _float_. La regola associata alla produzione $E->E_1+E_2$ richiede l'aggiunta dello pseudocodice:
-#align(center, [
+#algo()[
   *if* ($E_1$._type = integer_ *and* $E_2$._type = integer_) _E.type = integer_,\
   *else* *if* ($E_1$._type = float_ *and* $E_2$._type = integer_) $dots.c$\
   $dots.c$
-])
+]
 All'aumentare del numero dei tipi, il numero dei casi da considerare cresce molto rapidamente.
 #figure(image("images/2025-12-10-17-43-38.png"))
 Le regole di conversione di tipo variano da linguaggio a linguaggio. Le regole di conversione per il linguaggio Java riportate nella Figura 6.25 distinguono due casi:
@@ -348,20 +359,19 @@ L’azione semantica per il controllo di tipo della produzione $E->E_1+E_2$ util
   #figure(image("images/2025-12-10-18-17-02.png"))
 ]
 
-=== Sovraccaricamento di funziono e operatori
+=== Sovraccaricamento di funzioni e operatori
 Un simbolo *sovraccaricato* (*overloaded*) ha diversi significati a seconda del contesto in cui si trova. Si dice che il sovraccaricamento viene _risolto_ quando si assegna un significato univoco a ogni occorrenza di un nome.
 Una possibile regola per la sintesi del tipo di funzioni sovraccaricate é la seguente:
-#align(center, [
+#algo()[
   *if* $f$ può essere di tipo $s_i->t_i$, per $1 lt.eq i lt.eq n$, con $s_i eq.not s_j$ per $i eq.not j$\
   *and* $x$ è di tipo $s_k$, per qualche valore di $k$ tale che $1 lt.eq k lt.eq n$ \
   *then* l’espressione $f(x)$ è di tipo $t_k$
-])
-
+]
 Il metodo del valore numerico descritto nel Paragrafo 6.1.2 può essere applicato a espressioni di tipo per risolvere efficientemente il problema del sovraccaricamento sulla base del tipo degli argomenti. L’ipotesi di poter risolvere il sovraccaricamento di una funzione sulla base del tipo dei soli argomenti equivale all’ipotesi di poter risolvere il sovraccaricamento in base
 alla firma delle funzioni. Non sempre, tuttavia, l’analisi del tipo dei soli argomenti è sufficiente a risolvere il sovraccaricamento di una funzione.
 
 === Inferenza del tipo e funzioni polimorfiche
-L’inferenza del tipo è utile nel caso di linguaggi come ML, che pur essendo fortemente tipizzato, non richiede di dichiarare i nomi prima dell’uso. L’inferenza di tipo assicura che i nomi siano usati in modo consistente. I] termine *polimorfico* indica in generale un qualsiasi frammento di codice che possa essere eseguito con argomenti di diversi tipi. In questo paragrafo considereremo il polimorfismo parametrico, cioe quel tipo di polimorfismo caratterizzato da parametri o da variabili di tipo. A tale scopo ci riferiremo al programma in linguaggio ML che definisce la funzione _length_():
+L’inferenza del tipo è utile nel caso di linguaggi come ML, che pur essendo fortemente tipizzato, non richiede di dichiarare i nomi prima dell’uso. L’inferenza di tipo assicura che i nomi siano usati in modo consistente. Il termine *polimorfico* indica in generale un qualsiasi frammento di codice che possa essere eseguito con argomenti di diversi tipi. In questo paragrafo considereremo il polimorfismo parametrico, cioe quel tipo di polimorfismo caratterizzato da parametri o da variabili di tipo. A tale scopo ci riferiremo al programma in linguaggio ML che definisce la funzione _length_():
 #align(center, [
   ```ML
   fun length() = if null(x) then 0 else length(tl(x)) + 1;
@@ -381,7 +391,14 @@ Il simbolo $forall$ è il quantificatore universale e la variabile alla quale è
 
 #example()[
   #figure(image("images/2025-12-10-18-28-22.png"))
-  Questo albero sintattico astratto rappresenta la definizione della funzione _length()_ fornita precedentemente. La radice dell'albero con etichetta *fun* rappresenta la definizione della funzione. I rimanenti nodi interni possono essere visti come applicazioni di funzioni.
-  Possiamo inferire il tipo della funzione length() a partire dal suo corpo. Consideriamo i figli del nodo con etichetta *if*, presi da sinistra a destra. Dato che la funzione _null_() si aspetta di essere applicata a una lista, $x$ deve essere una lista. Indicando con la variabile $alpha$ il tipo degli elementi della lista, il tipo di $x$ è “lista di $alpha$”.
-  Se _null_($x$) è vera allora _length_($x$) vale 0. Pertanto il tipo di _length_() deve essere “funzione da una lista di $alpha$ a un intero”. Tale valore per il tipo inferito della funzione è anche consistente con la parte di definizione.
+  Questo albero sintattico astratto rappresenta la definizione della funzione _length()_ fornita precedentemente. La radice dell'albero con etichetta *fun* rappresenta la definizione della funzione. I rimanenti nodi interni possono essere visti come applicazioni di funzioni.  Possiamo inferire il tipo della funzione length() a partire dal suo corpo. Consideriamo i figli del nodo con etichetta *if*, presi da sinistra a destra. Dato che la funzione _null_() si aspetta di essere applicata a una lista, $x$ deve essere una lista. Indicando con la variabile $alpha$ il tipo degli elementi della lista, il tipo di $x$ è “lista di $alpha$”. Se _null_($x$) è vera allora _length_($x$) vale 0. Pertanto il tipo di _length_() deve essere “funzione da una lista di $alpha$ a un intero”. Tale valore per il tipo inferito della funzione è anche consistente con la parte di definizione.
 ]
+
+//11.12.2025
+Dato che nelle espressioni di tipo possono comparire variabili, è necessario prendere nuovamente in esame il concetto di equivalenza tra tipi. Supponiamo di applicare Ei di tipo s —> sz a $E_2$, di tipo t. Invece di determinare semplicemente l’uguaglianza tra s e t dobbiamo unificarli, cioè verificare se è possibile rendere i tipi set strutturalmente equivalenti sostituendo le variabili di tipo in s e t con espressioni di tipo. Una sostituzione è un mapping tra variabili di tipo ed espressioni di tipo. La scrittura S(t) indica il risultato dell’applicazione della sostituzione S alle variabili dell’espressione di tipo t (si veda il box “Sostituzioni, istanze e unificazione”). Due espressioni di tipo U e t2 possono essere unificate se esiste una sostituzione S tale che S(U) = S(t 2 ). In pratica siamo interessati all’unificatore più generale possibile, ovvero vogliamo individuare la sostituzione che impone il minor numero di vincoli sulle variabili di tipo delle espressioni in questione.
+
+#[
+  #set heading(numbering: none, outlined: false)
+  === Sostituzioni, istanze e unificazione
+]
+Se $t$ è un’espressione di tipo e $S$ una sostituzione (cioè un mapping tra variabili di tipo ed espressioni di tipo) la scrittura $S(t)$ indica il risultato che si ottiene sostituendo tutte le occorrenze di ogni variabile di tipo $alpha$ con $S(alpha)$. Chiamiamo $S(t)$ una istanza di $t$. Per esempio _list(integer)_ è un’istanza di _list($alpha$)_ poiché è il risultato della sostituzione di $alpha$ con _integer_ nell’espressione _list($alpha$)_. Il tipo _integer_ $->$ _float_ invece non è un’istanza di $alpha -> alpha$ poiché una sostituzione prevede che ogni occorrenza di una data variabile di tipo sia rimpiazzata dalla stessa espressione di tipo. Diciamo poi che la sostituzione S è un *unificatore* delle espressioni di tipo ti e t2 se risulta (ti) = Sftz). Inoltre diciamo che S è *unificatore più generale* di ti e ta se per qualsiasi altro unificatore S' di e t2 e per qualsiasi espressione di tipo t S'(t) è un’istanza di S(t). In altre parole S' impone su t vincoli più stringenti di quanto non faccia S.
