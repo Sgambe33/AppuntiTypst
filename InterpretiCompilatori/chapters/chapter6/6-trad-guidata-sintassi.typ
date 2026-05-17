@@ -665,6 +665,7 @@ Ogni nodo di un albero sintattico rappresenta un costrutto e i figli di tale nod
     edge(<l50>, <l64>, dash: "dashed", "-|>", bend: 15deg),
     edge(<l21>, <l25.north>, dash: "dashed", "-|>", bend: -30deg),
     edge(<l81>, <l95>, dash: "dashed", "-|>", bend: 30deg),
+    edge(<l21>, <l12>),
     edge(<l12>, <group4.north-west>, dash: "dashed", "-|>", bend: -30deg),
     edge(<l13>, <l06>, dash: "dashed", "-|>", bend: -25deg),
     // Loopty loop

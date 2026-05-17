@@ -6,29 +6,30 @@
 
 = Grammatiche (4.2)
 
+Le grammatiche sono una notazione utilizzata per specificare la sintassi di un linguaggio. Descrivono in maniera naturale la struttura gerarchica dei costrutti di molti linguaggi di programmazione.
+
 #definition("par 4.2.1")[
-  Le *grammatiche* si basano su un meccanismo generativo che *permette di produrre stringhe che appartengono al linguaggio desiderato*. \
   Formalmente una grammatica G è una quadrupla $(V, Sigma, P, S)$ dove:
   - *$V$* è l'insieme dei simboli non terminali
   - *$Sigma$* è l'insieme dei simboli terminali
-  - *$P$* è l'insieme delle regole della grammatica
+  - *$P$* è l'insieme delle produzioni della grammatica
   - *$S in V$* è il simbolo iniziale della grammatica
 ]<defGrammar>
 
 Prima di continuare bisogna chiarire cosa sono i simboli terminali e non terminali:
 - *Simboli terminali*: corrispondono a tutti quei simboli che compongono le stringhe del linguaggio.
-- *Simboli non terminali*: al contrario dei terminali, sono tutti quei simboli che *non* fanno parte del linguaggio, ma aiutano alla loro generazione.
+- *Simboli non terminali*: sono tutti quei simboli che *non* fanno parte del linguaggio, ma aiutano alla sua generazione.
 
-Sapendo ciò si può capire che l'interesezione tra $Sigma$ e $V$ corrisponde ad un insieme vuoto:
+Sapendo ciò si può capire che l'intersezione tra $Sigma$ e $V$ corrisponde ad un insieme vuoto:
 $
   Sigma inter V = nothing
 $
 
 Ci sono vari tipi di grammatiche in base alla struttura delle regole $P$ ma per ora assumiamo di lavorare con grammatiche _* context-free*_.
 
-== Regole delle grammatiche
+== Produzioni delle grammatiche
 
-Le regole delle grammatiche assumono la seguente forma:
+Le produzioni delle grammatiche assumono la seguente forma:
 $
   A -> alpha, quad quad quad "con " A in V " e " alpha in (V union Sigma)^*
 $
@@ -44,7 +45,7 @@ $
   A & -> alpha_n
 $
 
-Oltre alle regole ci sono anche delle convenzioni specifiche per riconoscere a colpo d'occhio i simboli:
+Oltre alle produzioni ci sono anche delle convenzioni specifiche per riconoscere a colpo d'occhio i simboli:
 + I seguenti simboli sono terminali\
   #set enum(numbering: "a)")
   + Le lettere minuscole all'inizio dell'alfabeto, come: $a, b, c$, ecc.;
@@ -68,13 +69,13 @@ Oltre alle regole ci sono anche delle convenzioni specifiche per riconoscere a c
 == Derivazioni
 
 #definition()[
-  La *derivazione* è il meccanismo generativo centrale su cui si basano le grammatiche. Data una stringa, consente di ottenerne una nuova sostituendo un simbolo non terminale presente in essa con la parte destra di una delle sue produzioni (regole).
+  La *derivazione* è il meccanismo generativo centrale su cui si basano le grammatiche. Data una stringa, consente di ottenerne una nuova sostituendo un simbolo non terminale presente in essa con la parte destra di una delle sue produzioni.
 ]
 
-Quando applichiamo una singola regola, si dice che la stringa $w$ *produce direttamente* la stringa $z$ oppure, se letta la contrario, la stringa $z$ *deriva direttamente* dalla stringa $w$.
+Quando applichiamo una singola produzione, si dice che la stringa $w$ *produce direttamente* la stringa $z$ oppure, se letta la contrario, la stringa $z$ *deriva direttamente* dalla stringa $w$.
 
 #example()[
-  Data una regola di produzione $A -> alpha$ e una stringa iniziale $beta A gamma$, la sostituzione produce direttamente la stringa $beta alpha gamma$:
+  Data una regola di produzione $A -> alpha$ e una stringa iniziale $beta A gamma$, la sostituzione *produce direttamente* la stringa $beta alpha gamma$:
   $
     beta A gamma => beta alpha gamma quad quad "con " A in V, quad alpha, beta, gamma in (V union Sigma)^*
   $
@@ -103,7 +104,7 @@ Come si evince chiaramente dal passo induttivo, la relazione di derivazione gode
 #definition("Forma di frase")[
   Data una grammatica G, una stringa $beta$ si dice *forma di frase* di G se e solo se $beta$ è *derivabile dal simbolo iniziale S* di G, quindi:
   $
-    S der(+) beta
+    S der(*) beta
   $
 ]
 
@@ -137,9 +138,9 @@ $
 #example()[
   Sia data la grammatica seguente:
   $
-    G = (V={E, I}, Sigma = {+, \*, (, ), a, b, 0, 1}, E, P)
+    G = (V={E, I}, Sigma = {+, \*, (, ), a, b, 0, 1}, S=E, P)
   $
-  Con le seguenti produzioni $P$ (Costruttori di espressioni):
+  Con le seguenti produzioni $P$:
   $
     E & -> I | E * E | E + E | (E) \
     I & -> a | b | I a | I b | I 0 | I 1
@@ -179,7 +180,7 @@ Supponiamo di dover dimostrare che un certo linguaggio $L$ coincida esattamente 
   $
     S -> epsilon | 0 | 1 | 0S 0 | 1S 1
   $
-  L(G) è il linguaggio E sia $L$ il linguaggio delle stringhe palindrome sull'alfabeto ${0,1}$. Un esempio di derivazione è:
+  L(G) è il linguaggio delle stringhe palindrome sull'alfabeto ${0,1}$. Un esempio di derivazione è:
   $
     S => 1 S 1 => 1 0 S 0 1 => 1 0 1 S 1 0 1 => 1 0 1 1 S 1 1 0 1 => 1 0 1 1 0 1 1 0 1
   $
@@ -237,12 +238,12 @@ Supponiamo di dover dimostrare che un certo linguaggio $L$ coincida esattamente 
 
 == Grammatiche regolari (par 4.2.7)
 
-Così chiamate perché i linguaggi generati sono esattamente quelli rappresentabili tramite espressioni regolari. La differenza con le generiche grammatiche context-free risiede nei rigidi vincoli imposti alle produzioni. Nelle grammatiche regolari, esse possono avere solo la seguente forma:
+Così chiamate perché i linguaggi generati sono esattamente quelli rappresentabili tramite espressioni regolari. La differenza con le generiche grammatiche context-free risiede nei vincoli imposti alle produzioni. Nelle grammatiche regolari, esse possono avere solo la seguente forma:
 $
-  & "Destre"     && "Sinistre" \
-  & X -> a Y     && X -> Y a \
-  & X -> a       && X -> a \
-  & X -> epsilon && X -> epsilon \
+  & "Destre" quad quad quad quad && "Sinistre" \
+  & X -> a Y                     && X -> Y a \
+  & X -> a                       && X -> a \
+  & X -> epsilon                 && X -> epsilon \
 $
 $ "con " X,Y in V " e " a in Sigma $
 
@@ -259,7 +260,7 @@ Ovvero:
 
 Guardando la forma delle produzioni, si può notare che c'è un solo modo per terminare la derivazione (e ottenere una stringa di soli terminali): applicare una regola della forma $X -> a$ oppure $X -> epsilon$, che elimina definitivamente l'ultimo non terminale.
 
-Generalmente, negli esempi sottostanti useremo la grammatica regolare destra (che è la più naturale per costruire automi a stati finiti).
+Generalmente, negli esempi sottostanti useremo la grammatica regolare destra (che è la più naturale per costruire automi a stati finiti). Il non-terminale fine di una forma di frase può essere utilizzato per rappresentare delle informazioni sulla sequenza di terminali che lo precede.
 
 #example(multiple: true)[
   + Stringhe su {a,b} di lunghezza pari. Se io volessi usare una grammatica regolare:\
@@ -500,7 +501,7 @@ Queste due definizioni sono, come detto, equivalenti, ma la seconda spiega molto
 In altre parole, la regola scatta solo quando $A$ è strettamente preceduta dal prefisso $alpha_1$ e seguita dal suffisso $alpha_2$. Se ci fosse un contesto diverso (es. un $alpha_3 != alpha_1$ prima di $A$), non potremmo applicare questa specifica regola di produzione.
 
 === Grammatiche non contestuali (Context-free) <gramNoCont>
-In questo tipo di grammatica, la forma delle regole di produzione è rigorosamente la seguente:
+In questo tipo di grammatica, la forma delle regole di produzione è la seguente:
 $
   A -> beta quad "con " A in V " e " beta in (V union Sigma)^*
 $
@@ -565,7 +566,7 @@ Ad ogni classe corrisponde inoltre uno specifico modello matematico (macchina as
   })
 ]
 
-#example(multiple: true, "Linguaggi non contestuali")[
+#example(multiple: true, "Grammatiche non contestuali")[
   - ${a^n b^n | n >= 0}$\
     $S -> a S b | epsilon$
 
@@ -601,7 +602,7 @@ Ad ogni classe corrisponde inoltre uno specifico modello matematico (macchina as
 ]
 
 
-#example(multiple: true, "Linguaggi contestuali")[
+#example(multiple: true, "Grammatiche contestuali")[
   - ${a^n b^n c^n | n > 0}$\
     $S &-> a b c | a X b c$\
     $X &-> a X b C | a b C$\
@@ -633,32 +634,32 @@ Ad ogni classe corrisponde inoltre uno specifico modello matematico (macchina as
     #line(length: 100%, stroke: .25pt)
     #block(
       $
-        & S -> a A S | b B S | X a | Y b  quad quad quad  S =>^+ a A union b B)^* (X a union Y b))\
+        & S -> a A S | b B S | X a | Y b quad quad quad S =>^+ a A union b B)^* (X a union Y b)) \
         & A a -> a A quad quad A b -> b A \
         & B a -> a B quad quad B b -> b B \
         & "dove i non terminali" A "e" B "scivolano verso destra superando i terminali."
-      $
+      $,
     )
     #line(length: 100%, stroke: .25pt)
     #block(
       $
         & A X -> X a quad quad A Y -> Y a quad quad && "Quando " A " o " B " incontrano il centro (" X " o " Y ")," \
         & B X -> X b quad quad B Y -> Y b quad quad && "lo attraversano e si trasformano nel terminale definitivo."
-      $
+      $,
     )
     #line(length: 100%, stroke: .25pt)
     #block(
       $
         & X -> a quad quad quad quad quad quad quad quad quad quad quad && "Alla fine, il marcatore centrale svanisce" \
         & Y -> b quad quad quad quad quad quad quad quad quad quad quad && "diventando l'ultimo carattere della prima metà."
-      $
+      $,
     )
     Esempio di derivazione per $w = a b b a$ (stringa finale $w w = a b b a a b b a$):
     #block(
       $
-        S &=> a A S => a A b B S => a A b B b B S => bold(a A b B b B X a) \
-          &=> a b A b B B X a => a b b A B B X a => bold(a b b A B X b a) \
-          &=> a b b A X b b a => bold(a b b X a b b a) => bold(a b b a a b b a)
-      $
+        S & => a A S => a A b B S => a A b B b B S => bold(a A b B b B X a) \
+          & => a b A b B B X a => a b b A B B X a => bold(a b b A B X b a) \
+          & => a b b A X b b a => bold(a b b X a b b a) => bold(a b b a a b b a)
+      $,
     )
 ]

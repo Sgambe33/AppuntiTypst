@@ -218,7 +218,7 @@ $
 $
 
 #observation()[
-  - $L^+ = L L^* = L^* L$
+  - $L^+ = L L^* = L^* L$ (stringa vuota è elemento neutro rispetto alla concatenazione)
   - $L^+ = L union L L^+$
 ]
 

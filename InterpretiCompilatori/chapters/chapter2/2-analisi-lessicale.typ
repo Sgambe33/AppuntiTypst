@@ -43,7 +43,7 @@ x^+=x x^* =x^* x$
   + $epsilon in x^* quad x^*=(x | epsilon)^*$
   + Idempotenza: $(x^*)^* = x^*$
 
-#example()[
+#example(multiple: true)[
   + $(a a)^*$: corrisponde a una stringa con $n space a$, dove $n>=0$ è pari\
   + $(a a)^+$: uguale alla precedente, però stavolta niente stringa vuota. $(n>0)$
   + $(a | b)^*$: una qualsiasi sequenza di $a$, $b$ o stringa vuota
@@ -51,7 +51,7 @@ x^+=x x^* =x^* x$
   + $((a | b)(a | b))^* => (a a | a b | b a | b b)^*$: tutte stringhe di lunghezza pari
 ]
 
-#example()[
+#example(multiple: true)[
   + ${a, b}$, contengono $a b a ==> (a bar b)^* a b a (a bar b)^*$
   + ${a, b}$, non contengono $a b a ==> (b bar a^+ b b)^*(epsilon bar a^+ | a^+ b)$
   + ${a, b}$, ogni $a$ è preceduta o seguita da $b$
@@ -95,7 +95,7 @@ x^+=x x^* =x^* x$
 
 Sia $Sigma={A,B,dots,Z,a,b,dots,z,0,1,dots,9,\_}$ l'alfabeto di tutti i caratteri che possono essere contenuti in un identificatore di variabile. L'espressione regolare estesa per verificare la correttezza di un identificatore è la seguente.
 $
-  (A|B|dots|Z|a|b|dots|z|0|1|dots|9|\_)(A|B|dots|Z|a|b|dots|z|\_|0|1|dots|9)^*
+  (A|B|dots|Z|a|b|dots|z|\_)(A|B|dots|Z|a|b|dots|z|\_|0|1|dots|9)^*
 $
 
 Usando le definizioni regolari, la scrittura si ottimizza enormemente diventando modulare:
