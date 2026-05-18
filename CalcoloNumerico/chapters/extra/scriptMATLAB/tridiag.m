@@ -13,15 +13,11 @@ function x = tridiag(b, a, c, z)
     if length(b) ~= n-1, error("Lunghezza sottodiagonale errata"), end
     if length(c) ~= n-1, error("Lunghezza sopradiagonale errata"), end
 
-    % FATTORIZZAZIONE LU (sovrascrivo b con L, a con U)
-    for i = 2:n
-        b(i-1) = b(i-1) / a(i-1);
-        a(i)   = a(i) - (b(i-1) * c(i-1));
-    end
-
-    % RISOLUZIONE Ly = z (Sostituzione in avanti)
+    % FATTORIZZAZIONE LU (sovrascrivo b con L, a con U) & risoluzione Ly=z
     y = z;
     for i = 2:n
+        b(i-1) = b(i-1) / a(i-1);
+        a(i) = a(i) - (b(i-1) * c(i-1));
         y(i) = z(i) - (b(i-1) * y(i-1));
     end
 

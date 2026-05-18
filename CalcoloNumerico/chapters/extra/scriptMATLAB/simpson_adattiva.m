@@ -10,10 +10,9 @@ function I = simpson_adattiva(fun, a, b, tol, fa, fb)
     % OUTPUT:
     %   I - approssimazione dell'integrale su [a, b]
     %                                                      Rel. 02.05.2026
-
+    
     if nargin < 4, error("Numero di argomenti non sufficiente"), end
     if a >= b, error("Intervallo di integrazione non valido"), end
-
     if nargin == 4
         fa = fun(a);
         fb = fun(b);
@@ -25,10 +24,8 @@ function I = simpson_adattiva(fun, a, b, tol, fa, fb)
     h = (b - a) / 6;
     S1 = h * (fa + 4*fm + fb);
 
-    m_sx = (a + m) / 2;
-    m_dx = (m + b) / 2;
-    f_msx = fun(m_sx);
-    f_mdx = fun(m_dx);
+    f_msx = fun((a + m) / 2);
+    f_mdx = fun((m + b) / 2);
 
     S_sx = ((m - a) / 6) * (fa + 4*f_msx + fm);
     S_dx   = ((b - m) / 6) * (fm + 4*f_mdx + fb);

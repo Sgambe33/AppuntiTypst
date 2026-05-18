@@ -605,7 +605,7 @@ Talora si presentano integrali definiti da una funzione che varia in modo drasti
     integral_(1/2)^100 -2x^(-3) cos(x^(-2)) d x equiv sin(10^(-4)) - sin(4)
   $
   
-  #figure(image("images/2026-04-22-16-45-45.png", width: 60%))
+  #figure(image("images/2026-04-22-16-45-45.png", width: 50%))
   Come si evince dal grafico, questa funzione oscilla violentemente vicino a $x=1/2$ (a causa del termine $x^(-2)$ che diverge), per poi appiattirsi quasi istantaneamente procedendo verso $x=100$. Un metodo a passo fisso costringerebbe a usare un $h$ minuscolo su tutto il dominio $[1/2, 100]$ solo per catturare le oscillazioni iniziali, sprecando milioni di valutazioni inutili nella zona piatta.
 ]
 
@@ -630,4 +630,4 @@ A questo punto si imposta un controllo algoritmico:
 L'accortezza fondamentale nell'implementare questa procedura è *evitare valutazioni funzionali ridondanti*. Nel calcolo di $I_1^((2))$, i valori $f(a)$, $f(x_1)$ e $f(b)$ sono già stati determinati e devono essere passati alle chiamate ricorsive successive per non ricalcolarli inutilmente.
 
 Ad esempio, impostando `tol` = $10^(-3)$, un'implementazione Matlab posizionerà automaticamente i nodi in questo modo (notare l'addensamento a sinistra):
-#figure(image("images/2026-04-22-16-48-09.png", width: 60%))
+#figure(image("images/2026-04-22-16-48-09.png", width: 50%))

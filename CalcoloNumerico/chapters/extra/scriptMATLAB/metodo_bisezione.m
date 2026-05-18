@@ -7,7 +7,7 @@ function x = metodo_bisezione(f, a, b, tol)
     %   tol - tolleranza desiderata (default = 1e-12);
     % OUTPUT:
     %   x - approssimazione della radice;
-    %                                                              Rel. 13.01.2026
+    %                                                      Rel. 13.01.2026
 
     if nargin < 3, error("Parametri insufficienti"), end
     if nargin < 4, tol=1e-12; end

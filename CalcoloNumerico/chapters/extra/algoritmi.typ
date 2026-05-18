@@ -239,9 +239,3 @@
 #simpson_adattiva
 
 ///////////////////////////////////////////////////////////////
-
-
-ascisse chebyshev grado k
-
-sistema tridiagonale
-

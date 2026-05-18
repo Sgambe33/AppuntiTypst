@@ -13,17 +13,10 @@ function I1 = trapezi_composita(f, a, b, n)
     if nargin < 4, error("Numero di argomenti non sufficiente"), end
     if a > b, error("Intervallo di integrazione non valido"), end
 
-    h = (b-a)/(2*n);
-    x = linspace(a,b, n+1);
+    h = (b - a) / n;
+    x = linspace(a, b, n + 1);
+    ff = f(x);
 
-    I1=0;
-    f1 = f(x(1));
-    for i=2:n+1
-        f2 = f(x(i));
-
-        I1 = I1 + f1 + f2;
-        f1 = f2;
-    end
-
-    I1 = I1 * h;
+    % (h/2) * [f(x_1) + 2*f(x_2) + ... + 2*f(x_n) + f(x_{n+1})]
+    I1 = (h / 2) * (ff(1) + 2 * sum(ff(2:end-1)) + ff(end));
 end
