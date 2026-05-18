@@ -246,7 +246,7 @@
 
 #let problem-style = builder-thmbox(color: colors.at(16), shadow: (offset: (x: 2pt, y: 2pt), color: luma(70%)))
 
-#let problem = problem-style("problem", "Problem")
+#let problem = problem-style("problem", "Problema").with(numbering: none)
 
 #let theorem-style = builder-thmbox(color: colors.at(1), shadow: (offset: (x: 3pt, y: 3pt), color: luma(70%)))
 

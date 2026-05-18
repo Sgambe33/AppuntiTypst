@@ -31,7 +31,7 @@ Il concetto di deadlock può essere illustrato con diversi esempi:
 
 - *Strettoia in senso unico alternato (ponte)*: Ogni lato del ponte è una risorsa. Per attraversare, un'auto deve "impossessarsi" di entrambi i lati. Si verifica un deadlock quando auto da lati opposti attendono indefinitamente che l'altra parte liberi la propria porzione del ponte. Il deadlock può essere rimosso facendo indietreggiare un'automobile (prelazione della risorsa), ma questo può causare *starvation*, dove le auto da una direzione non riescono mai ad attraversare.
 
-#image("images/2025-08-10-15-58-22.png")
+#figure(image("images/2025-08-10-15-58-22.png", width: 60%))
 
 - *Problema dei filosofi a cena (Dijkstra)*: Questo è un classico problema di controllo della concorrenza. Cinque filosofi condividono una tavola rotonda con un piatto di spaghetti e cinque forchette. Per mangiare, un filosofo deve prendere la forchetta alla sua destra e quella alla sua sinistra, una per volta. Le forchette devono essere usate in mutua esclusione. L'attività di ogni filosofo è: pensa, prendi forchetta sinistra, prendi forchetta destra, mangia, rilascia entrambe le forchette. Se tutti i filosofi hanno fame contemporaneamente e prendono la forchetta di sinistra, tutte le forchette diventano non disponibili. Quando un filosofo tenta di prendere la forchetta di destra, rimane in attesa indefinitamente, creando un deadlock.
   #figure(image("images/2025-08-10-15-59-20.png", height: 20%))
@@ -93,7 +93,6 @@ Le proprietà del grafo di Holt e il deadlock sono le seguenti:
 
 #example("Grafo risorse a singola istanza")[
   #figure(image("images/2025-08-10-16-20-23.png", height: 20%))
-  Un grafo con cicli e risorse a singola istanza mostra un deadlock
 ]
 
 #example(
@@ -107,7 +106,7 @@ Le proprietà del grafo di Holt e il deadlock sono le seguenti:
 == Metodi di Gestione dei Deadlock
 
 Esistono quattro approcci principali per gestire i deadlock:
-=== 1. Prevenire il deadlock
+=== Prevenire il deadlock
 Impedire che le condizioni necessarie si verifichino simultaneamente.
 La *prevenzione statica* dei deadlock impone vincoli sul comportamento dei processi al momento della scrittura del programma, per evitare che si verifichi almeno una delle quattro condizioni necessarie.
 
@@ -148,7 +147,7 @@ La *prevenzione statica* dei deadlock impone vincoli sul comportamento dei proce
 
 La prevenzione statica, sebbene impedisca il deadlock, può causare un scarso utilizzo delle risorse e ridotta produttività, e la responsabilità di implementare i vincoli ricade sui programmatori.
 
-=== 2. Evitare il deadlock
+=== Evitare il deadlock
 Il SO alloca le risorse dinamicamente solo se il sistema rimane in uno stato "sicuro".
 La *prevenzione dinamica* dei deadlock non impone vincoli sul comportamento dei processi, ma il SO usa algoritmi che esaminano lo stato di allocazione delle risorse per assicurarsi che la condizione di attesa circolare non possa mai verificarsi. Questi algoritmi richiedono informazioni a priori, come il numero massimo di risorse di ogni tipo di cui un processo può avere bisogno.
 
@@ -204,7 +203,7 @@ Sia $n$ il numero dei processi e $m$ il numero di tipi di risorse.
 - `Need`: matrice $n times m$; se `Need[i, j] = k`, allora il processo $P_i$ può avere bisogno di altre $k$ istanze di risorse del tipo $R_j$ per completare la sua esecuzione.f
 #align(center, strong[Vale l'invariante: `Need [i,j] = Max[i,j] - Allocation [i,j]`])
 
-===== *Algoritmo di verifica della sicurezza*
+===== Algoritmo di verifica della sicurezza
 
 L'algoritmo utilizzato per scoprire se il sistema è o non è in uno stato sicuro si può descrivere come segue.
 Siano `Work` e `Finish` vettori rispettivamente di lunghezza $m$ e $n$. I pedici indicano una riga della matrice mentre se non sono presenti indici di vettori, le operazioni di confronto sono da interpretare su tutto il vettore.
@@ -226,7 +225,7 @@ Siano `Work` e `Finish` vettori rispettivamente di lunghezza $m$ e $n$. I pedici
 
 *Costo*: $O(m times n^2)$ operazioni per trovare una sequenza sicura.
 
-===== *Algoritmo di richiesta delle risorse*
+===== Algoritmo di richiesta delle risorse
 Si descrive ora l'algoritmo che determina se le richieste possano essere soddisfatte mantenendo la condizione di sicurezza.
 
 Sia $"Request"_i$ il vettore (di lunghezza $m$) delle richieste di $P_i$
@@ -272,7 +271,7 @@ Viene quindi invocato l'algoritmo per verificare se uno stato è sicuro.
 
   Supponiamo che lo stato corrente sia il seguente:
 
-  #grid(
+  #align(center, grid(
     columns: 3,
     column-gutter: 3mm,
     align: center,
@@ -315,12 +314,12 @@ Viene quindi invocato l'algoritmo per verificare se uno stato è sicuro.
         [4], [3], [3],
       ),
     ),
-  )
+  ))
 
   Lo stato corrente è sicuro?
   La matrice `Need` definita come `Max`-`Allocation`, ed il vettore `Available` delle risorse attualmente disponibili, ricavabile sottraendo all risorse complessive del sistema quelle già allaocate, quindi `Available` = [10,5,7] - $sum_i "Allocation"_i$, sono:
 
-  #grid(
+  #align(center, grid(
     columns: 6,
     column-gutter: 3mm,
     align: center,
@@ -403,7 +402,7 @@ Viene quindi invocato l'algoritmo per verificare se uno stato è sicuro.
         [ ], [ ], [ ],
       ),
     ),
-  )
+  ))
 
   Il sistema è in uno stato sicuro poiché la sequenza <$P_1, P_3, P_4, P_2, P_0$> è sicura, infatti...
 
@@ -418,7 +417,7 @@ Viene quindi invocato l'algoritmo per verificare se uno stato è sicuro.
     + $"Request"_1 lt.eq "Need"_1$ cioè (1 0 2) $lt.eq$ (1 2 2)
     + $"Request"_1 lt.eq "Available"$ cioè (1 0 2) $lt.eq$ (3 3 2)
   - Aggiorniamo lo stato:
-    #grid(
+    #align(center, grid(
       columns: 6,
       column-gutter: 3mm,
       align: center,
@@ -474,7 +473,7 @@ Viene quindi invocato l'algoritmo per verificare se uno stato è sicuro.
           [ ], [ ], [ ],
         ),
       ),
-    )
+    ))
 
   - Invochiamo l'algoritmo per la verifica dello stato sicuro che restituisce la sequenza sicura <$P_1, P_3, P_4, P_2, P_0$>.
 
@@ -487,15 +486,13 @@ Viene quindi invocato l'algoritmo per verificare se uno stato è sicuro.
 
 L'algoritmo del banchiere è costoso in termini di overhead e non permette di utilizzare al massimo le risorse (basandosi sul caso peggiore), riducendo la produttività. Inoltre, spesso le esigenze massime dei processi non sono note a priori, i processi variano dinamicamente e le risorse possono improvvisamente non essere disponibili, rendendo l'algoritmo poco applicabile nella pratica. Anche se teoricamente risolve il problema, pochi sistemi lo usano, anche se euristiche simili (es. limitare il traffico di rete quando l'utilizzo del buffer supera una soglia) sono impiegate.
 
-=== 3. Rilevare il deadlock e ripristinare il sistema
+=== Rilevare il deadlock e ripristinare il sistema
 Rilevare i deadlock quando si verificano e recuperare il sistema. Nei sistemi che non prevengono o evitano i deadlock, è possibile fornire algoritmi per rilevarne la presenza e ripristinare il sistema.
 
-==== *Singola istanza per ogni tipo di risorsa*:
+==== Singola istanza per ogni tipo di risorsa
 Si può usare un *grafo di attesa*. I nodi rappresentano solo processi, e un arco $P_i arrow P_j$ esiste se $P_i$ attende che $P_j$ rilasci una risorsa. Nel grafo di attesa, un deadlock esiste se, e solo se, c'è almeno un ciclo. Il SO mantiene questo grafo e periodicamente invoca un algoritmo di ricerca di cicli (costo $O(n^2)$).
 
-#figure(
-  image("images/2025-08-10-17-39-30.png", height: 30%),
-)
+#figure(image("images/2025-08-10-17-39-30.png", height: 30%))
 
 
 ==== Tipi di risorsa con istanze multiple
@@ -530,8 +527,8 @@ Sia $n$ = num. dei processi e $m$ = num. di tipi di risorse. Lo stato del sistem
 Simile all'algoritmo di verifica dello stato sicuro, ma lavora con le esigenze effettive (`Request`) anziché quelle massime. Il costo è $O(m times n^2)$. Un processo `i` è considerato "finito" (`Finish[i]=true`) se `Allocation[i]` è zero (non possiede risorse e quindi non può far parte di un ciclo di attesa). Se alla fine un `Finish[i]` è `false`, allora Pi è in stallo.
 
 #example("Esempio algoritmo di rilevamento")[
-  #image("images/2025-08-12-18-32-11.png")
-  #image("images/2025-08-12-18-32-28.png")
+  #figure(image("images/2025-08-12-18-32-11.png",width: 70%))
+  #figure(image("images/2025-08-12-18-32-28.png",width: 70%))
 ]
 
 L'algoritmo di rilevamento dovrebbe essere eseguito in base alla frequenza dei deadlock e al numero di processi coinvolti, idealmente quando le prestazioni degradano.
