@@ -10,10 +10,11 @@
 
   #pagebreak()
 
-//  #include "chapters/chapter1/1-introduzione.typ"
-//  #include "chapters/chapter2/2-analisi-lessicale.typ"
-//  #include "chapters/chapter3/3-grammatiche.typ"
-//  #include "chapters/chapter4/4-automi.typ"
-  // #include "chapters/chapter5/5-analisi-sintattica.typ"
+  #include "chapters/chapter1/1-introduzione.typ"
+  #include "chapters/chapter2/2-analisi-lessicale.typ"
+  #include "chapters/chapter3/3-grammatiche.typ"
+  #include "chapters/chapter4/4-automi.typ"
+  #include "chapters/chapter5/5-analisi-sintattica.typ"
   #include "chapters/chapter6/6-trad-guidata-sintassi.typ"
+  #include "chapters/chapter7/7-gen-codice-intermedio.typ"
 ]
