@@ -1,5 +1,5 @@
 #import "../../../dvd.typ": *
-#import "@preview/cetz:0.4.2": canvas, draw
+#import "@preview/cetz:0.5.0": canvas, draw
 #import "@preview/cetz-plot:0.1.3": plot
 #import "@preview/codly:1.3.0": *
 #import "@preview/codly-languages:0.1.1": *
@@ -67,7 +67,7 @@ $
 
 #[
   #set heading(outlined: false, numbering: none)
-  == Esempi
+  == Gradi comuni
 ]
 *Caso $n=1$ (Metodo dei trapezi)* \
 Sfruttando la proprietà di simmetria #link(<5.4>, "(5.4)") deduciamo che $c_(01) = c_(11)$, mentre dalla condizione di normalizzazione #link(<5.3>, "(5.3)") sappiamo che $c_(01) + c_(11) = 1$. Di conseguenza, si ricava banalmente che $c_(01) = c_(11) = 1/2$.
@@ -78,20 +78,20 @@ $
 $
 Geometricamente, stiamo approssimando l'area sottesa dal grafico di $f(x)$ con l'area del trapezio rettangolo individuato dai vertici $(a,0), (b,0), (b,f(b))$ e $(a,f(a))$. Per questo motivo, la formula prende il nome di *metodo dei trapezi*.
 
-
 #figure(
   canvas({
     import draw: *
     plot.plot(
-      size: (10, 5),
+      size: (10, 6),
+      axis-style: "school-book",
       x-tick-step: 1,
       y-tick-step: 1,
-      y-min: -2,
+      y-min: -1,
       x-min: 0,
-      x-max: 14,
+      x-max: 12,
       y-max: 8,
       plot-style: (stroke: black),
-      min: 0,
+      legend: "inner-north-east",
       {
         let func = x => 4 + 1 / 2 * (x - 2) - 9 / 221 * (x - 2) * (x - 4) + 139 / 13260 * (x - 2) * (x - 4) * (x - 10.5)
         let func2 = x => 0.3 * x + 3.4
@@ -108,17 +108,14 @@ Geometricamente, stiamo approssimando l'area sottesa dal grafico di $f(x)$ con l
         let nodes = ((2, 4), (12, 7))
         plot.add(nodes, style: (stroke: none), mark: "o")
 
-        plot.add-hline(0, min: 0, max: 14, style: (stroke: black))
-
-
         plot.add-vline(2, min: 0, max: 3.8, style: (stroke: blue))
         plot.add-vline(12, min: 0, max: 6.8, style: (stroke: blue))
 
         plot.add-hline(4, min: 0, max: 1.8, style: (stroke: red))
         plot.add-hline(7, min: 0, max: 11.8, style: (stroke: red))
         plot.annotate({
-          content((2, -0.5), $a$)
-          content((12, -0.5), $b$)
+          content((2.3, 0.5), $a$)
+          content((11.7, 0.5), $b$)
         })
       },
     )
@@ -133,8 +130,7 @@ $
 $
 Sostituendo a ritroso, otteniamo $c_(02) = c_(22) = 1/3$ e, per differenza, $c_(12) = 2 - 2/3 = 4/3$. Ricordando che le ascisse di interpolazione sono $x_0 = a$, $x_1 = (a+b)/2$, e $x_2 = b$, possiamo scrivere la formula che definisce il *metodo di Simpson*:
 $
-  I_2 (f) & = (b-a)/2 (1/3 f(a) + 4/3 f((a+b)/2) + 1/3 f(b)) \
-          & = (b-a)/6 (f(a) + 4 f((a+b)/2) + f(b))
+  I_2 (f) & = (b-a)/2 (1/3 f(a) + 4/3 f((a+b)/2) + 1/3 f(b))
 $
 
 == Analisi di condizionamento
@@ -146,7 +142,7 @@ Consideriamo una perturbazione $tilde(f)(x)$ del dato in ingresso $f(x)$. Per va
 $
   abs(I(f)-I(tilde(f))) & = abs(integral_a^b f(x) d x - integral_a^b tilde(f)(x) d x) \
                         & <= integral_a^b abs(f(x)-tilde(f)(x)) d x \
-                        & <= integral_a^b d x dot norm(f-tilde(f))_infinity = (b-a) norm(f-tilde(f))_infinity
+                        & <= integral_a^b d x dot norm(f-tilde(f)) = (b-a) norm(f-tilde(f))
 $
 Considerato che:
 - $abs(I(f) - I(tilde(f)))$ è la misura dell'errore sul risultato finale;
@@ -161,11 +157,11 @@ $
   #set heading(outlined: false, numbering: none)
   === Problema discreto
 ]
-Eseguiamo la medesima analisi per l'integrale approssimato $I_n(f)$, definito dalla #link(<5.2>, "(5.2)"):
+Eseguiamo la medesima analisi per l'integrale approssimato $I_n (f)$, definito dalla #link(<5.2>, "(5.2)"):
 $
   abs(I_n (f) - I_n (tilde(f))) &= (b-a)/n abs(sum_(i=0)^n c_(i n) f_i - sum_(i=0)^n c_(i n) tilde(f)_i) = (b-a)/n abs(sum_(i=0)^n c_(i n) (f_i - tilde(f)_i)) \
   &<= (b-a)/n sum_(i=0)^n abs(c_(i n)) dot abs(f_i - tilde(f)_i) \
-  &<= underbrace(((b-a)/n sum_(i=0)^n abs(c_(i n))), =K_n) norm(f - tilde(f))_infinity
+  &<= underbrace(((b-a)/n sum_(i=0)^n abs(c_(i n))), =K_n) norm(f - tilde(f))
 $
 Analogamente a quanto fatto nel continuo, identifichiamo il *numero di condizionamento* della formula di Newton-Cotes di grado $n$:
 <5.6>
@@ -215,7 +211,7 @@ Per i restanti valori (ovvero $n=8$ e $n >= 10$), la presenza di pesi negativi f
     let plot-data = raw-data.map(pt => (pt.at(0), calc.log(pt.at(1), base: 10)))
     import draw: *
     plot.plot(
-      size: (12, 9),
+      size: (8, 6),
       x-label: [$n$],
       y-label: [$K_n / K$],
       x-min: 1,
@@ -263,9 +259,10 @@ Questa scomposizione è la chiave per calcolare i pesi in modo esatto al calcola
 )
 ```matlab
 % 1. Vettore delle radici (escluso l'indice i)
+% esempio: n=3 e i=1, ind = [0, 2, 3]
 ind = [0:i-1, i+1:n];
 
-% 2. Calcolo del denominatore (prodotto degli scarti)
+% 2. Calcolo del denominatore (costante)
 din = prod(i - ind);
 
 % 3. Calcolo del numeratore tramite integrazione polinomiale
@@ -276,18 +273,23 @@ alfain = polyval(q, n);    % valutazione della primitiva tra 0 e n
 % 4. Calcolo del peso finale
 cin = alfain / din;
 ```
-La logica matematica dietro le istruzioni per il numeratore merita una precisazione. La funzione `poly(ind)` restituisce il vettore dei coefficienti $a_k$ del polinomio monico con le radici in argomento, ordinati per potenze decrescenti. Se il polinomio ha grado $n$, esso è definito come:
+Approfondiamo la logica matematica dietro il calcolo del numeratore. In Matlab, un polinomio è rappresentato semplicemente da un vettore che contiene i suoi coefficienti, ordinati dalla potenza più alta fino al termine noto.Quando usiamo `poly(ind)` e salviamo il risultato nel vettore a, stiamo definendo un polinomio fatto così:
 $
-  q(t) = sum_(k=1)^(n+1) a_k t^(n+1-k)
+  p(t) = a_1 t^n + a_2 t^(n-1) + dots + a_n t + a_(n+1)
 $
-Integrando $q(t)$ rispetto a $t$, otteniamo la famiglia di primitive:
+Il nostro obiettivo è calcolarne l'integrale. Per le regole base dell'integrazione, ogni termine $t^m$ diventa $frac(t^(m+1), m+1)$. Se applichiamo questa regola a tutto il polinomio, otteniamo la sua funzione primitiva:
 $
-  integral q(t) d t = sum_(k=1)^(n+1) a_k frac(t^(n+2-k), n+2-k) + C
+  integral p(t) d t = a_1/(n+1) t^(n+1) + a_2/n t^n + dots + a_n/2 t^2 + a_(n+1)/1 t + C
 $
-L'istruzione Matlab `q = [a ./ (n+1:-1:1), 0]` esegue esattamente questa operazione: divide ogni coefficiente $a_k$ per il suo nuovo esponente e aggiunge uno $0$ finale per imporre la costante di integrazione $C=0$. Infine, la primitiva viene valutata nell'estremo superiore di integrazione $t=n$ tramite `polyval(q, n)` (la valutazione in $0$ è ovviamente nulla), ottenendo così l'esatto valore dell'integrale $alpha_(i n)$.
+L'istruzione Matlab `q = [a ./ (n+1:-1:1), 0]` esegue questo calcolo in un colpo solo:
+- Il vettore `(n+1:-1:1)` genera proprio la sequenza dei nuovi esponenti (da $n+1$ scendendo fino a $1$).
+- L'operazione `a ./ ...` divide ogni singolo coefficiente del vettore a per il corrispondente nuovo esponente.
+- L'aggiunta dello `, 0]` alla fine del vettore serve a imporre che la costante di integrazione sia $C = 0$ (visto che tutti i termini precedenti hanno la $t$, il termine noto della primitiva deve essere nullo).
+Ora `q` contiene i coefficienti del nostro integrale indefinito. Per ottenere l'integrale definito nell'intervallo $[0, n]$, dobbiamo valutare questa primitiva nell'estremo superiore $n$ e sottrarre la valutazione nell'estremo inferiore $0$.
+Poiché in $0$ il polinomio vale banalmente zero, ci basta calcolare quanto vale in $n$: è esattamente ciò che fa l'istruzione finale `polyval(q, n)`, che ci restituisce l'area esatta $alpha_(i n)$.
 
 == Errore e formule composite
-Poiché in generale $I(f) != I_n(f)$, vogliamo quantificare l'errore di integrazione $E_n(f) = I(f) - I_n(f)$. Utilizzando l'espressione dell'errore di interpolazione, possiamo scrivere:
+Poiché in generale $I(f) != I_n (f)$, vogliamo quantificare l'errore di integrazione $E_n (f) = I(f) - I_n (f)$. Utilizzando l'espressione dell'errore di interpolazione, possiamo scrivere:
 $
   E_n (f) = I(f) - I_n (f) & = integral_a^b f(x) d x - integral_a^b p(x) d x \
                            & = integral_a^b (f(x)-p(x)) d x \
@@ -317,10 +319,7 @@ Per superare questo paradosso, si introducono le formule di *Newton-Cotes compos
   #set heading(outlined: false, numbering: none)
   === Formula composita dei trapezi
 ]
-Per illustrare il concetto, applichiamo iterativamente la formula dei trapezi.
-#figure(image("images/2026-04-20-12-00-59.png"))
-
-L'integrale complessivo viene approssimato come somma delle aree dei singoli trapezi:
+Per illustrare il concetto, applichiamo iterativamente la formula dei trapezi. L'integrale complessivo viene approssimato come somma delle aree dei singoli trapezi (in questo caso $n$ rappresenta il numero di sottointervalli creati):
 $
   I(f) = integral_a^b f(x) d x & = sum_(i=1)^n integral_(x_(i-1))^x_i f(x) d x \
                                & approx sum_(i=1)^n underbrace((b-a)/n, =h) (frac(f_(i-1)+f_i, 2)) \
@@ -340,13 +339,8 @@ Si nota immediatamente che per $n -> infinity$, l'errore $E_1^((n))(f) -> 0$, ga
   === Formule composite di grado $k$
 ]
 Generalizzando, scegliamo un grado base $k in {1,dots,7,9}$ e un numero totale di ascisse $n = k ell$ (con $ell$ indicante il numero di sottointervalli macroscopici). La formula composita di grado $k$ si ottiene applicandola $ell$ volte per ricoprire l'intero dominio:
-\ >GEMINI
 $
   [x_0, x_k] union [x_k, x_(2k)] union dots union [x_(k(ell-1)), x_(k ell)] = [a,b]
-$
-\ >PROF
-$
-  [x_0, x_k] union [x_(k+1), x_(2k)] union dots union [x_(k(ell-1)), x_(k ell)] = [a,b]
 $
 
 Sostituendo $ell = (b-a)/(k h)$, il corrispondente errore globale risulta essere:
@@ -481,7 +475,7 @@ Il vettore `f` restituisce esattamente tutti i valori $f_i$ richiesti per implem
 
 
 //22.04.2026
-Vediamo come, partendo dalla #link(<5.11>, "(5.11)"), si possa ottenere una stima dell'errore di quadratura a costo quasi nullo. Se supponiamo che $n$ sia un *multiplo pari del grado $k$* (ovvero $n = 2 k ell$), possiamo applicare la formula composita in due modi: sia utilizzando tutti gli $n+1$ nodi, sia scartando i nodi dispari e utilizzando solo la metà dei sottointervalli.
+Vediamo come, partendo dalla #link(<5.11>, "(5.11)"), si possa ottenere una stima dell'errore di quadratura a costo quasi nullo. Se supponiamo che $n$ sia un *multiplo pari del grado $k$* (ovvero $n = 2 k ell$), possiamo applicare la formula composita in due modi: sia utilizzando tutti le $n+1$ ascisse, sia scartando i nodi dispari e utilizzando solo la metà dei sottointervalli.
 
 #example("Formula di Simpson")[
   Con $k=2$, prendiamo ad esempio $n=4$.
@@ -602,7 +596,7 @@ Così facendo, otteniamo una stima computazionale dell'errore (detta estrapolazi
 ]
 
 == Formule adattive
-Possiamo specializzare ulteriormente questo stimatore per ottenere delle *formule di quadratura di tipo adattivo*. 
+Possiamo specializzare ulteriormente questo stimatore per ottenere delle *formule di quadratura di tipo adattivo*.
 Talora si presentano integrali definiti da una funzione che varia in modo drastico solo in un piccolo sottointervallo del dominio. In questi casi, utilizzare una griglia di nodi uniforme è computazionalmente inefficiente. Conviene invece utilizzare punti distribuiti in modo non uniforme, "addensandoli" localmente solo dove il comportamento della funzione $f(x)$ lo richiede, al fine di soddisfare un prescritto criterio di accuratezza con il minor numero di valutazioni possibili.
 
 #example("Necessità dell'adattività")[
@@ -610,7 +604,8 @@ Talora si presentano integrali definiti da una funzione che varia in modo drasti
   $
     integral_(1/2)^100 -2x^(-3) cos(x^(-2)) d x equiv sin(10^(-4)) - sin(4)
   $
-  #figure(image("images/2026-04-22-16-45-45.png"))
+  
+  #figure(image("images/2026-04-22-16-45-45.png", width: 50%))
   Come si evince dal grafico, questa funzione oscilla violentemente vicino a $x=1/2$ (a causa del termine $x^(-2)$ che diverge), per poi appiattirsi quasi istantaneamente procedendo verso $x=100$. Un metodo a passo fisso costringerebbe a usare un $h$ minuscolo su tutto il dominio $[1/2, 100]$ solo per catturare le oscillazioni iniziali, sprecando milioni di valutazioni inutili nella zona piatta.
 ]
 
@@ -619,59 +614,20 @@ Illustriamo il concetto di adattamento automatico del passo con la formula dei t
 #problem()[
   Calcolare $I(f)$ su un intervallo globale con una tolleranza `tol` prescritta in input.
 ]
-Applicando la formula dei trapezi sull'intero intervallo $[a,b]$ (un solo trapezio) e poi la formula composita con $n=2$ (due trapezi), otteniamo:
+Applicando la formula dei trapezi sull'intero intervallo $[a,b]$ ($n=1$ trapezi) e poi la formula composita con $n=2$ (due trapezi), otteniamo:
 $
-  I_1 &= (b-a)/2 (f(a) + f(b)) \
-  I_2 &= (b-a)/4 (f(a) + 2f(x_1) + f(b)), quad quad "con" x_1 = (a+b)/2
+  I_1^((1)) & = (b-a)/2 (f(a) + f(b)) \
+  I_1^((2)) & = (b-a)/4 (f(a) + 2f(x_1) + f(b)), quad quad "con" x_1 = (a+b)/2
 $
 Come dimostrato precedentemente, la stima dell'errore su questo specifico passo è ottenibile come:
 $
-  E_(12) = abs(I_2 - I_1)/3
+  E_(12) = frac(I_k^((n))(f) - I_k^((n/2))(f), 2^(k + mu)-1) = abs(I_1^((2)) - I_1^((1)))/3
 $
 A questo punto si imposta un controllo algoritmico:
-+ Se $E_(12) <= "tol"$, l'accuratezza è soddisfatta: l'algoritmo si ferma e restituisce $I_2$.
++ Se $E_(12) <= "tol"$, l'accuratezza è soddisfatta: l'algoritmo si ferma e restituisce $I_1^((2))$.
 + Altrimenti, l'intervallo viene diviso a metà. Si riapplica ricorsivamente l'intera procedura sui due sottointervalli $[a, x_1]$ e $[x_1, b]$, ma richiedendo a ciascuno una tolleranza dimezzata pari a $"tol"/2$.
 
-L'accortezza fondamentale nell'implementare questa procedura è *evitare valutazioni funzionali ridondanti*. Nel calcolo di $I_2$, i valori $f(a)$, $f(x_1)$ e $f(b)$ sono già stati determinati e devono essere passati alle chiamate ricorsive successive per non ricalcolarli inutilmente.
+L'accortezza fondamentale nell'implementare questa procedura è *evitare valutazioni funzionali ridondanti*. Nel calcolo di $I_1^((2))$, i valori $f(a)$, $f(x_1)$ e $f(b)$ sono già stati determinati e devono essere passati alle chiamate ricorsive successive per non ricalcolarli inutilmente.
 
 Ad esempio, impostando `tol` = $10^(-3)$, un'implementazione Matlab posizionerà automaticamente i nodi in questo modo (notare l'addensamento a sinistra):
-#figure(image("images/2026-04-22-16-48-09.png"))
-
-#codly(
-  languages: codly-languages,
-  zebra-fill: none,
-  breakable: true,
-)
-```matlab
-function I2 = trapead(fun, a, b, tol, fa, fb)
-    % Approssimazione integrale con formula dei trapezi adattiva
-    % Input:
-    %   fun - function handle dell'integranda
-    %   a, b - estremi di integrazione
-    %   tol - tolleranza richiesta
-    %   fa, fb - (opzionali) valori della funzione già precalcolati
-    
-    if nargin == 4
-        fa = fun(a);
-        fb = fun(b);
-    end
-    
-    % Punto medio e nuova valutazione funzionale (l'unica necessaria)
-    x1 = (a + b) / 2;
-    f1 = fun(x1);
-    
-    % Calcolo delle due approssimazioni (h è la metà dell'intervallo)
-    h = (b - a) / 2;
-    I1 = h * (fa + fb);
-    I2 = (h / 2) * (fa + 2*f1 + fb);
-    
-    % Stima dell'errore di Richardson
-    err = abs(I2 - I1) / 3;
-    
-    if err > tol
-        % Criterio fallito: divisione e chiamate ricorsive (tolleranza dimezzata)
-        % Passiamo i valori di fa, f1 e fb per evitare di ricalcolarli
-        I2 = trapead(fun, a, x1, tol/2, fa, f1) + trapead(fun, x1, b, tol/2, f1, fb);
-    end
-return
-```
+#figure(image("images/2026-04-22-16-48-09.png", width: 50%))
