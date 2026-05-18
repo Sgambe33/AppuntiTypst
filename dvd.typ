@@ -309,3 +309,9 @@
     text(fill: #colors.at(sym.at(0)), #sym.at(1))
   $
 }
+
+#let mtext(text) = {
+  let content = str(text)
+  let elements = content.clusters().map(math.italic).join(h(0pt))
+  math.equation(elements)
+}

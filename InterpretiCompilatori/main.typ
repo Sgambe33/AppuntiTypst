@@ -4,7 +4,7 @@
   title: "Appunti Interpreti e Compilatori",
   author: none,
   subtitle: "Teoria\nCorso 2025/2026",
-  cover-image: image("cover.jpg", height: 100%, width: 100%)
+  cover-image: image("cover.jpg", height: 100%, width: 100%),
 )[
   #outline(title: "Contenuti")
 
@@ -15,4 +15,6 @@
   #include "chapters/chapter3/3-grammatiche.typ"
   #include "chapters/chapter4/4-automi.typ"
   #include "chapters/chapter5/5-analisi-sintattica.typ"
+  #include "chapters/chapter6/6-trad-guidata-sintassi.typ"
+  #include "chapters/chapter7/7-gen-codice-intermedio.typ"
 ]
