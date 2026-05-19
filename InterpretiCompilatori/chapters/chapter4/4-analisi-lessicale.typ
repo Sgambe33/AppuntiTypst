@@ -3,9 +3,9 @@
 #import fletcher.shapes: ellipse
 
 #pagebreak()
-= Automi
+= Analisi lessicale
 
-== Automi a stati finiti
+== Automi a stati finiti (DFA)
 
 #definition()[
   Un automa a stati finiti deterministico (DFA) è una quintupla $A=(Q, Sigma, delta, q_0, F)$.
