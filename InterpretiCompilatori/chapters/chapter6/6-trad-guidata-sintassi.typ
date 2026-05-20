@@ -302,7 +302,6 @@ Un grafo delle dipendenze rappresenta il flusso di informazioni attraverso gli a
 ]
 
 === Ordine di valutazione degli attributi
-Il grafo delle dipendenze caratterizza ogni possibile ordine di valutazione degli attributi associati ai nodi di un albero di parsing. Se c'è un arco da un nodo attributo $M$ ad un nodo attributo $N$, significa che l'attributo associato a $M$ deve essere valutato *prima* di quello associato a $N$.
 
 #definition()[
   Gli ordinamenti validi per la valutazione sono costituiti da sequenze di nodi $N_1, N_2, dots, N_k$, tali che, se esiste un arco dal nodo $N_i$ al nodo $N_j$ nel grafo delle dipendenze, allora deve necessariamente essere $i < j$. Un ordinamento che rispetta questa proprietà è detto *ordinamento topologico*.
@@ -311,13 +310,13 @@ Il grafo delle dipendenze caratterizza ogni possibile ordine di valutazione degl
 Se il grafo contiene un ciclo (una dipendenza circolare), allora *non esiste* alcun ordinamento topologico possibile, e la SDD non può essere valutata per quell'albero. Viceversa, se il grafo non presenta cicli (è un grafo diretto aciclico o DAG), la teoria dei grafi garantisce che esista sempre almeno un ordinamento topologico valido per completare l'analisi semantica.
 
 === Definizioni S-attribuite
-Per poter valutare gli attributi senza blocchi è strettamente necessario che il grafo delle dipendenze di un albero di parsing non contenga cicli. Esistono classi specifiche di SDD per cui è garantito che i grafi delle dipendenze non conterranno *mai* cicli, indipendentemente dall'albero di parsing generato.
+Esistono classi specifiche di SDD per cui è garantito che i grafi delle dipendenze non conterranno *mai* cicli, indipendentemente dall'albero di parsing generato.
 
 #definition()[
-  Una SDD che contiene solo attributi sintetizzati è detta *S-attribuita* (come l'esempio precedente). In una SDD S-attribuita ogni regola calcola un attributo associato alla variabile della parte *sinistra* della produzione a partire dagli attributi associati ai simboli della parte *destra*.
+  Una SDD che contiene solo attributi sintetizzati è detta *S-attribuita*. In una SDD S-attribuita ogni regola calcola un attributo associato alla variabile della parte *sinistra* della produzione a partire dagli attributi associati ai simboli della parte *destra*.
 ]
 
-In questo caso non ci sono sicuramente cicli nei grafi delle dipendenze. Per una SDD S-attribuita si possono valutare gli attributi secondo un qualsiasi ordinamento bottom-up dei nodi dell'albero di parsing, ad esempio visitando l'albero in postordine e valutando gli attributi associati ad un nodo quando questo viene visitato (quando viene lasciato per l'ultima volta). Ovvero si applica la seguente funzione a partire dalla radice dell'albero di parsing:
+Per una SDD S-attribuita si possono valutare gli attributi secondo un qualsiasi ordinamento bottom-up dei nodi dell'albero di parsing, ad esempio visitando l'albero in postordine e valutando gli attributi associati ad un nodo quando questo viene visitato (quando viene lasciato per l'ultima volta). Ovvero si applica la seguente funzione a partire dalla radice dell'albero di parsing:
 ```c
 postorder(N) {
   for ( ogni figlio C di N, da sinistra a destra )
@@ -373,109 +372,109 @@ Ogni traduzione reale comporta spesso effetti collaterali, ad esempio la stampa 
 
 + *Permettere effetti collaterali incidentali:* non pongono vincoli rigorosi sulla valutazione degli attributi; qualsiasi ordine di valutazione coerente col grafo delle dipendenze produce una traduzione corretta.
 
-#example()[
-  Nella SDD per le espressioni (calcolatrice) possiamo sostituire la regola semantica $L."val" = E."val"$ associata alla produzione $L -> E text("n")$ con l'azione $"print"(E."val")$ in modo che venga stampato il risultato a schermo. La SDD modificata produce la stessa traduzione seguendo un qualsiasi ordine topologico, perché l'istruzione di stampa è eseguita sempre e comunque per ultima, dopo aver calcolato in modo puro il valore di $E."val"$. Regole semantiche di questo tipo equivalgono logicamente alla definizione di attributi sintetizzati fittizi associati alla parte sinistra della produzione.
-]
+  #example()[
+    Nella SDD per le espressioni (calcolatrice) possiamo sostituire la regola semantica $L."val" = E."val"$ associata alla produzione $L -> E text("n")$ con l'azione $"print"(E."val")$ in modo che venga stampato il risultato a schermo. La SDD modificata produce la stessa traduzione seguendo un qualsiasi ordine topologico, perché l'istruzione di stampa è eseguita sempre e comunque per ultima, dopo aver calcolato in modo puro il valore di $E."val"$. Regole semantiche di questo tipo equivalgono logicamente alla definizione di attributi sintetizzati fittizi associati alla parte sinistra della produzione.
+  ]
 
 + *Vincolare gli ordini di valutazione:* si impongono vincoli rigidi in modo che la traduzione per ogni ordinamento sia comunque corretta e sequenziale. I vincoli possono essere visti come "archi impliciti" aggiunti al grafo delle dipendenze.
 
-#example()[
-  #table(
-    stroke: none,
-    columns: (10em, 15em),
-    align: left,
-    table.hline(start: 0),
-    table.header(
-      table.cell([*Produzione*]),
-      table.cell([*Regole semantiche*]),
-    ),
-    table.hline(start: 0),
-    [1) $D -> T L$      ], [_L.inh_ = _T.type_],
-    [2) $T ->$ *int*    ], [_T.type_ = integer],
-    [3) $T ->$ *float*  ], [_T.type_ = float],
-    [4) $F -> L_1,$ *id*], [$L_1$_.type_ = _L.inh_],
-    [                   ], [_addType_(*id*_.id_entry, L.inh_)],
-    [5) $L ->$ *id*     ], [_addType_(*id*_.id_entry, L.inh_)],
-    table.hline(start: 0),
-  )
+  #example()[
+    #table(
+      stroke: none,
+      columns: (10em, 15em),
+      align: left,
+      table.hline(start: 0),
+      table.header(
+        table.cell([*Produzione*]),
+        table.cell([*Regole semantiche*]),
+      ),
+      table.hline(start: 0),
+      [1) $D -> T L$      ], [_L.inh_ = _T.type_],
+      [2) $T ->$ *int*    ], [_T.type_ = integer],
+      [3) $T ->$ *float*  ], [_T.type_ = float],
+      [4) $F -> L_1,$ *id*], [$L_1$_.type_ = _L.inh_],
+      [                   ], [_addType_(*id*_.id_entry, L.inh_)],
+      [5) $L ->$ *id*     ], [_addType_(*id*_.id_entry, L.inh_)],
+      table.hline(start: 0),
+    )
 
-  Questa SDD rappresenta una dichiarazione $D$ costituita da un tipo base $T$ (che può essere `int` o `float`) seguito da una lista di identificatori $L$. Per ogni identificatore, il tipo viene aggiunto al corrispondente elemento della tavola dei simboli.
-  - La variabile $T$ ha un attributo sintetizzato $T."type"$ che può assumere i valori `integer` o `float` e che rappresenta il tipo della dichiarazione.
-  - $L$ ha un attributo ereditato $L."inh"$ che serve per far "scivolare" il tipo dichiarato attraverso tutta la lista di identificatori.
-  - Nella produzione 1, il valore di $T."type"$ passa a $L."inh"$.
-  - Nella produzione 4, il valore di $L."inh"$ viene passato da un nodo padre al nodo figlio $L_1$, verso il basso.
+    Questa SDD rappresenta una dichiarazione $D$ costituita da un tipo base $T$ (che può essere `int` o `float`) seguito da una lista di identificatori $L$. Per ogni identificatore, il tipo viene aggiunto al corrispondente elemento della tavola dei simboli.
+    - La variabile $T$ ha un attributo sintetizzato $T."type"$ che può assumere i valori `integer` o `float` e che rappresenta il tipo della dichiarazione.
+    - $L$ ha un attributo ereditato $L."inh"$ che serve per far "scivolare" il tipo dichiarato attraverso tutta la lista di identificatori.
+    - Nella produzione 1, il valore di $T."type"$ passa a $L."inh"$.
+    - Nella produzione 4, il valore di $L."inh"$ viene passato da un nodo padre al nodo figlio $L_1$, verso il basso.
 
-  Le produzioni 4 e 5 richiamano la funzione $"addType"()$ con due argomenti:
-  - $text("id")."entry"$: valore lessicale, che agisce da puntatore alla riga corretta nella tavola dei simboli.
-  - $L."inh"$: attributo ereditato che indica il tipo da assegnare agli identificatori della lista.
+    Le produzioni 4 e 5 richiamano la funzione $"addType"()$ con due argomenti:
+    - $text("id")."entry"$: valore lessicale, che agisce da puntatore alla riga corretta nella tavola dei simboli.
+    - $L."inh"$: attributo ereditato che indica il tipo da assegnare agli identificatori della lista.
 
-  #figure(
-    diagram(
-      node-stroke: none,
-      cell-size: 5mm,
-      spacing: 3mm,
+    #figure(
+      diagram(
+        node-stroke: none,
+        cell-size: 5mm,
+        spacing: 3mm,
 
-      node((0, 0), [_D_], name: <d>),
-      node((-3, 2), [_T_], name: <t>),
-      node((3, 2), [_L_], name: <l1>),
-      node((0, 4), [_L_], name: <l2>),
-      node((3, 4), [*,*], name: <c1>),
-      node((6, 4), $bold(id)_3$, name: <id1>),
-      node((-3, 6), [_L_], name: <l3>),
-      node((0, 6), [*,*], name: <c2>),
-      node((3, 6), $bold(id)_2$, name: <id2>),
-      node((-3, 4), [*float*], name: <float>),
-      node((-3, 8), $bold(id)_1$, name: <id3>),
+        node((0, 0), [_D_], name: <d>),
+        node((-3, 2), [_T_], name: <t>),
+        node((3, 2), [_L_], name: <l1>),
+        node((0, 4), [_L_], name: <l2>),
+        node((3, 4), [*,*], name: <c1>),
+        node((6, 4), $bold(id)_3$, name: <id1>),
+        node((-3, 6), [_L_], name: <l3>),
+        node((0, 6), [*,*], name: <c2>),
+        node((3, 6), $bold(id)_2$, name: <id2>),
+        node((-3, 4), [*float*], name: <float>),
+        node((-3, 8), $bold(id)_1$, name: <id3>),
 
-      edge(<d>, <t>, dash: "dotted"),
-      edge(<d>, <l1>, dash: "dotted"),
-      edge(<t>, <float>, dash: "dotted"),
-      edge(<l1>, <l2>, dash: "dotted"),
-      edge(<l1>, <c1>, dash: "dotted"),
-      edge(<l1>, <id1>, dash: "dotted"),
-      edge(<l2>, <l3>, dash: "dotted"),
-      edge(<l2>, <c2>, dash: "dotted"),
-      edge(<l2>, <id2>, dash: "dotted"),
-      edge(<l3>, <id3>, dash: "dotted"),
+        edge(<d>, <t>, dash: "dotted"),
+        edge(<d>, <l1>, dash: "dotted"),
+        edge(<t>, <float>, dash: "dotted"),
+        edge(<l1>, <l2>, dash: "dotted"),
+        edge(<l1>, <c1>, dash: "dotted"),
+        edge(<l1>, <id1>, dash: "dotted"),
+        edge(<l2>, <l3>, dash: "dotted"),
+        edge(<l2>, <c2>, dash: "dotted"),
+        edge(<l2>, <id2>, dash: "dotted"),
+        edge(<l3>, <id3>, dash: "dotted"),
 
-      node((-2.25, 2), $4$, name: <4>),
-      node((2.25, 2), $5$, name: <5>),
-      node((3.75, 2), $6$, name: <6>),
-      node((-0.75, 4), $7$, name: <7>),
-      node((0.75, 4), $8$, name: <8>),
-      node((6.75, 4), $3$, name: <3>),
-      node((-3.75, 6), $9$, name: <9>),
-      node((-2.25, 6), $10$, name: <10>),
-      node((3.75, 6), $2$, name: <2>),
-      node((-2.25, 8), $1$, name: <1>),
+        node((-2.25, 2), $4$, name: <4>),
+        node((2.25, 2), $5$, name: <5>),
+        node((3.75, 2), $6$, name: <6>),
+        node((-0.75, 4), $7$, name: <7>),
+        node((0.75, 4), $8$, name: <8>),
+        node((6.75, 4), $3$, name: <3>),
+        node((-3.75, 6), $9$, name: <9>),
+        node((-2.25, 6), $10$, name: <10>),
+        node((3.75, 6), $2$, name: <2>),
+        node((-2.25, 8), $1$, name: <1>),
 
-      node((-1.50, 2), [_type_]),
-      node((1.50, 2), [_inh_]),
-      node((4.65, 2), [_entry_]),
-      node((-1.50, 4), [_inh_]),
-      node((1.50, 4), [_entry_]),
-      node((7.50, 4), [_entry_]),
-      node((-4.50, 6), [_inh_]),
-      node((-1.50, 6), [_entry_]),
-      node((4.50, 6), [_entry_]),
-      node((-1.50, 8), [_entry_]),
+        node((-1.50, 2), [_type_]),
+        node((1.50, 2), [_inh_]),
+        node((4.65, 2), [_entry_]),
+        node((-1.50, 4), [_inh_]),
+        node((1.50, 4), [_entry_]),
+        node((7.50, 4), [_entry_]),
+        node((-4.50, 6), [_inh_]),
+        node((-1.50, 6), [_entry_]),
+        node((4.50, 6), [_entry_]),
+        node((-1.50, 8), [_entry_]),
 
-      edge(<4>, <5>, "-|>", bend: 30deg),
-      edge(<5>, <6>, "-|>", bend: -45deg),
-      edge(<5>, <7>, "-|>"),
-      edge(<3>, <6>, "-|>"),
-      edge(<7>, <8>, "-|>", bend: -45deg),
-      edge(<7>, <9>, "-|>"),
-      edge(<2>, <8>, "-|>"),
-      edge(<9>, <10>, "-|>", bend: -45deg),
-      edge(<1>, <10>, "-|>"),
-    ),
-    caption: "Grafo delle deipendenze per float " + $i d_1, i d_2, i d_3$,
-  )
+        edge(<4>, <5>, "-|>", bend: 30deg),
+        edge(<5>, <6>, "-|>", bend: -45deg),
+        edge(<5>, <7>, "-|>"),
+        edge(<3>, <6>, "-|>"),
+        edge(<7>, <8>, "-|>", bend: -45deg),
+        edge(<7>, <9>, "-|>"),
+        edge(<2>, <8>, "-|>"),
+        edge(<9>, <10>, "-|>", bend: -45deg),
+        edge(<1>, <10>, "-|>"),
+      ),
+      caption: "Grafo delle deipendenze per float " + $i d_1, i d_2, i d_3$,
+    )
 
-  6, 8 e 10: attributi fittizi utilizzati per rappresentare le chiamate alla
-  funzione addType().
-]
+    6, 8 e 10: attributi fittizi utilizzati per rappresentare le chiamate alla
+    funzione addType().
+  ]
 
 == Applicazioni della traduzione guidata dalla sintassi
 Poiché molti compilatori usano gli alberi sintattici come rappresentazione intermedia del codice, una forma comune di SDD ha come unico scopo quello di trasformare la stringa d'ingresso in un albero. Per completare la traduzione in codice intermedio (o direttamente in linguaggio macchina), il compilatore visiterà poi questo albero seguendo un nuovo insieme di regole che, di fatto, costituiscono una seconda SDD associata all'albero sintattico anziché all'albero di parsing.
@@ -565,7 +564,7 @@ Poiché molti compilatori usano gli alberi sintattici come rappresentazione inte
   caption: "Albero sintattico a sx e alberi d parsing a dx",
 )
 
-Ogni nodo di un albero sintattico rappresenta un costrutto logico e i figli di tale nodo rappresentano le parti significative che lo compongono. Un nodo che rappresenta un'espressione del tipo $E_1 + E_2$ ha come etichetta il simbolo logico dell'operatore `$+$` e come figli due nodi che rappresentano le sotto-espressioni $E_1$ e $E_2$.
+Ogni nodo di un albero sintattico rappresenta un costrutto logico e i figli di tale nodo rappresentano le parti significative che lo compongono. Un nodo che rappresenta un'espressione del tipo $E_1 + E_2$ ha come etichetta il simbolo logico dell'operatore $+$ e come figli due nodi che rappresentano le sotto-espressioni $E_1$ e $E_2$.
 Ogni oggetto ha un campo `op` che costituisce l'etichetta del nodo.
 - Se il nodo è una foglia, ha un campo aggiuntivo che contiene il valore lessicale associato. Viene creato con un costruttore del tipo `Leaf(op, val)`.
 - Un nodo interno ha tanti campi aggiuntivi quanti sono i nodi figli nell'albero sintattico. Viene creato con un costruttore `Node(op, c1, c2, ..., ck)`.
@@ -829,9 +828,9 @@ Ogni oggetto ha un campo `op` che costituisce l'etichetta del nodo.
 Gli schemi di traduzione guidati dalla sintassi sono una notazione operativa e complementare alle definizioni guidate dalla sintassi (SDD). Mentre una SDD si concentra sul *cosa* calcolare, uno SDT si concentra sul *quando* eseguirlo.
 
 #definition()[
-  Uno *schema di traduzione guidato dalla sintassi* o *SDT* (Syntax-Directed Translation scheme) è una grammatica libera dal contesto avente frammenti di programma integrati direttamente all'interno del corpo delle produzioni. Tali porzioni di programma sono dette *azioni semantiche* e possono apparire in una qualsiasi posizione nel corpo di una produzione.
+  Uno *schema di traduzione guidato dalla sintassi* o *SDT* (Syntax-Directed Translation scheme) è una grammatica context-free avente frammenti di programma integrati direttamente all'interno del corpo delle produzioni. Tali porzioni di programma sono dette *azioni semantiche* e possono apparire in una qualsiasi posizione nel corpo di una produzione.
 ]
-Per convenzione notazionale, le azioni semantiche sono racchiuse tra parentesi graffe `{ ... }`; qualora le parentesi graffe fossero simboli terminali appartenenti alla grammatica in esame, le si rappresenterebbero tra apici o virgolette (es. `'{'`). Qualsiasi schema di traduzione SDT può essere concettualmente realizzato costruendo in primo luogo un albero di parsing, e procedendo poi all'esecuzione delle azioni in profondità da sinistra a destra (*depth-first*), ovvero durante una classica visita in pre-ordine.
+Per convenzione notazionale, le azioni semantiche sono racchiuse tra parentesi graffe `{ ... }`; qualora le parentesi graffe fossero simboli terminali appartenenti alla grammatica in esame, le si rappresenterebbero tra apici o virgolette (es. `'{'`). Qualsiasi schema di traduzione SDT può essere concettualmente realizzato costruendo in primo luogo un albero di parsing, e procedendo poi all'esecuzione delle azioni durante una classica visita in pre-ordine.
 
 Nella pratica, si cerca di evitare la costruzione dell'intero albero in memoria, eseguendo le azioni "al volo" durante l'analisi sintattica. Consideriamo gli SDT necessari per realizzare le classi di SDD per cui:
 + La grammatica sottostante può essere riconosciuta da un parser LR (Bottom-Up) e la SDD è S-attribuita.
@@ -876,22 +875,22 @@ Quando la grammatica può essere analizzata con una tecnica bottom-up (es. parse
 
 === Implementazione degli SDT basata sugli stack del parser
 
-Gli SDT postfissi possono essere implementati durante il parsing LR eseguendo le azioni ogniqualvolta si effettua una riduzione. Gli attributi di ogni simbolo grammaticale possono essere messi sullo stack, in una posizione in siano recuperabili durante la riduzione. La migliore strategia consiste nel porre sullo stack gli attributi assieme ai simboli grammaticali (0 agli stati LR che rappresentano i simboli), memorizzandoli nei campi di un record.
+Gli SDT postfissi possono essere implementati durante il parsing LR eseguendo le azioni ogniqualvolta si effettua una riduzione. Gli attributi di ogni simbolo grammaticale possono essere messi sullo stack, in una posizione in cui siano recuperabili durante la riduzione. La migliore strategia consiste nel porre sullo stack gli attributi assieme ai simboli grammaticali (o agli stati LR che rappresentano i simboli), memorizzandoli nei campi di un record.
 
 #example()[
   #figure(image("images/2025-11-19-19-06-55.png"))
-  La Figura 5.19 mostra lo stack di un parser i cui elementi sono record aventi un campo per memorizzare il simbolo grammaticale (0 lo stato del parser) e un secondo campo (mostrato in basso) per memorizzare un attributo. I tre simboli grammaticali X, Y e Z si trovano sulla cima dello stack e potrebbero essere pronti per essere ridotti mediante una produzione del tipo A + XYZ.
+  La Figura 5.19 mostra lo stack di un parser i cui elementi sono record aventi un campo per memorizzare il simbolo grammaticale (o lo stato del parser) e un secondo campo (mostrato in basso) per memorizzare un attributo. I tre simboli grammaticali $X$, $Y$ e $Z$ si trovano sulla cima dello stack e potrebbero essere pronti per essere ridotti mediante una produzione del tipo $A -> X Y Z$.
 ]
 
 In generale possiamo permettere la presenza di più attributi per ogni simbolo sia definendo un record di maggiori dimensioni sia mettendo sullo stack i puntatori ai record piuttosto che i record stessi. Se tutti gli attributi sono sintetizzati e le azioni compaiono alla fine delle produzioni, possiamo calcolare il valore degli attributi associati alla parte sx di una produzione quando si fa una riduzione. Se, ad esempio, riduciamo con una regola A → XYZ, tutti gli attributi per X, Y e Z sono disponibili e si trovano in posizioni note nella pila; dopo la riduzione, A e i suoi attributi si troveranno in cima allo stack.
 
 #example()[
-  SDT per la stessa grammatica dell'esempio precedente in cui lo stack viene manipolato esplicitamente. Lo stack è realizzato con un array stack e un indice top che ne indica la cima. stack[top] si riferisce al record in testa alla pila, stack[top-1] al record sottostante. Supponiamo che ogni record abbia un campo val che contiene il valore dell'attributo. Ad esempio se E si trova nella terza posizione dalla cima della pila, stack[top-2].val corrisponde a E.val.
+  SDT per la stessa grammatica dell'esempio precedente in cui lo stack viene manipolato esplicitamente. Lo stack è realizzato con un array stack e un indice top che ne indica la cima. stack[top] si riferisce al record in testa alla pila, stack[top-1] al record sottostante. Supponiamo che ogni record abbia un campo _val_ che contiene il valore dell'attributo. Ad esempio se E si trova nella terza posizione dalla cima della pila, stack[top-2].val corrisponde a E.val.
   #figure(image("images/2025-11-19-19-09-13.png"))
 ]
 
 #example()[
-  Si utilizza la tabella di parsing SRL (già vista) per il parsing della stringa 3 \* ( 5 + 2 ). I record nella pila sono costituiti da due campi: quello che contiene il simbolo grammaticale caratteristico dello stato dell'automa LR(0) e quello che contiene il valore dell'attributo. Si assume che quando il parser impila un digit, il token d viene posto nel primo campo e il suo attributo nel secondo.
+  Si utilizza la tabella di parsing SRL (già vista) per il parsing della stringa 3 \* ( 5 + 2 ). I record nella pila sono costituiti da due campi: quello che contiene il simbolo grammaticale caratteristico dello stato dell'automa LR(0) e quello che contiene il valore dell'attributo. Si assume che quando il parser impila un digit, il token _d_ viene posto nel primo campo e il suo attributo nel secondo.
   #figure(image("images/2025-11-19-19-09-50.png"))
 ]
 
@@ -909,21 +908,21 @@ Poiché nessuna grammatica che presenti ricorsione sinistra può essere analizza
 ==== SDT con effetti collaterali semplici
 Consideriamo il caso semplice in cui l'unica questione riguarda l'ordine di esecuzione delle azioni (es. stampare una stringa). In questa situazione si applica il seguente principio:
 
-_*Nel processo di trasformazione della grammatica, si trattino le azioni semantiche alla stregua di ulteriori simboli terminali.*_
+_*Nel processo di trasformazione della grammatica si trattano le azioni come ulteriori simboli terminali.*_
 
 Questo principio si basa sul fatto che la rimozione della ricorsione sinistra preserva l'ordine dei terminali nella stringa generata. Le azioni, trattate come terminali, verranno quindi eseguite esattamente nello stesso ordine originale in qualsiasi visita da sinistra a destra.
 
 #example()[
   Si considerino le seguenti produzioni relative a $E$ prese da uno SDT per la traduzione di espressioni dalla forma infissa alla forma postfissa:
   $
-    E & -> E_1 + T quad { text("print")('+'); } \
+    E & -> E + T quad { text("print")('+'); } \
     E & -> T
   $
   Se applichiamo la trasformazione standard all'insieme delle produzioni, il "resto" della produzione ricorsiva inizia con $+ T { text("print")('+'); }$. Introducendo il non-terminale $R$ (resto), si ottiene l'insieme equivalente e privo di ricorsione sinistra:
   $
     E & -> T R \
-    R & -> + T quad { text("print")('+'); } quad R_1 \
-    R & -> epsilon
+    R & -> + T quad { text("print")('+'); } quad R \
+    R & -> epsilon quad { }
   $
 ]
 
@@ -967,12 +966,10 @@ Lo SDT finale trasformato è il seguente:
   )
 ]
 
-Si noti il tempismo perfetto: l'attributo ereditato $R."i"$ viene calcolato *immediatamente prima* dell'uso di $R$ nel corpo, mentre gli attributi sintetizzati $A."a"$ e $R."s"$ sono sempre valutati alla fine delle produzioni.
-
 
 //20.11.2025
 === Schemi di traduzione per definizioni L-attribuite
-Consideriamo ora il caso più generale di una SDD L-attribuita. Assumeremo che la grammatica sottostante possa essere analizzata top-down, poiché in caso contrario accade spesso che sia impossibile effettuare la trasformazione appoggiandosi a un parser LL o LR.
+Consideriamo ora il caso più generale di una SDD L-attribuita (con grammatica LL). Assumeremo che la grammatica sottostante possa essere analizzata top-down, poiché in caso contrario accade spesso che sia impossibile effettuare la trasformazione appoggiandosi a un parser LL o LR.
 
 Le regole fondamentali per trasformare una SDD L-attribuita in uno SDT funzionante sono due:
 + *Regola per gli attributi ereditati:* si aggiungano le azioni che calcolano gli attributi ereditati di un non-terminale $A$ *immediatamente prima* dell'occorrenza di $A$ nel corpo della produzione.
@@ -1068,7 +1065,7 @@ Tali condizioni implicano che l'attributo principale può essere costruito emett
 #example()[
   Possiamo modificare la funzione _S_ precedentemente descritta in modo che emetta gli elementi dell'attributo principale _S.code_ invece di salvarli per poi concatenarli nel valore di _S.code_ che verra poi restituito.
   #figure(image("images/2025-11-27-15-16-21.png"))
-  Le funzioni `S()` e `C()` non restituiscono alcun valore, poiché tutti i loro attributi sintetizzati sono prodotti mediante stampa. Inoltre, la posizione delle istruzioni di stampa nella funzione è importante. L'ordine in cui i vari elementi vengono stampati è il seguente: per prima cosa la stringa "label" L1, quindi il codice relativo al non-terminale C (che coincide con il valore della variabile _C.code_), la stringa "label" L2, e infine il codice derivante dalla chiamata ricorsiva della funzione S) (ovvero il valore della variabile _S.code_).
+  Le funzioni `S()` e `C()` non restituiscono alcun valore, poiché tutti i loro attributi sintetizzati sono prodotti mediante stampa. Inoltre, la posizione delle istruzioni di stampa nella funzione è importante. L'ordine in cui i vari elementi vengono stampati è il seguente: per prima cosa la stringa "label" L1, quindi il codice relativo al non-terminale C (che coincide con il valore della variabile _C.code_), la stringa "label" L2, e infine il codice derivante dalla chiamata ricorsiva della funzione S (ovvero il valore della variabile _S.code_).
 ]
 #example()[
   Possiamo fare lo stesso tipo di modifica direttamente sullo SDT sottostante sostituendo le azioni che costruiscono un attributo principale in azioni che emettono gli elementi che compongono tale attributo.
