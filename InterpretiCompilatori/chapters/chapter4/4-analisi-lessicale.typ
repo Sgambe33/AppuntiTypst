@@ -325,7 +325,38 @@ Si possono definire automi con $δ$ funzione parziale cioè non definita per tut
 
 #example()[
   Stringhe che non contengono $a a$:
-  #figure(image("images/2026-05-16-16-43-45.png"))
+  #import "@preview/cetz:0.5.0"
+
+  #align(center)[
+    #cetz.canvas({
+      import cetz.draw: *
+
+      circle((0, 0), radius: 0.5, name: "q0")
+      circle("q0.center", radius: 0.6, name: "q0_outer")
+      content("q0.center", $q_0$)
+
+      // --- STATO q1 ---
+      circle((4, 0), radius: 0.5, name: "q1")
+      circle("q1.center", radius: 0.6, name: "q1_outer")
+      content("q1.center", $q_1$)
+
+      // --- TRANSIZIONI ---
+
+      line((-1.5, 0), "q0_outer.west", mark: (end: ">"))
+
+      // Transizione q0 -> q1 (simbolo 'a')
+      line("q0_outer.east", "q1_outer.west", mark: (end: ">"))
+      content((2, 0.3), $a$)
+
+      // Transizione q1 -> q0 (simbolo 'b')
+      bezier("q1_outer.south-west", "q0_outer.south-east", (2, -1.5), mark: (end: ">"))
+      content((2, -0.7), $b$)
+
+      // Self-loop su q0 (simbolo 'b')
+      bezier("q0_outer.north-west", "q0_outer.north-east", (-0.8, 1.8), (0.8, 1.8), mark: (end: ">"))
+      content((0, 1.2), $b$)
+    })
+  ]
   Dallo stato $q_1$ non si può scandire una $a$ perché $δ(q_1, a)$ non è definita, quindi se l’automa è nella configurazione $[q_1, a w]$ si arresta rifiutando la stringa senza completare la scansione.
 ]
 

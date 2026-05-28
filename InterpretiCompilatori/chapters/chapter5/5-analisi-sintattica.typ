@@ -541,7 +541,79 @@ Si noti che questo pseudocodice è non-deterministico poiché inizia con la  sce
       & && &&&& text("Successo!") &&
     $,
   )
-  #figure(image("images/2026-05-15-20-06-30.png", width: 70%))
+  #import "@preview/cetz:0.5.0"
+
+  #align(center)[
+    #cetz.canvas({
+      import cetz.draw: *
+
+      // Impostiamo un po' di padding in modo che le linee
+      // si fermino a una distanza elegante dai caratteri
+      set-style(content: (padding: 0.1))
+
+      // --- ALBERO (a) ---
+      group(name: "tree_a", {
+        content((0, 0), $S$, name: "S")
+        content((-1, -1.2), $c$, name: "c")
+        content((0, -1.2), $A$, name: "A")
+        content((1, -1.2), $d$, name: "d")
+
+        // Cetz calcola automaticamente l'intersezione ai bordi del contenuto
+        line("S", "c")
+        line("S", "A")
+        line("S", "d")
+
+        content((0, -3.2), [(a)])
+      })
+
+      // --- ALBERO (b) ---
+      group(name: "tree_b", {
+        // Trasliamo l'intero albero verso destra
+        translate(x: 4.5)
+
+        content((0, 0), $S$, name: "S")
+        content((-1, -1.2), $c$, name: "c")
+        content((0, -1.2), $A$, name: "A")
+        content((1, -1.2), $d$, name: "d")
+
+        // Figli del nodo A (più vicini tra loro rispetto a c e d)
+        content((-0.6, -2.4), $a$, name: "a_child")
+        content((0.6, -2.4), $b$, name: "b_child")
+
+        line("S", "c")
+        line("S", "A")
+        line("S", "d")
+
+        line("A", "a_child")
+        line("A", "b_child")
+
+        content((0, -3.2), [(b)])
+      })
+
+      // --- ALBERO (c) ---
+      group(name: "tree_c", {
+        // Trasliamo ulteriormente verso destra
+        translate(x: 9)
+
+        content((0, 0), $S$, name: "S")
+        content((-1, -1.2), $c$, name: "c")
+        content((0, -1.2), $A$, name: "A")
+        content((1, -1.2), $d$, name: "d")
+
+        // Singolo figlio centrato
+        content((0, -2.4), $a$, name: "a_child")
+
+        line("S", "c")
+        line("S", "A")
+        line("S", "d")
+
+        line("A", "a_child")
+
+        content((0, -3.2), [(c)])
+      })
+    })
+    *Figura 4.13* Passi in un esempio di parsing top-down.
+  ]
 ]
 
 Può accadere che un parser a discesa ricorsiva entri in un ciclo infinito. Un tale problema si presenta a causa di produzioni “ricorsive sinistre” come:
@@ -570,7 +642,7 @@ E' sempre possibile costruire un parser predittivo - cioè un parser a discesa r
 ]
 
 Se le regole per la variabile $A$ sono $A-> alpha_1 bar alpha_2 bar ... bar alpha_k$ allora:
-#grid(
+#figure(grid(
   columns: 3,
   algo(
     title: [*void* A],
@@ -605,7 +677,7 @@ Se le regole per la variabile $A$ sono $A-> alpha_1 bar alpha_2 bar ... bar alph
     errore();#d#d\
     }
   ],
-)
+))
 //TODO: manca esempio da slide "Sulle LL(1).pptx"
 
 ==== Tabelle di parsing predittivo
@@ -793,6 +865,7 @@ Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la string
     table.hline(start: 0),
     table.vline(start: 1, x: 3, stroke: (paint: gray, dash: "dotted")),
     table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dotted")),
+    table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dotted")),
     [$$], [$E\$$], [$bold(id)+bold(id)*bold(id)\$$], [$$],
     [$$], [$T E'\$$], [$bold(id)+bold(id)*bold(id)\$$], [output  $E -> T E'$],
     [$$], [$F T'E'\$$], [$bold(id)+bold(id)*bold(id)\$$], [output  $T -> F T'$],
@@ -818,14 +891,20 @@ Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la string
 
 #figure(
   table(
-    columns: (.5fr, .5fr, .4fr, .75fr),
+    stroke: none,
+    columns: (.5fr, .5fr, .4fr, 1fr),
     align: (start, end, end, start),
+    table.hline(start: 0),
     table.header(
       table.cell(align: center, [Riconosciuta]),
-      table.cell(align: end, [Stack]),
+      table.cell(align: horizon, [Stack]),
       table.cell(align: center, [Input]),
       table.cell(align: center, [Azione]),
     ),
+    table.hline(start: 0),
+    table.vline(start: 1, x: 3, stroke: (paint: gray, dash: "dotted")),
+    table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dotted")),
+    table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dotted")),
     [       ], [$E\$$], [$bold(id)*+bold(id)\$$], [                      ],
     [       ], [$T E'\$$], [$bold(id)*+bold(id)\$$], [output $E -> T E'$],
     [       ], [$F T'E'\$$], [$bold(id)*+bold(id)\$$], [output $T -> F T'$],
@@ -840,14 +919,20 @@ Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la string
 
 #figure(
   table(
-    columns: (.5fr, .5fr, .4fr, .75fr),
+    stroke: none,
+    columns: (.5fr, .5fr, .4fr, 1fr),
     align: (start, end, end, start),
+    table.hline(start: 0),
     table.header(
       table.cell(align: center, [Riconosciuta]),
-      table.cell(align: end, [Stack]),
+      table.cell(align: horizon, [Stack]),
       table.cell(align: center, [Input]),
       table.cell(align: center, [Azione]),
     ),
+    table.hline(start: 0),
+    table.vline(start: 1, x: 3, stroke: (paint: gray, dash: "dotted")),
+    table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dotted")),
+    table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dotted")),
     [      ], [$E\$$], [(*id*\$], [                                           ],
     [      ], [$T E'\$$], [(*id*\$], [output  $E -> T E'$                        ],
     [      ], [$F T'E'\$$], [(*id*\$], [output  $T -> F T'$                        ],
