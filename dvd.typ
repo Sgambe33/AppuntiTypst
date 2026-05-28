@@ -246,7 +246,11 @@
 
 #let problem-style = builder-thmbox(color: colors.at(16), shadow: (offset: (x: 2pt, y: 2pt), color: luma(70%)))
 
-#let problem = problem-style("problem", "Problem")
+//#let problem = problem-style("problem", "Problema").with(numbering: none)
+#let problem(identifier: "problem", multiple: false, ..args) = {
+  let name = if multiple { "Problemi" } else { "Problema" }
+  problem-style(identifier, name, ..args).with(numbering: none)(..args)
+}
 
 #let theorem-style = builder-thmbox(color: colors.at(1), shadow: (offset: (x: 3pt, y: 3pt), color: luma(70%)))
 
