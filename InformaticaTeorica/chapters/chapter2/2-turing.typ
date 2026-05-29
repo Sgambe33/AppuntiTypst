@@ -473,10 +473,10 @@ L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato
 == MdT non deterministiche
 
 #definition()[
-  Una MdT si dice *non deterministica* quando le transizionoi non sono necessariamente funzionali nei primi due argomenti.
+  Una MdT si dice *non deterministica* quando le transizioni non sono necessariamente funzionali nei primi due argomenti.
 ]
 #observation()[
-  Le MdT deterministichee (o standard) *sono* MdT non deterministiche, ma il viceversa non è sempre vero.
+  Le MdT deterministiche (o standard) *sono* MdT non deterministiche, ma il viceversa non è sempre vero.
 ]
 
 #definition()[
@@ -490,7 +490,7 @@ L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato
 ]
 
 #definition()[
-  Consideriamo una MdT M non deterministicae tutte le sue transizioni in cui i primi due simboli sono fissati e gli ultimi due variabili, ovvero:
+  Consideriamo una MdT M non deterministica tutte le sue transizioni in cui i primi due simboli sono fissati e gli ultimi due variabili, ovvero:
   $
     {accent(q, tilde), accent(x, tilde), alpha, q | alpha in Sigma union {D, S}, q in Q}
   $
@@ -538,7 +538,7 @@ Di seguito alcuni esempi di possibili computazioni sulla stringa $w = a c a b$:
 ]
 
 #definition()[
-  Dati due insiem _A_ e _B_, una funzione $f$ si dice *funzione totale* da _A_ a _B_ quando $forall x in A, forall y in B, f(x) = y ==> D = A$
+  Dati due insiemi _A_ e _B_, una funzione $f$ si dice *funzione totale* da _A_ a _B_ quando $forall x in A, forall y in B, f(x) = y ==> D = A$
 ]
 
 #definition()[
@@ -748,7 +748,7 @@ Questo risultato è dato da:
 #pagebreak()
 #example(multiple: true)[
   +   $L_1 = {u u | u = a^i b^i c^i, i>=0} subset.eq {a,b,c}^*$
-    \ $L_2 = {a^i b^i c^i, i>=0} subset.eq {a,b,c}^* quad quad$ (decidible) $M_2$ MdT che decide $L_1$
+    \ $L_2 = {a^i b^i c^i, i>=0} subset.eq {a,b,c}^* quad quad$ (decidibile) $M_2$ MdT che decide $L_1$
     \ MdT che realizza (calcola) una riduzione da $L_1$ a $L_2$ su input $w in {a,b,c}^*$:
     - controlliamo se $w = u u$, per qualche $u in {a,b,c}^*$
     - se non è così, cancello _w_ e scrivo _a_
@@ -849,7 +849,7 @@ Restringiamo la classe dei linguaggi semidecidibili:
 ]
 
 #definition()[
-  Indichiamo con $cal(P)$ una qualunque *proprietà di un linguaggio semidecidibile* e con $cal(L)_cal(P)$ l'insieme di linguaggi semidicidibile che soffisfano $cal(P)$, cioé
+  Indichiamo con $cal(P)$ una qualunque *proprietà di un linguaggio semidecidibile* e con $cal(L)_cal(P)$ l'insieme di linguaggi semidicidibile che soddisfano $cal(P)$, cioè
   $
     &cal(L)_cal(P)= { L "semidecidibile" | L "soddisfa" cal(P)} "o, equivalentemente"\
     &cal(L)_cal(P)={R(M) | L(M) "soddisfa" cal(P)}
