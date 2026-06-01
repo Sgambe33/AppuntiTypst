@@ -1,6 +1,9 @@
 #import "../dvd.typ": *
 
-#dvdtyp(title: "Appunti Informatica Teorica", author: none)[
+#dvdtyp(
+  title: "Appunti Informatica Teorica",
+  cover-image: image("cover.jpg", height: 100%, width: 100%),
+)[
 
   #align(center, "Appunti basati su note prese a lezione e sugli appunti di Elena Simionato.")
   #outline(title: "Contenuti")

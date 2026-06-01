@@ -26,8 +26,8 @@
 
 #let dvdtyp(
   title: "",
-  subtitle: "",
-  author: "",
+  subtitle: none,
+  author: none,
   abstract: none,
   cover-image: none,
   accent: colors.at(6),
