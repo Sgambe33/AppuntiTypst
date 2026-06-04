@@ -416,7 +416,7 @@ In definitiva, un generico metodo di risoluzione si caratterizzerà per la *spec
   Quindi:
   $
     L_1^(-1)L = I => L=L_1\
-    U_1 U^(-1)= U => U_1 = U
+    U_1 U^(-1)= I => U_1 = U
   $
   Ovvero la fattorizzazione è *unica*.
 ]
