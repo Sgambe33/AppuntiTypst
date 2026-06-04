@@ -887,10 +887,10 @@ $
 
 //19.11.2025
 //TODO: ci sarebbe un mega esempio negli appunti.
-#[
-  #set heading(numbering: none, outlined: false)
-  === Matrici di permutazioni
-]
+
+== Pivoting parziale
+
+=== Matrici di permutazione
 Dato
 $uu(v)
 = mat(1; dots.v; k_1; dots.v; k_2; dots.v; n) in RR^n$
@@ -954,7 +954,7 @@ con ${l_1,...,l_n}$ permutazione di ${1,...,n}$.
   Non bisogna quindi memorizzare matrici di permutazione!
 ]
 
-== Pivoting parziale
+=== Fattorizzazione LU con pivoting parziale
 L'utilizzo di matrici di permutazione elementare ci permette di definire una variante della fattorizzazione LU di una matrice $A$ *che sia solo non singolare*. Preliminarmente ricordiamo che data una matrice a blocchi:
 $
   A = mat(A_(11), A_(12); 0, A_(22); augment: #(hline: 1, vline: 1), delim: "[") in RR^(n times n)
@@ -1543,10 +1543,7 @@ $
 $
 con $A in RR^(m times n)$,  $m>n="rank"(A) => uu(b) in RR^m, uu(x) in RR^n$, ovvero ci sono più equazioni che incognite.
 #observation()[
-  Nella (1) $A$ e $uu(b)$ sono i dati del problema, mentre $uu(x)$ è la soluzione da determinare. Tuttavia nelle applicazioni del deep-learning, i ruoli si capovolgono. Ad esempio, in una rete del tipo
-  //TODO: rifare diagramma rete
-  #figure(image("images/2025-12-03-13-15-10.png"))
-  tipicamente, se $x_1 in RR^(n_1)$ è il vettore degli input e $x_N in RR^(n_N)$ è il vettore con gli output, allora la rete si può formalizzare come:
+  Nella (1) $A$ e $uu(b)$ sono i dati del problema, mentre $uu(x)$ è la soluzione da determinare. Tuttavia nelle applicazioni del deep-learning, i ruoli si capovolgono. Ad esempio, in una tipica rete neurale, se $x_1 in RR^(n_1)$ è il vettore degli input e $x_N in RR^(n_N)$ è il vettore con gli output, allora la rete si può formalizzare come:
   $
     x_(i+1) = sigma(A_i x_i + b_i), space i=1,...,N
   $
@@ -1586,6 +1583,7 @@ $
 $
 Di conseguenza, la norma euclidea di un vettore è invariata per sua moltiplicazione per una matrice ortogonale.
 
+=== Fattorizzazione QR
 Vale, inoltre, il seguente risultato.
 #theorem("Fattorizzazione QR di A")[
   #index("Fattorizzazione", "QR")
@@ -1673,8 +1671,8 @@ $
 $
 Infatti
 $
-  H uu(x) &= (I-frac(2, uu(v)^T uu(v)) uu(v) uu(v)^T) uu(x) = uu(x) frac(2, uu(v)^T uu(v)) uu(v)^T uu(x) uu(v)\
-  &= uu(x) frac(2, uu(v)^T uu(v)) uu(v)^T uu(x) (uu(x)-alpha uu(e)_1)\
+  H uu(x) &= (I-frac(2, uu(v)^T uu(v)) uu(v) uu(v)^T) uu(x) = uu(x) - frac(2, uu(v)^T uu(v)) uu(v)^T uu(x) uu(v)\
+  &= uu(x) - frac(2, uu(v)^T uu(v)) uu(v)^T uu(x) (uu(x)-alpha uu(e)_1)\
   &= (1- frac(2, uu(v)^T uu(v)) uu(v)^T uu(x))uu(x) + alpha(frac(2, uu(v)^T uu(v)) uu(v)^T uu(x))uu(e)_1 = alpha uu(e)_1
 $
 se $frac(2, uu(v)^T uu(v)) uu(v)^T uu(x)=1$ ovvero, se $2 uu(v)^T uu(x) = uu(v)^T uu(v)$. Infatti:
