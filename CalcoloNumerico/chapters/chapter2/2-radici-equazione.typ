@@ -777,9 +777,9 @@ $
 $
 Sviluppando entrambi i membri e semplificando, si ottiene un'equazione di secondo grado dalla quale si ricava:
 $
-  cancel((x^*:i)^2) -(x_(i+1)+x_(i-1)) x^*_i + x_(i+1) x_(i-1) & approx cancel((x^*_i)^2) - 2x_i x^*_i + x_i^2 \
-                                  -(x_(i+1)+x_(i-1)+2x_i)x^*_i & approx -x_(i+1)x_(i-1)+x_i^2 \
-                                                         x^*_i & approx frac(x_(i+1)x_(i-1)-x_i^2, x_(i+1)+x_(i-1)+2x_i)
+  cancel((x^*_i)^2) -(x_(i+1)+x_(i-1)) x^*_i + x_(i+1) x_(i-1) & approx cancel((x^*_i)^2) - 2x_i x^*_i + x_i^2 \
+                                  -(x_(i+1)+x_(i-1)-2x_i)x^*_i & approx -x_(i+1)x_(i-1)+x_i^2 \
+                                                         x^*_i & approx frac(x_(i+1)x_(i-1)-x_i^2, x_(i+1)+x_(i-1)-2x_i)
 $
 Questa quantità fornisce una *stima migliorata della radice vera*.
 Il metodo può essere interpretato nel seguente modo:
