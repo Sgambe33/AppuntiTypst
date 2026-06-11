@@ -58,7 +58,7 @@
 == Metodo delle corde
 #let corde-data = read("scriptMATLAB/metodo_corde.m")
 
-#codly(header: [Metodo delle secanti])
+#codly(header: [Metodo delle corde])
 #raw(block: true, lang: "matlab", corde-data)
 
 
@@ -66,7 +66,7 @@
 
 == Sistema triangolare
 #let trisolve-data = read("scriptMATLAB/trisolve.m")
-  
+
 #codly(header: [Sistemi triangolari])
 #raw(block: true, lang: "matlab", trisolve-data)
 
@@ -74,34 +74,22 @@
 
 == Fattorizzazione LU
 #let fatt-lu-data = read("scriptMATLAB/fattorizza_lu.m")
-#let fatt-lu = [
-  #codly(header: [Fattorizzazione LU])
-  #raw(block: true, lang: "matlab", fatt-lu-data)
-]
-
-#fatt-lu
+#codly(header: [Fattorizzazione LU])
+#raw(block: true, lang: "matlab", fatt-lu-data)
 
 #pagebreak()
 
 == Fattorizzazione LU con pivoting parziale
 #let fatt-plu-data = read("scriptMATLAB/fattorizza_plu.m")
-#let fatt-plu = [
-  #codly(header: [Fattorizzazione con pivoting parziale])
-  #raw(block: true, lang: "matlab", fatt-plu-data)
-]
-
-#fatt-plu
+#codly(header: [Fattorizzazione con pivoting parziale])
+#raw(block: true, lang: "matlab", fatt-plu-data)
 
 #pagebreak()
 
 == LU Solver
 #let lusolve-data = read("scriptMATLAB/LUsolve.m")
-#let lusolve = [
-  #codly(header: [Risoluzione sistema con matrice LU])
-  #raw(block: true, lang: "matlab", lusolve-data)
-]
-
-#lusolve
+#codly(header: [Risoluzione sistema con matrice LU])
+#raw(block: true, lang: "matlab", lusolve-data)
 
 #pagebreak()
 
