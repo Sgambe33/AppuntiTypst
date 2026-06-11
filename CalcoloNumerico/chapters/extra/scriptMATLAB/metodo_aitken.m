@@ -29,7 +29,5 @@ function x = metodo_aitken(f,f1,x0,tol,itmax)
             flag=0;
         end
     end
-    if flag
-        warning('accuratezza non raggiunta')
-    end
+    if flag, warning('accuratezza non raggiunta'), end
     return

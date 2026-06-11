@@ -14,45 +14,33 @@
 = Algoritmi
 == Metodo di bisezione
 #let bisezione-data = read("scriptMATLAB/metodo_bisezione.m")
-#let metodo-bisezione = [
-  #codly(header: [Metodo di bisezione])
-  #raw(block: true, lang: "matlab", bisezione-data)
-]
+#codly(header: [Metodo di bisezione])
+#raw(block: true, lang: "matlab", bisezione-data)
 
-#metodo-bisezione
+
 
 #pagebreak()
 
 == Metodo di Newton
 #let newton-data = read("scriptMATLAB/metodo_newton.m")
-#let metodo-newton = [
-  #codly(header: [Metodo di Newton])
-  #raw(block: true, lang: "matlab", newton-data)
-]
+#codly(header: [Metodo di Newton])
+#raw(block: true, lang: "matlab", newton-data)
 
-#metodo-newton
+
 
 #pagebreak()
 
 == Metodo di Newton modificato
 #let newton-modificato-data = read("scriptMATLAB/metodo_newton_modificato.m")
-#let metodo-newton-modificato = [
-  #codly(header: [Metodo di Newton modificato])
-  #raw(block: true, lang: "matlab", newton-modificato-data)
-]
-
-#metodo-newton-modificato
+#codly(header: [Metodo di Newton modificato])
+#raw(block: true, lang: "matlab", newton-modificato-data)
 
 #pagebreak()
 
 == Metodo di Aitken
 #let aitken-data = read("scriptMATLAB/metodo_aitken.m")
-#let metodo-aitken = [
-  #codly(header: [Metodo di Aitken])
-  #raw(block: true, lang: "matlab", aitken-data)
-]
-
-#metodo-aitken
+#codly(header: [Metodo di Aitken])
+#raw(block: true, lang: "matlab", aitken-data)
 
 #pagebreak()
 
@@ -69,23 +57,18 @@
 
 == Metodo delle corde
 #let corde-data = read("scriptMATLAB/metodo_corde.m")
-#let metodo-corde = [
-  #codly(header: [Metodo delle secanti])
-  #raw(block: true, lang: "matlab", corde-data)
-]
 
-#metodo-corde
+#codly(header: [Metodo delle secanti])
+#raw(block: true, lang: "matlab", corde-data)
+
 
 #pagebreak()
 
 == Sistema triangolare
 #let trisolve-data = read("scriptMATLAB/trisolve.m")
-#let trisolve = [
-  #codly(header: [Sistemi triangolari])
-  #raw(block: true, lang: "matlab", trisolve-data)
-]
-
-#trisolve
+  
+#codly(header: [Sistemi triangolari])
+#raw(block: true, lang: "matlab", trisolve-data)
 
 #pagebreak()
 

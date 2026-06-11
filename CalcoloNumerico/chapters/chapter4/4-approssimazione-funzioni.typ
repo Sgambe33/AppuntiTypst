@@ -2,7 +2,7 @@
 #import "@preview/cetz:0.4.2": canvas, draw
 #import "@preview/cetz-plot:0.1.3": plot
 #import "@preview/suiji:0.5.1": *
-#import "@preview/in-dexter:0.7.2": *
+
 #import "@preview/codly:1.3.0": *
 #import "@preview/codly-languages:0.1.1": *
 #show: codly-init.with()
@@ -70,7 +70,7 @@ Dal punto di vista geometrico:
 Obiettivo: costruire una funzione "semplice" che interpola i dati $(x_i, f_i), i=0,1,...,n$. A riguardo, considereremo, tra le varie possibilità, *funzioni interpolanti* che sono polinomi.
 
 #definition()[
-  #index("Polinomio interpolante")
+  
   Diremo che $p(x) in Pi_n$ è un *polinomio interpolante* le coppie di dati  $(x_i, f_i)$, se:
   $
     p(x_i) = f_i, quad i=0,1,...,n
@@ -156,7 +156,7 @@ $
   3. $
       L_("in")(x_k) = cases(1 "se" k=i, 0 "se" k eq.not i)
     $
-    #index("Delta di Kroenecker")
+    
     Introducendo il *delta di Kroenecker*
     $
       delta_(i k) = cases(1 "se" k=i, 0 "se" k eq.not i)
@@ -172,7 +172,7 @@ $
 ]
 
 #lemma()[
-  #index("Forma di Lagrange")
+  
   Il polinomio $p(x) in Pi_n$ tale che $p(x_i)=f_i$ per $i=0,...,n$ si può rappresentare in modo esplicito come:
   <4.3>
   $
@@ -196,7 +196,7 @@ Analizziamo il singolo polinomio di base $L_("in")(x)$. Il suo *numeratore* è i
 $
   (x-x_0) dots (x-x_(i-1)) (x-x_(i+1)) dots (x-x_n) = x^n + dots
 $
-Sviluppando i prodotti, si ottiene chiaramente #index("Polinomio monico") un *polinomio monico* (cioè con coefficiente principale uguale a $1$).
+Sviluppando i prodotti, si ottiene chiaramente  un *polinomio monico* (cioè con coefficiente principale uguale a $1$).
 Il denominatore di $L_("in")(x)$ non è altro che una costante. Di conseguenza, il coefficiente principale dell'intero polinomio $L_("in")(x)$ è dato dall'inverso di questa costante:
 <4.4>
 $
@@ -228,7 +228,7 @@ $
 $
 Iterando questo procedimento per $r=1,...,n$, il polinomio $p_n (x)$ finale sarà l'interpolante globale su tutte le ascisse.
 
-Per ottenere questo comportamento incrementale, dobbiamo ricorrere ad un'ulteriore base di rappresentazione: #index("Base di Newton") la *base di Newton*. Essa è una famiglia di polinomi *monici* (cioè il coefficiente del termine di grado massimo è $1$) ed è definita per ricorrenza nel seguente modo:
+Per ottenere questo comportamento incrementale, dobbiamo ricorrere ad un'ulteriore base di rappresentazione:  la *base di Newton*. Essa è una famiglia di polinomi *monici* (cioè il coefficiente del termine di grado massimo è $1$) ed è definita per ricorrenza nel seguente modo:
 <4.7>
 $
   cases(
@@ -296,12 +296,12 @@ Successivamente dimostreremo che $f[x_0, dots, x_r]$ è effettivamente riscrivib
 ]
 
 #definition()[
-  #index("Differenza divisa")
+  
   $f[x_0,dots,x_r], space r=0,1,dots$, come definita nella #link(<4.9>)[(4.9)], è detta *differenza divisa* di $f(x)$ sulle ascisse $x_0,dots,x_r$.
 ]
 
 #definition()[
-  #index("Forma di Newton")
+  
   Il polinomio interpolante nella forma di Newton è quindi definito come:
   <4.12>
   $
@@ -671,7 +671,7 @@ $
 $
 A questo punto, l'operazione di far "collassare" i due punti ($x_(i+1/2) -> x_i$) equivale ad applicare l'operatore limite a entrambi i membri della seconda equazione. Per la definizione stessa di derivata, i rapporti incrementali si trasformano nelle derivate prime valutate nel nodo $x_i$.
 
-Abbiamo così dimostrato che, al limite, le condizioni originali definiscono un nuovo tipo di polinomio interpolante. Esiste ed è unico un polinomio $p_H (x) in Pi_(2n+1)$, detto *polinomio di Hermite*, che soddisfa il seguente sistema: #index("Polinomio di Hermite")
+Abbiamo così dimostrato che, al limite, le condizioni originali definiscono un nuovo tipo di polinomio interpolante. Esiste ed è unico un polinomio $p_H (x) in Pi_(2n+1)$, detto *polinomio di Hermite*, che soddisfa il seguente sistema: 
 <4.18>
 $
   cases(
