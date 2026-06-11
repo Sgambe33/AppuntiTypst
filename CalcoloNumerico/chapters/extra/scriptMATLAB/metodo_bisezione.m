@@ -2,11 +2,11 @@ function x = metodo_bisezione(f, a, b, tol)
     % function x = metodo_bisezione(f, a, b, tol)
     % Metodo di bisezione per gli zeri di una funzione
     % INPUT:
-    %   f - funzione di cui determinare la radice;
+    %   f   - funzione di cui determinare la radice;
     %   a,b - estremi dell'intervallo in cui ricercare la radice>;
     %   tol - tolleranza desiderata (default = 1e-12);
     % OUTPUT:
-    %   x - approssimazione della radice;
+    %   x   - approssimazione della radice;
     %                                                      Rel. 13.01.2026
 
     if nargin < 3, error("Parametri insufficienti"), end

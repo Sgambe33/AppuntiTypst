@@ -1,7 +1,7 @@
 #import "../../../dvd.typ": *
 #import "@preview/codly:1.3.0": *
 #import "@preview/codly-languages:0.1.1": *
-#import "@preview/in-dexter:0.7.2": *
+
 #show: codly-init.with()
 
 #pagebreak()
@@ -329,7 +329,7 @@ Considerazioni, del tutto analoghe a quelle fatte per il caso triangolare inferi
 === $A$ ortogonale
 
 #definition()[
-  Diremo che una matrice $A in RR^(n times n)$ è ortogonale #index("Matrice", "Ortogonale") se $A^T A = A A^T = I$. Questo significa che $A$ ortogonale $=> A^(-1)=A^T$.
+  Diremo che una matrice $A in RR^(n times n)$ è ortogonale  se $A^T A = A A^T = I$. Questo significa che $A$ ortogonale $=> A^(-1)=A^T$.
 ]
 In questo caso, la soluzione del sistema lineare (3.1) è:
 $
@@ -382,7 +382,7 @@ In definitiva, un generico metodo di risoluzione si caratterizzerà per la *spec
 #definition(
   "Fattorizzazione LU di una matrice",
 )[
-  #index("Fattorizzazione", "LU")
+
   Diremo che $A in RR^(n times n)$, non singolare, è *fattorizzabile LU* se $exists L in R^(n times n)$ matrice triangolare inferiore a *diagonale unitaria*, e $U in RR^(n times n)$ triangolare superiore, tali che $A = L U$.
 ]
 
@@ -416,7 +416,7 @@ In definitiva, un generico metodo di risoluzione si caratterizzerà per la *spec
   Quindi:
   $
     L_1^(-1)L = I => L=L_1\
-    U_1 U^(-1)= U => U_1 = U
+    U_1 U^(-1)= I => U_1 = U
   $
   Ovvero la fattorizzazione è *unica*.
 ]
@@ -428,12 +428,12 @@ $
   mat(v_1; dots.v; v_k; 0; dots.v; 0)
   #stack(dir: ttb, spacing: 1em, [\ \ $ lr(}, size: #320%) n-k $])
 $
-#index("Vettore", "elementare di Gauss")
+
 Se $v_k eq.not 0$, allora possiamo definire il *vettore elementare di Gauss* e il k-esimo versore di $RR^n$:
 $
   uu(g)_k = 1/(v_k) (overparen(0\,...\,0, k), v_(k+1),..., v_n)^T in RR^n quad quad uu(e)_k = mat(0; dots.v; 1; dots.v; 0) in RR^n
 $
-#index("Matrice", "elementare di Gauss")
+
 Definiamo la corrispondente *matrice elementare di Gauss*:
 $
   L = I - uu(g)_k uu(e)_k^T = I - 1/(v_k) mat(0; dots.v; 0; v_(k+1); dots.v; v_n) mat(0, dots.c, 1, dots.c, 0) = accent(mat(1, , , dots.v; , 1, , dots.v; , , dots.down, dots.v; dots, dots, dots, 1, dots, dots, dots; , , , -v_(k+1) / v_k, dots.down; , , , dots.v, , 1; , , , -v_n/v_k, , , 1; delim: "["), k) k
@@ -455,7 +455,7 @@ Ricapitolando, il vettore $uu(g)_k$ e la matrice $L$, esistono se e solo se $v_k
     L^(-1) L = (I + uu(g)_k uu(e)_k^T) (I - uu(g)_k uu(e)_k^T) = I - uu(g)_k uu(e)_k^T + uu(g)_k uu(e)_k^T - uu(g)_k underbracket((uu(e)_k^T uu(g)_k), =0) uu(e)_k^T=I
   $
 ]
-#index("Metodo", "eliminazione di Gauss")
+
 A questo punto, andiamo a definire il *metodo di eliminazione di Gauss*:
 - si tratta di un metodo costruttivo;
 - le condizioni che garantiscono la sua esecuzione saranno le condizioni che garantiscono l'esistenza della fattorizzazione $L U$;
@@ -608,7 +608,7 @@ $
   Se $A= mat(1, 2, 3; 4, 5, 6; 7, 8, 9)$, allora: $A_1 = (1), A_2 = mat(1, 2; 4, 5), A_3 equiv A$.
 ]
 #definition()[
-  #index("Minore principale")
+
   Si definisce *minore principale di ordine k* di una matrice, il determinante della sottomatrice principale di ordine $k$.
 ]
 #theorem(
@@ -657,7 +657,7 @@ Tuttavia, esistono importanti classi di matrici per cui la proprietà di non sin
 == Matrici a diagonale dominante
 
 #definition()[
-  #index("Matrice", "a diagonale dominante")
+
   Data una matrice $A=(a_(i j)) in RR^(n times n)$, si dice che essa è:
   - diagonale dominante per righe se:
   $
@@ -730,7 +730,7 @@ Valgono le seguenti proprietà:
 
 == Matrici SDP: fattorizzazione $L D L^T$
 #definition()[
-  #index("Matrice", "sdp")
+
   Diremo che la matrice $A = (a_(i j)) in RR^(n times n)$ è *SDP* (simmetrica e definita positiva) se:
   + $A = A^T$ (simmetria rispetto alla diagonale, ovvero $forall i,j: a_(i j) = a_(j i)$)
   + $forall uu(x) in RR^n, uu(x)eq.not uu(0): uu(x)^T A uu(x) > 0$ (definita positività)
@@ -791,7 +791,7 @@ Valgono le seguenti proprietà:
 ]
 
 #theorem()[
-  #index("Fattorizzazione", "LDL")
+
   $A$ è SDP $<=>$ $A=L D L^T$
   con:
   - $L$ triangolare inferiore a diagonale unitaria.
@@ -887,10 +887,10 @@ $
 
 //19.11.2025
 //TODO: ci sarebbe un mega esempio negli appunti.
-#[
-  #set heading(numbering: none, outlined: false)
-  === Matrici di permutazioni
-]
+
+== Pivoting parziale
+
+=== Matrici di permutazione
 Dato
 $uu(v)
 = mat(1; dots.v; k_1; dots.v; k_2; dots.v; n) in RR^n$
@@ -900,8 +900,9 @@ $
   I uu(v) = sum_(i=1)^n uu(e)_i underbrace((uu(e)_i^T uu(v)), =i) = sum_(i=1)^n i dot uu(e)_i = mat(1; 2; dots.v; n)
 $
 Nel nostro caso, invece, vogliamo scambiare le componenti $k_1$ e $k_2$. Quindi se definiamo:
+<3.8>
 $
-  P=(sum_(i=1\ i eq.not k_1 and k_2)^n uu(e)_i uu(e)_i^T) + uu(e)_(k_2) uu(e)_(k_1)^T + uu(e)_(k_1) uu(e)_(k_2)^T quad quad (3)
+  P=(sum_(i=1\ i eq.not k_1 and k_2)^n uu(e)_i uu(e)_i^T) + uu(e)_(k_2) uu(e)_(k_1)^T + uu(e)_(k_1) uu(e)_(k_2)^T quad quad (3.8)
 $
 otteniamo che
 $
@@ -910,8 +911,8 @@ $
 quindi $P$ è proprio la matrice che ci serve.
 
 #definition()[
-  #index("Matrice", "di permutazione")
-  $P$ definita come nella (3) si chiama *matrice di permutazione elementare*.
+
+  $P$ definita come nella #link(<3.8>, [(3.8)]) si chiama *matrice di permutazione elementare*.
 ]
 Esaminiamo la *struttura* di $P$:
 $
@@ -929,8 +930,9 @@ $
   P_1, P_2, ..., P_k
 $
 ciascuna che scambia due elementi di un vettore tra loro. Se ora moltiplichiamo:
+<3.9>
 $
-  underbrace(P_k dot P_(k-1) dot ... dot P_1, P) dot mat(1; 2; dots.v; n) = mat(l_1; l_2; dots.v; l_n) equiv uu(p) quad quad (4)
+  underbrace(P_k dot P_(k-1) dot ... dot P_1, P) dot mat(1; 2; dots.v; n) = mat(l_1; l_2; dots.v; l_n) equiv uu(p) quad quad (3.9)
 $
 con ${l_1,...,l_n}$ permutazione di ${1,...,n}$.
 #observation(multiple: true)[
@@ -941,7 +943,7 @@ con ${l_1,...,l_n}$ permutazione di ${1,...,n}$.
              & = P_1 dot P_2 dot ... dot P_k
     $
     pertanto $P$ è una matrice ortogonale (ma in generale non più simmetrica).
-  + Per tenere conto di $P$ è sufficiente memorizzare il vettore $uu(p)$ in (4). Infatti, per esempio, in Matlab il prodotto $P dot uu(x)$ si realizza con $uu(x)(uu(p))$ (operazione di *"reordering"*).
+  + Per tenere conto di $P$ è sufficiente memorizzare il vettore $uu(p)$ in #link(<3.9>, [(3.9)]). Infatti, per esempio, in Matlab il prodotto $P dot uu(x)$ si realizza con $uu(x)(uu(p))$ (operazione di *"reordering"*).
 ]
 
 #example()[
@@ -954,7 +956,7 @@ con ${l_1,...,l_n}$ permutazione di ${1,...,n}$.
   Non bisogna quindi memorizzare matrici di permutazione!
 ]
 
-== Pivoting parziale
+=== Fattorizzazione LU con pivoting parziale
 L'utilizzo di matrici di permutazione elementare ci permette di definire una variante della fattorizzazione LU di una matrice $A$ *che sia solo non singolare*. Preliminarmente ricordiamo che data una matrice a blocchi:
 $
   A = mat(A_(11), A_(12); 0, A_(22); augment: #(hline: 1, vline: 1), delim: "[") in RR^(n times n)
@@ -970,7 +972,7 @@ con $A_(11) in RR^(k times k)$ e $A_(22) in RR^(n-k times n-k)$, per cui si ha $
   $
 ]
 #theorem("Fattorizzazione LU con pivoting parziale")[
-  #index("Fattorizzazione", "con pivoting parziale")
+
   Se $A in RR^(n times n)$, $det(A) eq.not 0$, allora $exists P in RR^(n times n)$, matrice di permutazione, tale che:
   $
     P A = L U
@@ -1038,10 +1040,11 @@ con $A_(11) in RR^(k times k)$ e $A_(22) in RR^(n-k times n-k)$, per cui si ha $
     === Passo i-esimo
   ]
   La procedura prosegue in modo analogo, se $det(A) eq.not 0$, fino ad ottenere che:
+  <3.10>
   $
     L_(n-1) P_(n-1) dots.c L_2 P_2 L_1 P_1 A = mat(
       a_(k_1 1)^((1)), a_(k_1 2)^((1)), dots.c, dots.c, a_(k_1 n)^((1)); 0, a_(k_2 2)^((2)), dots.c, dots.c, a_(k_2 n)^((2)); dots.v, dots.down, dots.down, dots.down, dots.v; dots.v, , dots.down, dots.down, dots.v; 0, dots.c, dots.c, 0, a_(k_n n)^((n)); delim: "["
-    ) equiv A^((n)) equiv U quad quad (1)
+    ) equiv A^((n)) equiv U quad quad (3.10)
   $
   dove, per $i=1,...,n-1$
   $
@@ -1062,7 +1065,7 @@ con $A_(11) in RR^(k times k)$ e $A_(22) in RR^(n-k times n-k)$, per cui si ha $
     - Gli elementi di $uu(g)_i$ hanno tutti modulo $lt.eq 1$.
     - Ricordiamo che $P_i = P_i^T = P_i^(-1) => P_i dot P_i = I$. Ovvero le matrici di permutazione elementari sono simmetriche ed ortogonali e, se moltiplicate per un vettore, ne permutano le componenti $i$ e $k$ con $k_i gt.eq i$.
   ]
-  Cerchiamo di "leggere" meglio la (1). Considerando il caso $n=4$, si avrà che:
+  Cerchiamo di "leggere" meglio la #link(<3.10>, [(3.10)]). Considerando il caso $n=4$, si avrà che:
   $
     L_3 P_3 L_2 P_2 L_1 P_1 A = U
   $
@@ -1075,9 +1078,10 @@ con $A_(11) in RR^(k times k)$ e $A_(22) in RR^(n-k times n-k)$, per cui si ha $
   $
     hat(L)_3 hat(L)_2 hat(L)_1 P A = U
   $
-  In generale, per $n$ generico, la (1) si può riscrivere con gli stessi procedimenti come:
+  In generale, per $n$ generico, la #link(<3.10>, [(3.10)]) si può riscrivere con gli stessi procedimenti come:
+  <3.11>
   $
-    hat(L)_(n-1) hat(L)_(n-2) dot dots dot hat(L)_(1) P A = U quad quad (2)
+    hat(L)_(n-1) hat(L)_(n-2) dot dots dot hat(L)_(1) P A = U quad quad (3.11)
   $
   dove:
   - $hat(L)_(n-1) = L_(n-1)$
@@ -1101,7 +1105,7 @@ con $A_(11) in RR^(k times k)$ e $A_(22) in RR^(n-k times n-k)$, per cui si ha $
                  & =(P_(n-1) dot dots dot P_(i+2)) P_(i+1) uu(g)_i \
                  & =frac(1, a_(k_i i)^((i))) (underbrace(0 dots 0, i), *, *, dots *)^T
   $
-  Pertanto, $L_i$ e $hat(L)_i$ hanno la medesima struttura di matrice elementare di Gauss (la i-esima per la precisione). In virtù di questo, possiamo formalmente riscrivere la (2) come:
+  Pertanto, $L_i$ e $hat(L)_i$ hanno la medesima struttura di matrice elementare di Gauss (la i-esima per la precisione). In virtù di questo, possiamo formalmente riscrivere la #link(<3.11>, [(3.11)]) come:
   $
     L^(-1) P A = U, quad "con" space & L^(-1) = hat(L)_(n-1) dot dots dot hat(L)_1 \
                                      & P=P_(n-1) dot dots dot P_1
@@ -1112,10 +1116,11 @@ con $A_(11) in RR^(k times k)$ e $A_(22) in RR^(n-k times n-k)$, per cui si ha $
 
 #observation()[
   Se dobbiamo risolvere il sistema lineare
+  <3.12>
   $
-    A uu(x) = uu(b) quad quad (4)
+    A uu(x) = uu(b) quad quad (3.12)
   $
-  e se (3) è la fattorizzazione LU con pivoting di $A$, allora, formalmente, (4) è equivalente al sistema lineare
+  e se #link(<3.11>, [(3.11)]) è la fattorizzazione LU con pivoting di $A$, allora, formalmente, (4) è equivalente al sistema lineare
   $
     P A uu(x) = P uu(b)
   $
@@ -1124,8 +1129,9 @@ con $A_(11) in RR^(k times k)$ e $A_(22) in RR^(n-k times n-k)$, per cui si ha $
     L U uu(x) = P uu(b)
   $
   Allora risolviamo, in ordine, i sistemi triangolari
+  <3.13>
   $
-    (5) quad quad L uu(y) = P uu(b) quad "e" quad U uu(x) = uu(y)
+    (3.13) quad quad L uu(y) = P uu(b) quad "e" quad U uu(x) = uu(y)
   $
   Nella (5) il vettore $P uu(b)$ è un vettore contenente una permutazione degli elementi di $uu(b)$ e quindi sarà sufficiente memorizzare il vettore $uu(p)$ che corrisponde a tale permutazione. In altri termini:
   $
@@ -1145,7 +1151,7 @@ con $A_(11) in RR^(k times k)$ e $A_(22) in RR^(n-k times n-k)$, per cui si ha $
     Va considerato che, negli $n-1$ passi di fattorizzazione, al generico passo $i$, vanno scambiate le righe $i$ e $k_i$ della matrice. Questi scambi in memoria hanno ovviamente un costo.
   ]
 
-Scriviamo uno pseudocodice Matlab che implementa la fattorizzazione. In esso $a$ è un array $n times n$ che contiene la matrice $A$.
+Scriviamo uno pseudocodice Matlab che implementa la fattorizzazione. In esso `a` è un array $n times n$ che contiene la matrice $A$.
 #codly(
   languages: codly-languages,
   zebra-fill: none,
@@ -1185,7 +1191,7 @@ if a(n,n) == 0
 end
 ```
 #observation(multiple: true)[
-  - La conversione in indice assoluta è necessaria perché `max(abs(a(i:n,i)))` restituisce l'indice all'interno di un vettore più piccolo. Se $i=3$ e $n=5$, allora `max` opera su un vettore di dimensione $5-3=2$.
+  - La conversione in indice assoluto è necessaria perché `max(abs(a(i:n,i)))` restituisce l'indice all'interno di un vettore più piccolo. Se $i=3$ e $n=5$, allora `max` opera su un vettore di dimensione $5-3=2$.
   - Questa scrittura così compressa serve "semplicemente" per evitare di dichiarare una variabile di scambio. In questo modo è gestito tutto dal linguaggio. Stiamo chiedendo, in una sola riga, di fare ciò che richiederebbe 3 righe e una variabile aggiuntiva.
     ```matlab
     temp = a(i, :);      % Salva la riga i
@@ -1196,7 +1202,7 @@ end
 //26.11.2025
 == Condizionamento del problema
 Prima di cercare un algoritmo per risolvere un problema (come un sistema lineare $A uu(x)=uu(b)$), dobbiamo chiederci se il problema stesso è "ben posto". Il concetto di *condizionamento* misura la sensibilità della soluzione di un problema rispetto ai dati in ingresso.
-In altre parole:"Se i dati del problema ($A$ o $b$) cambiano di pochissimo (a causa di errori di misurazione o di arrotondamento), la soluzione $x$ cambia di poco o cambia drasticamente?"
+In altre parole:"Se i dati del problema ($A$ o $b$) cambiano di pochissimo (a causa di errori di misurazione o di arrotondamento), la soluzione $x$ cambia di poco o cambia drasticamente?".
 - *Problema Ben Condizionato*: piccole variazioni nei dati producono piccole variazioni nella soluzione. Il problema è stabile e "robusto".
 - *Problema Mal Condizionato*: piccole variazioni nei dati possono provocare enormi variazioni nella soluzione. Il risultato diventa inaffidabile, indipendentemente da quanto sia preciso l'algoritmo usato.
 
@@ -1240,8 +1246,9 @@ $
   A uu(x) = uu(b), quad quad det(A)eq.not 0
 $
 risolviamo quello perturbato
+<3.14>
 $
-  (A + Delta A) (uu(x) + Delta uu(x)) = uu(b) + Delta uu(b)
+  (A + Delta A) (uu(x) + Delta uu(x)) = uu(b) + Delta uu(b) quad quad (3.14)
 $
 dove:
 + $A in RR^(n times n) => Delta A in RR^(n times n)$, contenente le perturbazioni degli elementi di $A$.
@@ -1253,7 +1260,7 @@ Per questo motivo è necessario introdurre la nozione di *norma indotta su matri
 
 === Norme indotte
 #definition("Norma di un vettore")[
-  #index("Norma", "di vettore")
+
   Sia $norm(dot) : V --> RR$, con $V$ spazio vettoriale. Diremo che $norm(dot)$ è una norma su $V$ se:
   + $forall uu(v) in V: norm(uu(v)) gt.eq 0 and norm(uu(v)) = 0 => uu(v) = uu(0) in V$
   + $forall uu(v) in V$ e $alpha in RR : norm(alpha dot uu(v)) = abs(alpha) dot norm(uu(v))$
@@ -1265,11 +1272,8 @@ $
 $
 I valori di $p$ più utilizzati sono:
 $
-  #index("Norma", "Manhattan")
   p&=1: norm(uu(v))_1 = sum_(i=1)^n abs(v_i) quad "(norma Manhattan)"\
-  #index("Norma", "Euclidea")
   p&=2: norm(uu(v))_2 = sqrt(sum_(i=1)^n abs(v_i)^2) = sqrt(uu(v)^T uu(v)) quad "(norma euclidea)"\
-  #index("Norma", "del massimo")
   p&=infinity: norm(uu(v))_infinity = lim_(p -> infinity) norm(uu(v))_p equiv max_(i=1,..,n) abs(v_i) quad "(norma del massimo)"
 $
 
@@ -1291,7 +1295,7 @@ $
 Nel caso in cui $V = RR^(m times n)$, possiamo definire *norme su matrici* , *indotte dalle corrispondenti norme su vettore*.
 
 #definition("Norme su matrici")[
-  #index("Norma", "su matrice")
+
   Se $A in RR^(m times n)$ definiamo:
   $
     norm(A)_p = sup_(uu(x) in RR^n\ uu(x)eq.not uu(0)) frac(overbracket(norm(A uu(x))_p, "norma" p "in" RR^m), underbracket(norm(uu(x))_p, "norma" p "in" RR^n))
@@ -1388,7 +1392,7 @@ $
     $
 ]
 
-Ritorniamo a discutere il problema perturbato (2). A questo fine, supponiamo che:
+Ritorniamo a discutere il problema perturbato #link(<3.14>, [(3.14)]). A questo fine, supponiamo che:
 $
   Delta A = epsilon F, quad "con" epsilon in RR, F in RR^(n times n)
 $
@@ -1402,8 +1406,9 @@ $
   uu(b)(epsilon) & =uu(b) + epsilon uu(f) => uu(b)(0) = uu(b)
 $
 e, inoltre, indichiamo con $uu(x)(epsilon)$ la soluzione del sistema lineare:
+<3.15>
 $
-  A(epsilon) = uu(x)(epsilon) = uu(b)(epsilon) <=> (2) quad quad (3)
+  A(epsilon) = uu(x)(epsilon) = uu(b)(epsilon) <=> #link(<3.14>, [(3.14)]) quad quad (3.15)
 $
 Inoltre, da questo segue che:
 + $uu(x)(0) = uu(x)$, soluzione di (1);
@@ -1413,7 +1418,7 @@ Inoltre, da questo segue che:
     epsilon uu(x)(0) => Delta uu(x) = uu(x)(epsilon) - uu(x) approx epsilon dot accent(uu(x), dot)(0)
   $
 
-Andiamo ad ottenere $accent(uu(x), dot)(0)$. Poiché la (3) vale identicamente in un intorno di $epsilon=0$, questo significa che anche le derivate prime dei 2 membri devono essere uguali:
+Andiamo ad ottenere $accent(uu(x), dot)(0)$. Poiché la #link(<3.15>, [(3.15)]) vale identicamente in un intorno di $epsilon=0$, questo significa che anche le derivate prime dei 2 membri devono essere uguali:
 $
   underbrace(accent(A, dot)(epsilon), F) uu(x)(epsilon) + A(epsilon) accent(uu(x), dot)(epsilon) = underbrace(accent(uu(b), dot)(epsilon), uu(f))
 $
@@ -1433,7 +1438,7 @@ ovvero:
 $
   Delta A uu(x) + A Delta uu(x) = Delta uu(b)
 $
-Da questo vogliamo ricavare una misura scalare (alias un numero) che quantifica ciascuna perturbazione, al fine di ottenere una relazione più compatta tra loro. Dalla (3) otteniamo che:
+Da questo vogliamo ricavare una misura scalare (alias un numero) che quantifica ciascuna perturbazione, al fine di ottenere una relazione più compatta tra loro. Dalla #link(<3.15>, [(3.15)]) otteniamo che:
 $
   Delta uu(x) = A^(-1) ( Delta b - Delta A dot uu(x))
 $
@@ -1458,8 +1463,9 @@ $
   frac(norm(Delta uu(b)), norm(A)dot norm(uu(x)))lt.eq frac(norm(Delta uu(b)), norm(uu(b)))
 $
 In conclusione, otteniamo quindi che:
+<3.16>
 $
-  frac(norm(Delta uu(x)), norm(uu(x))) lt.eq norm(A) dot norm(A^(-1)) (frac(norm(Delta uu(b)), norm(uu(b))) + frac(norm(Delta A), norm(A))) quad quad (4)
+  frac(norm(Delta uu(x)), norm(uu(x))) lt.eq norm(A) dot norm(A^(-1)) (frac(norm(Delta uu(b)), norm(uu(b))) + frac(norm(Delta A), norm(A))) quad quad (3.16)
 $
 In questa diseguaglianza:
 - $frac(norm(Delta uu(x)), norm(uu(x)))$: può essere assimilato ad una sorta di *errore relativo* sul risultato.
@@ -1474,7 +1480,7 @@ $
 $
 definisce il numero di condizione del problema.
 #definition()[
-  #index("Matrice", "Numero di condizione")
+
   $k(A)$ si dice *numero di condizione* della matrice A. Se:
   - $k(A) >> 1$: diremo che $A$ è *mal condizionata*.
   - $k(A) =O(1)$ (costante di moderata entità): diremo che $A$ è *ben condizionata*.
@@ -1518,13 +1524,14 @@ for i=1:n
 end
 ```
 Fermo restando il resto, vogliamo implementare un controllo più robusto, per diagnosticare la "singolarità" della matrice, rispetto al controllo `if mi==0` che è decisamente "ingenuo". Un primo rimedio, potrebbe essere un controllo del tipo `if mi <= tol` con `tol` tolleranza da specificare. Per capire come scegliere `tol`, consideriamo il seguente esempio:
+<3.17>
 $
-  mat(10, 1; 1, 10) mat(x_1; x_2) = mat(1, 1; 1, 1) quad quad (5)
+  mat(10, 1; 1, 10) mat(x_1; x_2) = mat(1, 1; 1, 1) quad quad (3.17)
 $
 in cui:
 + la matrice è diagonale dominante e quindi fattorizzabile LU.
 + la soluzione è $x_1=x_2=1$.
-Se `eps` è la precisione di macchina, sembrerebbe ragionevole il controllo `if mi <= eps,...`. Tuttavia, se moltiplichiamo membro a membro, la (5) per `eps/10^4`, otteniamo che la matrice viene diagnosticata come singolare ma, non di meno, la matrice dei coefficienti rimane sempre diagonale dominante e la soluzione $x_1=x_2=1$. Pertanto la soluzione corretta al problema può essere quella di scegliere
+Se `eps` è la precisione di macchina, sembrerebbe ragionevole il controllo `if mi <= eps,...`. Tuttavia, se moltiplichiamo membro a membro, la #link(<3.17>, [(3.17)]) per `eps/10^4`, otteniamo che la matrice viene diagnosticata come singolare ma, non di meno, la matrice dei coefficienti rimane sempre diagonale dominante e la soluzione $x_1=x_2=1$. Pertanto la soluzione corretta al problema può essere quella di scegliere
 #align(center, [`tol = 100*eps*norm(a,1)`])
 - 100 è un multiplo scalare della precisione di macchina (può dipendere anche dalla dimensione $n$ del problema).
 - usare una norma poco costosa come $1$ o $infinity$ *non* $norm(dot)_2$.
@@ -1538,15 +1545,13 @@ Se `eps` è la precisione di macchina, sembrerebbe ragionevole il controllo `if 
 
 == Sistemi lineari sovradeterminati
 Il problema è risolvere
+<3.18>
 $
-  A uu(x) = uu(b) quad quad (1)
+  A uu(x) = uu(b) quad quad (3.18)
 $
 con $A in RR^(m times n)$,  $m>n="rank"(A) => uu(b) in RR^m, uu(x) in RR^n$, ovvero ci sono più equazioni che incognite.
 #observation()[
-  Nella (1) $A$ e $uu(b)$ sono i dati del problema, mentre $uu(x)$ è la soluzione da determinare. Tuttavia nelle applicazioni del deep-learning, i ruoli si capovolgono. Ad esempio, in una rete del tipo
-  //TODO: rifare diagramma rete
-  #figure(image("images/2025-12-03-13-15-10.png"))
-  tipicamente, se $x_1 in RR^(n_1)$ è il vettore degli input e $x_N in RR^(n_N)$ è il vettore con gli output, allora la rete si può formalizzare come:
+  Nella (1) $A$ e $uu(b)$ sono i dati del problema, mentre $uu(x)$ è la soluzione da determinare. Tuttavia nelle applicazioni del deep-learning, i ruoli si capovolgono. Ad esempio, in una tipica rete neurale, se $x_1 in RR^(n_1)$ è il vettore degli input e $x_N in RR^(n_N)$ è il vettore con gli output, allora la rete si può formalizzare come:
   $
     x_(i+1) = sigma(A_i x_i + b_i), space i=1,...,N
   $
@@ -1561,7 +1566,7 @@ Dobbiamo, innanzitutto, capire cosa si intenda per soluzione del problema. Infat
   $
   ma, per esempio, $uu(b) = mat(1; 2; 3; delim: "[") in.not "range"(A)$.
 ]
-La conclusione di questo argomento è che una soluzione, nel senso classico, generalmente non esiste. L'idea è la seguente: dato $uu(x) in RR^n$ posso definire il *vettore residuo* #index("Vettore residuo")
+La conclusione di questo argomento è che una soluzione, nel senso classico, generalmente non esiste. L'idea è la seguente: dato $uu(x) in RR^n$ posso definire il *vettore residuo*
 $
   uu(r) = A uu(x) - uu(b)
 $
@@ -1570,15 +1575,16 @@ $
   uu(0) = A uu(x) - uu(b) ==> A uu(x) = uu(b)
 $
 Quindi, se $uu(r) = uu(0) <=> uu(x)$ è soluzione classica del problema. Viceversa, se non possiamo ottenere $uu(r) = uu(0)$, allora ricerchiamo $uu(x)$:
+<3.19>
 $
-  norm(uu(r))_2^2 = norm(A uu(x)-uu(b))_2^2 = min! quad quad (2)
+  norm(uu(r))_2^2 = norm(A uu(x)-uu(b))_2^2 = min! quad quad (3.19)
 $
 #observation()[
   $
     uu(r) = mat(r_1; r_2; dots.v; r_m) => norm(uu(r))_2^2 = sum_(i=1)^m r_i^2 = uu(r)^T uu(r)
   $
 ]
-Per questo motivo la soluzione $uu(x)$ che soddisfa la (2), prende il nome di *soluzione ai minimi quadrati* del sistema lineare $A uu(x) = uu(b)$.
+Per questo motivo la soluzione $uu(x)$ che soddisfa la #link(<3.19>, [(3.19)]), prende il nome di *soluzione ai minimi quadrati* del sistema lineare $A uu(x) = uu(b)$.
 
 Prima di procedere con la determinazione di $uu(x)$, osserviamo che se $Q in RR^(m times m)$ è una matrice ortogonale ($Q^T Q = Q Q^T = I in RR^(m times m)$), allora:
 $
@@ -1586,9 +1592,10 @@ $
 $
 Di conseguenza, la norma euclidea di un vettore è invariata per sua moltiplicazione per una matrice ortogonale.
 
+=== Fattorizzazione QR
 Vale, inoltre, il seguente risultato.
 #theorem("Fattorizzazione QR di A")[
-  #index("Fattorizzazione", "QR")
+
   Se $A in RR^(m times n), m>n="rank"(A)$, allora esistono:
   + $Q in RR^(m times m)$, ortogonale;
   + $hat(R) in RR^(n times n)$, triangolare superiore e non singolare;
@@ -1644,8 +1651,9 @@ Utilizzando questo risultato, possiamo dimostrare il seguente corollario.
 ]
 === Esistenza della fattorizzazione QR
 Prima di vedere la dimostrazione del teorema precedente, consideriamo il seguente problema: dato un vettore $uu(x) in RR^n, uu(x)eq.not uu(0),$ vogliamo determinare una matrice ortogonale $H in RR^(n times n)$, detta *matrice di Householder*, tale che:
+<3.20>
 $
-  (4) quad H uu(x) = alpha uu(e)_1, quad "dove" alpha in RR space "e" space uu(e)_1 in RR^n "è il primo versore"
+  (3.20) quad H uu(x) = alpha uu(e)_1, quad "dove" alpha in RR space "e" space uu(e)_1 in RR^n "è il primo versore"
 $
 Osserviamo che, per l'ortogonalità di $H$ si ha:
 $
@@ -1665,16 +1673,17 @@ Osserviamo che:
   $
     H^T H = overbrace(H dot H, "simmetria") = (I-frac(2, uu(v)^T uu(v)) uu(v) uu(v)^T)(I-frac(2, uu(v)^T uu(v)) uu(v) uu(v)^T) = I - frac(4, uu(v)^T uu(v)) uu(v) uu(v)^T + frac(4, (uu(v)^T uu(v))^cancel(2)) uu(v) cancel((uu(v)^T uu(v))) uu(v)^T = I
   $
-  Quindi, qualunque sia la scelta di $uu(v)$, la matrice $H$ è simmetrica e ortogonale. Il problema è scegliere $uu(v)$ in modo che la (4) sia soddisfatta.
+  Quindi, qualunque sia la scelta di $uu(v)$, la matrice $H$ è simmetrica e ortogonale. Il problema è scegliere $uu(v)$ in modo che la #link(<3.20>, [(3.20)]) sia soddisfatta.
 
 Verifichiamo che questo è vero se scegliamo il *vettore di Householder* come:
+<3.21>
 $
-  uu(v) = uu(x) - alpha uu(e)_1 quad quad (5)
+  uu(v) = uu(x) - alpha uu(e)_1 quad quad (3.21)
 $
 Infatti
 $
-  H uu(x) &= (I-frac(2, uu(v)^T uu(v)) uu(v) uu(v)^T) uu(x) = uu(x) frac(2, uu(v)^T uu(v)) uu(v)^T uu(x) uu(v)\
-  &= uu(x) frac(2, uu(v)^T uu(v)) uu(v)^T uu(x) (uu(x)-alpha uu(e)_1)\
+  H uu(x) &= (I-frac(2, uu(v)^T uu(v)) uu(v) uu(v)^T) uu(x) = uu(x) - frac(2, uu(v)^T uu(v)) uu(v)^T uu(x) uu(v)\
+  &= uu(x) - frac(2, uu(v)^T uu(v)) uu(v)^T uu(x) (uu(x)-alpha uu(e)_1)\
   &= (1- frac(2, uu(v)^T uu(v)) uu(v)^T uu(x))uu(x) + alpha(frac(2, uu(v)^T uu(v)) uu(v)^T uu(x))uu(e)_1 = alpha uu(e)_1
 $
 se $frac(2, uu(v)^T uu(v)) uu(v)^T uu(x)=1$ ovvero, se $2 uu(v)^T uu(x) = uu(v)^T uu(v)$. Infatti:
@@ -1825,8 +1834,9 @@ $
   uu(x) <-- uu(b)
 $
 e, successivamente:
+<3.22>
 $
-  uu(x) <-- H_i uu(x), space i=1,...,n quad quad (3)
+  uu(x) <-- H_i uu(x), space i=1,...,n quad quad (3.22)
 $
 Infatti, questo è equivalente a:
 $
@@ -1836,7 +1846,7 @@ senza assemblare il prodotto indipendentemente:
 $
   H_n dot ... dot H_1 "(DA NON FARE)"
 $
-Inoltre, nella (3), osserviamo che:
+Inoltre, nella #link(<3.22>, [(3.22)]), osserviamo che:
 - $
     H_i uu(x) = mat(
       #table(
@@ -1910,7 +1920,7 @@ $
 $
 come vediamo nella riga 8 dell'Algoritmo 3.8.
 //TODO: ci sono altri passaggi nelle dispense da ricontrollare
-Questi accorgimenti consentono di ottenere un costo, in termini di operazionni algebriche elementari, di $2/3 n^2 (3m-n)$ `flops`.
+Questi accorgimenti consentono di ottenere un costo, in termini di operazioni algebriche elementari, di $2/3 n^2 (3m-n)$ `flops`.
 #observation()[
   Si potrebbe utilizzare la fattorizzazione $Q R$ anche nel caso $A in RR^(n times n)$, che sarebbe definita sotto l'ipotesi che $A$ sia non singolare, ovvero nel caso $m=n$. Tuttavia, in questo caso, il costo per ottenere la fattorizzazione sarebbe $4/3 n^3$ `flops` cioè circa il doppio rispetto alla fattorizzazione $L U$. Pertanto quest'ultima è in generale da preferirsi.
 ]
@@ -1930,41 +1940,47 @@ Questi accorgimenti consentono di ottenere un costo, in termini di operazionni a
 
 
 Ricordiamo che, nel caso scalare, $f(x)=0$, con $f: RR -->RR$, abbiamo esaminato, tra gli altri, il metodo di Newton:
+<3.23>
 $
-  x_(i+1) = x_i - frac(f(x_i), f'(x_i)), space i=0,1,... quad quad (1)
+  x_(i+1) = x_i - frac(f(x_i), f'(x_i)), space i=0,1,... quad quad (3.23)
 $
 ed il metodo delle corde:
+<3.24>
 $
-  x_(i+1) = x_i - frac(f(x_i), f'(x_0)), space i=0,1,... quad quad (2)
+  x_(i+1) = x_i - frac(f(x_i), f'(x_0)), space i=0,1,... quad quad (3.24)
 $
 entrambi con convergenza locale e con ordine di convergenza, verso *radici semplici*, pari a:
-- 2 per il metodo (1).
-- 1 per il metodo (2).
+- 2 per il metodo #link(<3.23>, [(3.23)]).
+- 1 per il metodo #link(<3.24>, [(3.24)]).
 #observation()[
   Se $x^*$ è radice semplice di $f(x)$, allora $f(x^*)=0$ e $f'(x^*) eq.not 0$.
 ]
-Per generalizzare il metodo di Newton al caso di sistemi, riscriviamo formalmente (1) come:
+Per generalizzare il metodo di Newton al caso di sistemi, riscriviamo formalmente #link(<3.23>, [(3.23)]) come:
+<3.25>
 $
-  x_(i+1) = x_i - f'(x_i)^(-1) f(x_i), space i=0,1,... quad quad (3)
+  x_(i+1) = x_i - f'(x_i)^(-1) f(x_i), space i=0,1,... quad quad (3.25)
 $
 Questo perché la divisione non è applicabile alle matrici ma esistono le matrici inverse. Supponiamo ora di voler risolvere il sistema di $n$ equazioni non lineari nelle $n$ incognite
+<3.26>
 $
-  uu(x) = mat(x_1; dots.v; x_n) in RR^n quad F(uu(x))=uu(0) in RR^n quad quad (4)
+  uu(x) = mat(x_1; dots.v; x_n) in RR^n quad F(uu(x))=uu(0) in RR^n quad quad (3.26)
 $
 dove $F: RR^n --> RR^n$ (_campi vettoriali_). In questo caso, definendo le *funzioni componenti* di $F(uu(x))$:
 $
   f_i : RR^n --> RR
 $
-allora possiamo riscrivere (4) come:
+allora possiamo riscrivere #link(<3.26>, [(3.26)]) come:
+<3.27>
 $
-  cases(f_1(uu(x))=0, f_2(uu(x))=0, quad space space dots.v, f_n(uu(x))=0) quad quad (5)
+  cases(f_1(uu(x))=0, f_2(uu(x))=0, quad space space dots.v, f_n(uu(x))=0) quad quad (3.27)
 $
 #observation()[
   Se $uu(e)_i in RR^n$ è l'i-esimo versore, allora $f_i (uu(x))=uu(e)_i^T F(uu(x)), space i=1,...,n$.
 ]
-Gli apici adesso verrano usati al posto dei pedici per evitare confusione nei passaggi. Anche ora, dato $uu(x)^0 in RR^n$, possiamo considerare un'approssimazione lineare al primo ordine di $F(uu(x))$ in un intorno di $uu(x)^0$ tramite Taylor:
+Gli apici adesso verranno usati al posto dei pedici per evitare confusione nei passaggi. Anche ora, dato $uu(x)^0 in RR^n$, possiamo considerare un'approssimazione lineare al primo ordine di $F(uu(x))$ in un intorno di $uu(x)^0$ tramite Taylor:
+<3.28>
 $
-  F(uu(x)) approx F(uu(x)^0) + F'(uu(x)^0)(uu(x)-uu(x)^0) quad quad (6)
+  F(uu(x)) approx F(uu(x)^0) + F'(uu(x)^0)(uu(x)-uu(x)^0) quad quad (3.28)
 $
 dove $F'(uu(x)^0)$ è la *matrice Jacobiana* di $F(uu(x))$ calcolata in $uu(x)^0$. Questa è così definita: $F'(uu(x)) in RR^(n times n)$, il cui elemento $(i, j)$ è dato dalla derivata parziale di $f_i (uu(x))$ rispetto alla componente $x_j$ del vettore. Questa è a sua volta definita se $uu(e)_j in RR^n$ è il j-esimo versore, allora:
 $
@@ -1978,8 +1994,9 @@ $
                                          uu(x) & = uu(x)^0 - (F'(uu(x)^0))^(-1) F(uu(x)^0)
 $
 Reiterando il procedimento, si ottiene il metodo di Newton:
+<3.29>
 $
-  uu(x)^(i+1) = uu(x)^i - (F'(uu(x)^i))^(-1) F(uu(x)^i), space i=0,1,... quad quad (7)
+  uu(x)^(i+1) = uu(x)^i - (F'(uu(x)^i))^(-1) F(uu(x)^i), space i=0,1,... quad quad (3.29)
 $
 
 #example()[
@@ -2002,7 +2019,7 @@ $
     )
   $
 ]
-Invece che calcolare l'inversa della matrice Jacobiana (operazione costosissima), l'iterazione (7) può essere equivalentemente formulata come:
+Invece che calcolare l'inversa della matrice Jacobiana (operazione costosissima), l'iterazione #link(<3.29>, [(3.29)]) può essere equivalentemente formulata come:
 $
        uu(x)^(i+1) -uu(x)^i & = - (F'(uu(x)^i))^(-1) F(uu(x)^i) \
               Delta uu(x)^i & = - (F'(uu(x)^i))^(-1) F(uu(x)^i) \
@@ -2011,7 +2028,7 @@ $
   F'(uu(x)^i) Delta uu(x)^i & = -F(uu(x)^i) ==> uu(x)^(i+1)=uu(x)^i+Delta uu(x)^i
 $
 Il costo computazionale per iterazione, consisterà in:
-+ Calcolo di $F(uu(x)^i)$ e $F'(uu(x)^i)$, la seconda è più costosta.
++ Calcolo di $F(uu(x)^i)$ e $F'(uu(x)^i)$, la seconda è più costosa.
 + Fattorizzazione di $F'(uu(x)^i)$ ($approx 2/3 n^3$ `flops`).
 + Risoluzione del sistema lineare ($approx 2 n^2$ `flops`).
 + Aggiornamento approssimazione ($n$ `flops`).

@@ -3,12 +3,12 @@ function x = metodo_corde(f, f1, x0, tol, maxit)
     % Metodo delle corde per gli zeri di una funzione
     % INPUT:
     %   f, f1 - function che implementano la funzione e la sua derivata prima;
-    %   x0 - punto iniziale;
-    %   tol - tolleranza di arresto (default = 1e-12);
+    %   x0    - punto iniziale;
+    %   tol   - tolleranza di arresto (default = 1e-12);
     %   maxit - numero massimo di iterazioni (default = 1000);
     % OUTPUT:
-    %   x - approssimazione della radice;
-    %                                                           Rel. 29.12.2025
+    %   x     - approssimazione della radice;
+    %                                                  Rel. 29.12.2025
 
     if nargin < 3, error('parametri insufficienti'), end
     if nargin < 5, maxit = 1000; end
@@ -30,7 +30,5 @@ function x = metodo_corde(f, f1, x0, tol, maxit)
         end
         x0=x;
     end
-    if flag
-        warning('Accuratezza non raggiunta');
-    end
+    if flag, warning('Accuratezza non raggiunta'), end
     return
