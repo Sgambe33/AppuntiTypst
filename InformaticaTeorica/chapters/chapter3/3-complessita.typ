@@ -1080,82 +1080,525 @@ Le clausole di $p$ possono essere:
 ]
 
 #proof()[
-  Descriviamo una riduzione da 3-SAT a HAM.\
+  Descriviamo una riduzione da 3-SAT a HAM. Sia $p$ un polinomio booleano in 3-CNF:
   $
-    & p = u_1 and u_2 and dots and u_m, quad u_i = (u_(i,1) or u_(i,2) or u_(i,3)) \
-    & V = {x_1, dots, x_n}
+    p = u_1 and u_2 and dots and u_m, quad u_i = (u_(i,1) or u_(i,2) or u_(i,3))
   $
-  Si introducono quattro categorie di nodi: _t_ (true), _f_ (false), $e_i$ (entrata), $o_i$ (output)\
-  Per ogni variabile $x_i$ si crea un grafo formato nel seguente modo:
+  Con $V = {x_1, dots, x_n}$ variabili di $p$, $x_i$ variabile di $p$. Si introducono quattro categorie di nodi: _t_ (true), _f_ (false), $e_i$ (entrata), $o_i$ (output). Per ogni variabile $x_i$ si crea un grafo formato nel seguente modo:
   #grid(
     columns: (0.5fr, 0.5fr),
     rows: (4em, 1em, 2em, 4em),
 
     align: (center, left),
 
-    grid.cell(rowspan: 6, image("/assets/image-8.png")),
-    grid.cell(rowspan: 3, [
+    grid.cell(rowspan: 6, cetz.canvas(length: 25pt, {
+      import cetz.draw: *
+      let dx = 2.5 // Distanza dal centro (asse x)
+      let y-e = 3.5 // Altezza nodo iniziale e_i
+      let y0 = 2 // Altezza riga 0
+      let y1 = 0 // Altezza riga 1
+      let y-dots = -1.25 // Altezza punti di sospensione
+      let yr = -2.5 // Altezza riga finale r_i
+      let y-o = -4 // Altezza nodo finale o_i
+
+      // Stile globale delle linee e delle frecce
+      set-style(mark: (fill: black, scale: 0.5))
+      content((0, y-e), text(size: 1.4em, $e_i$), name: "e")
+
+      content((-dx, y0), text(size: 1.4em, $t_(i,0)$), name: "t0")
+      content((dx, y0), text(size: 1.4em, $f_(i,0)$), name: "f0")
+
+      content((-dx, y1), text(size: 1.4em, $t_(i,1)$), name: "t1")
+      content((dx, y1), text(size: 1.4em, $f_(i,1)$), name: "f1")
+
+      content((-dx, y-dots), text(size: 1.5em, $dots.v$))
+      content((dx, y-dots), text(size: 1.5em, $dots.v$))
+
+      content((-dx, yr), text(size: 1.4em, $t_(i,r_i)$), name: "tr")
+      content((dx, yr), text(size: 1.4em, $f_(i,r_i)$), name: "fr")
+
+      content((0, y-o), text(size: 1.4em, $o_i$), name: "o")
+
+      // Da e_i alla prima riga
+      line("e", "t0", mark: (end: ">"))
+      line("e", "f0", mark: (end: ">"))
+
+      // Funzione d'appoggio per le doppie frecce orizzontali
+      // 'mw' è il margine laterale per evitare di sovrapporsi al testo
+      let double-h-arrow(y, mw) = {
+        let dy = 0.12 // Distanza dal centro
+        // Freccia superiore (Verso destra)
+        line((-dx + mw, y + dy), (dx - mw, y + dy), mark: (end: ">"))
+        // Freccia inferiore (Verso sinistra)
+        line((dx - mw, y - dy), (-dx + mw, y - dy), mark: (end: ">"))
+      }
+
+      // Chiamate per le frecce orizzontali
+      double-h-arrow(y0, 0.6)
+      double-h-arrow(y1, 0.6)
+      double-h-arrow(yr, 0.8) // Margine più ampio per via del pedice più lungo
+
+      // Frecce incrociate (Riga 0 -> Riga 1)
+      line("t0", "f1", mark: (end: ">"))
+      line("f0", "t1", mark: (end: ">"))
+
+      // Frecce incrociate in uscita (verso i puntini)
+      line("t1", (dx - 0.9, y1 - 1.1), mark: (end: ">"))
+      line("f1", (-dx + 0.9, y1 - 1.1), mark: (end: ">"))
+
+      // Frecce incrociate in entrata (dai puntini verso l'ultima riga)
+      line((dx - 0.9, yr + 1.1), "tr", mark: (end: ">"))
+      line((-dx + 0.9, yr + 1.1), "fr", mark: (end: ">"))
+
+      // Frecce in uscita dall'ultima riga verso o_i
+      line("tr", "o", mark: (end: ">"))
+      line("fr", "o", mark: (end: ">"))
+    })),
+    grid.cell(rowspan: 2, [
       - Esiste un arco tra un vertice $t_(i,j)$ e un vertice $f_(i, j+1)$ e un arco tra un vertice $f_(i,j)$ e un vertice $t_(i,j+1)$;
     ]),
-    [- Esiste un arco da $t_(i,j)$ a $f_(i,j)$ e viceversa;],
-    [- con $r_i$ = massimo fra le occorrenze di $x_i "e" x_i^'$ in _p_],
+    grid.cell(rowspan: 2, [- Esiste un arco da $t_(i,j)$ a $f_(i,j)$ e viceversa;]),
+    grid.cell(rowspan: 2, [- con $r_i$ = massimo fra le occorrenze di $x_i "e" x_i^'$ in _p_.]),
   )
 
-  I pezzi di grafo così costruiti si connettono aggiungendo un lato da $o_i "a" c_(i+1)$, per ogni i, infine si aggiunge un lato da $o_n "a" e_1$.
-  Essendo che ogni variabile ha 2 camini hamiltoniani da $e_j "a" o_j$:.
+  I pezzi di grafo così costruiti si connettono aggiungendo un lato da $o_i "a" c_(i+1)$, per ogni $i$, infine si aggiunge un lato da $o_n "a" e_1$.
+  Essendo che ogni variabile ha 2 camini hamiltoniani da $e_j "a" o_j$:
   #grid(
     columns: (0.5fr, 0.5fr),
-    rows: 25em,
     align: center,
 
-    [#image("/assets/image-12.png")], [#image("/assets/image-13.png")],
+    [#cetz.canvas(length: 25pt, {
+      import cetz.draw: *
+      let dx = 2.5 // Distanza dal centro (asse x)
+      let y-e = 3.5 // Altezza nodo iniziale e_i
+      let y0 = 2 // Altezza riga 0
+      let y1 = 0 // Altezza riga 1
+      let y-dots = -1.25 // Altezza punti di sospensione
+      let yr = -2.5 // Altezza riga finale r_i
+      let y-o = -4 // Altezza nodo finale o_i
+
+      // Stile globale delle linee e delle frecce
+      set-style(mark: (fill: black, scale: 0.5))
+      content((0, y-e), text(size: 1.4em, $e_i$), name: "e")
+
+      content((-dx, y0), text(size: 1.4em, $t_(i,0)$), name: "t0")
+      content((dx, y0), text(size: 1.4em, $f_(i,0)$), name: "f0")
+
+      content((-dx, y1), text(size: 1.4em, $t_(i,1)$), name: "t1")
+      content((dx, y1), text(size: 1.4em, $f_(i,1)$), name: "f1")
+
+      content((-dx, y-dots), text(size: 1.5em, $dots.v$))
+      content((dx, y-dots), text(size: 1.5em, $dots.v$))
+
+      content((-dx, yr), text(size: 1.4em, $t_(i,r_i)$), name: "tr")
+      content((dx, yr), text(size: 1.4em, $f_(i,r_i)$), name: "fr")
+
+      content((0, y-o), text(size: 1.4em, $o_i$), name: "o")
+
+      // Da e_i alla prima riga
+      line("e", "t0", mark: (end: ">"), stroke: red + 1pt)
+      line("e", "f0", mark: (end: ">"))
+
+      // Funzione d'appoggio per le doppie frecce orizzontali
+      // 'mw' è il margine laterale per evitare di sovrapporsi al testo
+      let double-h-arrow(y, mw) = {
+        let dy = 0.12 // Distanza dal centro
+        // Freccia superiore (Verso destra)
+        line((-dx + mw, y + dy), (dx - mw, y + dy), mark: (end: ">"), stroke: red + 1pt)
+        // Freccia inferiore (Verso sinistra)
+        line((dx - mw, y - dy), (-dx + mw, y - dy), mark: (end: ">"))
+      }
+
+      // Chiamate per le frecce orizzontali
+      double-h-arrow(y0, 0.6)
+      double-h-arrow(y1, 0.6)
+      double-h-arrow(yr, 0.8) // Margine più ampio per via del pedice più lungo
+
+      // Frecce incrociate (Riga 0 -> Riga 1)
+      line("t0", "f1", mark: (end: ">"))
+      line("f0", "t1", mark: (end: ">"), stroke: red + 1pt)
+
+      // Frecce incrociate in uscita (verso i puntini)
+      line("t1", (dx - 0.9, y1 - 1.1), mark: (end: ">"))
+      line("f1", (-dx + 0.9, y1 - 1.1), mark: (end: ">"), stroke: red + 1pt)
+
+      // Frecce incrociate in entrata (dai puntini verso l'ultima riga)
+      line((dx - 0.9, yr + 1.1), "tr", mark: (end: ">"), stroke: red + 1pt)
+      line((-dx + 0.9, yr + 1.1), "fr", mark: (end: ">"))
+
+      // Frecce in uscita dall'ultima riga verso o_i
+      line("tr", "o", mark: (end: ">"))
+      line("fr", "o", mark: (end: ">"), stroke: red + 1pt)
+    })],
+    [#cetz.canvas(length: 25pt, {
+      import cetz.draw: *
+      let dx = 2.5 // Distanza dal centro (asse x)
+      let y-e = 3.5 // Altezza nodo iniziale e_i
+      let y0 = 2 // Altezza riga 0
+      let y1 = 0 // Altezza riga 1
+      let y-dots = -1.25 // Altezza punti di sospensione
+      let yr = -2.5 // Altezza riga finale r_i
+      let y-o = -4 // Altezza nodo finale o_i
+
+      // Stile globale delle linee e delle frecce
+      set-style(mark: (fill: black, scale: 0.5))
+      content((0, y-e), text(size: 1.4em, $e_i$), name: "e")
+
+      content((-dx, y0), text(size: 1.4em, $t_(i,0)$), name: "t0")
+      content((dx, y0), text(size: 1.4em, $f_(i,0)$), name: "f0")
+
+      content((-dx, y1), text(size: 1.4em, $t_(i,1)$), name: "t1")
+      content((dx, y1), text(size: 1.4em, $f_(i,1)$), name: "f1")
+
+      content((-dx, y-dots), text(size: 1.5em, $dots.v$))
+      content((dx, y-dots), text(size: 1.5em, $dots.v$))
+
+      content((-dx, yr), text(size: 1.4em, $t_(i,r_i)$), name: "tr")
+      content((dx, yr), text(size: 1.4em, $f_(i,r_i)$), name: "fr")
+
+      content((0, y-o), text(size: 1.4em, $o_i$), name: "o")
+
+      // Da e_i alla prima riga
+      line("e", "t0", mark: (end: ">"))
+      line("e", "f0", mark: (end: ">"), stroke: green + 1pt)
+
+      // Funzione d'appoggio per le doppie frecce orizzontali
+      // 'mw' è il margine laterale per evitare di sovrapporsi al testo
+      let double-h-arrow(y, mw) = {
+        let dy = 0.12 // Distanza dal centro
+        // Freccia superiore (Verso destra)
+        line((-dx + mw, y + dy), (dx - mw, y + dy), mark: (end: ">"))
+        // Freccia inferiore (Verso sinistra)
+        line((dx - mw, y - dy), (-dx + mw, y - dy), mark: (end: ">"), stroke: green + 1pt)
+      }
+
+      // Chiamate per le frecce orizzontali
+      double-h-arrow(y0, 0.6)
+      double-h-arrow(y1, 0.6)
+      double-h-arrow(yr, 0.8) // Margine più ampio per via del pedice più lungo
+
+      // Frecce incrociate (Riga 0 -> Riga 1)
+      line("t0", "f1", mark: (end: ">"), stroke: green + 1pt)
+      line("f0", "t1", mark: (end: ">"))
+
+      // Frecce incrociate in uscita (verso i puntini)
+      line("t1", (dx - 0.9, y1 - 1.1), mark: (end: ">"), stroke: green + 1pt)
+      line("f1", (-dx + 0.9, y1 - 1.1), mark: (end: ">"))
+
+      // Frecce incrociate in entrata (dai puntini verso l'ultima riga)
+      line((dx - 0.9, yr + 1.1), "tr", mark: (end: ">"))
+      line((-dx + 0.9, yr + 1.1), "fr", mark: (end: ">"), stroke: green + 1pt)
+
+      // Frecce in uscita dall'ultima riga verso o_i
+      line("tr", "o", mark: (end: ">"), stroke: green + 1pt)
+      line("fr", "o", mark: (end: ">"))
+    })],
   )
+
   Per cui si hanno in totale $2^n$ circuiti hamiltoniani nel grafo rappresentato sotto.
-  #figure(image("/assets/image-10.png"))
+
+  #align(center, cetz.canvas(length: 20pt, {
+    import cetz.draw: *
+
+    set-style(mark: (fill: black, scale: .75))
+
+    let draw-gadget(cx, id, label-e, label-o, label-x) = {
+      let name-e = "e" + id
+      let name-o = "o" + id
+      let name-x = "x" + id
+
+      // Nodi di testo (e_i, x_i, o_i)
+      content((cx - 2, 0), text(size: 1.4em, weight: "bold", label-e), name: name-e)
+      content((cx + 2, 0), text(size: 1.4em, weight: "bold", label-o), name: name-o)
+      content((cx, 0), text(size: 1.4em, weight: "bold", label-x), name: name-x)
+
+      let h = 1.4
+      let w = 1.
+      line(name-e, (cx - w, h), (cx + w, h), name-o)
+      line(name-e, (cx - w, -h), (cx + w, -h), name-o)
+    }
+
+    draw-gadget(0, "1", $e_1$, $o_1$, $x_1$)
+    draw-gadget(6, "2", $e_2$, $o_2$, $x_2$)
+    draw-gadget(14, "n", $e_n$, $o_n$, $x_n$)
+
+    content((10, 0), text(size: 1.4em, weight: "bold", $dots$), name: "dots")
+    line("o1", "e2", mark: (end: ">"))
+    line("o2", "dots", mark: (end: ">"))
+    line("dots", "en", mark: (end: ">"))
+    line("on", (17.5, 0), (17.5, -2.5), (-2, -2.5), "e1", mark: (end: ">"))
+  }))
 
   Si ha quindi $u_j=(u_(j, 1) or u_(j, 2) or u_(j, 3))$, si inseriscono i nodi $i n_(i, j)$ e $o u t_(i, j)$
 
   #grid(
     columns: (0.5fr, 0.5fr),
-    rows: 10em,
     align: (center, center + horizon),
 
-    [#image("/assets/image-15.png")], [Ne serve uno per ogni clausola $u_j$],
+    [#align(center, cetz.canvas(length: 25pt, {
+      import cetz.draw: *
+      set-style(mark: (fill: black, scale: 1))
+      set-style(content: (padding: 0.2))
+      set-style(line: (padding: 0.2))
+      let dx = 3 // Distanza orizzontale tra i nodi
+      let y-in = 2.5 // Altezza della riga "in"
+      let y-out = 0 // Altezza della riga "out"
+
+      // Riga superiore (in)
+      content((0, y-in), text(size: 1.4em, $"in"_(j,1)$), name: "in1")
+      content((dx, y-in), text(size: 1.4em, $"in"_(j,2)$), name: "in2")
+      content((2 * dx, y-in), text(size: 1.4em, $"in"_(j,3)$), name: "in3")
+
+      // Riga inferiore (out)
+      content((0, y-out), text(size: 1.4em, $"out"_(j,1)$), name: "out1")
+      content((dx, y-out), text(size: 1.4em, $"out"_(j,2)$), name: "out2")
+      content((2 * dx, y-out), text(size: 1.4em, $"out"_(j,3)$), name: "out3")
+
+      // Frecce verticali in ingresso dall'alto
+      line((0, y-in + 1.5), "in1", mark: (end: ">"))
+      line((dx, y-in + 1.5), "in2", mark: (end: ">"))
+      line((2 * dx, y-in + 1.5), "in3", mark: (end: ">"))
+
+      // Frecce verticali in uscita verso il basso
+      line("out1", (0, y-out - 1.5), mark: (end: ">"))
+      line("out2", (dx, y-out - 1.5), mark: (end: ">"))
+      line("out3", (2 * dx, y-out - 1.5), mark: (end: ">"))
+
+      // Frecce verticali interne (da "in" a "out")
+      line("in1", "out1", mark: (end: ">"))
+      line("in2", "out2", mark: (end: ">"))
+      line("in3", "out3", mark: (end: ">"))
+
+      // Frecce orizzontali sulla riga superiore (verso destra)
+      line("in1", "in2", mark: (end: ">"))
+      line("in2", "in3", mark: (end: ">"))
+
+      // Frecce orizzontali sulla riga inferiore (verso sinistra)
+      line("out3", "out2", mark: (end: ">"))
+      line("out2", "out1", mark: (end: ">"))
+
+      let cut = 1
+
+      // Freccia curva superiore (da in3 a in1, passa "sotto" i nodi)
+      bezier("in3", "in1", (dx, y-in - 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
+
+      // Freccia curva inferiore (da out1 a out3, passa "sopra" i nodi)
+      bezier("out1", "out3", (dx, y-out + 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
+    }))],
+    //TODO: aggiustare sta merda
+    [Ne serve uno per ogni clausola $u_j$],
   )
-
-  Esempio:
-  $
-    p = (x_1 or x_2 or x_3^') and (x_1^' or x_2 or x_4^') and (x_1 or x_2^' or x_4) and (x_1^' or x_3 or x_4)
-  $
-  Devo sapere quanti nodi vanno scritti, sapere quindi quanto vale $r_i$ (massimo delle occorrenze di $x_i "e" x_i^' "in" p$). Esempio per $x_1$:
-
-  $x_1$ appare 2 volte, $x_1^'$ appare 2 volte, $==> r_i = 2 ==>$ sono 3 nodi $0, 1, 2$.
-  #figure(image("/assets/image-17.png", width: 75%))
+  #example()[
+    Consideriamo:
+    $
+      p = (x_1 or x_2 or x_3^') and (x_1^' or x_2 or x_4^') and (x_1 or x_2^' or x_4) and (x_1^' or x_3 or x_4)
+    $
+    Devo sapere quanti nodi vanno scritti, sapere quindi quanto vale $r_i$ (massimo delle occorrenze di $x_i "e" x_i^' "in" p$). Esempio per $x_1$: $x_1$ appare 2 volte, $x_1^'$ appare 2 volte $==> r_i = 2 ==>$ sono 3 nodi $0, 1, 2$.
+    #figure(image("/assets/image-17.png", width: 75%))
+  ]
 ]
 
-#pagebreak()
+#align(center, cetz.canvas(length: 20pt, {
+  import cetz.draw: *
+
+  // Stile globale
+  set-style(content: (padding: 0.2)) // Allontana le frecce dai testi
+  set-style(mark: (fill: black, scale: .4))
+
+  // ==========================================
+  // 1. Macro per disegnare i gadget "Diamante"
+  // ==========================================
+
+  let draw-diamond(cx, cy-e, id, rows) = {
+    let dx = 2.5 // Larghezza del diamante
+
+    // Nodo iniziale e_i
+    let name-e = "e" + id
+    content((cx, cy-e), text(size: 1.4em, weight: "bold", $e_#id$), name: name-e)
+
+    // Generazione delle righe (t e f)
+    for k in range(rows + 1) {
+      let y = cy-e - 1.5 - k * 1.5
+      content((cx - dx, y), text(size: 1.3em, $t_{#id,#k}$), name: "t" + id + "_" + str(k))
+      content((cx + dx, y), text(size: 1.3em, $f_{#id,#k}$), name: "f" + id + "_" + str(k))
+    }
+
+    // Nodo finale o_i
+    let name-o = "o" + id
+    let y-end = cy-e - 1.5 - (rows + 1) * 1.5
+    content((cx, y-end), text(size: 1.4em, weight: "bold", $o_#id$), name: name-o)
+
+    // --- Disegno degli spigoli ---
+    line(name-e, "t" + id + "_0", mark: (end: ">"))
+    line(name-e, "f" + id + "_0", mark: (end: ">"))
+
+    let m = 0.6 // Margine per le doppie frecce orizzontali
+    for k in range(rows + 1) {
+      let y = cy-e - 1.5 - k * 1.5
+      // Frecce orizzontali
+      line((cx - dx + m, y + 0.1), (cx + dx - m, y + 0.1), mark: (end: ">"))
+      line((cx + dx - m, y - 0.1), (cx - dx + m, y - 0.1), mark: (end: ">"))
+
+      // Frecce incrociate
+      if k < rows {
+        line("t" + id + "_" + str(k), "f" + id + "_" + str(k + 1), mark: (end: ">"))
+        line("f" + id + "_" + str(k), "t" + id + "_" + str(k + 1), mark: (end: ">"))
+      }
+    }
+
+    line("t" + id + "_" + str(rows), name-o, mark: (end: ">"))
+    line("f" + id + "_" + str(rows), name-o, mark: (end: ">"))
+  }
+
+  // ==========================================
+  // 2. Posizionamento dei 4 Gadget Variabile
+  // ==========================================
+
+  // (Centro X, Altezza nodo e, ID, numero di righe)
+  draw-diamond(0, 15, "1", 2) // x1 (Top-Left)
+  draw-diamond(0, 6, "2", 2) // x2 (Bottom-Left)
+  draw-diamond(16, 15, "3", 1) // x3 (Top-Right)
+  draw-diamond(16, 6, "4", 2) // x4 (Bottom-Right)
+
+  // // ==========================================
+  // // 3. Disegno del Gadget Clausola (J=1)
+  // // ==========================================
+
+  let y-in = 8.5
+  let y-out = 6.5
+
+  content((5.5, y-in), text(size: 1.4em, weight: "bold", $"in"_{j,1}$), name: "in_1")
+  content((8.0, y-in), text(size: 1.4em, weight: "bold", $"in"_{j,2}$), name: "in_2")
+  content((10.5, y-in), text(size: 1.4em, weight: "bold", $"in"_{j,3}$), name: "in_3")
+
+  content((5.5, y-out), text(size: 1.4em, weight: "bold", $"out"_{j,1}$), name: "out_1")
+  content((8.0, y-out), text(size: 1.4em, weight: "bold", $"out"_{j,2}$), name: "out_2")
+  content((10.5, y-out), text(size: 1.4em, weight: "bold", $"out"_{j,3}$), name: "out_3")
+
+  // // Frecce verticali Clausola
+  line("in_1", "out_1", mark: (end: ">"))
+  line("in_2", "out_2", mark: (end: ">"))
+  line("in_3", "out_3", mark: (end: ">"))
+
+  // // Frecce orizzontali Clausola (con margine per non toccare il testo)
+  let mc = 0.8
+  line((5.5 + mc, y-in), (8.0 - mc, y-in), mark: (end: ">"))
+  line((8.0 + mc, y-in), (10.5 - mc, y-in), mark: (end: ">"))
+
+  line((10.5 - mc, y-out), (8.0 + mc, y-out), mark: (end: ">"))
+  line((8.0 - mc, y-out), (5.5 + mc, y-out), mark: (end: ">"))
+
+  // // Frecce Curve Clausola
+  let cut = 0.5
+  bezier("in_3", "in_1", (8.0, y-in - 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
+  bezier("out_1", "out_3", (8.0, y-out + 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
+
+
+  // // ==========================================
+  // // 4. Collegamenti Main Spine (Lo scheletro)
+  // // ==========================================
+
+  line("o1", "e2", mark: (end: ">"))
+  line("o3", "e4", mark: (end: ">"))
+
+  // o2 -> e3 (passa in mezzo, x = 3.8)
+  line("o2", (0, -1.5), (3.8, -1.5), (3.8, 16.0), (16, 16.0), "e3", mark: (end: ">"))
+
+  // o4 -> e1 (back edge grande a sinistra, x = -7.0)
+  line("o4", (16, -4.0), (-7.0, -4.0), (-7.0, 17.0), (0, 17.0), "e1", mark: (end: ">"))
+
+
+  // // ==========================================
+  // // 5. Routing Variabili <-> Clausola
+  // // ==========================================
+
+  // x1 <-> Clausola
+  line("f1_0", (3.2, 13.5), (3.2, 9.5), (5.5, 9.5), "in_1", mark: (end: ">"))
+  line("out_1", (5.5, 5.5), (4.8, 5.5), (4.8, 12.0), "f1_1", mark: (end: ">"))
+
+  // // x2 <-> Clausola
+  // line("t2_1", (-4.5, 3.0), (-4.5, 10.0), ("in_2.x", 10.0), "in_2", mark: (end: ">"))
+  // line("out_2", ("out_2.x", 5.0), (-5.5, 5.0), (-5.5, 1.5), "t2_2", mark: (end: ">"))
+
+  // // x3 <-> Clausola
+  // line("f3_0", (20.0, 13.5), (20.0, 10.5), ("in_3.x", 10.5), "in_3", mark: (end: ">"))
+  // line("out_3", ("out_3.x", 5.5), (12.0, 5.5), (12.0, 12.0), "f3_1", mark: (end: ">"))
+
+
+  // // ==========================================
+  // // 6. Testi e Annotazioni a mano
+  // // ==========================================
+
+  // content((-1.5, 16), text(size: 1.2em, style: "italic")[Scegli un percorso in\nbase ai valori di $x_i$])
+
+  // content((-2.5, 15), text(size: 1.5em, weight: "bold")[$x_1: 0$])
+  // content((-2.5, 6), text(size: 1.5em, weight: "bold")[$x_2: 0$])
+  // content((13.5, 15), text(size: 1.5em, weight: "bold")[$x_3: 1$])
+  // content((13.5, 6), text(size: 1.5em, weight: "bold")[$x_4:$])
+
+  // content((11.5, 7.5), text(size: 1.4em, weight: "bold")[$J=1$])
+  // content((17.5, 0), text(size: 1.4em, weight: "bold")[$=m$])
+}))
 
 == Problema 2-SAT
 #problem()[
-  Dato un polinomio booleano _p_ in 2-CNF, determinare se _p_ + soddisfacibile
+  Dato un polinomio booleano $p$ in CNF in cui ogni clausola contiene esattamente 2 letterali, esiste un assegnamento di valori delle variabili che soddisfa $p$?
 ]
 
 #proposition()[
   Il problema 2-SAT $in$ P.
 ]
+Vediamo come costruire il grafo associato a $p$. Sia $p = u_1 and u_2 and dots and u_s " con " u_i = u_(i, 1) or u_(i, 2)$ un polinomio booleano in 2-CNF. Costruiamo un grafo orientato $G(p)$ nel seguente modo:
+- Vertici: $forall x$ variabile che compare in _p_, si scrivono i nodi $x "e" x'$ (2 vertici)
+- Archi: $forall "clausola" u_i$, 2 archi: $cases(u_(i, 1)^' --> u_(i, 2), u_(i, 2)^' --> u_(i, 1))$
 
-#proof()[
-  Sia $p = u_1 and u_2 and dots and u_s " con " u_i = u_(i, 1) or u_(i, 2)$
+#example()[
+  $
+    p = (x'_1 or x_2) or (x_1 or x_3) and (x_2 or x'_3) "in" {x_1,x_2,x_3}
+  $
+  #align(center, cetz.canvas({
+    import cetz.draw: *
+    set-style(mark: (fill: black, scale: 1))
+    let r = 0.65
+    let draw-node(pos, name, label) = {
+      circle(pos, radius: r, name: name + "-c", fill: white, stroke: 1pt)
+      content(pos, text(size: 1.4em, weight: "bold", label), name: name)
+    }
+    draw-node((0, 4), "x1", $x_1$)
+    draw-node((0, 2), "x2", $x_2$)
+    draw-node((0, 0), "x3", $x_3$)
 
-  Costruiamo un grafo orientato $G(p)$ nel seguente modo:
-  - Vertici: $forall x$ variabile che compare in _p_, si scrivono i nodi $x "e" x'$ (2 vertici)
-  - Archi: $forall "clausola" u_i$, 2 archi: $cases(u_(i, 1)^' --> u_(i, 2), u_(i, 2)^' --> u_(i, 1))$
-
-  #image("/assets/image-7.png") // no
+    draw-node((4.5, 4), "x1p", $x'_1$)
+    draw-node((4.5, 2), "x2p", $x'_2$)
+    draw-node((4.5, 0), "x3p", $x'_3$)
+    let conn(from, to) = {
+      line(from + "-c", to + "-c", mark: (end: ">"))
+    }
+    conn("x1", "x2")
+    conn("x3", "x2")
+    conn("x2p", "x1p")
+    conn("x2p", "x3p")
+    conn("x1p", "x3")
+    conn("x3p", "x1")
+    content((7, 3.5), anchor: "west", text(size: 1.1em)[
+      1. $(x'_1)' -> (x_2) ==> x_1 -> x_2$\
+      2. $(x_1)' -> (x_3) ==> x'_1 -> x_3$\
+      3. $(x_2)' -> (x'_3) ==> x'_2 -> x'_3$
+    ])
+    content((7, 0.5), anchor: "west", text(size: 1.1em)[
+      1'. $(x_2)' -> (x'_1) ==> x'_2 -> x'_1$\
+      2'. $(x_3)' -> (x_1) ==> x'_3 -> x_1$\
+      3'. $(x'_3)' -> (x_2) ==> x_3 -> x_2$
+    ])
+  }))
 ]
 
-#proposition()[
-  _p_ è soddisfacibile $<==> exists.not x "variabile di" p "t.c. in" G(p) space x arrow.squiggly.long x' " e " x' arrow.squiggly.long x$
+#observation()[
+  Siano $alpha$ e $beta$ vertici di $G(p)$. Allora, $alpha arrow.squiggly.long beta$ significa che c'è un cammino diretto da $alpha$ a $beta$.
+]
+
+#lemma()[
+  _p_ è soddisfacibile $<==> exists.not x "variabile di" p "ale che in" G(p) space x arrow.squiggly.long x' " e " x' arrow.squiggly.long x$
 ]
 
 #proof()[\
@@ -1183,31 +1626,28 @@ Le clausole di $p$ possono essere:
   - Se sì, allora _p_ non è soddisfacibile;
   - Altrimenti _p_ è soddisfacibile
 
+Tale algoritmo ha complessità in tempo polinomiale, in quanto consiste essenzialmente nell'esecuzione di un algoritmo di ricerca in ampiezza (opportunamente modificato).
+
 == Linguaggi NP-intermedi
-#grid(
-  columns: (0.75fr, 0.25fr),
 
-  [
-    Se $"P" eq.not "NP":$
-    #definition()[
-      I linguaggi NP-intermedi (o NP-I) sono linguaggi di NP che non stanno nè in P nè in NP-completi (o NP-C).
+Se $"P" eq.not "NP":$
+#definition()[
+  I linguaggi NP-intermedi (o NP-I) sono linguaggi di NP che non stanno né in P né in NP-completi (o NP-C).
 
-      $"NP-I" = "NP" \\ ("P" union "NP-C")$
-    ]
-    #theorem("Ladner")[
-      Se $"P" eq.not "NP, allora NP-I" eq.not emptyset$
-    ]
-    P è chiuso rispetto alla complementazione.
-    #problem("Aperto")[
-      NP è chiusa per complementazione?
-      $ "co-NP = NP?" $
-    ]
-    #definition()[
-      co-NP $= {L "linguaggi" | L' in "NP"}$
-    ]
-  ],
-  [#figure(image("/assets/image-2.png", height: 50%))],
-)
+  $"NP-I" = "NP" \\ ("P" union "NP-C")$
+]
+#theorem("Ladner")[
+  Se $"P" eq.not "NP, allora NP-I" eq.not emptyset$
+]
+P è chiuso rispetto alla complementazione.
+#problem("Aperto")[
+  NP è chiusa per complementazione?
+  $ "co-NP = NP?" $
+]
+#definition()[
+  co-NP $= {L "linguaggi" | L' in "NP"}$
+]
+
 
 #example()[
   #underline("UNSAT"): Dato un polinomio booleano _p_, determinare se _p_ *non*
@@ -1218,7 +1658,7 @@ Le clausole di $p$ possono essere:
 ]
 
 #proposition()[
-  NP $eq.not$ co-NP $==>$ P $eq.not$ NP
+  Se fosse dimostrato NP $eq.not$ co-NP $==>$ P $eq.not$ NP
 ]
 #proof()[\
   $
@@ -1227,9 +1667,7 @@ Le clausole di $p$ possono essere:
 ]
 
 #proposition()[
-  $
-    "co-NP" = "NP" <== cases(L in "co-NP", L in "NPC")
-  $
+  Supponiamo che esista un linguaggio $L$ tale che $L in$ NP-C e $L in$ co-NP $==>$ NP $=$ co-NP.
 ]
 #proof()[
   #rect($"co-NP" subset.eq "NP"$)
@@ -1247,15 +1685,14 @@ Le clausole di $p$ possono essere:
   $Q in "NP" ==> Q' in "co-NP" ==> Q' in "NP" ==> Q in "co-NP"$
 ]
 
-== 06/05/2026
-== Numeri primi
+== Test di primalità
 #proposition()[
   _n_ composto $==> exists d | n, " con " d in [2, sqrt(n)]$
 ]
 
 #proof()[
   $n = m_1 dot m_2$\
-  Per assurdo: $m_1, m_2 > sqrt(n) => n = m_1 dot m_2 > n,$ (assurdo)
+  Se per assurdo $m_1, m_2 > sqrt(n)$ allora $n = m_1 dot m_2 > n$ ma $m_1 dot m_2 = n$ (assurdo)
 ]
 
 === Algoritmo deterministico
@@ -1277,25 +1714,27 @@ $
 $
 
 === Piccolo teorema di Fermat
-+ $ a^p equiv a(p) <== cases(delim: "[", p "primo", a in NN) $
-+ $ a^(p-1) equiv 1(p) <== cases(delim: "[", p "primo", a in NN, (a, p) = 1) $
++ $ a^p equiv a quad (p) <== cases(delim: "[", p "primo", a in NN) $
++ $ a^(p-1) equiv 1 quad (p) <== cases(delim: "[", p "primo", a in NN, (a, p) = 1) $
 
 === Algoritmo non deterministico #underline("non corretto") polinomiale
 
 Dato $n in NN$:
 - genero non deterministicamente $a in NN "t.c. "(a, n) = 1$
-- se $a^(n-1) equiv (n)$, allora $n$ primo
+- se $a^(n-1) equiv 1 quad (n)$, allora $n$ primo
 - altrimenti, $n$ composto
 
-Complessità: esiste un algoritmo per calcolare le potenze modulari $a^n$ con complessità:
+Questo algoritmo applica il teorema di Fermat al contrario (ovviamente non vale) e pertanto non è corretto.
+
+Esiste un algoritmo per calcolare le potenze modulari $a^n$ con complessità:
 $ Omicron(log n^2) = Omicron(l^2) $
 
 #theorem("Pratt, 1975")[
   $n in NN$.\
-  Se $exists a in NN "t.c."$:
+  Se $exists a in NN$ tale che:
   - $(a, n) = 1$
-  - $a^(n - 1) equiv 1 (n)$
-  - $forall q | n - 1, q "primo", a^((n-1)/q) equiv.not 1 (n)$
+  - $a^(n - 1) equiv 1 quad (n)$
+  - $forall q | n - 1, space q "primo", a^((n-1)/q) equiv.not 1 quad (n)$
   Allora $n$ è primo
 ]
 #observation()[
@@ -1304,15 +1743,16 @@ $ Omicron(log n^2) = Omicron(l^2) $
   $
     n = p_1^(alpha_1) dot p_2^(alpha_2) dot dots dot p_r^(alpha_r)
   $
-  caso peggiore $alpha_1 = alpha_2 = dots = alpha_3 = 1$:
+  Il caso peggiore è dato da  $alpha_1 = alpha_2 = dots = alpha_r = 1$:
   $
     n = p_1 dot p_2 dot dots dot p_r > 2^r
   $
+  Il numero dion congruenze da controllare è quindi inferiore.
 ]
-Testare la condizione del piccolo teorema di Fermat per un certo numero di $a$.
+Testare la condizione del piccolo teorema di Fermat per un certo numero di $a$. ?
 
 #definition()[
-  $n in NN$ si dice *numero di Carmichael* quando $forall a in NN, (a, n) == 1$, vale $a^(n-1) equiv 1 (n)$ e $n$ non è primo.
+  $n in NN$ si dice *numero di Carmichael* quando $forall a in NN, (a, n) = 1$, vale $a^(n-1) equiv 1 quad (n)$ e $n$ non è primo.
 ]
 
 #example()[
@@ -1320,22 +1760,24 @@ Testare la condizione del piccolo teorema di Fermat per un certo numero di $a$.
 ]
 
 #theorem("Alford, Granville, Pomerance")[
-  Esistono infiniti numeri di carmichael
+  Esistono infiniti numeri di Carmichael.
 ]
 
-#underline("Idea"): Modifica del piccolo teorema di Ferma
+#underline("Idea"): modifichiamo il piccolo teorema di Fermat.
 #theorem("Agrawal")[
-  $2 <= n in NN, a in NN$\
-  $(a, n) = 1 quad quad n "primo" <==> (x + a)^n equiv x^n + a (n)$
+  Sia $n in NN, a in NN$ con $n>=2$ e $(a, n) = 1$:
+  $
+    n "primo" <==> (x + a)^n equiv x^n + a quad (n)
+  $
 ]
 
 #proof()[\
-  $==> )$ n primo (congruenze tutte modulo n):
+  $==> )$ $n$ primo (congruenze tutte modulo $n$):
   $
-    (x + a)^n = sum_(k=0)^n binom(n, k)a^(n - k)x^k equiv x^n + a^n equiv x^n + a space (n)\
+    (x + a)^n = sum_(k=0)^n binom(n, k)a^(n - k)x^k equiv x^n + a^n equiv x^n + a quad (n)\
     binom(n, k) = (n!)/(k!(n - k)!) = (n dot (n - 1) dot dots dot (n - k + 1))/(k!) quad quad 0 < k < n --> n bar binom(n, k)
   $
-  $<== )$ n composto. Facciamo vedere che $exists k "con" 0 < k <= n$,
+  $<== )$ $n$ composto. Facciamo vedere che $exists k "con" 0 < k <= n$,
   $
     n cancel(inverted: #true, bar) binom(n, k)
   $
@@ -1349,21 +1791,16 @@ Testare la condizione del piccolo teorema di Fermat per un certo numero di $a$.
   $
 ]
 
-Le congruenze da testare sono circa "n = 2^l"\
-#underline("IDEA"): dividere i polinomi per $x^r - 1$, per opportuno r
-#underline("Agrawal, Kayac, Saxena (2002)")
-- Se _n_ è composto, e si sceglie un _r_ "giusto", allora è sufficiente testare la seguente congruenza per "pochi" _a_:
+Le congruenze da testare sono circa $n = 2^l$.\
+#underline("IDEA"): dividere i polinomi per $x^r - 1$, per opportuno $r$. #underline("Agrawal, Kayac, Saxena (2002)") hanno dimostrato che:
+- Se _n_ è composto e si sceglie un _r_ "giusto", allora è sufficiente testare la seguente congruenza per "pochi" _a_:
 $
   (x+a)^n equiv x^n + a quad (n, x^r - 1)
 $
-e ne trovo uno per cui non vale
+e ne trovo uno per cui non vale.
 
 // SONO ESERCIZI SVOLTI A LEZIONE
-//#example(multiple: true)[
-
-//]
-
-== Lezione 07-05-2026
+// Volendo vedi appunti sgambe
 
 == Classi di complessità
 
@@ -1371,25 +1808,26 @@ e ne trovo uno per cui non vale
 
 Si definiscono come:
 $
-  "Exp" = {L | exists M "MdT deterministica che accetta" L "t.c." t_C_M (n) = Omicron(2^n^k), exists k >= 1}
+  "Exp" = {L | exists M "MdT deterministica che accetta" L "t.c." t_C_M (n) = Omicron(2^n^k) "per qualche" k >= 1}
 $
 
-#observation()[
-  $L in "Exp" <==> exists M "MdT deterministica che accetta" L "t.c." Omicron(c^p(n)), exists c > 1, exists p "polinomio di grado" >=1", sennò sarebbe costante"$
-
+#observation(multiple: true)[
+  - $L in "Exp" <==> exists M$ MdT deterministica che accetta $L$ t.c. $t_(C_M)(n) = Omicron(c^(p(n)))$, per opportuni $c > 1$ e $p(n)$ polinomio di grado $>= 1$ (sennò sarebbe costante).
+  - $"P" subset.eq "Exp"$
 ]
-- $"P" subset.eq "Exp"$
 
 #proposition()[
   $"NP" subset.eq "Exp"$
 ]
 #proof()[
-  Si basa sulla costruzione di una MdT deterministica equivalente ad una non deterministica.
+  $L in "NP"$, $M$ MdT non deterministica che accetta $L$ t.c. $t_(C_M)(n) = O(n^k)$ (è polinomiale). Sia $delta$ il grado di non determinismo di $M$ (ovvero il massimo numero di transizioni associate a una coppia stato-simbolo letto). Posso costruire una MdT $N$ deterministica che accetta $L$ eseguendo tutte le possibili computazioni di $M$ su una stringa $w$.
+
+  Codifica delle computazioni di $M$ su $w$ di lunghezza $n$:
   $
-    L in "NP" ==> exists M "MdT non deterministica " & "polinomial" && "e che accetta" L "t.c." t_C_M (n)=p(n) \
-         "grado di non determinismo di M" <-- S^p(n) & dot p(n) --> && "complessità di una MdT" \
-                                                     &              && "deterministica equivalente a M"
+    (m_1, m_2, dots, m_(n^k)) quad "dove" quad m_i in {1, dots, delta}
   $
+
+  Il numero di transizioni di una singola computazione è $O(n^k)$, mentre il numero delle possibili computazioni è $delta^(n^k) => t_(C_N)(n) = O(n^k dot delta^(n^k))$ per cui $L in "Exp"$.
 ]
 
 #problem("Aperto")[
@@ -1465,7 +1903,7 @@ $
 ]
 
 #proposition()[
-  Se si dimostra ch e Exp $eq.not$ NExp, allora P $eq.not$ NP
+  Se si dimostra che Exp $eq.not$ NExp, allora P $eq.not$ NP
 ]
 
 #proof()[
@@ -1493,15 +1931,15 @@ $
 == Complessità in spazio di M
 
 #definition()[
-  Sia M una MdT a k+1 nastri:
+  Sia M una MdT a $k+1$ nastri:
   - nastro 1 per l'input (mai modificato);
-  - k nastri di lavoro.
+  - $k$ nastri di lavoro.
 
   La *complessità in spazio di M* è una funzione:
   $
     s_C_M: NN --> NN
   $
-  in cui, $s_C_M (n)$, è il numero di celle sui nastri di lavoro a cui le testine hanno accesso durante una compuazione di M su una stringa di lunghezza n, nel caso peggiore.
+  in cui, $s_C_M (n)$, è il numero di celle sui nastri di lavoro a cui le testine hanno accesso durante una computazione di M su una stringa di lunghezza $n$, nel caso peggiore.
 ]
 
 #observation(multiple: true)[
@@ -1511,13 +1949,7 @@ $
 ]
 
 #example()[
-  // TODO: aggiungere esempio fatto a lezione
-]
-
-== Lezione 11-05-2026
-
-#example()[
-  L linguaggio delle palindrome binarie su ${a,b}$. Descriviamo il comportamento di una MdT M che accetta tale linguaggio.
+  Sial $L$ linguaggio delle palindrome binarie su ${a,b}$. Descriviamo il comportamento di una MdT M che accetta tale linguaggio.
 
   All'inizio scrivo 1 sul nastro 3, il nastro 2 è vuoto, sul nastro 2 c'è l'input le testine sono a inizio nastro.
 
@@ -1543,7 +1975,7 @@ $
 ]
 
 #proposition()[
-  M MdT a 2 nastri:
+  Se M MdT a 2 nastri, allora:
   $
     t_C_M (n) = f(n) ==> s_C_M (n) <= f(n) + 1
   $
@@ -1553,7 +1985,7 @@ $
 ]
 
 #proposition()[
-  M MdT a 2 nastri, $|Q| = m, |Sigma| = t$ (cardinalità di insieme degli stati e alfabeto):
+  Se M MdT a 2 nastri, $|Q| = m, |Sigma| = t$ (cardinalità di insieme degli stati e alfabeto):
   $
     s_C_M (n) = f(n) ==> t_C_M (n) <= m(n+2)f(n)t^f(n)
   $
@@ -1566,7 +1998,7 @@ $
   Dove:
   - m è il numero di possibili stati;
   - $n+2$ è il numero di possibili posizione della testina sul nastro 1, su un simbolo della stringa, sulla prima cella vuota o sull'ultima;
-  - $f(n)$ è il nunmero di possibili posizioni della testina sul nastro 2;
+  - $f(n)$ è il numero di possibili posizioni della testina sul nastro 2;
   - $t^f(n)$ è il numero di possibili simboli da scrivere nelle $f(n)$ celle lette sul nastro 2;
 
   Si conclude che:
@@ -1584,16 +2016,6 @@ $
   $
 ]
 
-#observation(multiple: true)[
-  + $"P" subset.eq "PSapce"$\
-    $"P" limits(=)^? "PSpace"$
-  + $"PSpace" subset.eq "Exp"$
-    $"PSpace" limits(=)^? "Exp"$
-  + $"NP" subset.eq "PSpace"$
-    $L in "NP" ==> exists M "MdT non deterministica polinomiale che accetta" L$\
-    Poiché si può riutilizzare lo spazio
-]
-
 #definition()[
   $
     "NPSpace" = {L "linguaggio" | & exists M "MdT non deterministica che accetta" L "t.c." \
@@ -1601,11 +2023,16 @@ $
   $
 ]
 
-#observation()[
-  $"PSpace" subset.eq "NPSpace"$
+#observation(multiple: true)[
+  + $"P" subset.eq "PSpace"$\
+    $"P" limits(=)^? "PSpace"$
+  + $"PSpace" subset.eq "Exp"$
+    $"PSpace" limits(=)^? "Exp"$
+  + $"NP" subset.eq "PSpace"$
+    $L in "NP" ==> exists M "MdT non deterministica polinomiale che accetta" L$ poiché si può riutilizzare lo spazio.
+  + $"PSpace" subset.eq "NPSpace"$
 ]
 
-#pagebreak()
 === Teorema di Savitch
 
 #theorem("Savitch - PDF è più dettagliato")[
@@ -1634,7 +2061,7 @@ $
 #definition()[
   L linguaggio si dice *PSpace-difficile* quando $forall Q in "PSpace", exists f$ riduzione polinomiale in tempo da _Q_ a _L_.
 
-  L si dice *PSpace-completop* quando L è PSpace-difficile e $L in "PSpace"$
+  L si dice *PSpace-completo* quando L è PSpace-difficile e $L in "PSpace"$
 ]
 
 #proposition()[
@@ -1664,17 +2091,18 @@ $
 ]
 
 == Problemi di conteggio
-$Sigma = {0, 1}, quad f: Sigma^* --> NN$
+I problemi di conteggio si occupano di stabilire quante possono essere le soluzioni di un problema (ovvero, data una MdT M e una stringa $w$, ci si chiede quante siano le configurazioni accettanti di M su $w$).
+// $Sigma = {0, 1}, quad f: Sigma^* --> NN$
 
 #definition()[
-  Si chiama $cal(F)P$ la classe delle funzioni $f: Sigma^* --> NN$ per cui esiste una MdT deterministica che calcola _f_ in tempo polinomiale:
+  Si chiama $cal(F)P$ la classe delle funzioni $f: Sigma^* -> NN$ per cui esiste una MdT deterministica che calcola _f_ in tempo polinomiale:
   $
-    cal(F)P = {f: Sigma^* --> NN | exists M "MdT che calcola" f "t.c." t_C_M (n) = Omicron)n^k, exists k >= 1}
+    cal(F)P = {f: Sigma^* -> NN | exists M "MdT che calcola" f "t.c." t_C_M (n) = Omicron(n^k), exists k >= 1}
   $
 ]
 
 #definition()[
-  Si chiama *\#_P_* (sharp P) la classe delle funzioni $f: Sigma^* --> NN$ per cui esiste una MdT non deterministica polinomiale tale che, per ogni stringa $w in Sigma^*$, le computazioni accentanti di M su _w_ sono $f(w)$:
+  Si chiama *\#_P_* (sharp P) la classe delle funzioni $f: Sigma^* -> NN$ per cui esiste una MdT non deterministica polinomiale tale che, per ogni stringa $w in Sigma^*$, le computazioni accet  tanti di M su _w_ sono $f(w)$:
   $
     \#P = {
     f: Sigma^* --> NN | & exists M "MdT non deterministica polinomiale t.c.", forall w in Sigma^* \
@@ -1690,7 +2118,7 @@ $Sigma = {0, 1}, quad f: Sigma^* --> NN$
 #proof()[
   $f in \#P$, sia M MdT deterministica polinomiale che calcola _f_.\
   Considero la seguente MdT non deterministica polinomiale:
-  - Su input _w_, calcoloo $f(w) = k$;
+  - Su input _w_, calcolo $f(w) = k$;
   - Genero _k_ computazioni (ciascuna delle quali stampa un intero _i_, con $1 <= i <= k$), e le considero tutte accettanti
   $
     arrow.b.double\

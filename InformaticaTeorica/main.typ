@@ -13,5 +13,4 @@
   #include "chapters/chapter1/1-introduzione.typ"
   #include "chapters/chapter2/2-turing.typ"
   #include "chapters/chapter3/3-complessita.typ"
-  #include "chapters/temp.typ"
 ]
