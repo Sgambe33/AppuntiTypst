@@ -78,26 +78,29 @@ Un *router* controlla l'indirizzo IP di destinazione e "indovina" la subnet di d
 
 == Incapsulamento e layers
 Come sempre, per semplificare i problemi, si è deciso di suddividere il problema principale in problemi più piccoli. In questo caso si parla di *layer* della rete. Ogni layer offre i propri servizi al layer soprastante e fa uso dei servizi del layer sottostante. I layer interagiscono tra loro mediante *SAP* (Service Access Point), l'equivalente delle *API* (Application Programming Interface).
-#figure(image("images/2026-06-18-23-14-33.png"))
+#figure(image("images/2026-06-18-23-14-33.png", width: 50%))
 Ogni layer aggiunge i propri dati in un *header* e opzionalmente in un *trailer*. Ciò permette di realizzare l'*incapsulamento*.
-#figure(image("images/2026-06-18-23-19-10.png"))
+#figure(image("images/2026-06-18-23-19-10.png", width: 50%))
 
 == Stack ISO/OSI
-#figure(image("images/2026-06-18-23-21-56.png"))
-// TODO: piazzare di lato
-Il modello ISO/OSI è formato da 7 livelli. E' bene conoscerlo ma di fatto non è usato. Applica alcuni concetti fondamentali come:
-- *Separazione della responsabilità*: le funzionalità non sono duplicate.
-- *Information hiding*: l'implementazione effettiva viene nascosta, viene esposta solo l'interfaccia.
+#grid(
+  columns: 2,
+  [#figure(image("images/2026-06-18-23-21-56.png", height: 20%))],
+  [Il modello ISO/OSI è formato da 7 livelli. E' bene conoscerlo ma di fatto non è usato. Applica alcuni concetti fondamentali come:
+    - *Separazione della responsabilità*: le funzionalità non sono duplicate.
+    - *Information hiding*: l'implementazione effettiva viene nascosta, viene esposta solo l'interfaccia.
 
-I layer L1-L3 sono detti *Media Layers* mentre i L4-L7 sono detti *Host Layers*.
+    I layer L1-L3 sono detti *Media Layers* mentre i L4-L7 sono detti *Host Layers*.],
+)
 
-#figure(image("images/2026-06-18-23-22-23.png"))
+
+#figure(image("images/2026-06-18-23-22-23.png", width: 80%))
 
 I dati vengono scambiati tra nodi adiacenti e i nodi intermedi non dovrebbero processare le informazioni finali (a meno che non si tratti di Proxy o Gateways)-
 
 == Stack TCP/IP
 Lo stack TPC/IP è molto più semplice dell'ISO/OSI.
-#figure(image("images/2026-06-18-23-25-56.png"))
+#figure(image("images/2026-06-18-23-25-56.png", width: 30%))
 - L7 Livello Application: composto dai protocolli applicativi come ftp, smtp, http, etc...
 - L7 Livello Transport: composto dai protocolli per il trasferimento dei dati end-to-end come TCP, UDP, QUICK, etc...
 - L3 Livello Network: composto dai protocolli per il routing sorgente-destinazione come IP, ICMP, ARP, RARP, etc...
@@ -178,17 +181,17 @@ Il DNS è un protocollo alla base del web moderno, senza di esso si fermerebbe i
 #definition()[
   Il DNS è semplicemente un database distribuito, ridondato e ad alta disponibilità. Se un server non sa rispondere ad una richiesta, tramite gerarchie, deleghe e cache sarà in grado di recuperare la risposta.
 ]
-Non serve, attenzione, soltanto per comodità ovvero per evitare di memorizzare gli indirizzi IP dei vari siti piuttosto che il loro nome (google.com invece di 142.250.184.195). Serve per il *Virtual Hosting* e per il *Cloud/Load Balancing*. Oggi, su un singolo indirizzo IP possono essere ospitati migliaia di siti web diversi. Quando viene effettuata una richiesta HTTP, inserite il nome del sito nell'header. Se il DNS non esistesse e usaste solo l'IP, il server di destinazione non saprebbe quale dei migliaia di siti (virtual host) si vuole visitare.
+Non serve, attenzione, soltanto per comodità, ovvero per evitare di memorizzare gli indirizzi IP dei vari siti piuttosto che il loro nome (google.com invece di 142.250.184.195). Serve per il *Virtual Hosting* e per il *Cloud/Load Balancing*. Oggi, su un singolo indirizzo IP possono essere ospitati migliaia di siti web diversi. Quando viene effettuata una richiesta HTTP, inserite il nome del sito nell'header. Se il DNS non esistesse e usaste solo l'IP, il server di destinazione non saprebbe quale dei migliaia di siti (virtual host) si vuole visitare.
 
 = Socket
-Nella storia di Internet, l'introduzione delle socket ha rappresentato una vera e propria rivoluzione culturale. Sono state inventate a Berkeley, in concomitanza con lo sviluppo dei sistemi UNIX. Il parallelismo geniale alla base delle socket era legato all'hardware dell'epoca (negli anni '70 non c'erano i dischi rigidi moderni, ma si usavano molto i nastri magnetici). Per scrivere su un nastro si usava una `write` sequenziale, e per leggere si usava una `read` sequenziale. Le socket usano esattamente la stessa semantica: per trasmettere dati usi una `send` (o una scrittura sequenziale), e per riceverli usi una `receive` (una lettura che va a riempire un blocco di memoria).
+Nella storia di Internet, l'introduzione delle socket ha rappresentato una vera e propria rivoluzione culturale. Sono state inventate a Berkeley, in concomitanza con lo sviluppo dei sistemi UNIX. Il parallelismo alla base delle socket era legato all'hardware dell'epoca (negli anni '70 non c'erano i dischi rigidi moderni, ma si usavano molto i nastri magnetici). Per scrivere su un nastro si usava una `write` sequenziale, e per leggere si usava una `read` sequenziale. Le socket usano esattamente la stessa semantica: per trasmettere dati usi una `send` (o una scrittura sequenziale), e per riceverli usi una `receive` (una lettura che va a riempire un blocco di memoria).
 
 == Blocking vs Non-Blocking
 La prima grande complicazione nello sviluppo di reti riguarda il comportamento del programma quando tenta di leggere o scrivere dati. Esistono due tipi principali di socket:
 
-- Socket Bloccanti: come suggerisce il nome, inviando o richiedendo la lettura di dati, il programma si "blocca" su quell'istruzione e non passa alla successiva finché i dati non sono stati scritti tutti, non sono stati ricevuti a sufficienza, o non scade un timeout. Sono più semplici da usare: basta controllare il codice di errore o il numero di byte restituiti.
+- *Socket Bloccanti*: come suggerisce il nome, inviando o richiedendo la lettura di dati, il programma si "blocca" su quell'istruzione e non passa alla successiva finché i dati non sono stati scritti tutti, non sono stati ricevuti a sufficienza, o non scade un timeout. Sono più semplici da usare: basta controllare il codice di errore o il numero di byte restituiti.
 
-- Socket Non Bloccanti: i dati da inviare sono passati al sistema operativo e il programma continua immediatamente la sua esecuzione. In fase di lettura, la socket restituisce subito i dati se sono già disponibili; altrimenti, istruisce il sistema operativo a mandare una notifica (callback) quando i dati arriveranno.
+- *Socket Non Bloccanti*: i dati da inviare sono passati al sistema operativo e il programma continua immediatamente la sua esecuzione. In fase di lettura, la socket restituisce subito i dati se sono già disponibili; altrimenti, istruisce il sistema operativo a mandare una notifica (callback) quando i dati arriveranno.
 
 == Struttura
 
@@ -196,7 +199,7 @@ Aprendo il terminale (su Linux/Mac) e digitando `man socket`, è possibile  trov
 
 #align(center, `int socket(int domain, int type, int protocol);`)
 
-+ Dominio (Domain): indica la famiglia di protocolli. I più comuni sono:
++ *Dominio* (Domain): indica la famiglia di protocolli. I più comuni sono:
 
   - `AF_INET` per IPv4.
 
@@ -208,7 +211,7 @@ Aprendo il terminale (su Linux/Mac) e digitando `man socket`, è possibile  trov
     Il fatto che un'applicazione debba scegliere esplicitamente tra IPv4 e IPv6 è tecnicamente una violazione del principio di "information hiding", ma attualmente è così che funziona
   ]
 
-+ Tipo (Type): indica la modalità di comunicazione. I due tipi principali sono:
++ *Tipo* (Type): indica la modalità di comunicazione. I due tipi principali sono:
 
   - `SOCK_STREAM`: garantisce un flusso continuo di byte. Sotto il cofano si mappa tipicamente sul protocollo TCP. Si possono scrivere o leggere i byte un po' alla volta (1 byte, 10 byte o un giga). Sarà l'applicazione a dover capire dove inizia e finisce logicamente un messaggio.
 
@@ -216,6 +219,868 @@ Aprendo il terminale (su Linux/Mac) e digitando `man socket`, è possibile  trov
 
   Ci sono anche tipi speciali come `SOCK_RAW`, che permette di bypassare i livelli alti e creare pacchetti a mano (packet injection), utile per la cybersecurity o lo sviluppo di basso livello.
 
-+ Protocollo (Protocol): generalmente si imposta a `0`, delegando al sistema operativo la scelta del protocollo di default per quel dominio e quel tipo. Lo si specifica solo se si vogliono forzare protocolli particolari.
++ Protocollo (Protocol): generalmente si imposta a `0`, delegando al sistema *operativo* la scelta del protocollo di default per quel dominio e quel tipo. Lo si specifica solo se si vogliono forzare protocolli particolari.
 
-Questa funzione restituisce un numero intero. Se l'intero è negativo, significa che c'è stato un errore (es. dominio non supportato, permessi mancanti). Se l'intero è positivo, rappresenta l'ID della socket. Il kernel dei sistemi operativi Unix/Linux è scritto in C, che è un linguaggio procedurale. Ecco perché la funzione non restituisce un "oggetto socket", ma un semplice numero identificativo (un file descriptor), che verrà usato come fosse il riferimento a quell'oggetto per tutte le operazioni successive.
+Questa funzione restituisce un numero intero. Se l'intero è negativo, significa che c'è stato un errore (es. dominio non supportato, permessi mancanti). Se l'intero è positivo, rappresenta l'ID della socket. Il kernel dei sistemi operativi Unix/Linux è scritto in C, che è un linguaggio procedurale. Ecco perché la funzione non restituisce un "oggetto socket", ma un semplice numero identificativo (un *file descriptor*), che verrà usato come fosse il riferimento a quell'oggetto per tutte le operazioni successive.
+
+= Livello trasporto (SLIDE 06)
+A livello di trasporto abbiamo protocolli *connection-oriented* e *protocolli connectionless*. I protocolli di livello 4 sono definiti "end-to-end", ovvero vanno dalla sorgente alla destinazione e i nodi intermedi della rete teoricamente se ne dovrebbero disinteressare. Se volessimo fare un paragone con il modello OSI - cosa sconsigliata di fare all'esame - diremmo che il livello Trasporto del TCP/IP fa cose che non gli competono, sobbarcandosi anche funzioni che l'OSI relegherebbe al livello di sessione. Il suo scopo primario è fare *multiplexing* e *demultiplexing*, fornire degli indirizzi di livello 4 ed eventualmente occuparsi del controllo di congestione e di flusso.
+
+Il multiplexing, nelle reti, significa prendere i dati generati da più processi (ad esempio, un'applicazione che usa una socket TCP e un'altra che usa UDP) e infilarli insieme su un unico canale fisico di trasmissione. Il demultiplexing è l'esatto opposto in fase di ricezione. Per poter fare questo smistamento, ogni livello della pila protocollare deve avere nell'header un'informazione che identifichi a chi è destinato il payload: nel frame Ethernet c'è il campo EtherType, nell'IP c'è il campo Protocol, e a livello di trasporto sono usate le Porte.
+
+== UDP vs TCP
+Nel modello connection-oriented, come il TCP, il livello 4 esegue una fase di setup iniziale. Una volta stabilita la connessione, so ha la certezza che i dati arriveranno e si potrà comunicare in modo efficiente. I grandi svantaggi sono che permette solo comunicazioni uno-a-uno e, soprattutto, richiede il mantenimento continuo di uno "stato" della connessione. Poiché il livello IP sottostante è inaffidabile e invia i pacchetti ognuno per i fatti suoi, tutto l'enorme carico di mantenere in piedi la connessione e verificarne l'affidabilità ricade sul TCP.
+
+L'UDP, al contrario, è connectionless ed è molto più affine all'IP: prende un pacchetto, lo manda e spera che arrivi. È una comunicazione monodirezionale, non ha fasi di setup e permette di inviare dati a un destinatario specifico, in multicast a molti, o in broadcast a tutti. Il lato negativo è che si perde completamente la garanzia di consegna. L'UDP non dà alcun feedback sull'arrivo dei dati; se serve sapere se un pacchetto è giunto a destinazione, sarà necessario programmare un sistema di conferma a livello applicativo. Questo, però, lo rende un protocollo estremamente leggero e veloce, non essendoci alcuno stato da mantenere in memoria.
+
+Il modo migliore per capire come funziona l'UDP è guardare il suo header, che è lungo appena 8 byte.
+#figure(image("images/2026-06-20-17-37-16.png"), caption: "UDP a sx, UDP-Lite a dx")
+
+Contiene solo quattro campi: la porta sorgente, la porta destinazione, la lunghezza e un checksum per il controllo degli errori. La lunghezza è essenziale perché permette al sistema ricevente di sapere esattamente quanta memoria allocare in modo dinamico prima ancora di finire di leggere l'intero pacchetto. Non essendoci numeri di sequenza o acknowledgement, si tratta di un protocollo sostanzialmente vuoto.
+
+C'è un'unica vera anomalia: per calcolare il checksum, l'UDP utilizza un cosiddetto "pseudo-header" IP. In pratica, il livello UDP ha bisogno di conoscere l'indirizzo IP sorgente, l'indirizzo destinazione e il protocollo, compiendo una violazione del principio di isolamento dei livelli (information hiding). Questo crea una complicazione in fase di invio, poiché l'UDP deve chiedere al livello IP quale indirizzo sorgente verrebbe usato per raggiungere quella determinata destinazione, in modo da poter calcolare correttamente il checksum prima di passargli il pacchetto. Esiste anche una variante meno comune, l'UDP-Lite, pensata per i flussi multimediali, che permette di applicare il checksum solo a una porzione del pacchetto in modo da tollerare lievi errori sui frame video senza scartare l'intera immagine.
+
+== Porte e Socket
+Infine, parliamo di porte e socket. Le porte sono i punti logici in cui avviene il multiplexing dei servizi. Usiamo delle porte standard predeterminate, come la 80 per l'HTTP, per evitare che un client debba interrogare ogni volta il server per sapere su quale porta sia in ascolto un determinato servizio; un meccanismo del genere intaserebbe la rete e offrirebbe il fianco a innumerevoli problemi di sicurezza.
+
+Le porte si dividono in categorie: le porte "well-known" (ben conosciute, da 1 a 1023), le porte registrate (da 1024 a 49151, dove troviamo di tutto, persino la porta 666 assegnata al multiplayer di Doom) e le porte effimere assegnate dinamicamente. L'unica vera differenza pratica tra queste categorie è un retaggio storico: per aprire un servizio in ascolto su una well-known port è necessario avere i privilegi di amministratore (root), mentre per le altre basta un utente normale.
+
+Quando il vostro programma apre una socket, le viene assegnata una porta locale. Potete decidere di vincolare (bind) questa socket a uno specifico indirizzo IP della vostra macchina, a una specifica interfaccia di rete (come il Wi-Fi o il cavo Ethernet) oppure lasciarla in ascolto su tutte le interfacce disponibili. Attenzione a un dettaglio fondamentale: poiché l'UDP è senza connessione, una volta aperta una socket su una determinata porta, questa riceverà indiscriminatamente pacchetti da chiunque ve li mandi. Spetterà interamente alla vostra applicazione fare il "demultiplexing applicativo", ovvero controllare l'indirizzo IP e la porta sorgente di ogni singolo pacchetto in ingresso per capire con chi state parlando e gestire correttamente le risposte. Le socket UDP di basso livello non fanno alcun filtro al posto vostro.
+
+= TCP (SLIDE 08)
+<RC_Lezione_2026.03.30.m4a>
+L'header del TCP è molto più complicato di quello dell'UDP e, a differenza di quest'ultimo, non ha una dimensione fissa.
+
+#figure(image("images/2026-06-20-17-41-09.png"))
+
+- *Punti in comune con l'UDP:* anche il TCP possiede uno pseudo-header (identico a quello usato dall'UDP per IPv4/IPv6, essenziale per il calcolo del checksum). Inoltre, i primi due campi dell'header TCP sono la *Porta Sorgente* e la *Porta Destinazione* (entrambe da 16 bit), che si trovano nella stessa posizione e hanno la stessa semantica dell'UDP. Questa somiglianza non è una regola fissa per tutti i protocolli di livello 4 (esiste ad esempio l'SCTP, usato nelle reti mobili, che funziona in modo diverso), ma è dovuta al fatto che TCP e UDP sono stati progettati nello stesso periodo, spesso dalle stesse persone, all'interno della suite TCP/IP.
+- *Numeri di sequenza (Sequence e Acknowledgement Number):*  subito dopo le porte, troviamo due campi da 32 bit fondamentali:
+  - *Sequence Number*
+  - *Acknowledgement Number*
+  Questi sono il cuore del meccanismo di affidabilità del TCP.
+- *La dimensione variabile (Data Offset):* a differenza dell'UDP che ha un header di 8 byte fissi, l'header TCP ha una dimensione base di 20 byte (5 word da 32 bit), ma può essere più lungo a causa del campo *Options*. Per capire dove finisce l'header e dove inizia il payload, il TCP utilizza il campo *Data Offset* (lungo 4 bit), che indica la lunghezza dell'header in word da 32 bit. È cruciale leggere questo valore: ignorare le opzioni porta a calcolare male il checksum e a invalidare i pacchetti.
+- *Altri campi:* troviamo la *Window* (finestra di ricezione), il *Checksum* (che qui è obbligatorio e copre pseudo-header, header e payload), l'*Urgent Pointer* e una serie di flag di controllo:
+  - *CWR + ECE* : Explicit Congestion Notification
+  - *URG*: Urgent data
+  - *ACK*: l'Acknowledgement Number è valido e reale
+  - *RST*: reset della connessione (hard termination)
+  - *SYN*: sincronizzazione numero di sequenza (connection start)
+  - *FIN*: assenza di ulteriori dati da trasmettere (soft termination)
+
+== TCP demultiplexing
+
+C'è una differenza fondamentale nel modo in cui l'applicazione gestisce la ricezione dei pacchetti rispetto all'UDP.
+
+- *UDP (Connectionless):* l'UDP invia e riceve datagrams senza stato. Usando una socket UDP, l'applicazione deve usare una funzione come `recvfrom()` per estrarre manualmente dall'header l'indirizzo IP e la porta sorgente del mittente. Spetta all'applicazione (demultiplexing applicativo) capire chi le sta parlando.
+- *TCP (Connection-Oriented):* nel TCP, il canale è dedicato tra due endpoint precisi. Se un pacchetto arriva a una socket TCP attiva, il sistema sa già che proviene dall'unico mittente autorizzato per quella connessione. Il demultiplexing è gestito a livello TCP, e l'applicazione può usare una semplice funzione `recv()`, disinteressandosi dell'identità del mittente, che è già implicita nello stato della socket.
+
+== Affidabilità
+
+L'UDP è connectionless e privo di riscontri (*stateless*). Il TCP, essendo connection-oriented (*stateful*), garantisce che i dati arrivino (reliable) e vengano riordinati correttamente. Per farlo, deve gestire perdite, duplicati e pacchetti fuori ordine.
+
+Il *Sequence Number* non conta i pacchetti inviati (pacchetto 1, 2, 3...), ma conta l'*offset in byte* dei dati trasmessi. Se il primo pacchetto invia 100 byte iniziando, per semplicità, dal numero di sequenza 1, il pacchetto successivo non avrà sequenza 2, ma sequenza 101.
+
+== Flag di controllo
+
+I flag TCP servono a gestire lo stato della connessione:
+
+- *ACK*: indica che il campo *Acknowledgement Number* contiene un valore valido. Poiché la comunicazione è bidirezionale, un pacchetto potrebbe contenere solo dati senza dover confermare nulla di nuovo. Se questo flag è a 0, il destinatario sa di dover ignorare il campo ACK, evitando di interpretarlo erroneamente come una conferma duplicata (Duplicate ACK), che innescherebbe meccanismi di reazione alla congestione.
+- *SYN*: inizia una connessione.
+- *FIN*: termina una connessione in modo controllato.
+- *RST*: termina la connessione in modo drastico, utile per situazioni di emergenza (es. connessione caduta da un lato).
+
+== Three-way Handshake
+
+Per stabilire una connessione bidirezionale affidabile, il TCP usa il *Three-way Handshake*:
+
+1. *SYN:* il client invia un pacchetto con flag SYN a 1, indicando le opzioni TCP e, soprattutto, il suo Sequence Number iniziale (che viene generato casualmente, non parte da 1).
+2. *SYN-ACK:* il server riceve il SYN e risponde con un pacchetto avente i flag SYN e ACK a 1. Conferma di aver ricevuto il sequence number del client (incrementato) e invia il *proprio* Sequence Number iniziale.
+3. *ACK:* il client riceve il SYN-ACK e manda un ultimo pacchetto (ACK = 1) per confermare la ricezione del sequence number del server. A questo punto, la connessione è *Established* ed è possibile lo scambio bidirezionale di dati.
+
+#figure(image("images/2026-06-20-17-48-10.png"))
+
+
+#observation()[
+  Il protocollo TCP prevede (come requisito "MUST") la gestione dell'apertura simultanea, ovvero il caso legale ma raro in cui due host inviino un pacchetto SYN nello stesso identico momento.
+]
+
+== Four-way Teardown
+Supponiamo sia presente una connessione TCP attiva tra Alice e Bob. La chiusura di una connessione è indipendente per le due direzioni e richiede quattro passaggi:
+
+1. *FIN:* Alice invia un pacchetto FIN a Bob, indicando che non ha più dati da trasmettere.
+2. *ACK:* Bob conferma la ricezione del FIN. In questo momento, la connessione è "Half-Open": Alice non trasmetterà più, ma Bob può ancora inviare dati (situazione tipica di quando un client HTTP invia una richiesta breve e il server risponde con un file molto grosso).
+3. *FIN:* quando anche Bob ha terminato, invia il suo pacchetto FIN.
+4. *ACK:* Alice conferma il FIN di Bob, e la connessione si chiude. (I passaggi 2 e 3 possono essere collassati in un unico pacchetto FIN-ACK).
+
+== Il TCB
+
+Il TCP è una complessa macchina a stati finiti (FSM). Lo stato di questa macchina per una singola connessione viene memorizzato in una struttura dati chiamata *TCB (Transmission Control Block)*. Il TCB contiene lo stato della connessione, i timer e i buffer per gestire i dati in ingresso e in uscita e per riordinare i pacchetti. Mantenere queste strutture occupa molta memoria RAM.
+
+Il TCP identifica due ruoli all'interno della connessione: il *server* che apre una porta ed aspetta connessioni (la sua porta deve essere conosciuta dal client) e il *client* che avvia la connessione verso il server (la sua porta può essere effimera).
+
+Quando un server mette in ascolto una socket TCP (stato *LISTEN*), non conosce ancora chi si connetterà. Quando arriva un pacchetto SYN da un client, il server crea un nuovo TCB parziale (per evitare attacchi di tipo *SYN Flood*, che esaurirebbero la memoria). Una volta completato l'handshake (stato *ESTABLISHED*), il processo del server esegue tipicamente una `fork()`: il processo padre continua ad ascoltare sulla socket originale (che rimane in *LISTEN*). Il processo figlio eredita una *nuova* socket dedicata a quella specifica connessione, dotata di un TCB completo contenente la *quintupla* identificativa `{src/dst IP, src/dst port, protocol}`.
+
+#observation()[
+  Un attacco di tipo SYN flood consiste nell'inviare ripetutamente richieste di connessione iniziale (SYN) in modo tale da esaurire e sopraffare tutte le porte disponibili di un server. Quest'ultimo, di conseguenza, sarà obbligato a rispondere lentamente, o direttamente ignorare, al traffico legittimo.
+]
+
+== Introduzione alla congestione
+
+Il TCP originario (RFC 793) non prevedeva algoritmi per gestire la congestione; sono stati aggiunti in seguito per evitare che le reti collassassero.
+
+Il fenomeno si spiega tramite la teoria dei Sistemi a Coda. Si immagini un router (il servente) che riceve pacchetti a un rate di ingresso ($lambda$) e li inoltra a un rate di uscita ($mu$). La stabilità del sistema dipende dal fatto che la capacità di smaltimento del router sia superiore al traffico in ingresso.
+#figure(image("images/2026-06-20-17-50-54.png"))
+
+Se il rate di uscita ($mu$) è di 1 Gigabit e l'ingresso ($lambda$) è di 10 Megabit, la coda non si riempirà mai. Se avviene il contrario (es. una dorsale veloce che entra in un router domestico lento), si crea un collo di bottiglia.
+
+I pacchetti in eccesso finiscono nella coda del router. Poiché la memoria del router (la dimensione della coda) è limitata, quando la coda si riempie, i nuovi pacchetti vengono semplicemente scartati (*dropped*). Il controllo di congestione del TCP serve proprio ad accorgersi di queste perdite e a rallentare l'invio dei dati per evitare di riempire la coda.
+
+<RC_Lezione_2026.03.31.m4a>
+Nella realtà di Internet, la dimensione dei pacchetti segue una distribuzione quasi binomiale: ci sono pacchetti molto grandi e pacchetti molto piccoli, con una distribuzione del tempo di inter-arrivo estremamente variabile e fastidiosa da calcolare. Ma perché ci interessa parlarne? Perché ci porta a identificare l'elemento critico dentro ai dispositivi di rete: la coda. E attenzione, non c'è *una* sola coda. Analizzando un sistema di trasmissione, è possibile trovare code ovunque. C'è la coda dei messaggi dell'applicazione, la coda del TCP o dell'UDP in attesa di essere passati all'IP e infine la coda hardware della scheda di rete, che spesso è limitatissima (es. solo tre o sei pacchetti).
+
+=== Controllo di congestione
+
+L'obiettivo del controllo di congestione è evitare che le code nei router intermedi si riempiano. L'ideale è mantenere il tasso di ingresso $lambda$ leggermente inferiore al tasso di servizio $mu$. Visto che nella rete arriva traffico da ovunque, il problema è: come faccio a calcolare il giusto ritmo di trasmissione dalla sorgente in modo da non intasare i nodi intermedi? Abbiamo un sistema che non possiamo osservare direttamente (non possiamo chiedere lo stato delle code a ogni singolo router su Internet), quindi dobbiamo agire alla cieca usando un feedback loop.
+
+#example("Feedback loop")[
+  Funziona esattamente come l'ABS dell'auto: il sistema rileva che le ruote si stanno bloccando (l'uscita) e allenta la pressione sui freni (modifica l'ingresso). Nel nostro caso, il trasmettitore cerca di capire se la rete è congestionata e, in tal caso, rallenta.
+]
+
+
+Il problema è che questo feedback arriva con un ritardo. Vogliamo che la coda sia non solo stabile, ma il più piccola possibile. Perché? Perché anche se non si perdono pacchetti, una coda lunga introduce un ritardo enorme. In una trasmissione dati, il ritardo end-to-end è la somma del ritardo di propagazione (spesso trascurabile), del tempo di trasmissione sulla linea (la "velocità" in Gigabit) e del tempo passato in coda. Il tempo in coda è ciò che deve essere minimizzato.
+
+=== Gestione delle Perdite
+Ma se i pacchetti si perdono, come vengono gestiti? Il TCP gestisce anche questo scenario, abbastanza comune, in diversi modi:
+- *Stop-and-Wait*: si invia un pacchetto e si aspetta l'acknowledgement (ACK) prima di mandare il successivo. Facilissimo da implementare, ma super inefficiente a causa del tempo morto (il Round Trip Time, o RTT).
+- *Go-Back-N*: si trasmettono pacchetti a raffica e, se si scopre di aver perso il pacchetto numero due, si butta via tutto quello che è arrivato dopo e si ritrasmette dal due in poi. È più efficiente, ma in una rete Internet dove i pacchetti arrivano fuori ordine o duplicati, diventa problematico.
+- *Selective Repeat*: il ricevitore comunica esattamente quale pacchetto manca. Contrariamente agli altri, richiede il riordino dei pacchetti.
+
+Originariamente il TCP usava ACK cumulativi (confermando tutto fino a un certo punto), il che lo rendeva simile a un Go-Back-N. Oggi, nelle reti ad altissima velocità dove il Round Trip Time permette di avere migliaia di pacchetti "in volo" (cioè trasmessi ma non ancora confermati), si usano i Selective Acknowledgement (SACK). Attenzione però: le opzioni come SACK devono essere negoziate all'apertura della connessione e allungano l'header TCP, riducendo lo spazio per i dati reali.
+
+#figure(image("images/2026-06-20-17-56-01.png"))
+
+=== Controllo del flusso e della congestione
+Non si deve confondere il controllo di congestione nei nodi intermedi con il controllo di flusso al ricevitore. Se si trasmette a una velocità elevata ma il computer ricevente è un dispositivo IoT poco potente, la sua memoria si saturerà. Il controllo di flusso serve proprio a sincronizzare la velocità del trasmettitore con le risorse di chi riceve, per evitare che i pacchetti vengano scartati alla fine del viaggio.
+
+#observation("Controllo del flusso")[
+  Si occupa di mantenere un flusso "liscio" di pacchetti tra due endpoint. Chi trasmette deve conoscere le capacità del ricevitore. Chi trasmette deve stimare il RTT e la velocità della rete.
+]
+
+#observation("Controllo della congestione")[
+  Si occupa di mantenere un flusso "liscio" di pacchetti tra due endpoint. Chi trasmette dovrebbe conoscere la capacità dei buffer intermedi (impossibile). Chi trasmette deve stimare la velocità dei collegamenti intermedi (difficile).
+]
+
+Come fa praticamente il TCP a regolare la velocità? Usa una "Congestion Window". Più è grande questa finestra, più dati trasmetto in un RTT. La teoria classica si basa sull'algoritmo *AIMD* (Additive Increase, Multiplicative Decrease): ogni volta che ricevo un ACK, aumento la finestra linearmente di 1; se rilevo una perdita, presumo ci sia congestione e dimezzo drasticamente la finestra.  Questo approccio crea il classico grafico a dente di sega e garantisce stabilità e *fairness* (equità) tra i vari utenti che si contendono la banda.
+
+Oggi però l'AIMD puro è superato. I sistemi operativi moderni usano diversi "flavors" (varianti) del TCP. Linux usa spesso il *Cubic*, mentre Google spinge per algoritmi basati sui ritardi come il *BBR*. Ognuno reagisce in modo diverso alla congestione.
+
+#observation()[
+  Ricordiamo che una perdita di pacchetti non significa sempre congestione; in una rete Wi-Fi o satellitare le perdite possono avvenire per interferenze radio, e dimezzare la velocità per un'interferenza è un errore grave.
+]
+
+Uno dei metodi più recenti è l'*AQM* (Active Queue Management). Piuttosto che aspettare che la coda di un router si riempia del tutto e provochi un disastro, l'AQM fa una cosa molto intelligente: inizia a scartare intenzionalmente *qualche* pacchetto in anticipo.  Questo segnale "sveglia" il controllo di congestione del TCP prima che sia troppo tardi. Senza algoritmi come RED, CoDel o FQ-CoDel nei router intermedi, la latenza su Internet sarebbe insopportabile e non potremmo fare, ad esempio, videochiamate.
+
+= IPv4
+<RC_Lezione_2026.04.27.m4a>
+
+Da dove salta fuori Internet? Nasce negli anni '60, quando alcuni pionieri come Leonard Kleinrock e J.C.R. Licklider decisero di pubblicare due articoli rivoluzionari. All'epoca, le reti a packet-switching erano considerate un'eresia: si lavorava solo con circuit-switching.
+
+Licklider, in particolare, scrisse un articolo intitolato "Galactic Networks". Intendeva proprio l'idea fantascientifica di una rete universale di comunicazioni che abbracciasse l'intera galassia. Negli anni '60, l'idea stessa di una rete universale era fantascienza pura. All'epoca i calcolatori usavano reti rigorosamente proprietarie: se avevi computer DEC, usavi la DECnet; se avevi Novell, usavi la rete Novell. Erano reti piccolissime, che univano al massimo le tre stanze di un ufficio o, se andava bene, due palazzi vicini.
+
+L'idea, per quanto folle, fu finanziata. Si dice sempre che Internet sia nata come una rete militare. Falso, è una moneta da tre euro. È vero che fu finanziata dal Dipartimento della Difesa americano (DARPA), ma solo perché negli Stati Uniti i fondi federali passano quasi tutti dai vari dipartimenti e all'epoca la National Science Foundation ancora non c'era. Il Dipartimento della Difesa era interessato a questa tecnologia perché prometteva di creare una rete decentralizzata, priva di un singolo nodo critico (single point of failure), che potesse sopravvivere anche se una parte della rete fosse crollata.
+
+Perché questa idea ha preso piede ed è diventata Internet? Ci sono motivi politici, economici e tecnici. Un aspetto fondamentale è che all'inizio gli sviluppatori e gli utenti finali erano la stessa persona. Questo ha accelerato enormemente lo sviluppo: quando sei l'utente della tecnologia che stai creando, sai esattamente cosa vuoi.
+
+Un secondo motivo è la facilità d'uso per i programmatori. Non sottovalutate le Berkeley Sockets (BSD Sockets) di cui abbiamo già parlato. Prima delle socket, per mandare un pacchetto in rete bisognava leggersi manuali infiniti e scrivere un codice complessissimo. Con le socket BSD, bastavano tre chiamate di sistema in croce e il programma funzionava. La facilità tecnica fa vincere le tecnologie.
+
+Terzo, l'assenza dei colossi delle telecomunicazioni. Internet ha trovato una nicchia vuota. Se volessimo essere puristi, il protocollo di rete teoricamente perfetto era l'ATM (Asynchronous Transfer Mode). L'ATM non aveva una semplice pila protocollare, aveva un "cubo" protocollare che separava magistralmente i dati utente, il controllo e il management. Era un capolavoro di ingegneria. Il problema? Quando l'ATM è arrivato sul mercato, tutti usavano già il TCP/IP. E quando l'ente standardizzatore è andato a dire alle aziende di buttare via i loro sistemi per adottare l'ATM perché era "fatto meglio", le aziende gli hanno fatto una pernacchia. Il TCP/IP non ha vinto perché era il protocollo migliore del mondo, ha vinto perché è arrivato prima.
+
+== Internet: una Rete di Reti (Autonomous Systems)
+Saltando la storia recente (l'esplosione negli anni '80 e '90 grazie ai personal computer e alle interfacce grafiche), vi ricordo una cosa: non date mai Internet per scontata. La Rete, intesa come comunicazione orizzontale e libera, è preziosa e va difesa.
+
+Internet è composta da entità chiamate *Autonomous Systems* (AS). Un Autonomous System non è un concetto di routing, è un concetto amministrativo: è un blocco di reti gestite da un singolo operatore o organizzazione, che dichiara al resto del mondo le proprie policy di instradamento del traffico. Non c'è nessuno a capo di Internet. Tutto funziona perché questi AS stringono tra loro accordi bilaterali commerciali, chiamati *peering*, decidendo se e come scambiarsi il traffico o farlo transitare per conto di terzi.
+
+L'unico vero vincolo forte che tiene insieme questo caos è il protocollo di routing usato per far parlare tra loro gli Autonomous System: il *BGP* (Border Gateway Protocol). È un protocollo difficilissimo da aggiornare o sostituire, perché è il collante dell'intera architettura mondiale; provare a cambiarlo significherebbe rivoluzionare Internet.
+
+All'interno del proprio AS, invece, un operatore è un sovrano assoluto. Può decidere di bloccare un certo protocollo, può usare algoritmi di routing interni super-inefficienti, può fare quello che gli pare. E un'altra precisazione: per far parte di Internet, non c'è nessuna legge che vi obblighi a implementare tutto il TCP/IP. Teoricamente, potreste costruire un nodo che usa solo IP e UDP, omettendo del tutto il TCP.
+
+== Gli RFC e la Topologia
+Tutte le tecnologie di Internet si basano su standard aperti chiamati RFC (Request for Comments). L'iter, oggi, è molto rigoroso, con gruppi di lavoro, round di revisione infiniti e la necessità di implementazioni di test funzionanti, per evitare di rompere la rete.
+
+Se analizziamo la topologia di Internet, troviamo due tipi di nodi:
+
+- Host: i dispositivi finali (sorgente e destinazione) che creano e consumano traffico.
+
+- Nodi Intermedi: se instradano il traffico a livello 3 (IP) senza modificarlo, li chiamiamo Router. Se operano fino al livello 7 (Applicativo) agendo sul contenuto della sessione, li chiamiamo Gateway o Proxy.
+
+== Indirizzi: Livello MAC, IP e DNS
+Veniamo al concetto più critico: gli indirizzi. Nel disegno originale del TCP/IP, ogni host in Internet doveva avere un indirizzo IP univoco a livello globale. Questo principio è stato fondamentale per la semplicità della rete, ma è stato tradito pesantemente nel tempo a causa dell'esaurimento degli indirizzi IPv4, creando infiniti mal di testa (come vedremo domani parlando del NAT).
+
+Ma chiariamo la gerarchia e lo scope (l'ambito di validità) degli indirizzi, per evitare fraintendimenti:
+
+- Indirizzi MAC (Livello 2): Servono per comunicare all'interno di una rete locale (es. Ethernet o Wi-Fi). Il loro scope finisce appena incontrate un router. Devono essere univoci all'interno dello stesso segmento di rete, altrimenti succedono disastri. Quanti indirizzi MAC ha una scheda di rete? Di norma uno, ma a livello software può riceverne e gestirne molti.
+
+- Indirizzi IP (Livello 3): Servono per il routing end-to-end, da sorgente a destinazione. Quanti indirizzi IP può avere una singola scheda di rete? Quanti ne volete. Dimenticatevi la fandonia che a una scheda di rete corrisponda un solo indirizzo IP. Con IPv4 si usa spesso assegnarne uno solo per un problema di scarsità, ma in IPv6 averne multipli è la norma assoluta.
+
+- Indirizzi Alfanumerici (DNS, Livello 7): Nomi come www.unifi.it. Non esistono solo per aiutarvi a memorizzarli. Esistono per creare un livello di astrazione! Se il server del fioraio cambia provider (e quindi cambia indirizzo IP, che dipende strettamente dal routing e dall'Autonomous System a cui ci si aggancia), il DNS permette agli utenti di continuare a raggiungerlo digitando lo stesso nome. Quanti indirizzi IP può avere un dominio? Quanti ne volete. Quanti domini possono puntare allo stesso IP? Quanti ne volete.
+
+Un'ultima precisazione vitale sull'Information Hiding e il Modello OSI. Il modello OSI originale (con i suoi 7 livelli) prevedeva una netta separazione: ogni livello doveva fare il suo lavoro leggendo solo il proprio header, ignorando il contenuto del payload (information hiding). Questo manteneva l'architettura pulita, ma generava header giganteschi e inefficienze pesantissime.
+Il TCP/IP se n'è fregato. Il TCP/IP vìola l'information hiding in continuazione per ottimizzare le prestazioni. È per questo che i livelli OSI (Sessione, Presentazione, ecc.) non sono mai stati davvero implementati su larga scala e oggi usiamo i numeri dei livelli OSI (Layer 2, Layer 3, Layer 4) solo come vaga convenzione per capirci.
+
+
+= Il Routing e l'evoluzione delle classi IP
+<RC_Lezione_2026.04.28.m4a>
+Oggi dobbiamo dare un'occhiata all'IPv6 e al NAT. Ma prima, una precisazione vitale sull'IPv4: dimenticate le "classi" IP. Se sento qualcuno all'esame parlare di Classe A, Classe B o Classe C in un contesto moderno, gli tolgo dei punti. Le classi sono un concetto storico, nato obsoleto ed estremamente inefficiente.
+
+In origine, l'idea era che l'indirizzo IPv4 avesse una parte fissa per identificare la rete (Net ID) e una per identificare l'host (Host ID). Se due computer avevano lo stesso Net ID, sapevano di essere nella stessa sottorete e potevano comunicare direttamente, senza passare dal router. Il problema delle classi era la rigidità: se un'azienda aveva bisogno di 500 indirizzi, non le bastava una Classe C (254 indirizzi), quindi l'ente assegnatore doveva per forza sprecare una Classe B intera (65.000 indirizzi). Inoltre, questa rigidità impediva di compattare le tabelle di routing nei router, rendendo la ricerca del percorso molto lenta.
+
+Per risolvere questo problema è nato il CIDR (Classless Inter-Domain Routing). Con il CIDR, la lunghezza della parte di rete non è più fissa, ma viene indicata con una barra e un numero (es. /24). Questo permette di allocare lo spazio in modo fluido e, soprattutto, di unire (compattare) più reti contigue in un'unica riga della tabella di routing, velocizzando enormemente il lavoro dei router.
+
+Come funziona davvero il routing e la Memoria Ternaria
+
+Una tabella di routing non è magica. Contiene la destinazione, la maschera (Netmask/Genmask), il gateway (Next Hop) e l'interfaccia di uscita. Quando un pacchetto arriva, il router deve fare un'operazione logica di AND tra l'indirizzo IP di destinazione e la maschera di ogni singola riga della tabella. La riga giusta è quella che produce un match valido con il maggior numero di bit uguali (la Longest Prefix Match).
+
+Il problema gigantesco è che questa ricerca non si può fare con una semplice bisezione o con alberi di ricerca standard, perché non si può escludere a priori che più in fondo alla tabella ci sia una regola più specifica. Ogni pacchetto costringe il router a scandagliare gran parte della tabella.
+
+Come si fa a farlo velocemente in router di fascia alta? Si usa la Memoria Ternaria (TCAM). Mentre la memoria classica ragiona in bit (0 e 1), la memoria ternaria aggiunge un terzo stato: "Non importa" (Don't Care). Questo permette all'hardware di confrontare l'indirizzo di destinazione con l'intera tabella di routing in un singolo ciclo di clock. È una tecnologia potentissima, essenziale per i router di dorsale, ma costa un'ira di Dio. Ed è per questo che un router domestico costa cinquanta euro e un router professionale ne costa decine di migliaia.
+
+= Il NAT (Network Address Translation)
+
+Il Network Address Translation (NAT) è stato introdotto negli anni '90 come soluzione transitoria per arginare l'esaurimento degli indirizzi IPv4, in attesa dell'implementazione su larga scala dello standard IPv6. L'approccio si basa sulla definizione di blocchi di indirizzi IP "privati" (come le sottoreti 192.168.0.0/16 o 10.0.0.0/8), utilizzabili liberamente all'interno di reti locali aziendali o domestiche. Tuttavia, non essendo univoci a livello globale, tali indirizzi non sono instradabili sulla rete Internet pubblica.
+
+Il NAT, posizionato tipicamente sul router di confine, agisce traducendo gli indirizzi IP privati dei dispositivi della rete interna in uno o più indirizzi IP pubblici, consentendo così l'accesso a Internet. Ne esistono tre varianti principali:
+
++ *NAT Statico*: prevede un'associazione univoca (rapporto 1:1) tra un indirizzo IP privato e un indirizzo IP pubblico. Questa configurazione è utilizzata prevalentemente per esporre server o servizi interni affinché siano sempre raggiungibili dall'esterno tramite un IP fisso. Essendo una mappatura uno-a-uno, non contribuisce in alcun modo a mitigare la scarsità di indirizzi IPv4.
+  #figure(image("images/2026-06-22-20-05-55.png", width: 60%))
+
++ *NAT Dinamico*: associa dinamicamente un IP pubblico, prelevato da un pool predefinito, a un IP privato nel momento in cui questo genera traffico in uscita. L'indirizzo pubblico viene poi rilasciato al termine della sessione di comunicazione. Tale meccanismo opera secondo una logica "first-come, first-served" e presenta forti limitazioni: l'esaurimento temporaneo degli IP nel pool preclude l'accesso a Internet per tutti gli altri dispositivi della rete locale.
+  #figure(image("images/2026-06-23-12-13-29.png", width: 70%))
+
++ *NAPT / PAT *: consente a molteplici dispositivi di una rete privata di accedere a Internet utilizzando un singolo indirizzo IPv4 pubblico (rapporto N:1 tra indirizzi privati e indirizzo pubblico). Il PAT sfrutta i numeri di porta di livello di trasporto per tracciare le diverse sessioni di comunicazione, alterando la porta sorgente durante la traslazione e potendo gestire teoricamente fino a $2^{16}$ (65.536) connessioni simultanee. Questa tecnica introduce però alcune problematiche:
+  - *Violazione dell'astrazione dei livelli*: costringe un apparato di livello 3 (il router) a ispezionare i pacchetti fino al livello 4 (TCP/UDP). L'eventuale adozione di futuri protocolli privi del concetto di "porta" renderebbe il NAPT inefficace, venendo a mancare l'elemento chiave per la traslazione.
+  - *Incompatibilità con i protocolli di sicurezza*: il NAT altera l'intestazione IP originale, compromettendo l'integrità richiesta da protocolli di sicurezza come IPsec in modalità AH (Authentication Header). Il ricevente, rilevando una discrepanza tra l'header modificato e la firma crittografica, scarterà il pacchetto. Le contromisure necessarie (come il *NAT Traversal* tramite l'incapsulamento del traffico crittografato all'interno di ulteriori datagrammi UDP) introducono *overhead* aggiuntivo, sprecano larghezza di banda e generano gravi interferenze tra i meccanismi di controllo della congestione a causa di tunnel annidati (es. TCP-over-TCP).
+
+== NAT non deterministico
+
+L'utilizzo del NAT introduce un comportamento non deterministico nelle comunicazioni. Nel caso del protocollo *connection-oriented* TCP, la gestione dello stato è lineare: l'apertura (flag SYN) e la chiusura (flag FIN o RST) della connessione dettano chiaramente al NAT quando creare e distruggere la relativa regola di traduzione (*binding*).
+
+Per il protocollo UDP (*connectionless*), l'assenza di meccanismi espliciti di instaurazione e terminazione della sessione rende la gestione complessa. Il NAT deve creare un *binding* temporaneo al passaggio del primo pacchetto, basandosi su timer di inattività (timeout) per rimuoverlo. Un timeout eccessivamente breve provoca disconnessioni casuali (critiche nel gaming o nello streaming), mentre uno troppo lungo comporta un inutile spreco di risorse sul router. Di conseguenza, le applicazioni moderne (come software VoIP o messaggistica) sono obbligate a implementare meccanismi di *keep-alive*, inviando periodici pacchetti fittizi al solo scopo di impedire la chiusura della porta da parte del NAT.
+
+Ulteriori complicanze si riscontrano nel *Referral Handover*, tipico delle comunicazioni Peer-to-Peer. Quando un client contatta un server di segnalazione, quest'ultimo memorizza l'IP pubblico e la porta assegnati dal NAT del client. Se un secondo utente cerca di connettersi direttamente al primo utilizzando quelle coordinate, il tentativo fallisce quasi sempre: molti NAT (come i *Symmetric NAT* o i *Port-Restricted NAT*) applicano policy di filtraggio rigorose, accettando traffico in ingresso unicamente se proveniente dall'indirizzo IP originariamente contattato dall'host interno. Questo costringe a far transitare inutilmente il traffico multimediale attraverso server centralizzati (relay).
+
+== NAT in cascata (Carrier-Grade NAT)
+
+L'esaurimento terminale degli indirizzi IPv4 ha spinto gli Internet Service Provider (ISP) ad adottare il *Carrier-Grade NAT* (CGNAT). In questa configurazione, non solo il modem domestico esegue una prima traslazione (CPE NAT), ma l'infrastruttura dell'ISP applica un ulteriore livello di NAT a monte per ottimizzare l'uso degli IP pubblici.
+
+Questa architettura introduce topologie altamente complesse e stratificate. Un utente potrebbe vedersi assegnare IP pubblici differenti per flussi diretti verso destinazioni geografiche diverse (ad esempio, un IP per le connessioni verso il Giappone e un altro per quelle verso gli Stati Uniti). Questa imprevedibilità rende inefficaci le tradizionali tecniche di *NAT Traversal* (come il protocollo STUN), le quali falliscono nel catalogare o aggirare comportamenti così complessi.
+
+Sebbene il NAT sia stato uno strumento essenziale per prolungare la longevità dell'IPv4, ha di fatto compromesso il paradigma *end-to-end* originario di Internet, introducendo enormi inefficienze nello sviluppo e nel funzionamento delle applicazioni distribuite. L'unica soluzione architetturale definitiva per superare questi ostacoli rimane l'adozione e la transizione completa al protocollo IPv6.
+
+= Protocollo IPv6 e Fondamenti di Sicurezza delle Reti
+<RC_Lezione_2026.05.04.m4a>
+
+L'evoluzione delle infrastrutture di rete ha reso obsoleti molti dei paradigmi legati allo standard IPv4. Attualmente, l'IPv6 non costituisce un protocollo sperimentale o futuro, bensì lo standard *de facto* su cui transita la maggioranza del traffico Internet globale. Comprendere l'IPv6 è un requisito fondamentale per lo sviluppo e l'amministrazione delle reti moderne.
+
+== Motivazioni della Transizione a IPv6
+
+La nascita dell'IPv6 è motivata principalmente dal progressivo esaurimento dello spazio di indirizzamento IPv4 (poco più di 4 miliardi di indirizzi). Tale esaurimento è stato causato dalle politiche iniziali di allocazione inefficiente da parte dei Regional Internet Registry (RIR). L'IPv6 è stato progettato basandosi su quattro pilastri architetturali:
++ *Spazio di indirizzamento esteso*: fornisce un numero di indirizzi teorico pari a $2^128$, consentendo un'allocazione capillare e logica.
++ *Superamento del NAT*: ripristina il paradigma *end-to-end* originario di Internet, in cui ogni host possiede un indirizzo IP globalmente univoco, eliminando le violazioni del principio di *information hiding* introdotte dal Network Address Translation.
++ *Semplificazione dell'Header*: ottimizza l'elaborazione dei pacchetti da parte dei router di transito.
++ *Autoconfigurazione nativa (SLAAC)*: permette ai dispositivi di acquisire autonomamente i parametri di rete senza necessitare di server DHCPv6, sebbene con implicazioni di sicurezza da valutare.
+
+Nonostante l'enorme spesa operativa (OPEX) richiesta agli Internet Service Provider (ISP) per il mantenimento di infrastrutture *Dual Stack*, la transizione è oggi accelerata dai costi insostenibili dei Carrier-Grade NAT (CG-NAT) per l'IPv4 e dai requisiti architetturali delle Core Network 5G Standalone (SA), le quali operano esclusivamente su IPv6.
+
+== Semplificazione dell'Header e Prestazioni
+
+Una delle maggiori inefficienze dell'IPv4 è l'header a dimensione variabile (da 20 a 60 byte) e la presenza del campo Checksum, che costringe ogni router a ricalcolare l'integrità del pacchetto a ogni salto (*hop*). Ogni singolo router su Internet, per ogni pacchetto, deve:
+- Leggere un campo per calcolare la lunghezza dell'header.
+- Allocare memoria di conseguenza.
+- Ricalcolare l'intero Checksum, altrimenti il pacchetto viene scartato.
+
+In IPv6, l'header principale è stato fissato a una dimensione costante di *40 byte* e il Checksum è stato eliminato (delegando il controllo di integrità ai livelli datalink e di trasporto, data l'alta affidabilità dei mezzi trasmissivi odierni come la fibra ottica). Le opzioni aggiuntive sono state delegate a strutture separate denominate *Extension Headers*. Un router intermedio analizza esclusivamente l'header fisso; se il campo `Next Header` indica un protocollo di livello superiore o un'estensione non pertinente al routing nodo-a-nodo, il router inoltra il pacchetto sfruttando percorsi di commutazione accelerati via hardware (*Fast Path*). Se invece vale zero, significa che subito dopo c'è un Hop-by-Hop Extension Header che deve essere analizzato.
+
+#figure(image("images/2026-06-23-18-11-46.png", width: 60%))
+
+== Classificazione degli Indirizzi IPv6
+
+La notazione degli indirizzi IPv6 utilizza una rappresentazione esadecimale separata da due punti. La struttura tipologica è altamente razionalizzata. Rientrano tra i tipi di indirizzo *Unicast*, quindi (uno a uno):
+
+- *Global Unicast (`2000::/3`)*: indirizzi pubblici, instradabili a livello globale. Garantiscono l'univocità dell'host su Internet. Al fine di mitigare i rischi di tracciamento (privacy), i sistemi operativi moderni generano ciclicamente indirizzi Global Unicast temporanei per la navigazione.
+
+- *Link-Local Unicast (`fe80::/10`)*: indirizzi generati automaticamente da ogni interfaccia di rete. Hanno validità strettamente confinata al segmento di rete locale (Broadcast Domain) e non vengono mai inoltrati dai router.
+
+- *Unique Local (ULA) (`fc00::/7`)*: analoghi agli indirizzi IP privati dell'IPv4, pensati per reti isolate (l'uso combinato con il NAT66 (IPv6-to-IPv6 NAT) è fortemente sconsigliato).
+
+Altre tipologie di indirizzi sono:
+- *Multicast (`ff00::/8`)*: l'IPv6 abbandona completamente il concetto di Broadcast a favore del Multicast. Gli indirizzi Multicast integrano un campo *Scope* per definire l'ambito di validità (es. `ff02` per il link-local). Il secondo byte definisce quanto lontano può arrivare il pacchetto. Gruppi, identificati dall'ultimo pezzo, notevoli includono l'*All-nodes* (`ff02::1`), l'*All-routers* (`ff02::2`) e *Multicast Globale* (`ff08`).
+  #observation(multiple: true)[
+    + Perché si usa quasi solo l'`ff02`? Perché fare routing Multicast a livello globale (usando protocolli come il *PIM Sparse Mode*) è un incubo ingegneristico. Il Multicast locale, invece, è comodo, sicuro e non appesantisce i router.
+    + I driver delle schede di rete possono filtrare i pacchetti a livello hardware, evitando di interrompere la CPU per il traffico non di competenza. Questo permette di filtrare efficientemente i pacchetti in base al loro scope.
+  ]
+
+- *Anycast*: indirizzi sintatticamente indistinguibili dai Global Unicast, ma assegnati a interfacce appartenenti a nodi differenti. La rete instrada i pacchetti verso il nodo Anycast topologicamente più prossimo al mittente.
+
+Ulteriori tipologie:
+- *Unspecified (`::/128`)*: indirizzo composto da soli zeri, impiegato esclusivamente in contesti di inizializzazione.
+
+- *Loopback (`::1/128`)*: equivalente all'indirizzo localhost `127.0.0.1` dell'IPv4.
+
+== Autoconfigurazione, NDP e Superamento delle Subnet
+
+L'IPv6 introduce il concetto di *scope*, ovvero per quanta distanza, in termini di hop, l'indirizzo continua ad avere _senso_.
+
+// TODO: aggiungere discorso su sicurezza+scope
+// La crittografia è solo uno strumento. Una delle basi della sicurezza di rete è la definizione delle cosiddette "zone di sicurezza": aree della rete in cui i dispositivi condividono le stesse esigenze e regole. Ad esempio, la rete a disposizione degli studenti universitari non può avere gli stessi privilegi della rete della segreteria amministrativa. Se uno studente fa danni, non possiamo licenziarlo; se lo fa un dipendente, sì.
+
+// Di solito, per separare queste zone si usano i firewall (oltre a tecniche più moderne come lo Zero Trust). Ma c'è un metodo ancora più basilare e drastico per isolare due zone: usare indirizzi con uno scope incompatibile. Se la zona A e la zona B usano entrambe solo indirizzi link local, e in mezzo c'è un router, le due zone non potranno mai comunicare. Il router semplicemente non instraderà i pacchetti.
+
+// Originariamente, l'idea degli indirizzi site local o organization local serviva proprio a questo: creare isolamento a livello di protocollo. Alla fine, però, questi indirizzi sono stati abbandonati perché gli amministratori di rete trovavano molto più logico, flessibile e naturale assegnare indirizzi globali a tutti e usare i firewall per gestire chi potesse parlare con chi.
+
+
+Dopo l'avvio della scheda di rete, si avvia la configurazione dello stack IPv6. Come prima cosa, viene creato un indirizzo link local `fe80::/10`.
+#figure(image("images/2026-06-23-22-01-44.png", width: 50%))
+L'*interface ID* può essere costruito in diversi modi:
+- usando indirizzi MAC a 64 bit
+- usando indirizzi MAC a 48 bit ed espandendoli nel formato EUI-64 a 64 bit
+- via DHCP
+- manualmente
+- randomicamente
+- con crittografia (CGA)
+
+Il metodo più comune è quello di utilizzare l'indirizzo MAC. Nel caso di un indirizzo a 48 bit, lo si trasforma in un Extended Unique Identifier a 64 bit nel seguente modo:
+#figure(image("images/2026-06-23-22-04-53.png", width: 60%), caption: "MAC sopra, IPv6 sotto")
+#example()[
+  L'indirizzo MAC `00:1f:5b:39:67:3c` viene convertito in `021f:5bff:fe39:673c`.
+]
+
+Ogni interfaccia di rete possiede *almeno* tre indirizzi IPv6 ma potenzialmente anche di più:
+- Indirizzo di loobpack (`::1/128`)
+- Indirizzo Link Local (`FE80::xx:yy:zz:kk` dove `xx:yy:zz:kk` proviene dal MAC)
+- Indirizzo Global Unicast
+- Indirizzo All-Nodes Multicast (`FF02::1`)
+- Indirizzo All-Routers Multicast (`FF02::2`) se è un router
+- Indirizzo Solicited-Node Multicast (`FF02::1:FF00:0000/104`) se in autoconfigurazione
+
+L'IPv6 rivoluziona la gestione delle reti locali. Il concetto di *Subnet Mask* (Netmask) utilizzato in IPv4 per dedurre se un destinatario risiede sulla medesima rete fisica viene eliminato.
+
+=== SLAAC
+#figure(image("images/2026-06-24-17-08-26.png", width: 50%))
+
+Lo *SLAAC* (Stateless Addess Autoconfiguration) è il meccanismo di autoconfigurazione di IPv6. Permette a due o più host, connessi anche da solo un cavo tra loro, che utilizzano IPv6 di ottenere automaticamente un indirizzo IP senza la presenza di un router. L'intero processo è basato sul protocollo *NDP* (Neighbor Discovery Protocol) che a sua volta incapsulata pacchetti ICMPv6. Il NDP definisce cinque (ma ne vedremo quattro) tipologie di messaggi:
+
++ *Router Solicitation (RS)*: un host che fa uso di SLAAC, invierà automaticamente sulla rete dei pacchetti RS. Questi pacchetti servono per "sollecitare" eventuali router nella rete a presentarsi con il proprio IP in modo tale che l'host conosca il loro indirizzo. Nell'immagine sottostante si può notare come il PC1 invia un pacchetto RS contenente il proprio indirizzo IP (link-local autogenerato da MAC) e specificando come indirizzo di destinazione l'indirizzo *All-Routers Multicast*. In questo modo, soltanto i router considereranno questo pacchetto. Il tipo per RS è 133.
+  #figure(image("images/2026-06-24-17-31-14.png", width: 50%))
+
++ *Router Advertisement (RA)*: i router rispondono a pacchetti RS oppure inviano periodicamente pacchetti RA per annunciare la loro presenza. All'interno è possibile trovare l'indirizzo IPv6 del router, il prefisso che viene utilizzato su quel segmento di rete così come la lunghezza del prefisso e altri parametri utili come l'MTU (Maximum Transfer Unit) o il Router Lifetime (per quanto le informazioni inviate sono da supporre valide). Attraverso il blocco *Prefix Information Option (PIO)*, contenuto nel campo Options... nei messaggi RA, il router utilizza il *Flag L (On-Link)* per comunicare agli host se un determinato prefisso risiede sulla stessa rete fisica. Questo disaccoppiamento logico permette topologie dinamiche e la coesistenza di prefissi multipli sullo stesso dominio di collisione.
+  #figure(image("images/2026-06-24-17-37-24.png", width: 50%))
+  #figure(image("images/2026-06-23-19-23-29.png", width: 50%), caption: "Pacchetto RA")
+  #figure(image("images/2026-06-23-21-23-48.png", width: 50%), caption: "Pacchetto Prefix Information")
+
++ *Neighbor Solicitation (NS)*: i messaggi NS sono simili al protocollo ARP in IPv4. Vengono utilizzati per controllare la disponibilità di un host e anche per il *DAD* (Duplicate Address Detection). L'indirizzo sorgente può essere link-local oppure non specificato (`::/128`) se si sta eseguendo il DAD. L'indirizzo di destinazione è invece il *Solicited-Node Multicast*. Il tipo è 135.
+  #figure(image("images/2026-06-24-17-52-57.png", width: 50%))
+
++ *Neighbor Advertisement (NA)*: i messaggi NA vengono inviati in risposta ai NS oppure per comunicare che un indirizzo è cambiato. L'indirizzo sorgente è quello dell'host che invia il messaggio. L'indirizzo di destinazione può essere link-local (se sta rispondendo ad un NS) oppure *All-Nodes Multicast* se si vuole comunicare un cambio di indirizzo. Il tipo è 136.
+  #figure(image("images/2026-06-24-17-53-12.png", width: 50%))
+
+=== Duplicate Address Detection (DAD)
+
+Al momento dell'autoconfigurazione dell'Interface ID (generato ad esempio tramite EUI-64 o meccanismi randomizzati), il dispositivo deve validarne l'univocità tramite il *DAD*. Questo processo invia una *Neighbor Solicitation* per l'indirizzo appena calcolato e attende una replica. Poiché il DAD si basa su un approccio "silenzio-assenso" (se scade il timer senza risposte, l'IP viene assunto libero), in reti wireless affollate o rumorose eventuali pacchetti persi possono portare a collisioni di IP, causando disservizi complessi e non facilmente rilevabili dagli switch di Livello 2.
+
+= Sicurezza delle Reti (Cybersecurity)
+
+L'introduzione di nuovi protocolli impone una rigorosa analisi delle minacce (*Threat Analysis*). La Cybersecurity non mira alla creazione di sistemi invulnerabili, ma alla riduzione del rischio a un livello operativamente ed economicamente accettabile. Un'analisi strutturata deve rispondere a tre quesiti:
++ *Cosa* si sta proteggendo (asset: dati, hardware, software).
++ *Da chi* e *da quali vettori* ci si protegge.
++ *Perché* lo si protegge (Requisiti normativi, business continuity, incolumità fisica).
+
+L'aggiunta indiscriminata di layer di sicurezza (es. cifratura ovunque) aumenta esponenzialmente la complessità architetturale. Un sistema eccessivamente complesso è prono a difetti di configurazione (misconfigurations) e spesso spinge gli utenti ad aggirare le policy di sicurezza per preservare l'usabilità.
+
+L'isolamento delle zone di sicurezza, storicamente gestito tramite indirizzi IP appositi (come i deprecati *site-local*), oggi viene implementato a livello di architettura di rete (VLAN) o tramite firewall avanzati e policy di *Zero Trust*.
+
+== Tipologie di Vulnerabilità
+
+Le vulnerabilità dei protocolli di rete derivano tipicamente da tre categorie di errori:
+
++ *Vulnerabilità "By Design"*: compromessi architetturali accettati in fase di standardizzazione per privilegiare l'efficienza. Un esempio è l'ARP spoofing in IPv4 (o l'NDP spoofing in IPv6), che sfrutta l'assenza intrinseca di autenticazione nei messaggi di risoluzione degli indirizzi. La mitigazione di queste vulnerabilità è demandata all'applicazione di policy descritte nei manuali (es. *Dynamic ARP Inspection* sugli switch).
+
++ *Vulnerabilità "Bad Implementation" o "Bad Deployment"*: difetti introdotti durante lo sviluppo del codice sorgente o durante la configurazione dell'infrastruttura. Tali difetti sono il veicolo principale dei moderni *Supply Chain Attack*.
+
++ *Vulnerabilità "Bad Design"*: errori concettuali severi. Un esempio si riscontra nel *TCP Window Scaling*. Il protocollo TCP chiude le sessioni anomale tramite pacchetti con flag `RST` validi solo se recanti il corretto `Sequence Number` (spazio a 32 bit). L'introduzione del Window Scaling (per massimizzare il throughput su reti veloci) ha allargato a dismisura la finestra dei pacchetti accettabili. Questo ha abbattuto lo spazio di entropia necessario a un attaccante per eseguire un attacco *TCP Reset Spoofing* cieco: sono sufficienti pochissimi pacchetti per intercettare la finestra valida e abbattere la connessione. La mitigazione implementata successivamente ha imposto restrizioni rigide: un router deve accettare un flag `RST` solo se il Sequence Number è esatto, senza margini di tolleranza, rigettando i valori generici all'interno della finestra.
+
+
+
+// = IPv6
+// <RC_Lezione_2026.05.04.m4a>
+// Perché è nato l'IPv6?
+
+// L'IPv6 nasce più di vent'anni fa. Il motivo scatenante è stato l'esaurimento degli indirizzi IPv4 e il bisogno di superare quella soluzione "cerotto" che era il NAT. L'IPv6 si basa su quattro pilastri fondamentali:
+// - Ha uno spazio di indirizzamento enorme.
+// - Permette di sbarazzarsi finalmente del NAT.
+// - Ha un header semplificato.
+// - Supporta nativamente l'autoconfigurazione.
+
+// I punti più rilevanti, ironicamente, non sono i miliardi di indirizzi, ma l'header semplificato e l'autoconfigurazione.Il design originale di Internet prevedeva un principio sacrosanto: ogni host doveva avere un indirizzo IP univoco a livello globale. Le soluzioni alternative (come i NAT o i tentativi di creare doppi indirizzamenti tra i livelli OSI) falliscono sistematicamente perché violano l'information hiding, creando disastri applicativi. Qualsiasi applicazione moderna prima chiede al DNS il nome di dominio (es. www.unifi.it) e poi dialoga direttamente con l'indirizzo IP. Se in mezzo mettiamo accrocchi non standard, le applicazioni smettono di funzionare. L'IPv6 ripristina la purezza del design originale: un host, un indirizzo univoco.
+
+// La scarsità degli indirizzi IPv4
+
+// Ma perché i 4 miliardi (4 bilioni, in gergo) di indirizzi IPv4 sono finiti? Sicuramente c'è stata una cattiva gestione all'inizio, ma la realtà è che oggi non basterebbero comunque. All'epoca, i Regional Internet Registry (RIR) assegnavano enormi blocchi di indirizzi per sempre. Università come l'MIT avevano interi blocchi che oggi usano a malapena. Quando nel 2012 la disponibilità globale di IPv4 si è ufficialmente esaurita, il mondo non è finito. Semplicemente, si è creata una coda d'attesa lunghissima per i nuovi indirizzi. Questo ha trasformato l'IPv4 in un asset finanziario: chi aveva vecchi blocchi inutilizzati ha iniziato ad affittarli a caro prezzo. Amazon, ad esempio, è oggi uno dei più grandi "proprietari terrieri" di IPv4 e genera profitti enormi semplicemente affittandoli alle aziende.
+
+// La transizione rallentata
+
+// L'IPv6 è stato standardizzato rapidissimamente tra il 1995 e il 1997. Nei primi anni 2000 ci furono test globali (come la rete 6bone) e nazioni come Cina, Giappone e Corea del Sud – che avevano un disperato bisogno di indirizzi per la loro enorme popolazione – diventarono leader nell'adozione. L'Europa è rimasta tragicamente indietro, e l'Italia in particolare (ferma ancora oggi attorno al 20% di adozione). Perché? Perché l'adozione dell'IPv6 non dipende da voi utenti. Dipende dai grandi Internet Service Provider (Telecom, Fastweb, Wind, ecc.). Se l'operatore non abilita l'IPv6, l'utente non lo può usare. E purtroppo, senza incentivi governativi forti (come accadde negli USA, dove il governo obbligò le agenzie federali ad aggiornarsi), i provider nostrani hanno spesso preferito vivacchiare mettendo NAT in cascata piuttosto che aggiornare le infrastrutture.
+
+// Quanto è grande l'IPv6?
+
+// Lo spazio di indirizzamento dell'IPv6 è di $2^{128}$ indirizzi. La mente umana fatica a comprendere un numero simile. Vi faccio un esempio: se gli indirizzi IPv4 fossero 4 secchielli pieni di sabbia, gli indirizzi IPv6 non sarebbero una spiaggia. Non sarebbero nemmeno un Monte Everest di sabbia. Sarebbero pari a sei volte l'intero globo terrestre fatto di sabbia. Significa che potremmo assegnare un IP a ogni singola cellula del nostro corpo e avere ancora spazio. Questa abbondanza non è fine a sé stessa: ci permette di strutturare le reti con una logica che l'IPv4 non ci consentiva.
+
+// Header semplificato e Information Hiding
+
+// La prima rivoluzione tecnica dell'IPv6 è la semplificazione dell'header. Nell'IPv4 l'header era di dimensione variabile (dai 20 ai 60 byte) per colpa delle Opzioni e aveva un Checksum. Questo significava che ogni singolo router su Internet, per ogni pacchetto, doveva:
+// - Leggere un campo per calcolare la lunghezza dell'header.
+// - Allocare memoria di conseguenza.
+// - Ricalcolare l'intero Checksum, altrimenti il pacchetto era scartato.
+// Queste operazioni sprecano cicli di CPU enormi. L'IPv6 taglia la testa al toro: l'header è fisso a 40 byte. Niente frammentazione a livello di router (funziona diversamente) e, soprattutto, niente Checksum. Visto che i collegamenti moderni (fibra, ecc.) hanno tassi di errore fisici trascurabili, perdere tempo a verificare il Checksum a ogni hop è stato ritenuto inutile. E le opzioni? Sono state spostate fuori dall'header principale, in quelli che si chiamano "Extension Headers". Il router legge l'header fisso; se il campo Next Header vale zero, significa che subito dopo c'è un Hop-by-Hop Extension Header che richiede la sua attenzione.
+
+// #figure(image("images/2026-06-23-18-11-46.png", width: 50%))
+
+
+// Se c'è qualsiasi altro numero, il router sa che non gli compete, ignora il resto e inoltra il pacchetto alla velocità della luce tramite hardware dedicato (il cosiddetto Fast Path o Hardware Path). È un salto di efficienza pazzesco.
+
+// I tipi di indirizzi IPv6
+
+// L'indirizzo IPv6, essendo lunghissimo, si scrive in notazione esadecimale divisa da due punti (es. `2001:0db8:85a3::8a2e:0370:7334`). Quando inserite un IP in un browser, va messo tra parentesi quadre (`http://[2001:db8::1]`) e attenzione: il prefisso `2001:db8::/32` è riservato solo alla documentazione e ai manuali. Se lo usate in produzione, il router butta via il pacchetto in automatico per evitare disastri. I tipi di indirizzi sono strutturati in modo molto logico
+// - `:::` (Tutti zeri): indirizzo non specificato.
+// - `::1` : il Localhost (l'equivalente del vecchio `127.0.0.1`).
+// - `2000::/3` : Global Unicast. Sono gli indirizzi pubblici, instradabili ovunque su Internet.
+// - `fe80::/10`: Link-Local. Indirizzi fondamentali. Sono validi solo nel vostro cavo locale e muoiono al primo router.
+// - `fc00::/7` (Unique Local Addresses - ULA): l'equivalente dei vecchi IP privati. Si usano solo se volete fare esperimenti con l'IPv6 isolando la vostra rete, magari mettendoci un NAT (cosa che vi sconsiglio vivamente).
+// - `ff00::/8`: Multicast. Il Multicast in IPv6 sostituisce completamente il vecchio Broadcast. Il Multicast in IPv6 è onnipresente ed è strutturato con uno Scope. Il secondo byte definisce quanto lontano può arrivare il pacchetto. Se usate `ff02`, il pacchetto si ferma al Link-Local (non supera il router). Se usate `ff08`, è un Multicast globale.
+
+// Perché si usa quasi solo l'FF02? Perché fare routing Multicast a livello globale (usando protocolli mostruosi come il PIM Sparse Mode) è un incubo ingegneristico che fa piangere sangue agli amministratori di rete. Il Multicast locale, invece, è comodo, sicuro e non appesantisce i router. E infine, esiste il concetto di Anycast: indirizzi sintatticamente identici ai Global Unicast, ma assegnati a più macchine in giro per il mondo. Se inviate un pacchetto a un indirizzo Anycast, la rete lo instraderà magicamente al server geograficamente o topologicamente più vicino a voi.
+
+// Autoconfigurazione (SLAAC)
+
+// Domani parleremo a fondo dell'autoconfigurazione. Non pensate al DHCP. Nelle reti IPv6, se attaccate due dispositivi con un cavo, anche senza alcun server o router, questi iniziano automaticamente a parlare in IPv6 usando i loro indirizzi Link-Local.Questo è fantastico per il Plug&Play, ma è un potenziale incubo per la sicurezza. Se vi collegate al Wi-Fi di un hotel, potreste non avere Internet in IPv6, ma il vostro computer in background inonderà la rete locale di pacchetti scoprendo condizionatori, lampadine e lavatrici smart configurate male dagli amministratori. Una rete che si configura da sola è una rete che dovete sorvegliare con il doppio dell'attenzione. Ma di questo, e dei dettagli di come avviene la magia, parleremo nella prossima lezione.
+
+// <RC_Lezione_2026.05.05.m4a>
+// Ripartiamo dall'IPv6 e dalla sua tanto amata (e temuta) autoconfigurazione. Il problema dell'autoconfigurazione dell'IPv6 non è che non funzioni, ma che è come l'Inquisizione Spagnola: nessuno se l'aspetta. Chi installa una rete senza sapere esattamente cosa sta facendo, si ritrova spesso con l'IPv6 attivo, funzionante e configurato "a sua insaputa". E se non sai di avere una rete, non puoi metterla in sicurezza.
+
+// Per capire l'IPv6, dobbiamo ripassare il concetto di "scope", ovvero di ambito di validità. A differenza dell'IPv4, in cui l'ambito era gestito in modo un po' approssimativo, in IPv6 ogni indirizzo ha un suo scope preciso: c'è il nodo locale (localhost), il link local (che muore al primo router) e il global (raggiungibile da tutta Internet). Un tempo c'erano anche indirizzi site local o organization local, ma sono stati deprecati. Perché? Per capirlo, dobbiamo fare una piccola e doverosa deviazione nel mondo della Cybersecurity.
+
+// La Cybersecurity non è la scienza che rende un sistema invulnerabile, è la scienza che minimizza e gestisce i rischi associati all'uso dei dispositivi. Voi vi sentite sicuri in quest'aula perché c'è un estintore e una porta con il maniglione antipanico, ma se l'aula fosse piena zeppa e ci fosse un'emergenza, chi è seduto in mezzo ai banchi farebbe una gran fatica a uscire. La sicurezza al 100% non esiste; per ottenerla dovremmo rimuovere tre file di banchi, ma perderemmo utilità. Lo stesso vale per le reti.
+
+// Spesso si pensa che la sicurezza informatica si riassuma nel "cifrare tutto con HTTPS". Sbagliato. La crittografia è solo uno strumento. Una delle basi della sicurezza di rete è la definizione delle cosiddette "zone di sicurezza": aree della rete in cui i dispositivi condividono le stesse esigenze e regole. Ad esempio, la rete a disposizione degli studenti universitari non può avere gli stessi privilegi della rete della segreteria amministrativa. Se uno studente fa danni, non possiamo licenziarlo; se lo fa un dipendente, sì.
+
+// Di solito, per separare queste zone si usano i firewall (oltre a tecniche più moderne come lo Zero Trust). Ma c'è un metodo ancora più basilare e drastico per isolare due zone: usare indirizzi con uno scope incompatibile. Se la zona A e la zona B usano entrambe solo indirizzi link local, e in mezzo c'è un router, le due zone non potranno mai comunicare. Il router semplicemente non instraderà i pacchetti.
+
+// Originariamente, l'idea degli indirizzi site local o organization local serviva proprio a questo: creare isolamento a livello di protocollo. Alla fine, però, questi indirizzi sono stati abbandonati perché gli amministratori di rete trovavano molto più logico, flessibile e naturale assegnare indirizzi globali a tutti e usare i firewall per gestire chi potesse parlare con chi.
+
+// Tipi di indirizzi IPv6
+
+// Fatta questa premessa, rivediamo rapidamente le classi di indirizzi IPv6 che vi dovete ricordare:
+
+// Tutti zeri (::): È l'indirizzo unspecified. Si può usare come mittente, ma solo in un caso rarissimo che vedremo a breve.
+
+// ::1: Il localhost, la vostra macchina. Home sweet home.
+
+// 2000::/3: Global Unicast. Qualsiasi indirizzo che inizia con 2 o 3 è pubblico e globale.
+
+// fe80::/10: Link Local. State attenti, il 99% delle volte vedrete fe80, ma tecnicamente anche un indirizzo che inizia con fe90 o feab è un Link Local validissimo.
+
+// ff00::/8: Multicast. Sostituisce completamente il concetto di Broadcast, che in IPv6 non esiste più.
+
+// Ci sono anche gli indirizzi Anycast, ma non hanno un prefisso speciale: sono sintatticamente identici ai Global Unicast. La loro particolarità è che lo stesso indirizzo è assegnato a più macchine nel mondo, e sarà la rete (tramite il routing) a portare il vostro pacchetto al server topologicamente più vicino a voi.
+
+// Il Multicast e l'abbandono del Broadcast
+
+// Soffermiamoci sul Multicast. Nell'IPv4 avevamo l'indirizzo di broadcast, che inondava l'intera sottorete di pacchetti. Il problema del broadcast è fisico ed energetico: un pacchetto mandato in broadcast costringe tutte le schede di rete di tutti i dispositivi a svegliarsi, decodificare il pacchetto e passarlo al sistema operativo per capire se gli interessa o no. In scenari IoT o per dispositivi a batteria, questo è un salasso energetico intollerabile.
+
+// L'IPv6 risolve questo problema con un uso pesantissimo del Multicast. In IPv6, gli indirizzi Multicast (ffxx::) hanno una struttura precisa: il secondo byte definisce lo scope (quanto lontano può viaggiare il pacchetto, es. link-local o globale), e l'ultimo pezzo definisce il gruppo.
+
+// Ci sono due gruppi Multicast fondamentali:
+
+// All-nodes (ff02::1): Tutti i dispositivi collegati al link. Sostituisce di fatto il broadcast locale.
+
+// All-routers (ff02::2): Tutti i router collegati al link. Se volete cercare un router, non urlate a tutti, mandate un pacchetto solo a loro.
+
+// La vera genialità dell'IPv6 è come traduce il Multicast IP in indirizzi MAC a livello datalink (Ethernet/Wi-Fi). In IPv4, il broadcast IP si traduce in un MAC address composto da tutti 1 (FF:FF:FF:FF:FF:FF), costringendo tutti ad ascoltare. In IPv6, l'indirizzo MAC di destinazione viene generato fondendo un prefisso fisso con gli ultimi 3 byte dell'indirizzo Multicast IPv6.
+// Questo significa che la vostra scheda di rete, già a livello hardware, può filtrare i pacchetti. Se un router manda un messaggio al gruppo Multicast All-routers, la scheda di rete del vostro portatile o del vostro termostato smart guarderà l'indirizzo MAC, capirà che non è roba per lei e rimarrà in standby, senza nemmeno disturbare la CPU.
+
+// Questa filosofia viene applicata a tutto: se cercate un server DHCP, non inondate la rete, mandate un pacchetto al gruppo Multicast dei server DHCP. Questa semantica spinta fa risparmiare un'enorme quantità di risorse. L'unico lato negativo è il Multicast su scala globale: gestire il routing Multicast tra migliaia di router tramite protocolli come il PIM Sparse Mode è un incubo matematico e gestionale che fa letteralmente impazzire gli ingegneri di rete.
+
+// Il Boot e il Duplicate Address Detection (DAD)
+// Ma come fa esattamente un dispositivo IPv6 a configurarsi da solo? Mettetevi nei panni del vostro computer quando premete il tasto d'accensione.
+// Prima si avvia l'hardware, poi la scheda di rete segnala al sistema operativo di aver stabilito un collegamento (il cavo è inserito o il Wi-Fi è connesso). A quel punto, lo stack IPv6 entra in azione.
+
+// La prima cosa che fa il sistema è auto-assegnarsi un indirizzo Link Local (fe80::). Per farlo, deve generare una coda di 64 bit chiamata Interface ID. Lo standard suggerisce di generare questa coda in modo da minimizzare il rischio di creare un indirizzo identico a quello di un'altra macchina. Il metodo storico è usare il MAC Address della scheda di rete: si prende l'indirizzo MAC (48 bit), lo si spezza a metà, ci si infila in mezzo FF:FE e si inverte il settimo bit. In questo modo si ottiene un Interface ID a 64 bit (formato EUI-64) che dovrebbe essere univoco in tutto il mondo, figuriamoci nel vostro cavo locale. Esistono anche metodi per generarlo tramite algoritmi crittografici (CGA), utili per la sicurezza ma pesantissimi per i router che poi dovranno gestirli.
+
+// Una volta che il computer si è "inventato" il suo indirizzo Link Local, può iniziare a usarlo? No. Deve prima assicurarsi che nessun altro nella rete locale abbia avuto la sua stessa idea. Qui entra in gioco il tallone d'Achille dell'IPv6: il Duplicate Address Detection (DAD).
+
+// Funziona così: il vostro computer si unisce a uno speciale gruppo Multicast chiamato Solicited-node multicast address, associato agli ultimi 3 byte dell'indirizzo che vuole usare. Poi, manda un pacchetto a questo gruppo chiedendo: "C'è qualcuno che sta già usando questo IP?". Per mandare questa richiesta, usa come mittente l'indirizzo di tutti zeri (::, l'unspecified address), perché ufficialmente lui un indirizzo non ce l'ha ancora.
+
+// Se un altro dispositivo nella rete possiede già quell'IP, riceverà il pacchetto, si arrabbierà e risponderà (sempre via Multicast) dicendo: "Ehi, quello è mio!". A quel punto, il vostro computer capisce che c'è stato un conflitto e dovrà generare un nuovo Interface ID e riprovare.
+
+// Qual è il gigantesco, disastroso problema del DAD? È basato sul principio del "silenzio-assenso". Voi mandate la richiesta e fate partire un timer. Se il timer scade e non avete ricevuto risposte, assumete che l'indirizzo sia libero e iniziate a usarlo.
+// Ma cosa succede se il pacchetto di richiesta è andato perso per colpa di un'interferenza Wi-Fi? E se il dispositivo che aveva il vostro stesso IP era in modalità risparmio energetico e ha risposto troppo tardi? O se la rete era semplicemente congestionata?
+// In tutti questi casi, il vostro timer scadrà, voi inizierete a usare l'IP e vi ritroverete con due dispositivi sulla stessa rete locale con lo stesso identico indirizzo. I pacchetti inizieranno ad arrivare alla macchina sbagliata, e la rete impazzirà.
+
+// In un'aula affollata con centinaia di telefoni o in grandi reti wireless pubbliche, calcolando le probabilità di perdita dei pacchetti e il paradosso del compleanno, le collisioni di indirizzi IP non sono solo una possibilità, sono una certezza matematica. Progettare un protocollo di rete basandolo sul presupposto che "se non ricevo risposta, allora va tutto bene" è un suicidio concettuale. Funziona solo in reti cablate perfette e prive di rumore, non certo nel Wi-Fi moderno.
+
+// Purtroppo, essendo cablato nello standard IPv6, il DAD non si può semplicemente rimuovere. L'unica soluzione pratica usata dagli ingegneri di rete oggi è limitare drasticamente le dimensioni fisiche dei domini Link Local (isolando gli access point tra loro) per abbassare statisticamente il numero di utenti che si parlano e, di conseguenza, la probabilità che il DAD fallisca in modo catastrofico.
+
+// <RC_Lezione_2026.05.11.m4a>
+// Ricominciamo da dove ci eravamo lasciati. L'autoconfigurazione in IPv6 è una bestia. Se non la capite, vi ritroverete a configurare reti che fanno acqua da tutte le parti. Vi ricordo una cosa fondamentale: in IPv6 abbiamo indirizzi Global (pubblici) e indirizzi Link-Local (fe80::). Un dispositivo potrebbe non avere un indirizzo Global (se non c'è un router o un server DHCP), ma avrà sempre un indirizzo Link-Local. Se sentite qualcuno dire "Ho controllato la mia rete e l'IPv6 è disabilitato perché ho solo un indirizzo fe80...", sappiate che sta dicendo una sciocchezza. L'IPv6 è attivissimo.
+
+// L'indirizzo Link-Local viene autoconfigurato automaticamente. L'unico modo per forzarlo è configurare manualmente l'Interface ID (gli ultimi 64 bit), ma anche in quel caso c'è di mezzo il DAD, il Duplicate Address Detection. E qui arrivano i dolori.
+
+// Lo standard non dice esattamente cosa debba fare un dispositivo se il DAD fallisce (cioè se scopre che un altro dispositivo nella rete sta già usando quel preciso indirizzo). Nei sistemi operativi normali (PC, smartphone) di solito viene generato un nuovo Interface ID a caso e si riprova. Ma in scenari IoT, se il DAD fallisce e il firmware è scritto male, il dispositivo potrebbe semplicemente bloccarsi in attesa di un intervento umano. Visto che non ha uno schermo, voi vi ritrovate con un sensore che non funziona e non sapete perché.
+
+// E se il DAD fallisce "in silenzio"? Ovvero, se il dispositivo crede che l'indirizzo sia libero quando invece è già usato da qualcun altro? Si genera una duplicazione di indirizzi IP sulla stessa rete locale (due MAC address diversi che rispondono allo stesso IP). Questo crea una confusione totale non solo tra i due dispositivi, ma anche per gli switch di rete. Per rilevare un problema del genere, lo switch dovrebbe ispezionare i pacchetti a livello IP (Livello 3), ma uno switch puro lavora a Livello 2 (MAC). Quindi, evitate a tutti i costi che questo accada.
+
+// Configurare gli indirizzi Globali: Router Advertisement e il mito della Netmask
+
+// Per gli indirizzi Globali, il processo di autoconfigurazione è simile a quello dei Link-Local, ma i dispositivi non possono inventarsi il prefisso da soli. Hanno bisogno di un Router Advertisement (RA).
+// I router IPv6 inviano periodicamente questi messaggi (RA unsolicited) in multicast a tutti i nodi (ff02::1). Se un dispositivo appena acceso ha fretta, può inviare una Router Solicitation (RS) all'indirizzo multicast dei router (ff02::2), chiedendo: "C'è un router qui? Datemi i parametri!". In risposta, il router invia un RA che contiene, tra le altre cose, i prefissi Globali che il dispositivo può usare per autoconfigurarsi. Un piccolo avviso: la specifica originale dei RA non includeva la configurazione dei server DNS (è stata aggiunta dopo). Se avete a che fare con dispositivi vecchi o scritti male, potreste ricevere un IP ma non un DNS, rimanendo impossibilitati a navigare.
+
+// Ora passiamo al mal di testa vero. Se non capite questo, non avete capito come funziona l'instradamento in IPv6.
+
+// Siete stati abituati all'IPv4 e al concetto di Subnet (sottorete) e di Netmask. In IPv4, per capire se un altro dispositivo è sulla vostra stessa rete locale (e quindi se potete parlargli direttamente senza passare dal router), fate una semplice operazione di AND logico tra il vostro IP, l'IP di destinazione e la Netmask. Se i risultati coincidono, siete nella stessa subnet. Questo meccanismo, però, si rompe in modo catastrofico se due computer hanno Netmask configurate in modo diverso (es. uno ha /24 e l'altro /16).
+
+// In IPv6, la Netmask non esiste più. Dimenticatevela. La lunghezza del prefisso (es. /64) non è una Netmask. E allora, come fate a sapere se un indirizzo IPv6 è nella vostra rete locale (on-link) o se dovete passare dal router (off-link)?
+// Semplice: non lo fate. È una rivoluzione copernicana. In IPv6 non c'è deduzione logica. La risposta vi deve essere fornita esplicitamente dal router.
+
+// L'importanza del flag "On-Link" e il Neighbor Discovery
+// Quando un router IPv6 vi manda un Router Advertisement, all'interno del pacchetto c'è un blocco chiamato PIO (Prefix Information Object). Questo PIO contiene il prefisso (es. 2001:db8::/64) e una serie di bit (flag).
+// Uno di questi è il bit L (On-Link).
+
+// Se il bit L è a 1, il router vi sta dicendo: "Tutti gli host che usano questo prefisso sono collegati fisicamente alla tua stessa rete locale. Puoi contattarli direttamente".
+
+// Se il bit L è a 0, il router vi sta dicendo: "Anche se questi host hanno il tuo stesso prefisso, non sono nella tua rete locale. Devi mandare i pacchetti a me, ci penso io a instradarli".
+
+// Se non avete ricevuto nessun Router Advertisement, di default qualsiasi indirizzo (tranne i Link-Local) è considerato off-link. Invierete tutto al vostro Default Gateway.
+
+// Ma cosa succede se mandate un pacchetto al router per un dispositivo che in realtà è fisicamente connesso al vostro stesso switch? Il router IPv6 lo inoltrerà al dispositivo corretto, ma subito dopo vi manderà un messaggio ICMPv6 chiamato Redirect (che possiamo tradurre educatamente come: "Smettila di scocciarmi"). Con questo messaggio, il router vi dice: "Guarda che tu e quel destinatario specifico siete on-link. Parlatevi direttamente la prossima volta". In questo modo, il concetto di "rete locale" diventa dinamico e non è più vincolato rigidamente ai blocchi IP.
+
+// Questa flessibilità permette configurazioni che in IPv4 sarebbero state assurde. Potete avere due computer collegati allo stesso switch, ma con prefissi IP completamente diversi, e il router potrebbe dire a entrambi che sono on-link per certi indirizzi e off-link per altri.
+// Vi faccio un esempio pratico: l'Internet delle Cose (IoT). Supponiamo che abbiate in casa una rete Wi-Fi/Ethernet e un gateway Zigbee/Thread per dispositivi IoT (lampadine, sensori). I dispositivi Zigbee non hanno il MAC address a 48 bit del Wi-Fi, quindi non potete fare un bridge diretto tra le due reti. Il gateway deve per forza fare da router.
+// In IPv6, invece di impazzire creando sottoreti complesse, potete assegnare a tutta la casa e a tutta la rete IoT lo stesso identico prefisso /64. Per farlo funzionare, configurate il router principale in modo che dichiari quel prefisso come off-link (bit L=0). A quel punto, i vostri computer Wi-Fi invieranno i pacchetti destinati all'IoT al router principale; quest'ultimo, sapendo dove si trova il gateway Zigbee, instraderà i pacchetti a lui. È complicato all'inizio, ma sul lungo periodo scala infinitamente meglio rispetto all'uso disordinato di IP locali.
+
+// E per trovare il MAC address (o equivalente) del destinatario, una volta scoperto che è on-link? Si usa il Neighbor Discovery Protocol (NDP). L'NDP sostituisce il vecchio ARP dell'IPv4. Invece di inviare un fastidioso broadcast, il dispositivo sorgente usa un messaggio ICMPv6 chiamato Neighbor Solicitation, inviandolo a un indirizzo Multicast calcolato appositamente in base all'indirizzo IP di destinazione (il Solicited-node multicast address). Chi possiede quell'IP risponderà con un Neighbor Advertisement, confermando la sua presenza e il suo MAC address.
+
+// DHCPv6: Un ruolo diverso
+
+// E il DHCP in tutto questo? In IPv6 il suo ruolo cambia. Viene usato solo se il router ve lo ordina.
+// Nel PIO del Router Advertisement ci sono altri due flag importanti:
+
+// Il bit M (Managed): Se è a 1, il router vi dice: "Usa il server DHCPv6 per ottenere il tuo indirizzo IPv6".
+
+// Il bit O (Other): Se è a 1, il router vi dice: "Usa l'autoconfigurazione per farti l'indirizzo IP, ma chiedi al server DHCPv6 le altre configurazioni accessorie" (es. i server DNS, il dominio di ricerca).
+
+// Inoltre, il DHCPv6 non identifica i client tramite il MAC address. Dato che oggi i dispositivi cambiano MAC address di continuo per ragioni di privacy (MAC randomization), usare il MAC manderebbe in tilt il server DHCP. Invece, si usa il DUID (DHCP Unique Identifier). Il DUID viene generato dal sistema operativo, di solito fondendo il MAC address originario e altri parametri, e rimane fisso e costante nel tempo, garantendo al server DHCP di riconoscere sempre lo stesso client.
+
+// Frammentazione e Path MTU Discovery
+
+// Ultimo grande argomento di oggi: la frammentazione e il concetto di MTU (Maximum Transmission Unit).
+// Ogni rete fisica ha una dimensione massima per i pacchetti (es. 1500 byte per Ethernet). In IPv4, se un pacchetto arriva a un router intermedio e la rete successiva ha una MTU più piccola (es. 1492 byte per via di incapsulamenti PPPoE come nelle vecchie ADSL), il router "taglia" il pacchetto in due frammenti usando i campi di frammentazione dell'header IPv4. Questo crea un sovraccarico di lavoro (overhead) enorme per il router, che deve ricalcolare il Checksum e gestire la suddivisione.
+
+// In IPv6, la regola è drastica: i router intermedi non frammentano mai i pacchetti.
+// Se un router IPv6 riceve un pacchetto troppo grande per la rete successiva, lo scarta e manda indietro un messaggio ICMPv6 di errore chiamato Packet Too Big. Questo messaggio contiene la dimensione dell'MTU consentita.
+// Il nodo sorgente riceve l'errore e aggiorna il suo Path MTU (PMTU) per quella specifica destinazione. Da quel momento in poi, sarà il nodo sorgente (e solo lui) a generare pacchetti più piccoli, inserendo un Extension Header di frammentazione se necessario.
+
+// Questo sistema è infinitamente più efficiente per i router di dorsale, ma ha un punto debole mortale: gli amministratori di rete incompetenti. Spesso chi configura i firewall blocca totalmente il traffico ICMP, credendo di aumentare la sicurezza ("così non mi pingano!"). In IPv6, se bloccate l'ICMP, bloccate i messaggi Packet Too Big. Il nodo sorgente non saprà mai perché i suoi pacchetti vengono scartati e la connessione andrà in stallo senza spiegazioni (i famosi "buchi neri" di rete).
+
+// Infine, una salvaguardia imposta dall'IPv6: lo standard vieta l'esistenza di link con MTU inferiore a 1280 byte. Mentre in IPv4 potevano esistere reti con payload piccolissimi (ignorando il consiglio teorico dei 576 byte), in IPv6 il limite di 1280 byte è legge.
+// E cosa succede con reti come il Bluetooth, LoRa o Zigbee (IEEE 802.15.4), che hanno MTU a livello fisico minuscole (spesso inferiori ai 100 byte)? Semplice: devono usare un Adaptation Layer (uno strato software intermedio, come 6LoWPAN) che si occupa di comprimere l'header IPv6 e gestire una frammentazione invisibile al livello IP superiore, garantendo all'IPv6 di vedere sempre e comunque i suoi 1280 byte garantiti.
+
+// Direi che come mole di informazioni per oggi può bastare. Domani ci avventureremo nella sicurezza di rete vera e propria. Caffè meritato per tutti!
+
+// = RC_Lezione_2026.05.12_FULL.m4a
+// Ricominciamo e facciamo un po' di chiarezza, perché l'autoconfigurazione dell'IPv6 è un argomento che, se non lo capite a fondo, vi farà sbattere la testa contro il muro. Voi arrivate con dei preconcetti molto forti derivati dall'IPv4 e vi trovate spiazzati.
+
+// In IPv6 avete due tipi di indirizzi fondamentali: il Link-Local e il Global. Un dispositivo potrebbe benissimo non avere un indirizzo Global (magari perché non c'è un router o non c'è connessione a Internet), ma avrà sempre e comunque un indirizzo Link-Local. Se collegate un cavo di rete a un PC, quello si genera un Link-Local e inizia a usarlo, indipendentemente dalla vostra volontà.
+
+// Spesso mi si chiede: "Ma perché dovrei voler passare all'IPv6? Cosa fa di meglio rispetto all'IPv4 dal punto di vista dell'utente finale?". La risposta brutale è: niente. O quasi.
+// Immaginate di avere una vecchia Fiat Panda a benzina e io vi dico di cambiarla con una Panda diesel perché "la benzina sta per finire". Voi mi rispondereste che la macchina fa le stesse cose, va sulle stesse strade e, finché trovate benzina o un additivo, non avete nessun motivo pratico per svenarvi a comprarne una nuova.
+
+// Per gli Internet Service Provider (ISP) è lo stesso: implementare l'IPv6 è un costo enorme. Richiede di mantenere due infrastrutture di rete (Dual Stack), avere firewall separati e, soprattutto, affrontare un Operational Expenditure (OPEX) altissimo, ovvero formare il personale che per trent'anni ha lavorato solo in IPv4 e non vuole sentir parlare di altro. Il capitale iniziale per aggiornare gli apparati (CAPEX) è quasi nullo perché i router lo supportano già, ma i costi di gestione sono enormi.
+// E allora perché si sta facendo questa transizione? Perché il costo dei Carrier-Grade NAT (i mega-NAT che i provider devono installare per far bastare i pochi IPv4 rimasti) sta diventando talmente proibitivo da superare i costi della transizione all'IPv6. Inoltre, l'avvento del 5G (nella sua vera versione "Standalone", o SA) costringe gli operatori a migrare, poiché la Core Network del 5G parla esclusivamente e obbligatoriamente in IPv6.
+
+// Sfatare i miti: Subnetting e Neighbor Discovery
+// Qual è la cosa che vi fa più paura dell'IPv6? La mancanza delle Subnet.
+// In IPv4, siete stati abituati a prendere l'indirizzo IP, applicare la Netmask e dire "Ah, siamo nella stessa sottorete, quindi comunichiamo direttamente". In IPv6, questa logica è stata letteralmente brasata via. Non esiste la Netmask in IPv6. La lunghezza del prefisso (es. /64) non è una Netmask. E allora come fate a sapere se un nodo è sulla vostra stessa rete locale (on-link)? Semplicemente, non lo fate da soli. È il router che, tramite i messaggi Router Advertisement (RA), vi dice esplicitamente quali prefissi sono "on-link" (potete raggiungerli direttamente) e quali sono "off-link" (dovete passare da lui).
+
+// Per scoprire il MAC address di un destinatario che si trova nella vostra rete locale, l'IPv4 usava l'ARP (Address Resolution Protocol), un protocollo grezzo che urlava in broadcast a tutti i nodi. L'IPv6 usa il Neighbor Discovery Protocol (NDP). A livello di campi dati non sono poi così diversi, ma il modo in cui comunicano è rivoluzionario. L'NDP viaggia sopra l'ICMPv6 e non usa il broadcast, ma il Multicast. Se cerco un dispositivo, non do fastidio a tutta la rete: mando la richiesta a un indirizzo Multicast calcolato matematicamente (il Solicited-node multicast address) in modo che venga elaborato solo da chi ha un indirizzo IP simile a quello che sto cercando.
+
+// Inoltre, vi sconvolge il fatto che un dispositivo abbia tanti indirizzi. Ma ragionateci: anche in IPv4 il vostro computer ha l'indirizzo della scheda di rete e il 127.0.0.1 (localhost). In IPv6 è la norma averne ancora di più. Ne avrete uno Link-Local fisso (per comunicare nella rete locale) e diversi Global.
+// Perché più di un Global? Per la Privacy. Se usaste sempre lo stesso indirizzo Global per navigare, sareste tracciabili in tutto il mondo con una precisione chirurgica, peggio del MAC address. Quindi, i sistemi operativi moderni generano indirizzi IPv6 Global temporanei, li usano per navigare per qualche ora e poi li buttano via per generare quelli nuovi, mantenendo un livello di privacy decente senza gravare sull'infrastruttura di rete.
+
+// Introduzione alla Cybersecurity
+
+// Tutte le scelte fatte nella progettazione dell'IPv6 ci portano a introdurre il concetto di Sicurezza Informatica (Cybersecurity).
+// Quando si parla di sicurezza di rete, sento spesso parlare a pappagallo di Confidenzialità, Integrità e Disponibilità. Vi prego, smettetela di partire dalla fine. La sicurezza non significa "cifrare tutto con HTTPS a prescindere".
+
+// La sicurezza informatica è la scienza che mira a minimizzare i rischi a un livello accettabile. Prima di applicare qualsiasi contromisura, dovete porvi tre domande:
+
+// Cosa sto proteggendo? (Gli Asset: hardware, software, e soprattutto i dati).
+
+// Da chi mi sto proteggendo? (Analisi delle minacce).
+
+// Perché lo sto proteggendo? (Requirement di legge o policy aziendali).
+
+// Se non fate una Threat Analysis (Analisi dei Rischi), state sprecando soldi. La sicurezza è un costo, spesso esponenziale, e rende i sistemi terribilmente più complicati. E ricordate: un sistema più complicato è un sistema più prono agli errori. Se imponete regole troppo stringenti ai vostri dipendenti (come password di 30 caratteri cambiate ogni settimana), loro le scriveranno su un post-it attaccato al monitor, vanificando tutto. La sicurezza deve essere pensata di concerto con l'usabilità.
+
+// Da dove derivano le vulnerabilità nei sistemi e nei protocolli di rete? Principalmente da tre fattori:
+
+// Vulnerabilità "By Design": Sono difetti intrinseci alla logica di un protocollo. L'ARP spoofing in IPv4, ad esempio, sfrutta il fatto che il protocollo si fida ciecamente di chiunque risponda a una richiesta ARP. I progettisti sanno che questa vulnerabilità esiste, ma l'hanno lasciata per non appesantire o distorcere il protocollo originale, demandando la protezione ad altre tecnologie (es. port security sugli switch). Se un sistema viene bucato perché non avete letto il manuale e non avete applicato le mitigazioni consigliate, la colpa è vostra.
+
+// Vulnerabilità "Bad Design": Sono errori veri e propri nella progettazione. Il vecchio protocollo Wi-Fi WEP era bucato "by design" in senso negativo. Quando si scopre una roba del genere, l'unica soluzione è buttare via il protocollo e ricominciare da capo (passando a WPA, poi WPA2, ecc.).
+
+// Vulnerabilità "Bad Implementation" o "Bad Deployment": Il protocollo sulla carta era perfetto, ma il programmatore che ha scritto il codice ha fatto un disastro, oppure l'amministratore di sistema l'ha installato e configurato male. Da qui nascono i moderni Supply Chain Attack, in cui gli hacker non attaccano direttamente il bersaglio, ma inseriscono codice malevolo in una libreria open-source oscura che poi verrà importata a cascata in migliaia di altri software aziendali.
+
+// Domani entreremo nel vivo e vi mostrerò un paio di vulnerabilità specifiche del design dei protocolli, come sono state affrontate e come una banale sottovalutazione della dimensione di un campo di testo possa scatenare l'inferno.
+
+// = RC_Lezione_2026.05.13.m4a
+// Riprendiamo da dove ci eravamo lasciati, affrontando un tema fondamentale. Vi chiedo: qual è l'argomento dell'IPv6 che finora vi è risultato più alieno e ostico? Molti di voi, avendo studiato l'IPv4 alle superiori, si trovano spiazzati perché l'IPv6 ha un funzionamento profondamente diverso, soprattutto in come comunicano i dispositivi all'interno della stessa rete locale. E avete perfettamente ragione a sentirvi disorientati.
+
+// Il vero ostacolo nell'imparare l'IPv6 è che siete pieni di preconcetti derivati dall'IPv4. Purtroppo non posso farvi una "pulizia del cervello" totale, quindi cerchiamo di usare dei parallelismi. Da un certo punto di vista, è stato teorizzato che l'IPv6 sia stato un enorme fallimento di marketing. Ci ha messo vent'anni per diffondersi. Perché? Perché per un utente finale, o persino per un Internet Service Provider (ISP), l'IPv6 non offre alcun vantaggio pratico immediato e visibile rispetto all'IPv4.
+// Se vi chiedessi di buttare la vostra vecchia auto a benzina (funzionante) per comprarne una diesel solo perché "la benzina sta per finire", voi mi chiedereste "Sì, ma cosa fa di meglio?". La risposta per l'IPv6 è: sostanzialmente niente che voi possiate notare navigando.
+
+// Per un ISP, implementare l'IPv6 significa raddoppiare i costi infrastrutturali (il cosiddetto OPEX, l'Operational Expenditure), formare il personale e gestire due reti in parallelo (Dual Stack). L'unica spinta attuale al cambiamento è che mantenere in piedi reti enormi in IPv4, usando costosi sistemi di Carrier-Grade NAT (CG-NAT) per mascherare la carenza di indirizzi, costa ormai più che fare la transizione all'IPv6.
+// Un'altra spinta fondamentale è l'arrivo del 5G. La Core Network del vero 5G (la versione Standalone, SA) deve obbligatoriamente funzionare su IPv6 per le sue comunicazioni interne. A quel punto, se un operatore ha già l'infrastruttura IPv6 pronta e il personale formato per il 5G, convergerà tutta la sua rete (anche quella fissa) su IPv6, eliminando i costi del Dual Stack.
+
+// L'eliminazione delle Subnet: il terrore dei sistemisti
+// A livello applicativo, per voi che usate un browser o aprite una socket, passare da IPv4 a IPv6 non cambia assolutamente nulla. C'è il DNS, mettete un nome a dominio, e il sistema fa tutto da solo. Le vere differenze stanno sotto il cofano.
+// Una di queste differenze è come l'IP viene tradotto in MAC address. In IPv4 si usa l'ARP (Address Resolution Protocol), un pacchetto grezzo di Livello 2. In IPv6 si usa l'NDP (Neighbor Discovery Protocol), che è integrato all'interno dell'ICMPv6 (Livello 3). A livello di funzionamento pratico sono molto simili: cambia solo che l'IPv6 usa messaggi Multicast invece che fastidiosi messaggi Broadcast, rendendo la rete molto più efficiente.
+
+// Ma la cosa che vi terrorizza di più è la sparizione del concetto di "Subnet".
+// In IPv4, la rete aziendale è tipicamente divisa in tante piccole "isole" isolate fisicamente o tramite NAT. Con l'IPv6, avendo spazio infinito, l'istinto è quello di dare a tutta l'azienda o al dipartimento un unico enorme prefisso. Cosa succede domani mattina se tolgo i NAT e unifico tutto? Succede che lo studente del primo piano vede la stampante del decimo piano, clicca "Stampa" per errore, la stampante non va, ci riclicca dieci volte, e intanto dall'altra parte dell'edificio qualcuno si infuria. I server, le macchine di calcolo e i dispositivi personali finiscono tutti nello stesso calderone visibile.
+
+// Come si risolve? I sistemisti devono smettere di usare gli indirizzi IP e i NAT come strumenti di isolamento e iniziare a usare strumenti veri, come i Firewall e le VLAN (Virtual LAN) a livello 2. È una transizione mentale e manuale, ma tecnicamente la rete funzionerà benissimo.
+
+// L'altra cosa che vi sconvolge è vedere il vostro computer con 10 indirizzi IPv6 contemporaneamente. Ragionateci: in IPv6 l'indirizzo Global cambia in continuazione per garantirvi la privacy. Se navigaste sempre con lo stesso IP pubblico (che, essendo IPv6, vi identifica univocamente senza il "nascondiglio" del NAT), le aziende di advertising vi traccerebbero ovunque andiate, incrociando i vostri dati in modo spaventoso. I sistemi operativi moderni generano nuovi indirizzi IP temporanei ogni poche ore per la navigazione, mantenendone uno stabile (spesso il Link-Local) solo per le comunicazioni strettamente locali.
+
+// Introduzione alla Sicurezza delle Reti (Cybersecurity)
+// A questo punto è necessario introdurre il concetto di Sicurezza, che è strettamente legato al design dei protocolli. Invece di elencarvi le solite parole magiche "Confidenzialità, Integrità e Disponibilità", voglio che ragioniate sul perché facciamo sicurezza.
+// Prima di decidere come proteggervi, dovete fare un'Analisi delle Minacce (Threat Analysis):
+
+// Quali sono gli Asset? (Hardware, software, dati. I dati sono l'asset più prezioso).
+
+// Chi vi attacca e perché? 3. Cosa succede se l'attacco ha successo? (Se modificate la sedia a rotelle smart della nonna, il rischio non è solo informatico, è fisico. Può morire qualcuno).
+
+// Aggiungere sicurezza (es. cifratura HTTPS, VPN) aggiunge invariabilmente complessità al sistema. E un sistema più complesso è più prono a errori di configurazione. Se costringete gli utenti a procedure di sicurezza troppo fastidiose o estenuanti, troveranno un modo per aggirarle (come bloccare la porta antincendio pur di uscire a fumare).
+
+// Le fonti delle vulnerabilità
+// Da dove arrivano i buchi di sicurezza nelle reti? Principalmente da tre tipi di vulnerabilità:
+
+// By Design: Il protocollo è fatto così. L'ARP spoofing in IPv4 esiste perché l'ARP non prevede alcun meccanismo nativo di autenticazione di chi risponde. È stato lasciato così per semplicità; spetta a voi leggere il manuale (RTFM: Read The Fucking Manual) e applicare le mitigazioni necessarie a livello di switch.
+
+// Bad Implementation: Il protocollo è sano, ma chi ha scritto il codice (o lo ha installato) ha lasciato bug evidenti.
+
+// Bad Design: Il peggiore. Il protocollo è stato proprio pensato male.
+
+// Un esempio lampante di Bad Design nel TCP è la scalabilità della Finestra di Ricezione (Window Scaling). Il TCP usa i Sequence Number (un campo da 32 bit) e un flag chiamato RST (Reset) per chiudere in emergenza una connessione. Se un attaccante vuole sabotare una vostra connessione TCP, deve inviare un pacchetto RST "falso" con il giusto Sequence Number.
+// All'inizio, la finestra di ricezione era piccola (al massimo 65.000 byte), quindi indovinare il numero esatto alla cieca richiedeva migliaia di tentativi, rendendo l'attacco lungo e rumoroso. Con l'avvento delle reti veloci, però, è stato introdotto il Window Scaling, che ingrandisce la finestra a dismisura (sino a GigaByte di dati "accettabili"). Questo ha drasticamente ridotto i tentativi necessari: oggi un attaccante può indovinare la finestra giusta inviando solo quattro pacchetti ciechi. Ha trasformato un attacco teorico in una vulnerabilità letale. La mitigazione applicata in fretta e furia è stata dire ai router: "Accetta il Reset solo se il Sequence Number è esattamente quello immediatamente successivo all'ultimo pacchetto ricevuto, senza margini di tolleranza". Una toppa, ma ha funzionato.
+
+// Qual è la lezione per noi ingegneri e scienziati? Quando progettate un protocollo, mai hard-codare (fissare) la lunghezza dei campi nell'header a livello binario fisso (es. "questo campo è da 16 bit e lo sarà per sempre"). Se un domani avrete bisogno di 32 bit, dovrete riscrivere l'intero protocollo. Oggi si tende a usare formati strutturati a oggetti (come TLV - Type, Length, Value) per garantire flessibilità futura.
+
+= Verso il Routing e l'Instradamento in Internet
+
+== Principi di Instradamento
+L'instradamento (routing) all'interno di una rete si divide principalmente in due paradigmi architetturali:
+- *Centralizzato*: Un controllore globale possiede una mappatura onnisciente della topologia di rete (similmente a un navigatore satellitare) e determina a priori i percorsi ottimali per tutti i nodi.
+- *Distribuito*: Ogni router deduce autonomamente il nodo successivo ("next hop") ideale basandosi su informazioni di stato locale e sullo scambio di dati con i nodi adiacenti.
+
+Per garantire elevati standard di resilienza, l'infrastruttura di Internet adotta il routing distribuito: in caso di guasto hardware o indisponibilità di un nodo, i router limitrofi sono in grado di ricalcolare dinamicamente un percorso alternativo. Su scala globale, un sistema centralizzato introdurrebbe un *single point of failure* critico, generando inoltre un overhead di comunicazioni di controllo incompatibile con le capacità della rete. 
+Esiste teoricamente il *Source Routing*, una tecnica in cui l'host mittente codifica all'interno del pacchetto l'elenco esatto dei nodi da attraversare. Tale approccio è oggi rigorosamente interdetto sull'Internet pubblica per gravissime implicazioni di sicurezza informatica, in quanto consentirebbe a un attaccante di offuscare l'origine reale del traffico forzandone il rimbalzo su nodi arbitrari.
+
+I protocolli di routing distribuito si classificano ulteriormente in:
+- *Proattivi*: Il protocollo opera in *background* calcolando e aggiornando costantemente le tabelle di routing, indipendentemente dal traffico effettivo. Garantisce instradamenti immediati, ma consuma banda ininterrottamente.
+- *Reattivi*: L'esplorazione del percorso viene innescata esclusivamente *on-demand*, ovvero nel momento in cui si presenta la necessità di trasmettere un pacchetto.
+- *Flooding* (Inondazione): Il pacchetto viene replicato e inoltrato su tutte le interfacce disponibili, nella probabilità statistica di raggiungere prima o poi il destinatario. Pur essendo dispendioso in termini di risorse, in contesti di assoluta emergenza (o per reti fortemente instabili) rappresenta la strategia d'inoltro più robusta, se opportunamente controllata.
+
+<RC_Lezione_2026.05.18.m4a>
+== La Complessità del Routing: Teoria vs Pratica
+Da un punto di vista puramente matematico, il routing è assimilabile alla ricerca del cammino minimo all'interno di un grafo pesato. Tuttavia, mentre la teoria dei grafi garantisce la calcolabilità dell'ottimo teorico, l'applicazione ingegneristica è vincolata ai limiti fisici, ai tempi di latenza e all'hardware degli apparati di rete. _I protocolli reali costituiscono dunque approssimazioni dell'ottimo matematico_.
+
+Si considerino, ad esempio, approcci limite come l'*Hot Potato Routing* (in cui un pacchetto viene immediatamente smistato a un vicino casuale pur di svuotare i buffer). Questo paradigma trova fondamento razionale nelle reti "Full Optical": in queste architetture, il tempo necessario per la conversione elettro-ottica (fondamentale per leggere l'header del pacchetto e interrogare la tabella di routing) risulta nettamente superiore al tempo di propagazione fisica. Di conseguenza, in una topologia fortemente magliata, l'inoltro cieco può paradossalmente garantire latenze inferiori rispetto a un'elaborazione del percorso ottimo. Ciò dimostra come la progettazione algoritmica debba sempre integrarsi con le specificità dello strato fisico.
+
+== Approccio Proattivo vs Reattivo
+La scelta del paradigma di routing dipende in larga misura dalla volatilità della topologia di rete. In uno scenario caratterizzato da instabilità dei link fisici (frequenti disconnessioni o variazioni), un protocollo proattivo inonderebbe la rete di messaggi di aggiornamento a ogni singola fluttuazione. In contesti dove il volume del traffico dati è contenuto ma la topologia è altamente dinamica, l'approccio reattivo si rivela di gran lunga più efficiente.
+Tuttavia, qualora la mutevolezza della rete sia talmente elevata da rendere obsoleto il percorso reattivo ancor prima della sua completa instaurazione, la topologia collassa e l'unica strategia d'inoltro in grado di garantire il recapito del pacchetto rimane il *flooding*.
+
+== Metriche e Pesi di Instradamento
+La modellazione algoritmica prevede l'assegnazione di "pesi" agli archi del grafo (i link di rete). A livello matematico, qualsiasi parametro di penalità imputabile a un nodo (es. probabilità di congestione) può essere formalmente traslato sui suoi archi incidenti. 
+
+La selezione della metrica ottimale è uno dei temi più critici della disciplina. Una valutazione puramente teorica porterebbe a favorire concetti quali la larghezza di banda residua, ideale per l'instradamento di trasferimenti *Delay-Tolerant*. Viceversa, per i flussi in tempo reale (*Real-Time flows* come lo streaming video o il gaming), la larghezza di banda assoluta perde rilevanza rispetto alla minimizzazione del *jitter* (la varianza del ritardo di trasmissione). Un ritardo di rete costante può essere facilmente assorbito mediante un buffer di riproduzione, mentre fluttuazioni costanti generano disservizi inaccettabili.
+
+Ciò nonostante, l'inclusione di metriche dinamiche (congestione, latenza o jitter) all'interno dei pesi algoritmici genera gravi esiti applicativi. Poiché i valori misurati su una rete in attività oscillano a frequenze altissime, i protocolli innescherebbero variazioni continue delle rotte (effetto di instabilità noto come *route flapping*), rincorrendo gradienti transitori privi di significato statistico a lungo termine.
+
+A livello accademico è stata storicamente analizzata l'*Expected Transmission Count* (ETX) per le reti wireless, che stima la qualità del link in base al numero di ritrasmissioni necessarie per recapitare un pacchetto. Il limite strutturale di questa metrica è la necessità pregressa di traffico per la validazione statistica: in assenza di traffico, il router non dispone di dati. L'introduzione della sua variante speculativa, denominata *Optimistic ETX* (che in assenza di trasmissioni recenti assume ottimisticamente il link come privo di errori), portò i router a convergere disastrosamente verso percorsi instabili o interrotti, causando gravi colli di bottiglia.
+Di conseguenza, le soluzioni *enterprise* adottano quasi esclusivamente metriche statiche o semi-statiche: il conteggio dei salti (*hop count*) o la capacità trasmissiva nominale dell'arco. L'unico parametro dinamico raccomandabile, prettamente in ambito wireless, è il Rapporto Segnale-Rumore (SNR), la cui varianza fisica è predicibile e non dipende direttamente dal carico di traffico istantaneo.
+
+== Il Protocollo RIP (Routing Information Protocol) e l'Algoritmo di Bellman-Ford
+Tra i protocolli proattivi basati sui vettori di distanza, il RIP rappresenta lo standard di riferimento per la sua semplicità architetturale. Il funzionamento prevede che ciascun router trasmetta la propria tabella di routing completa ai soli nodi adiacenti a intervalli regolari (tipicamente ogni 30 secondi), o in modalità *triggered update* a seguito di variazioni di stato.
+Alla ricezione di una tabella, il router ricevente incrementa le metriche (quantificate in numero di *hop*) di un'unità. Se l'elaborazione evidenzia un costo cumulativo inferiore per una destinazione nota, il router aggiorna la propria tabella eleggendo il mittente come nuovo "Next Hop".
+
+A livello distribuito, il RIP implementa l'algoritmo di Bellman-Ford. Pur consentendo l'identificazione del percorso minimo, l'algoritmo presenta una complessità computazionale asintotica pari a $V times E$ (dove $V$ indica il numero di vertici ed $E$ il numero di archi). Ne consegue che il tempo globale di convergenza dell'intera rete risulta teoricamente elevato. Nella realtà ingegneristica, la priorità ricade sul tempo minimo necessario per stabilire un instradamento valido end-to-end, il quale risulta direttamente proporzionale al diametro massimo del grafo di rete, rendendo il protocollo pienamente operativo in pochi minuti.
+
+La sopravvivenza del RIP a scapito di algoritmi più efficienti (come Dijkstra) risiede nei costi computazionali: l'impronta in memoria è quasi nulla (ogni nodo manipola unicamente le metriche relative senza allocare l'intera topologia) e l'aumento della cardinalità dei nodi non satura proporzionalmente i cicli di CPU, garantendo un'altissima scalabilità in termini di risorse hardware.
+
+=== Il problema del Count to Infinity e lo Split Horizon
+La vulnerabilità principale degli algoritmi Distance-Vector distribuiti è il fenomeno del *Count to Infinity*. Se un collegamento cessa di funzionare, i router adiacenti, condividendosi tabelle obsolete non ancora sincronizzate con il guasto, innescano un *loop* di instradamento in cui i costi vengono reciprocamente incrementati all'infinito per una destinazione irraggiungibile.
+
+Il protocollo risolve tale problematica attraverso diverse implementazioni algoritmiche:
++ *Definizione dell'Infinito*: La metrica è limitata superiormente a 16 (rappresentabile a livello di bit come lo 0 matematico in logica binaria a 4 bit). Il raggiungimento di tale limite sancisce l'immediata irraggiungibilità della rete, interrompendo il ciclo iterativo.
++ *Split Horizon*: Regola tassativa per cui un router cessa di annunciare l'esistenza di una determinata rotta sull'interfaccia di rete da cui la rotta stessa è stata appresa.
++ *Split Horizon with Poison Reverse*: Ottimizzazione aggressiva del punto precedente, mediante la quale il router annuncia attivamente la rotta sull'interfaccia da cui l'ha appresa associandole artificialmente una metrica infinita (16), così da invalidarla per i nodi vicini.
+
+== Il Protocollo OSPF (Open Shortest Path First) e Dijkstra
+Contrapposto alla famiglia Distance-Vector, il protocollo OSPF si basa sull'algoritmo di routing Link-State di Dijkstra. Questo garantisce prestazioni teoretiche eccellenti in termini di calcolo (la complessità dell'algoritmo è $E + V log V$), ma impone vincoli hardware stringenti: affinché l'albero dei cammini minimi possa essere risolto, ogni router deve prima acquisire e mantenere nella propria memoria l'intera topologia della rete, generata attraverso il costante inoltro incrociato di *Link-State Advertisements* (LSA).
+
+Questa disseminazione capillare si traduce, in reti molto estese, in un duplice collo di bottiglia: il sovraccarico costante della banda per il traffico LSA e la saturazione dei processori. Ricevuto un aggiornamento topologico, ciascun router è costretto a reiterare l'algoritmo di Dijkstra ripartendo da zero; qualora la CPU non fosse sufficientemente prestante, il calcolo potrebbe essere interrotto dall'arrivo di una nuova notifica LSA, portando il nodo al collasso computazionale.
+
+Di conseguenza, l'OSPF possiede limiti drastici di scalabilità lineare. Il design del protocollo mitiga tale problema compartimentando l'infrastruttura logica in "Aree" gerarchiche. All'interno dell'Area, i router condividono un set topologico unificato ed eleggono specifici router di transito (*Area Border Router*), i quali aggregano e inoltrano il routing unicamente verso la dorsale logica (*Backbone*). Quest'architettura abbatte il carico computazionale, cedendo come contropartita l'ottimalità globale del percorso: la forzatura dell'instradamento sui *Border Router* genera cammini inter-area basati su ottimi puramente locali.
+
+<RC_Lezione_2026.05.19>
+== OSPF, Link-State e Software-Defined Networking (SDN)
+Avendo piena visione della topologia di rete, i protocolli Link-State quali l'OSPF consentono l'adozione di metriche algoritmiche sofisticate, a patto di stabilire eque norme di sblocco (*tie-breaker*, come la selezione del router con l'indirizzo IP inferiore in caso di metriche speculari) essenziali per garantire il determinismo e facilitare il *troubleshooting* della rete in fase di analisi.
+
+Tuttavia, configurando l'OSPF per basare le metriche di rotta esclusivamente sulla larghezza di banda nominale, emergono dei limiti di adattabilità dinamica: l'algoritmo instraderebbe il traffico verso percorsi in fibra ad alta capacità sebbene in potenziale stato di saturazione fisica, trascurando link più lenti ma completamente sgombri.
+
+Questa rigidità algoritmica giustifica la migrazione dell'industria verso il paradigma *Software-Defined Networking* (SDN). Nell'architettura SDN, le funzioni del "cervello" dei router (il Control Plane algoritmico come OSPF o RIP) sono delegate a un server di controllo centralizzato (*SDN Controller*), riducendo fisicamente i router a semplici elaboratori di commutazione dei pacchetti (*Data Plane* o *Network Elements*).
+Il Controller riceve dati di telemetria dalle infrastrutture, calcola metriche istantanee multi-parametro e sovrascrive le tabelle di inoltro dei vari interruttori sfruttando protocolli di configurazione (*OpenFlow*). A causa delle stringenti necessità di bassa latenza tra le comunicazioni di gestione, l'SDN non scala sull'Internet pubblica, ma rappresenta l'attuale standard progettuale intra-struttura nei Data Center e nelle topologie Cloud/Kubernetes.
+
+== Reti Mesh e IoT: L'esigenza di soluzioni Ad-Hoc
+Laddove non via sia un'infrastruttura cablata (es. costellazioni di droni o sistemi di sensori estesi per ambito agricolo), si introducono le *Reti Mesh* (o *Ad-Hoc Networks*). In queste reti destrutturate, il router perde la sua accezione di entità fisica esclusiva, in quanto ogni dispositivo finale agisce simultaneamente da client e nodo di inoltro (multi-hop) basandosi sulla sovrapposizione delle limitate coperture dei moduli radioelettrici.
+
+Il panorama dei protocolli operativi è frammentato: l'offerta include approcci reattivi come l'AODV (che invia query esplorative per tracciare percorsi on-demand), proattivi ottimizzati come l'OLSR, e varianti sperimentali di flooding condizionato come B.A.T.M.A.N. o Meshtastic.
+
+Nel dominio dell'IoT domestico ed enterprise (Smart Home/Alexa), l'assenza di un vero standard universale ha spinto all'adozione del consorzio *Thread*. Paradossalmente, all'interno della rete Thread, la base dei calcoli di instradamento è delegata ad un'architettura derivata dal RIP. Benché in netta contrapposizione alle classiche specifiche del wireless dinamico, la sua implementazione pratica risponde ai requisiti minimi fintantoché la topologia IoT rimane rigidamente stazionaria; a seguito di variazioni topologiche (come la rilocazione di un nodo), l'intera rete mesh si espone al collasso del framework di instradamento.
+
+== Oltre la propria rete: Il BGP e il routing tra Autonomous System
+I protocolli sinora discussi (RIP, OSPF, AODV) costituiscono *Interior Gateway Protocols* (IGP). L'implementazione e i parametri di un IGP soggiacciono interamente all'entità amministratrice del singolo dominio logico di rete (*Autonomous System* o AS).
+
+La comunicazione infrastrutturale e di transito fra AS disgiunti richiede invece l'impiego di un *Exterior Gateway Protocol* (EGP). All'atto pratico, l'unico standard di fatto in operatività sull'infrastruttura Internet mondiale è il *Border Gateway Protocol* (BGP). L'insediamento monopolistico del BGP deriva non dall'assoluta eccellenza computazionale del protocollo, ma dall'impossibilità tecnica e infrastrutturale di coordinare una sostituzione sincronizzata dell'ecosistema internet.
+
+Lo scopo funzionale del BGP disattende l'individuazione di percorsi con metriche matematiche ottime. Il focus algoritmico consiste nel determinare rotte globalmente "fattibili" che aderiscano scrupolosamente agli accordi economici e alle restrizioni burocratico-politiche di *peering* vigenti fra i soggetti amministratori. A titolo esplicativo, un ISP italiano devierà deliberatamente il traffico in transito per il suolo francese via Corsica, malgrado una minore rapidità topologica, in ossequio all'economicità del contratto di interscambio rispetto all'operatore confinante nel Nord Italia.
+
+A livello tecnico, il BGP risolve i propri alberi decisionali non per sommatorie di pesi continui, ma elaborando iterativamente attributi prioritari ordinati in gerarchia rigida (tra cui *Weight*, *Local Preference*, *AS Path*, *MED* e *Community*). Il parametro maggiormente indicativo, l'*AS Path*, computa il numero di sistemi autonomi indipendenti attraversati: un dato di elevata significatività logico-strutturale ma di marginale affinità con l'effettivo calcolo di latenza hardware in millisecondi.
+
+Il BGP configura l'architettura di Internet. Benché lento nell'assimilazione dei ricalcoli di scala intercontinentale (i tempi di convergenza raggiungono ore), esso fornisce all'infrastruttura la stabilità cruciale per il corretto sostentamento globale. Criticamente, in caso di applicazione di configurazioni improprie (causa dei noti *Black Hole* di routing) o restrizioni nazionali ostili, le tabelle decisionali del BGP costituiscono lo strumento cardine per applicare politiche di embargo logico internazionale (una *Splinternet*).
+
+// = Verso il Routing e l'instradamento in Internet
+
+// == Come si passa da un punto A a un punto B in Internet?
+// Il routing si divide in *Centralizzato* (un controllore onnisciente mappa l'intera rete, come Google Maps, e decide i percorsi) e *Distribuito* (ogni router decide autonomamente qual è il prossimo "salto" migliore in base alle informazioni locali).
+
+// Internet usa il routing distribuito per motivi di resilienza: se un nodo crolla, i router vicini ricalcolano semplicemente un percorso alternativo. Un sistema centralizzato, su scala globale, sarebbe un single point of failure catastrofico e produrrebbe un overhead di comunicazioni di controllo inaccettabile. Esiste anche il *Source Routing*, dove il mittente del pacchetto specifica l'intero tragitto nodo per nodo ma in Internet è vietato per enormi motivi di sicurezza, poiché permetterebbe a un attaccante di mascherare l'origine reale del traffico facendolo rimbalzare a piacimento.
+
+// Il routing distribuito può essere *Proattivo* (il router mantiene le tabelle costantemente aggiornate, sprecando banda ma essendo pronto subito) o *Reattivo* (il router cerca il percorso solo quando deve effettivamente inviare qualcosa). E infine c'è il *Flooding*: invio il pacchetto a tutti sperando che prima o poi arrivi al destinatario. Sembra stupido e brutale, ma a volte (come per l'allarme antincendio) è la strategia di emergenza più efficace se implementata in modo controllato. 
+
+// <RC_Lezione_2026.05.18.m4a>
+// == La complessità del Routing: Teoria vs Pratica
+// Il problema del routing consiste, in sostanza, nel minimizzare un percorso all'interno di un grafo. I nostri amici teorici e matematici ci dicono che, dato un grafo, è sempre possibile calcolare il percorso ottimo. L'ingegnere, che invece deve far funzionare le cose nel mondo reale, risponde: "Ottima idea, peccato che io le cose le debba fare davvero, con limiti fisici e hardware". Tutti gli algoritmi di routing che trovate su Internet nascono proprio dall'esigenza di trovare un compromesso per avvicinarsi all'ottimo matematico, facendo i conti con la cruda realtà. 
+
+// Ci scontriamo subito con diverse scelte progettuali. La prima è: quando calcolo il percorso? Le alternative principali sono tre:
+// + Proattivo: Costruisco le tabelle di routing in anticipo. Il protocollo gira in continuazione per mantenere aggiornati i pesi del grafo, indipendentemente dal fatto che ci sia o meno traffico da inviare.
+// + Reattivo: Costruisco il percorso solo quando ne ho effettivo bisogno, ovvero quando devo spedire un pacchetto.
+// + Flooding (Inondazione): Non calcolo alcun percorso. Mando semplicemente il pacchetto a tutti i nodi collegati e spero che prima o poi arrivi a destinazione.Esistono anche approcci più esoterici. Ad esempio, nelle reti "Full Optical", si usa a volte l'Hot Potato Routing: ricevo il pacchetto e lo inoltro a un vicino a caso. Sembra una follia, ma ha senso: in una rete completamente ottica, il tempo per leggere l'header del pacchetto (dovendo passare dal dominio ottico a quello elettrico e viceversa) è infinitamente superiore al tempo di trasmissione fisica. Se la rete è sufficientemente magliata (interconnessa), inoltrare a caso garantisce che il pacchetto arrivi a destinazione prima del tempo che si perderebbe a calcolare la porta d'uscita ottimale. Questo è un caso limite, ma vi dimostra che quando progettate il routing dovete considerare l'intero stack, inclusi i ritardi fisici dell'hardware.
+
+// == Quando conviene passare da un approccio proattivo a uno reattivo? 
+// Immaginate una rete in cui gli archi (i link) si rompono o cambiano continuamente. In un protocollo proattivo, ogni minima variazione scatena l'invio di messaggi di aggiornamento a tutta la rete. Se le variazioni sono molto frequenti e il traffico dati effettivo è basso, finirete per saturare la rete solo con il traffico di controllo del routing. In questo scenario, un protocollo reattivo è decisamente migliore.
+
+// E se la rete cambia così velocemente che, nel tempo necessario a calcolare un percorso reattivo, la topologia è già mutata di nuovo? In quel caso, l'unica soluzione fisica e affidabile potrebbe essere il flooding.
+
+// == Metriche e Pesi
+// Per applicare la teoria dei grafi al routing, dobbiamo assegnare dei pesi ai rami (i link). Matematicamente, assegnare un costo a un nodo (es. la sua congestione o probabilità di perdere pacchetti) equivale ad assegnarlo a un ramo; ci sono formule per spostare il peso dal nodo all'arco. Ma come decidiamo questo peso? Qual è la metrica migliore? 
+
+// Se leggete la letteratura scientifica, troverete di tutto, ma vi do un avvertimento: la maggior parte delle idee "intelligenti" sulla carta, nella pratica si rivelano disastrose. Se dovete trasferire un file gigantesco, verrebbe spontaneo usare la banda residua del link come metrica, per trovare il percorso più sgombro. Se invece state gestendo traffico audio, video o gaming (Real-Time flows rispetto ai Delay-Tolerant flows), la banda importa meno: ciò che conta è ridurre il jitter, ovvero la variazione del ritardo (la deviazione standard del ping). Un ritardo fisso è facilmente compensabile con un buffer (il classico pallino di caricamento su YouTube); un ritardo che oscilla in continuazione causa interruzioni e "lag" insopportabili. Allora, perché non inserire il jitter o la congestione direttamente come pesi matematici nei nostri algoritmi di routing? Perché per farlo dovreste poter misurare questi valori in tempo reale. E una misura in tempo reale su una rete viva oscilla in continuazione. Se il vostro algoritmo di routing reagisce a ogni minima oscillazione del jitter o della congestione, la rete diventerà totalmente instabile: i percorsi cambieranno ogni frazione di secondo (effetto "flapping"), inseguendo stati transitori che non hanno alcun significato pratico.
+
+// Vi faccio un esempio storico. Qualche tempo fa è stato proposto in un RFC di usare una metrica chiamata Expected Transmission Count (ETX) per le reti wireless: il router conta quante volte deve ritrasmettere un pacchetto prima che il nodo successivo lo riceva correttamente, e usa questo numero come indice di qualità del link. Sembra logico, vero? Ma c'è un problema enorme: per avere una statistica valida su quante volte ritrasmetti, devi prima avere dei pacchetti da trasmettere! Se la rete è a riposo, non hai dati. E se il link è talmente pessimo da farti perdere il contatto con il vicino? Per risolvere questo "dettaglio", gli stessi autori hanno proposto l'Optimistic ETX: "se non senti un nodo da un po', assumi ottimisticamente che il link sia diventato eccellente". Il risultato pratico? I router continuavano a switchare il traffico tra nodi stabili e nodi "ottimisticamente perfetti" (che in realtà erano irraggiungibili o pessimi), creando il caos. 
+
+// Qual è la lezione? Quasi tutti i protocolli di routing commerciali seri usano metriche apparentemente "stupide" o statiche del secolo scorso: il numero di hop (salti) o la banda nominale del link. L'unico parametro dinamico di basso livello che ha senso usare (soprattutto nel wireless) è il Rapporto Segnale/Rumore, perché varia in modo prevedibile e dipende dalla fisica del mezzo, non dal traffico temporaneo.
+
+// == Il Protocollo RIP (Routing Information Protocol) e il Belman-Ford
+// Passiamo alle implementazioni pratiche dei protocolli proattivi. Il primo è il RIP (Routing Information Protocol). La leggenda narra che sia stato progettato scrivendolo su un tovagliolo al ristorante, ed è credibile, vista la sua estrema semplicità. Il funzionamento del RIP è banale: ogni router invia periodicamente (di solito ogni 30 secondi, o meno in caso di triggered updates) la propria tabella di routing a tutti i suoi vicini diretti. La tabella contiene i prefissi di rete conosciuti e il "costo" (la metrica, solitamente il numero di hop) per raggiungerli.Quando il router A riceve la tabella dal router B, prende tutte le metriche, ci somma 1 (o il costo preimpostato del link tra A e B) e confronta i risultati con la propria tabella. Se il percorso via B costa meno di quello che A già conosceva, A aggiorna la sua tabella impostando B come nuovo "Next Hop". 
+
+// Nonostante la sua semplicità, il RIP implementa globalmente l'algoritmo di Bellman-Ford. Chi ha studiato gli algoritmi sa che Bellman-Ford trova sempre il percorso ottimo, proprio come l'algoritmo di Dijkstra, ma ha una complessità computazionale maggiore nel caso peggiore ($V times E$, vertici per archi). Questo significa che il suo tempo di convergenza totale (il tempo affinché tutta la rete raggiunga l'equilibrio ottimale dopo un cambiamento) può essere molto alto. Tuttavia, c'è un trucco: non ci interessa il tempo di convergenza totale, ci interessa il tempo minimo affinché tutti i router sappiano almeno qualcosa su come raggiungere le destinazioni. Questo tempo dipende dal diametro della rete (il numero massimo di salti da un capo all'altro). Se il diametro è 5 hop e l'aggiornamento avviene ogni 30 secondi, in un paio di minuti la rete è già utilizzabile.
+
+// Perché si usa il RIP se Dijkstra è teoricamente migliore? Per la facilità di implementazione. Il RIP richiede memoria zero (o quasi): non deve memorizzare l'intera mappa della rete, lavora solo aggiornando la propria tabellina riga per riga. Aumentare il numero di nodi in una rete RIP non appesantisce le CPU dei router esistenti, rendendolo estremamente scalabile dal punto di vista hardware.Il Count to Infinity e lo Split HorizonIl problema storico del RIP (e del Bellman-Ford distribuito) è il Count to Infinity. 
+
+// Immaginate tre router in fila: A, B e C, che puntano a una rete collegata a C. A sa di poter raggiungere la rete in 2 salti passando da B. B sa di raggiungerla in 1 salto passando da C.All'improvviso, il cavo tra C e la rete si trancia. C perde la connessione diretta e il suo costo va a infinito. Ma prima che C possa avvisare tutti, A manda il suo aggiornamento periodico a B: "Ehi, io posso raggiungere quella rete in 2 salti!". B, che ora vede C isolato, pensa: "Ottimo! Allora io posso passarci tramite A in 3 salti". B aggiorna la sua tabella e lo dice a C. C pensa: "Wow, B ha un percorso a 3 salti, allora io ci passo in 4!".I router continuano ad aggiornarsi a vicenda in un loop infinito (o meglio, in un circolo di annunci), incrementando la metrica all'infinito per una rete che in realtà è irraggiungibile.Per fermare questo disastro, il RIP stabilisce che Infinito = 16 (o 256 in alcune varianti). Appena la metrica raggiunge 16, la rete viene dichiarata ufficialmente "morta" e il loop si spezza. Si è scelto 16 perché matematicamente, su un contatore a 4 bit, 16 corrisponde a 0, rendendo il controllo molto rapido a livello binario.Per prevenire attivamente questo fenomeno, il RIP usa due tecniche:
+// + *Split Horizon*: Una regola semplice. Non annunciare mai a un vicino una rotta che hai imparato da quel vicino stesso. (Se ho imparato da te la strada per Roma, non vengo a dirti che so come arrivare a Roma passando da te).
+// + *Split Horizon with Poison Reverse*: Ancora più aggressivo. Annuncio la rotta al vicino da cui l'ho imparata, ma le assegno preventivamente una metrica pari a 16 (Infinito), "avvelenandola".
+
+// == Il Protocollo OSPF (Open Shortest Path First) e Dijkstra
+// L'esatto opposto del RIP è l'OSPF. L'OSPF impone ai router di utilizzare l'algoritmo di Dijkstra. Essendo basato su Dijkstra, il calcolo matematico è più veloce ($E + V log V$), ma i requisiti infrastrutturali esplodono. Per far girare Dijkstra, ogni singolo router deve avere in memoria l'intera topologia della rete, completa di tutti i nodi e di tutti i pesi degli archi (costruita tramite messaggi chiamati Link-State Advertisements). Se la rete è molto grande, i messaggi di aggiornamento inviati continuamente da tutti a tutti intaseranno la banda. Peggio ancora, quando arriva un aggiornamento, il router deve ricalcolare l'intero albero dei percorsi ottimi partendo da zero. Se la rete è immensa e la CPU del router è lenta, potrebbe non fare in tempo a finire i calcoli prima che arrivi un nuovo aggiornamento 30 secondi dopo, portando il router al collasso termico o computazionale.Ecco perché l'OSPF non è scalabile in modo lineare. Per reti enormi, richiede hardware sempre più costoso .Per risolvere il problema, l'OSPF obbliga a "disottimizzare" la rete, dividendola in "Aree" gerarchiche. I router all'interno di un'Area conoscono perfettamente solo la topologia della propria zona ed eleggono un router "di bordo" (Area Border Router) che li connette a una Backbone centrale, che a sua volta collega le varie Aree. Questo abbatte drasticamente il carico computazionale e di memoria. Il compromesso è che, passando forzatamente dai router di bordo eletti, i percorsi tra due Aree diverse non saranno più l'ottimo globale assoluto, ma solo un ottimo locale (la somma di due percorsi ottimi locali non garantisce il percorso ottimo globale).
+
+// Quale scegliere tra RIP e OSPF? Dipende. Se avete una rete molto dinamica o non volete spendere capitali in router potenti, il RIP (o i suoi derivati) fa egregiamente il suo lavoro. Se avete una rete complessa, gerarchica e volete reattività pura, andrete su OSPF. Ma sappiate che configurare e implementare OSPF è un'operazione estremamente delicata e complessa.
+
+// <RC_Lezione_2026.05.19>
+// Ci sono gli algoritmi Proattivi, che calcolano costantemente i percorsi a prescindere dal traffico (come l'OSPF o il RIP).
+// Ci sono quelli Reattivi, che cercano il percorso solo quando c'è un pacchetto da spedire (utili in reti che cambiano molto velocemente, dove il proattivo sprecherebbe banda per aggiornare mappe obsolete).
+// E infine c'è il Flooding (l'inondazione), dove il pacchetto viene mandato a tutti sperando che arrivi.
+
+// Esistono anche follie esoteriche come l'Hot Potato Routing: mando il pacchetto a un vicino a caso. Ha senso? Incredibilmente, in alcuni scenari estremi, sì. Pensate alle reti Full Optical (completamente ottiche). Il tempo necessario per fermare un raggio di luce, convertirlo in segnale elettrico, fargli leggere la tabella di routing alla CPU, riconvertirlo in ottico e decidere la porta d'uscita è infinitamente superiore al tempo di propagazione della luce stessa. In una rete sufficientemente densa, "rimbalzare" il segnale ottico a caso senza decodificarlo lo farà arrivare a destinazione prima di quanto impiegherebbe un router a fare la scelta "ottima". Questo è un caso limite, ma vi fa capire che nel routing dovete sempre considerare tutto lo stack, compresi i colli di bottiglia fisici dell'hardware.
+
+// == OSPF, Link-State e Software-Defined Networking (SDN)
+// Torniamo all'OSPF. Abbiamo detto che è un algoritmo Link-State, basato su Dijkstra. Negli algoritmi Link-State, ogni router ha una mappa completa della topologia della rete. Non c'è limite alle metriche che potete usare, a patto di stabilire una regola chiara (un tie-breaker) per decidere cosa fare a parità di costo (ad esempio: in caso di parità, scegli il router con l'IP più basso). Questo è fondamentale per la replicabilità: se scegliete a caso, il giorno che la rete si rompe non riuscirete mai a fare troubleshooting perché il comportamento della rete non sarà deterministico.
+
+// L'OSPF richiede molta memoria e molta CPU, e i suoi aggiornamenti (LSA) viaggiano in tutta la rete. La metrica dell'OSPF è basata sulla larghezza di banda nominale del link (un link a 10 Gigabit ha un costo minore di uno a 1 Gigabit). C'è un problema però: l'OSPF non guarda l'occupazione effettiva del link. Potrebbe mandarvi su un link a 10 Gigabit completamente intasato, ignorando un link a 1 Gigabit perfettamente libero.
+
+// Per superare i limiti rigidi del routing tradizionale, l'industria sta spingendo verso il Software-Defined Networking (SDN). Immaginate che i router vengano svuotati del "cervello". Non c'è più OSPF o RIP. Ci sono solo switch stupidi (i Network Elements) che inoltrano i pacchetti basandosi su una tabella precompilata. Chi compila questa tabella? Un SDN Controller centralizzato.
+// I router informano il controller su traffico, code e congestione. Il controller vede l'intera rete "dall'alto", calcola i percorsi ottimi in tempo reale e inietta le tabelle nei router.
+// Tutto questo avviene tramite protocolli come OpenFlow. È un sistema potentissimo ma pesantissimo. Per questo motivo l'SDN non ha sfondato sulla rete globale (Internet), mentre è diventato lo standard assoluto nei moderni Data Center (e in ambienti Cloud/Kubernetes), dove le macchine sono vicine, il ritardo di controllo è minimo e l'infrastruttura è gestita da un'unica entità.
+
+// == Reti Mesh e IoT: L'esigenza di soluzioni Ad-Hoc
+// Facciamo un salto indietro. E se non ci fosse nessun router? E se avessimo dei droni, o dei sensori sparsi in un campo agricolo? Parliamo delle Reti Mesh (o reti Ad-Hoc). Qui, ogni nodo fa sia da client che da router. Il percorso si crea in multi-hop, balzando da un'antenna all'altra in base alla sola copertura radio.
+
+// Le reti Mesh usano protocolli specifici. Ci sono quelli reattivi come AODV (invio una richiesta in broadcast e chi ha la rotta mi risponde creando il percorso a ritroso) e protocolli proattivi ottimizzati come OLSR. Ultimamente vanno di moda protocolli stravaganti come B.A.T.M.A.N. o protocolli basati sul flooding controllato come Meshtastic.
+
+// Ma nel mondo reale dell'IoT (Internet of Things), cosa usano dispositivi commerciali come Alexa, Google Home o le lampadine smart? Non usano AODV o OLSR. Usano lo standard Thread (spinto da aziende come Google).
+// E qui vi faccio rabbrividire: i nodi principali della rete Thread comunicano tra loro utilizzando una variante del... RIP! Esatto, quel protocollo vecchio e stupido nato per le reti cablate ed etichettato come inadatto al wireless. Sulla carta è un pasticcio ingegneristico. Nella pratica "funzionicchia", a patto che la rete stia ferma. Se spostate una lampadina da una stanza all'altra, la rete va in crisi e dovete resettare tutto.
+
+// == Oltre la propria rete: Il BGP e il routing tra Autonomous System
+// Finora abbiamo parlato di IGP (Interior Gateway Protocol). RIP, OSPF, AODV... sono tutti protocolli usati all'interno di un Autonomous System (AS). Lì siete i padroni: scegliete voi le metriche, i costi e le regole.
+
+// Ma come fa il traffico a viaggiare tra gli Autonomous System? Come passa dall'AS di Telecom Italia a quello della rete universitaria americana? Serve un EGP (Exterior Gateway Protocol).
+// E quanti EGP esistono su Internet? Uno solo: il BGP (Border Gateway Protocol).
+// Dovete rassegnarvi. Potete inventare il protocollo esterno più bello del mondo, ma non verrà mai implementato perché dovreste convincere l'intera Internet a cambiare simultaneamente sistema. Il BGP è un monopolio assoluto.
+
+// L'obiettivo del BGP non è trovare il percorso matematicamente più veloce o più corto. L'obiettivo del BGP è trovare un percorso "feasible" (fattibile e permesso) che rispetti rigorosamente gli accordi commerciali e politici (il peering) stipulati tra gli AS.
+// Telecom Italia potrebbe decidere di instradare il traffico verso la Francia facendolo passare per la Corsica anziché per Ventimiglia, non perché sia più veloce, ma perché l'accordo commerciale con l'operatore corso le costa di meno.
+
+// Il BGP non usa metriche continue, ma una complessa e rigidissima lista di priorità (Weight, Local Preference, AS Path, MED, Community, ecc.). Il router applica queste regole in ordine "a cascata" per decidere da dove far uscire il pacchetto. La cosa fondamentale da capire è che al BGP non interessa il numero di router attraversati; semmai guarda la lunghezza dell'AS Path (cioè quanti Autonomous System interi deve attraversare, il che è una metrica politicamente importante ma tecnicamente quasi inutile per capire la reale latenza).
+
+// Il BGP è il protocollo che regge Internet. È vecchio, è macchinoso, impiega interi minuti (se non ore) a propagare i cambiamenti a livello globale. Ma è stabile. Ed è anche il protocollo che, se configurato con malizia (o per errore, creando i famosi "buchi neri" di routing), permette di creare la cosiddetta Splinternet, ovvero isolare intere nazioni dal resto della rete globale.
+
+// Direi che come panoramica per oggi ci siamo. Domani abbandoniamo la teoria dei protocolli e vediamo come simulare tutto questo software su un computer.
+
+= (SIMULATORE)
+<RC_Lezione_2026.05.20.m4a> 
+== La Simulazione di Rete: Tra Teoria e Pratica
+L'altra volta ci siamo lasciati con il problema del routing e oggi chiudiamo il discorso parlando di come si studiano e si validano effettivamente le reti e i protocolli, perché la teoria sui libri è fondamentale, ma l'informatica e le telecomunicazioni richiedono la pratica. Se vi trovate a dover dimostrare che una vostra idea per una tesi funziona, o che una rete aziendale regge il carico, dovete passare all'atto pratico.
+
+Quali sono le vostre scelte?
+- Matematica: Usate la teoria delle code, modelli statistici e fate i calcoli. È rigoroso, ma spesso si scontra con limiti di calcolo quando la rete diventa complessa.
+- Simulazione: Scrivete del codice che imita il comportamento della rete. In una simulazione il tempo è slegato dalla realtà: il vostro computer potrebbe metterci 5 minuti per simulare 10 secondi di traffico reale, o viceversa, simulare due anni in 5 minuti.
+- Emulazione e Hardware in the Loop (Testbed): Qui lavorate in tempo reale (Real-Time). Il software è interfacciato con dispositivi fisici reali, inviando e ricevendo dati come se fosse in produzione.
+- Test sul campo (Field Test): Mettete letteralmente le antenne sul tetto, date i dispositivi in mano agli utenti e vedete cosa succede nel mondo reale.Nessuno di questi approcci è intrinsecamente migliore degli altri: ognuno ha il suo scopo. Il disastro avviene quando si usa lo strumento sbagliato senza averne consapevolezza.Il "Durable Nonsense" e le false assunzioni
+
+Questo ci porta a un concetto fondamentale teorizzato nel 1969 e ancora oggi attualissimo, il "Durable Nonsense". Il Durable Nonsense si verifica quando si produce una ricerca estremamente rigorosa e matematicamente ineccepibile, ma basata su presupposti totalmente fuori dalla realtà. Il risultato è una sciocchezza monumentale ("nonsense") che però, proprio per la sua patina di rigore scientifico, dura nel tempo ("durable") e viene citata per anni.Ad esempio, se studiate in modo impeccabile come avviene il passaggio di connessione Wi-Fi (handover) tra due antenne in un corridoio con pareti di metallo massiccio, la ricerca è formalmente perfetta. Peccato che non esista alcun corridoio in metallo massiccio nella realtà (a parte un rifugio antiatomico). I risultati che otterrete saranno matematicamente veri, ma totalmente inapplicabili. Nel 2001, una famosa ricercatrice di nome Sally Floyd smontò una fetta enorme della ricerca accademica sulle reti dimostrando proprio questo. Fino a quel momento, i simulatori e i modelli matematici assumevano che il traffico Internet (generato dai server web o dalle applicazioni) avesse una distribuzione statistica predicibile e governabile dal Teorema del Limite Centrale (ad esempio, traffico poissoniano o a bitrate costante). Sally Floyd dimostrò, dati reali alla mano, che il traffico Internet ha una natura "frattale" (Self-Similar o a invarianza di scala), con distribuzioni a coda lunga (come Pareto o Weibull) che non possiedono una varianza finita. Se il traffico non rispetta il Teorema del Limite Centrale, significa che aggregando migliaia di utenti, il traffico non si "spiana" su una comoda curva Gaussiana, ma mantiene picchi (spike) spaventosi e imprevedibili. Se progettate la memoria (i buffer) di un router o la banda di una rete usando un modello statistico sbagliato, state creando del Durable Nonsense: la matematica torna, ma il router nella realtà andrà in congestione in cinque minuti.
+
+== Gli strumenti giusti: Da Matlab ai Discrete-Event Simulators
+Come evitiamo di produrre spazzatura? Usando gli strumenti adatti per ogni livello dello stack.S e volete studiare il Livello Fisico (come i segnali elettrici o radio si propagano nell'aria, le modulazioni o le probabilità di errore per bit), usare un simulatore di rete è inutile. Lì la matematica governa suprema: si usano software come Matlab o librerie Python avanzate per processare il segnale.Quando però si sale dal Livello 2 (MAC) fino al Livello 4 (Trasporto) o Applicativo, la matematica pura esplode. Lì servono i Simulatori di Rete a Eventi Discreti (Discrete-Event Simulators), come NS-3 (che tra l'altro contribuisco a sviluppare).
+
+Cos'è una simulazione a eventi discreti? A differenza dei modelli continui (dove lo stato del sistema viene ricalcolato ogni nanosecondo), in un simulatore a eventi discreti il tempo avanza solo quando "succede qualcosa".Se il nodo A inizia a trasmettere un pacchetto al nodo B al tempo $T_0$, sappiamo che il pacchetto finirà di essere trasmesso al tempo $T_1$ (calcolabile in base alla lunghezza del pacchetto e alla banda). Nel lasso di tempo tra $T_0$ e $T_1$, lo stato del sistema (il cavo o il canale radio) non cambia: è semplicemente "Occupato". Il simulatore quindi non fa nessun calcolo intermedio; inserisce l'evento di "Fine Trasmissione" in una coda cronologica (Scheduler) e "salta" direttamente al momento $T_1$, eseguendo la funzione associata. Questo rende i calcoli computazionalmente leggeri e permette di simulare reti immense. Ovviamente, quanto in dettaglio volete spingervi dipende da voi: volete simulare il tempo preciso di inizio e fine pacchetto per intercettare eventuali collisioni simultanee sul canale, o vi basta simulare che un messaggio astratto è partito ed è arrivato? Più dettagli inserite (come l'ARP, il Neighbor Discovery, o le collisioni a livello fisico), più la simulazione sarà lenta e complessa, ma anche più aderente alla realtà. La vera abilità del ricercatore sta nel capire quali "rumori di fondo" scartare per alleggerire la simulazione, senza alterare la validità dei risultati.
+
+== Simulazione Monte Carlo, Topologie e Affidabilità
+Se fate una singola simulazione e funziona, avete dimostrato ben poco. Una simulazione genera solo una istanza di un sistema complesso, vincolata ai semi (seed) del generatore di numeri pseudocasuali che avete impostato.Per avere una vera validità scientifica dovete applicare il Metodo Monte Carlo: ripetere la stessa simulazione decine o centinaia di volte, variando leggermente le condizioni iniziali (i seed, la posizione geografica dei nodi, l'orario di generazione del traffico, i tassi di errore). E non basta variare i numeri: dovreste anche variare, in modo programmato, la topologia della rete. Non potete simulare un protocollo per edifici scolastici mappando alla perfezione l'edificio in cui ci troviamo ora. Quella dimostrerebbe che il protocollo funziona in questo plesso, non in un plesso generico.Dal Metodo Monte Carlo otterrete una nuvola di risultati, da cui dovrete estrarre medie, mediane, varianze e, soprattutto, gli Intervalli di Confidenza. Nel 2026, presentare un grafico senza intervalli di confidenza (o, ancora meglio, senza un "Violin Plot" che mostri chiaramente l'intera distribuzione e l'eventuale multimodalità dei dati) significa farsi deridere dalla comunità scientifica. Se il risultato di un simulatore combacia esattamente al millimetro con il modello teorico matematico, significa semplicemente che nel simulatore avete replicato alla lettera le stesse assunzioni iper-semplificate che avevate fatto sulla carta, rendendo la simulazione un puro e inutile esercizio di stile. La simulazione serve proprio per scoprire come il sistema reagisce quando la teoria pura incontra le imperfezioni e i ritardi (le "code") del mondo reale.
+
+== Come simulare: Reinventare la ruota o usare le librerie?
+Quando costruite un simulatore, a livello base (MAC/Livello 2) dovete scrivere codice C++ (o simili) per simulare l'accesso al mezzo (tempi di ritardo, re-trasmissioni CSMA/CD, ecc.), perché è hardware-specifico.Ma quando salite a livello Trasporto, vi trovate davanti a un bivio. Se dovete simulare l'algoritmo QUIC o il TCP:
+- Ve lo riscrivete da zero: Ci perdete 6 mesi, commettete errori, ma avete il controllo totale per modificare ogni singola virgola dell'algoritmo per i vostri esperimenti.
+- Usate una libreria reale (es. PicoQUIC o l'implementazione del TCP di Linux): La integrate direttamente nel simulatore tramite wrapper. Funzionerà perfettamente, ma se dovete "bucare" la logica interna della libreria per testare una variante del protocollo, sarà molto più ostico.
+
+La scelta dipende dalle vostre capacità ingegneristiche e dall'obiettivo della vostra ricerca. In ogni caso, i simulatori di rete moderni sono giganteschi capolavori di ingegneria del software (Spesso Open Source) basati su pattern e architetture scalabili. Anche se non farete mai ricerca accademica, approcciarsi allo sviluppo o alla modifica di un simulatore come NS-3 è una scuola di programmazione di livello assoluto.
