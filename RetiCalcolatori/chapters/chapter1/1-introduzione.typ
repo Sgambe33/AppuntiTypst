@@ -172,6 +172,8 @@ Ciò ha influenzato pesantemente i protocolli oggi utilizzati:
 
 - *IMAP* o *POP3*: usato dal destinatario per leggere la posta (pull). Visto che il destinatario non è sempre connesso, deve essere lui a interrogare il proprio server per chiedere se sono presenti nuovi messaggi.
 
+#figure(image("images/2026-07-02-17-51-39.png", width: 60%))
+
 #observation("PEC")[
   Il protocollo email standard non è nato per garantire consegne o integrità. La PEC cerca di risolvere questo problema, ma la sicurezza si basa sull'affidabilità dell'infrastruttura dei server che ospitano le caselle, non solo sulla crittografia della comunicazione.
 ]
@@ -182,6 +184,40 @@ Il DNS è un protocollo alla base del web moderno, senza di esso si fermerebbe i
   Il DNS è semplicemente un database distribuito, ridondato e ad alta disponibilità. Se un server non sa rispondere ad una richiesta, tramite gerarchie, deleghe e cache sarà in grado di recuperare la risposta.
 ]
 Non serve, attenzione, soltanto per comodità, ovvero per evitare di memorizzare gli indirizzi IP dei vari siti piuttosto che il loro nome (google.com invece di 142.250.184.195). Serve per il *Virtual Hosting* e per il *Cloud/Load Balancing*. Oggi, su un singolo indirizzo IP possono essere ospitati migliaia di siti web diversi. Quando viene effettuata una richiesta HTTP, inserite il nome del sito nell'header. Se il DNS non esistesse e usaste solo l'IP, il server di destinazione non saprebbe quale dei migliaia di siti (virtual host) si vuole visitare.
+
+Il processo di risoluzione degli indirizzi avviene per gradi: quando un utente inserisce un indirizzo (come `wikiflix.toolforge.org`), il computer controlla prima la propria cache locale (il local resolver). Se non trova la risposta, invia la richiesta a un server DNS dedicato, chiamato recursive resolver (spesso fornito dall'ISP).
+
+Questo resolver procede suddividendo il nome di dominio nelle sue componenti gerarchiche, partendo dall'elemento più a destra. Innanzitutto, interroga i server Root, i quali forniscono l'indirizzo dei server responsabili per i domini di primo livello (Top-Level Domain, come `.org`). Successivamente, il resolver interroga il server `.org`, che a sua volta indica il server autorevole per il dominio di secondo livello, `toolforge.org`. Infine, interrogando il server di `toolforge.org`, il resolver ottiene l'indirizzo IP definitivo associato a `wikiflix.toolforge.org`. In ogni fase di questo percorso, i server possono sfruttare sistemi di caching per restituire le risposte precedentemente memorizzate, velocizzando notevolmente il processo per le richieste successive.
+
+#figure(image("images/2026-07-02-23-16-50.png"))
+
+=== Vulnerabilità
+Il *DNS* è particolarmente critico dal punto di vista della sicurezza per vari motivi:
+
+- non è autenticato: l'informazione richiesta potrebbe arrivare non dal DNS Server corretto ma da un'altra macchina;
+- è molto lento, quindi è possibile che qualcuno intercetti la richiesta destinata a un DNS Server e risponda al suo posto (spoofing);
+- il protocollo non offre meccanismi per proteggere l'integrità delle informazioni distribuite (basti pensare all'associazione tra hostname e indirizzo IP).
+- DNS cache poisoning: attacchi volti a manomettere le informazioni contenute nei DNS Server, compromettendo la coerenza e l'integrità dei suoi dati.
+
+Un DNS Server mantiene in una memoria cache anche informazioni relative a domini non di sua competenza. Una risposta fornita sulla base di questi dati è detta *non authoritative* e il valore del campo TTL indica sia attendibile (più è alto il TTL più è alta la probabilità che il dato sia corretto). Un attacco di tipo *cache poisoning* a un DNS Server comporta la modifica dei dati della sua cache, inserendovi un valore di TTL molto alto, così da rendere attendibile l'informazione modificata. 
+
+Tipicamente, l'intervento consiste nell'associare a un nome l'indirizzo IP di un server malevolo. Per esempio, un utente scrive nel browser l'URL di un sito web ma viene poi direzionato, a sua insaputa, verso un sito clone costruito per effettuare furti di identità o di dati bancari (phishing). Questo succede perché nella cache del DNS Server l'indirizzo IP originale, associato a quel nome, è stato sostituito con quello del web server malevolo.
+
+=== DNSSEC
+
+Per rimediare alle mancanze del protocollo originario in termini di sicurezza, è stato creato un gruppo di lavoro che ha definito un'estensione al DNS denominata DNSSEC (Domain Name System Security Extensions). Il compito di DNSSEC è di garantire all'utente che il sito web che sta visitando è quello originale e non una copia creata per scopi fraudolenti. A tal scopo si usano delle chiavi crittografiche per *autenticare* i dati nel DNS, a partire dalla root. Le chiavi per la root sono gestite da ICANN, l'ente responsabile dei Domain Name di primo livello (generici e nazionali).
+
+=== DoT e DoH
+Il DNSSEC, garantisce l'autenticità dei dati mitigando il rischio di DNS poisoning, ma non offre confidenzialità: le richieste (es. il dominio che si vuole visitare) viaggiano in chiaro. Ciò consente agli Internet Service Provider (ISP) o a chiunque intercetti il traffico di tracciare l'attività dell'utente. Per ovviare a questo problema di privacy, sono nati *DoT (DNS over TLS)* e *DoH (DNS over HTTPS)*. 
+
+Entrambi abbandonano il trasporto UDP in favore del TCP e cifrano il traffico: DoT utilizza un canale TLS dedicato, mentre DoH incapsula le query DNS all'interno del normale traffico web HTTPS. Nonostante queste soluzioni crittografino la comunicazione in transito, presentano alcune criticità: non sono sempre supportate di default dai sistemi operativi, richiedono la conoscenza preventiva dell'indirizzo IP del resolver (che deve essere raggiunto senza l'ausilio di un DNS classico) e, soprattutto, non anonimizzano l'utente agli occhi del resolver stesso. Questo significa che la confidenzialità è garantita lungo il tragitto, ma i dati di navigazione vengono comunque consegnati ai grandi provider che gestiscono i server DoT/DoH (come Google o Cloudflare), spostando semplicemente il problema del tracciamento dall'ISP a questi colossi tecnologici.
+
+=== ODoH
+Per risolvere il paradosso della privacy intrinseco in DoH e DoT — dove il resolver conosce sia chi fa la richiesta sia cosa viene richiesto — è stato introdotto *ODoH (Oblivious DNS over HTTPS)*. L'obiettivo di ODoH è separare la conoscenza dell'identità dell'utente dalla conoscenza del contenuto della sua query, introducendo un intermediario chiamato Proxy. 
+
+#figure(image("images/2026-07-02-23-15-12.png"))
+
+Il funzionamento prevede che il client crittografi la propria richiesta DNS (utilizzando la chiave pubblica del resolver finale, detto Target, tramite HPKE) e la invii prima al Proxy via HTTPS. Il Proxy non possiede la chiave per decifrare il contenuto, quindi non sa cosa stia cercando l'utente, ma conoscendone l'indirizzo IP, funge da tramite inoltrando la richiesta cifrata al Target per conto del client. Il Target, a sua volta, decifra la query e prepara la risposta (che può essere firmata via DNSSEC), ma la invia al Proxy senza conoscere l'indirizzo IP del client originale. In questo modo, il Proxy conosce l'identità del client ma non il contenuto della richiesta, mentre il Target conosce il contenuto ma ignora l'identità dell'utente, garantendo un livello di privacy (oblivion) nettamente superiore.
 
 = Socket
 Nella storia di Internet, l'introduzione delle socket ha rappresentato una vera e propria rivoluzione culturale. Sono state inventate a Berkeley, in concomitanza con lo sviluppo dei sistemi UNIX. Il parallelismo alla base delle socket era legato all'hardware dell'epoca (negli anni '70 non c'erano i dischi rigidi moderni, ma si usavano molto i nastri magnetici). Per scrivere su un nastro si usava una `write` sequenziale, e per leggere si usava una `read` sequenziale. Le socket usano esattamente la stessa semantica: per trasmettere dati usi una `send` (o una scrittura sequenziale), e per riceverli usi una `receive` (una lettura che va a riempire un blocco di memoria).
@@ -245,7 +281,11 @@ Infine, parliamo di porte e socket. Le porte sono i punti logici in cui avviene 
 
 Le porte si dividono in categorie: le porte "well-known" (ben conosciute, da 1 a 1023), le porte registrate (da 1024 a 49151, dove troviamo di tutto, persino la porta 666 assegnata al multiplayer di Doom) e le porte effimere assegnate dinamicamente. L'unica vera differenza pratica tra queste categorie è un retaggio storico: per aprire un servizio in ascolto su una well-known port è necessario avere i privilegi di amministratore (root), mentre per le altre basta un utente normale.
 
+#figure(image("images/2026-07-02-18-54-27.png", width: 40%))
+
 Quando il vostro programma apre una socket, le viene assegnata una porta locale. Potete decidere di vincolare (bind) questa socket a uno specifico indirizzo IP della vostra macchina, a una specifica interfaccia di rete (come il Wi-Fi o il cavo Ethernet) oppure lasciarla in ascolto su tutte le interfacce disponibili. Attenzione a un dettaglio fondamentale: poiché l'UDP è senza connessione, una volta aperta una socket su una determinata porta, questa riceverà indiscriminatamente pacchetti da chiunque ve li mandi. Spetterà interamente alla vostra applicazione fare il "demultiplexing applicativo", ovvero controllare l'indirizzo IP e la porta sorgente di ogni singolo pacchetto in ingresso per capire con chi state parlando e gestire correttamente le risposte. Le socket UDP di basso livello non fanno alcun filtro al posto vostro.
+
+#pagebreak()
 
 = TCP (SLIDE 08)
 <RC_Lezione_2026.03.30.m4a>
