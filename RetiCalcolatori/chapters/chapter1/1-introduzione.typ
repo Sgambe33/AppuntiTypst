@@ -128,7 +128,7 @@ Per capire dove inviare un pacchetto, i sistemi consultano una Tabella di Routin
 
 Per trovare la rotta corretta, il sistema applica un'operazione logica per verificare se l'IP di destinazione combacia con le reti conosciute: verifica che `DestIP && RTMask == RTDestIP`. Poiché un pacchetto potrebbe teoricamente soddisfare più regole contemporaneamente (ad esempio una rotta generica e una specifica), il sistema applica la regola del *Maximum Matching Entry* (o Longest Prefix Match): tra tutte le rotte compatibili, vince quella con il maggior numero di bit a 1 nella sua maschera di sottorete (Genmask). In parole povere, il pacchetto viene sempre instradato seguendo il percorso in assoluto più specifico che il router conosce.
 
-= Protocolli?
+= Protocolli
 Il protocollo DNS, se osserviamo lo stack TCP/IP o il modello ISO/OSI, risiede sopra il livello di trasporto, quindi è un livello applicativo. Ma attenzione non viene utilizzato come il protocollo HTTP o SMTP, il DNS è al servizio di altre applicazioni, pertanto è un protocollo livello 7 anomalo. Questo riconferma che i due modelli sono utili solo dal punto di vista teorico in quanto nella realtà è tutta un'altra storia.
 
 == HTTP
@@ -199,7 +199,7 @@ Il *DNS* è particolarmente critico dal punto di vista della sicurezza per vari 
 - il protocollo non offre meccanismi per proteggere l'integrità delle informazioni distribuite (basti pensare all'associazione tra hostname e indirizzo IP).
 - DNS cache poisoning: attacchi volti a manomettere le informazioni contenute nei DNS Server, compromettendo la coerenza e l'integrità dei suoi dati.
 
-Un DNS Server mantiene in una memoria cache anche informazioni relative a domini non di sua competenza. Una risposta fornita sulla base di questi dati è detta *non authoritative* e il valore del campo TTL indica sia attendibile (più è alto il TTL più è alta la probabilità che il dato sia corretto). Un attacco di tipo *cache poisoning* a un DNS Server comporta la modifica dei dati della sua cache, inserendovi un valore di TTL molto alto, così da rendere attendibile l'informazione modificata. 
+Un DNS Server mantiene in una memoria cache anche informazioni relative a domini non di sua competenza. Una risposta fornita sulla base di questi dati è detta *non authoritative* e il valore del campo TTL indica sia attendibile (più è alto il TTL più è alta la probabilità che il dato sia corretto). Un attacco di tipo *cache poisoning* a un DNS Server comporta la modifica dei dati della sua cache, inserendovi un valore di TTL molto alto, così da rendere attendibile l'informazione modificata.
 
 Tipicamente, l'intervento consiste nell'associare a un nome l'indirizzo IP di un server malevolo. Per esempio, un utente scrive nel browser l'URL di un sito web ma viene poi direzionato, a sua insaputa, verso un sito clone costruito per effettuare furti di identità o di dati bancari (phishing). Questo succede perché nella cache del DNS Server l'indirizzo IP originale, associato a quel nome, è stato sostituito con quello del web server malevolo.
 
@@ -208,19 +208,19 @@ Tipicamente, l'intervento consiste nell'associare a un nome l'indirizzo IP di un
 Per rimediare alle mancanze del protocollo originario in termini di sicurezza, è stato creato un gruppo di lavoro che ha definito un'estensione al DNS denominata DNSSEC (Domain Name System Security Extensions). Il compito di DNSSEC è di garantire all'utente che il sito web che sta visitando è quello originale e non una copia creata per scopi fraudolenti. A tal scopo si usano delle chiavi crittografiche per *autenticare* i dati nel DNS, a partire dalla root. Le chiavi per la root sono gestite da ICANN, l'ente responsabile dei Domain Name di primo livello (generici e nazionali).
 
 === DoT e DoH
-Il DNSSEC, garantisce l'autenticità dei dati mitigando il rischio di DNS poisoning, ma non offre confidenzialità: le richieste (es. il dominio che si vuole visitare) viaggiano in chiaro. Ciò consente agli Internet Service Provider (ISP) o a chiunque intercetti il traffico di tracciare l'attività dell'utente. Per ovviare a questo problema di privacy, sono nati *DoT (DNS over TLS)* e *DoH (DNS over HTTPS)*. 
+Il DNSSEC, garantisce l'autenticità dei dati mitigando il rischio di DNS poisoning, ma non offre confidenzialità: le richieste (es. il dominio che si vuole visitare) viaggiano in chiaro. Ciò consente agli Internet Service Provider (ISP) o a chiunque intercetti il traffico di tracciare l'attività dell'utente. Per ovviare a questo problema di privacy, sono nati *DoT (DNS over TLS)* e *DoH (DNS over HTTPS)*.
 
 Entrambi abbandonano il trasporto UDP in favore del TCP e cifrano il traffico: DoT utilizza un canale TLS dedicato, mentre DoH incapsula le query DNS all'interno del normale traffico web HTTPS. Nonostante queste soluzioni crittografino la comunicazione in transito, presentano alcune criticità: non sono sempre supportate di default dai sistemi operativi, richiedono la conoscenza preventiva dell'indirizzo IP del resolver (che deve essere raggiunto senza l'ausilio di un DNS classico) e, soprattutto, non anonimizzano l'utente agli occhi del resolver stesso. Questo significa che la confidenzialità è garantita lungo il tragitto, ma i dati di navigazione vengono comunque consegnati ai grandi provider che gestiscono i server DoT/DoH (come Google o Cloudflare), spostando semplicemente il problema del tracciamento dall'ISP a questi colossi tecnologici.
 
 === ODoH
-Per risolvere il paradosso della privacy intrinseco in DoH e DoT — dove il resolver conosce sia chi fa la richiesta sia cosa viene richiesto — è stato introdotto *ODoH (Oblivious DNS over HTTPS)*. L'obiettivo di ODoH è separare la conoscenza dell'identità dell'utente dalla conoscenza del contenuto della sua query, introducendo un intermediario chiamato Proxy. 
+Per risolvere il paradosso della privacy intrinseco in DoH e DoT — dove il resolver conosce sia chi fa la richiesta sia cosa viene richiesto — è stato introdotto *ODoH (Oblivious DNS over HTTPS)*. L'obiettivo di ODoH è separare la conoscenza dell'identità dell'utente dalla conoscenza del contenuto della sua query, introducendo un intermediario chiamato Proxy.
 
 #figure(image("images/2026-07-02-23-15-12.png"))
 
 Il funzionamento prevede che il client crittografi la propria richiesta DNS (utilizzando la chiave pubblica del resolver finale, detto Target, tramite HPKE) e la invii prima al Proxy via HTTPS. Il Proxy non possiede la chiave per decifrare il contenuto, quindi non sa cosa stia cercando l'utente, ma conoscendone l'indirizzo IP, funge da tramite inoltrando la richiesta cifrata al Target per conto del client. Il Target, a sua volta, decifra la query e prepara la risposta (che può essere firmata via DNSSEC), ma la invia al Proxy senza conoscere l'indirizzo IP del client originale. In questo modo, il Proxy conosce l'identità del client ma non il contenuto della richiesta, mentre il Target conosce il contenuto ma ignora l'identità dell'utente, garantendo un livello di privacy (oblivion) nettamente superiore.
 
 = Socket
-Nella storia di Internet, l'introduzione delle socket ha rappresentato una vera e propria rivoluzione culturale. Sono state inventate a Berkeley, in concomitanza con lo sviluppo dei sistemi UNIX. Il parallelismo alla base delle socket era legato all'hardware dell'epoca (negli anni '70 non c'erano i dischi rigidi moderni, ma si usavano molto i nastri magnetici). Per scrivere su un nastro si usava una `write` sequenziale, e per leggere si usava una `read` sequenziale. Le socket usano esattamente la stessa semantica: per trasmettere dati usi una `send` (o una scrittura sequenziale), e per riceverli usi una `receive` (una lettura che va a riempire un blocco di memoria).
+Nella storia di Internet, l'introduzione delle socket ha rappresentato una vera e propria rivoluzione. Sono state inventate a Berkeley, in concomitanza con lo sviluppo dei sistemi UNIX. Il parallelismo alla base delle socket era legato all'hardware dell'epoca (negli anni '70 non c'erano i dischi rigidi moderni, ma si usavano molto i nastri magnetici). Per scrivere su un nastro si usava una `write` sequenziale, e per leggere si usava una `read` sequenziale. Le socket usano esattamente la stessa semantica: per trasmettere dati usi una `send` (o una scrittura sequenziale), e per riceverli usi una `receive` (una lettura che va a riempire un blocco di memoria).
 
 == Blocking vs Non-Blocking
 La prima grande complicazione nello sviluppo di reti riguarda il comportamento del programma quando tenta di leggere o scrivere dati. Esistono due tipi principali di socket:
@@ -235,7 +235,7 @@ Aprendo il terminale (su Linux/Mac) e digitando `man socket`, è possibile  trov
 
 #align(center, `int socket(int domain, int type, int protocol);`)
 
-+ *Dominio* (Domain): indica la famiglia di protocolli. I più comuni sono:
++ *Domain*: indica la famiglia di protocolli. I più comuni sono:
 
   - `AF_INET` per IPv4.
 
@@ -247,7 +247,7 @@ Aprendo il terminale (su Linux/Mac) e digitando `man socket`, è possibile  trov
     Il fatto che un'applicazione debba scegliere esplicitamente tra IPv4 e IPv6 è tecnicamente una violazione del principio di "information hiding", ma attualmente è così che funziona
   ]
 
-+ *Tipo* (Type): indica la modalità di comunicazione. I due tipi principali sono:
++ *Type*: indica la modalità di comunicazione. I due tipi principali sono:
 
   - `SOCK_STREAM`: garantisce un flusso continuo di byte. Sotto il cofano si mappa tipicamente sul protocollo TCP. Si possono scrivere o leggere i byte un po' alla volta (1 byte, 10 byte o un giga). Sarà l'applicazione a dover capire dove inizia e finisce logicamente un messaggio.
 
@@ -255,7 +255,7 @@ Aprendo il terminale (su Linux/Mac) e digitando `man socket`, è possibile  trov
 
   Ci sono anche tipi speciali come `SOCK_RAW`, che permette di bypassare i livelli alti e creare pacchetti a mano (packet injection), utile per la cybersecurity o lo sviluppo di basso livello.
 
-+ Protocollo (Protocol): generalmente si imposta a `0`, delegando al sistema *operativo* la scelta del protocollo di default per quel dominio e quel tipo. Lo si specifica solo se si vogliono forzare protocolli particolari.
++ *Protocol*: generalmente si imposta a `0`, delegando al *sistema operativo* la scelta del protocollo di default per quel dominio e quel tipo. Lo si specifica solo se si vogliono forzare protocolli particolari.
 
 Questa funzione restituisce un numero intero. Se l'intero è negativo, significa che c'è stato un errore (es. dominio non supportato, permessi mancanti). Se l'intero è positivo, rappresenta l'ID della socket. Il kernel dei sistemi operativi Unix/Linux è scritto in C, che è un linguaggio procedurale. Ecco perché la funzione non restituisce un "oggetto socket", ma un semplice numero identificativo (un *file descriptor*), che verrà usato come fosse il riferimento a quell'oggetto per tutte le operazioni successive.
 
@@ -265,25 +265,25 @@ A livello di trasporto abbiamo protocolli *connection-oriented* e *protocolli co
 Il multiplexing, nelle reti, significa prendere i dati generati da più processi (ad esempio, un'applicazione che usa una socket TCP e un'altra che usa UDP) e infilarli insieme su un unico canale fisico di trasmissione. Il demultiplexing è l'esatto opposto in fase di ricezione. Per poter fare questo smistamento, ogni livello della pila protocollare deve avere nell'header un'informazione che identifichi a chi è destinato il payload: nel frame Ethernet c'è il campo EtherType, nell'IP c'è il campo Protocol, e a livello di trasporto sono usate le Porte.
 
 == UDP vs TCP
-Nel modello connection-oriented, come il TCP, il livello 4 esegue una fase di setup iniziale. Una volta stabilita la connessione, so ha la certezza che i dati arriveranno e si potrà comunicare in modo efficiente. I grandi svantaggi sono che permette solo comunicazioni uno-a-uno e, soprattutto, richiede il mantenimento continuo di uno "stato" della connessione. Poiché il livello IP sottostante è inaffidabile e invia i pacchetti ognuno per i fatti suoi, tutto l'enorme carico di mantenere in piedi la connessione e verificarne l'affidabilità ricade sul TCP.
+Nel modello connection-oriented, come il TCP, il livello 4 esegue una fase di setup iniziale. Una volta stabilita la connessione, si ha la certezza che i dati arriveranno e si potrà comunicare in modo efficiente. I grandi svantaggi sono che permette solo comunicazioni uno-a-uno e, soprattutto, richiede il mantenimento continuo di uno "stato" della connessione. Poiché il livello IP sottostante è inaffidabile e invia i pacchetti ognuno per i fatti suoi, tutto l'enorme carico di mantenere in piedi la connessione e verificarne l'affidabilità ricade sul TCP.
 
-L'UDP, al contrario, è connectionless ed è molto più affine all'IP: prende un pacchetto, lo manda e spera che arrivi. È una comunicazione monodirezionale, non ha fasi di setup e permette di inviare dati a un destinatario specifico, in multicast a molti, o in broadcast a tutti. Il lato negativo è che si perde completamente la garanzia di consegna. L'UDP non dà alcun feedback sull'arrivo dei dati; se serve sapere se un pacchetto è giunto a destinazione, sarà necessario programmare un sistema di conferma a livello applicativo. Questo, però, lo rende un protocollo estremamente leggero e veloce, non essendoci alcuno stato da mantenere in memoria.
+L'UDP, al contrario, è connectionless ed è molto più affine all'IP: prende un pacchetto, lo manda e spera che arrivi. È una comunicazione monodirezionale, non ha fasi di setup e permette di inviare dati a un destinatario specifico, in multicast a molti o in broadcast a tutti. Il lato negativo è che si perde completamente la garanzia di consegna. L'UDP non dà alcun feedback sull'arrivo dei dati; se serve sapere se un pacchetto è giunto a destinazione, sarà necessario programmare un sistema di conferma a livello applicativo. Questo, però, lo rende un protocollo estremamente leggero e veloce, non essendoci alcuno stato da mantenere in memoria.
 
 Il modo migliore per capire come funziona l'UDP è guardare il suo header, che è lungo appena 8 byte.
 #figure(image("images/2026-06-20-17-37-16.png"), caption: "UDP a sx, UDP-Lite a dx")
 
 Contiene solo quattro campi: la porta sorgente, la porta destinazione, la lunghezza e un checksum per il controllo degli errori. La lunghezza è essenziale perché permette al sistema ricevente di sapere esattamente quanta memoria allocare in modo dinamico prima ancora di finire di leggere l'intero pacchetto. Non essendoci numeri di sequenza o acknowledgement, si tratta di un protocollo sostanzialmente vuoto.
 
-C'è un'unica vera anomalia: per calcolare il checksum, l'UDP utilizza un cosiddetto "pseudo-header" IP. In pratica, il livello UDP ha bisogno di conoscere l'indirizzo IP sorgente, l'indirizzo destinazione e il protocollo, compiendo una violazione del principio di isolamento dei livelli (information hiding). Questo crea una complicazione in fase di invio, poiché l'UDP deve chiedere al livello IP quale indirizzo sorgente verrebbe usato per raggiungere quella determinata destinazione, in modo da poter calcolare correttamente il checksum prima di passargli il pacchetto. Esiste anche una variante meno comune, l'UDP-Lite, pensata per i flussi multimediali, che permette di applicare il checksum solo a una porzione del pacchetto in modo da tollerare lievi errori sui frame video senza scartare l'intera immagine.
+Il calcolo del checksum è facoltativo su IPv4, obbligatorio su IPv6 mentre su UDP-Lite è opzionale e potrebbe non coprire l'intero header. C'è un'unica vera anomalia: per calcolare il checksum, l'UDP utilizza un cosiddetto "pseudo-header" IP. In pratica, il livello UDP ha bisogno di conoscere l'indirizzo IP sorgente, l'indirizzo destinazione e il protocollo, compiendo una violazione del principio di isolamento dei livelli (information hiding). Questo crea una complicazione in fase di invio, poiché l'UDP deve chiedere al livello IP quale indirizzo sorgente verrebbe usato per raggiungere quella determinata destinazione, in modo da poter calcolare correttamente il checksum prima di passargli il pacchetto. Esiste anche una variante meno comune, l'UDP-Lite, pensata per i flussi multimediali, che permette di applicare il checksum solo a una porzione del pacchetto in modo da tollerare lievi errori sui frame video senza scartare l'intera immagine.
 
 == Porte e Socket
-Infine, parliamo di porte e socket. Le porte sono i punti logici in cui avviene il multiplexing dei servizi. Usiamo delle porte standard predeterminate, come la 80 per l'HTTP, per evitare che un client debba interrogare ogni volta il server per sapere su quale porta sia in ascolto un determinato servizio; un meccanismo del genere intaserebbe la rete e offrirebbe il fianco a innumerevoli problemi di sicurezza.
+Le porte sono i punti logici in cui avviene il multiplexing dei servizi. Usiamo delle porte standard predeterminate, come la 80 per l'HTTP, per evitare che un client debba interrogare ogni volta il server per sapere su quale porta sia in ascolto un determinato servizio; un meccanismo del genere intaserebbe la rete e offrirebbe il fianco a innumerevoli problemi di sicurezza.
 
-Le porte si dividono in categorie: le porte "well-known" (ben conosciute, da 1 a 1023), le porte registrate (da 1024 a 49151, dove troviamo di tutto, persino la porta 666 assegnata al multiplayer di Doom) e le porte effimere assegnate dinamicamente. L'unica vera differenza pratica tra queste categorie è un retaggio storico: per aprire un servizio in ascolto su una well-known port è necessario avere i privilegi di amministratore (root), mentre per le altre basta un utente normale.
+Le porte si dividono in categorie: le porte *well-known* (da 1 a 1023), le porte *registrate* (da 1024 a 49151, dove troviamo di tutto, persino la porta 666 assegnata al multiplayer di Doom) e le porte *effimere* assegnate dinamicamente. L'unica vera differenza pratica tra queste categorie è un retaggio storico: per aprire un servizio in ascolto su una well-known port è necessario avere i privilegi di amministratore (root), mentre per le altre basta un utente normale.
 
 #figure(image("images/2026-07-02-18-54-27.png", width: 40%))
 
-Quando il vostro programma apre una socket, le viene assegnata una porta locale. Potete decidere di vincolare (bind) questa socket a uno specifico indirizzo IP della vostra macchina, a una specifica interfaccia di rete (come il Wi-Fi o il cavo Ethernet) oppure lasciarla in ascolto su tutte le interfacce disponibili. Attenzione a un dettaglio fondamentale: poiché l'UDP è senza connessione, una volta aperta una socket su una determinata porta, questa riceverà indiscriminatamente pacchetti da chiunque ve li mandi. Spetterà interamente alla vostra applicazione fare il "demultiplexing applicativo", ovvero controllare l'indirizzo IP e la porta sorgente di ogni singolo pacchetto in ingresso per capire con chi state parlando e gestire correttamente le risposte. Le socket UDP di basso livello non fanno alcun filtro al posto vostro.
+Quando il programma apre una socket, le viene assegnata una porta locale. E' possibile vincolare (bind) questa socket a uno specifico indirizzo IP della macchina, a una specifica interfaccia di rete (come il Wi-Fi o il cavo Ethernet) oppure lasciarla in ascolto su tutte le interfacce disponibili. Attenzione a un dettaglio fondamentale: poiché l'UDP è senza connessione, una volta aperta una socket su una determinata porta, questa riceverà indiscriminatamente pacchetti da chiunque li invii. Spetterà interamente all'applicazione fare il "demultiplexing applicativo", ovvero controllare l'indirizzo IP e la porta sorgente di ogni singolo pacchetto in ingresso per capire con chi si sta parlando e gestire correttamente le risposte. Le socket UDP di basso livello non fanno alcun filtro.
 
 #pagebreak()
 
@@ -293,8 +293,8 @@ L'header del TCP è molto più complicato di quello dell'UDP e, a differenza di 
 
 #figure(image("images/2026-06-20-17-41-09.png"))
 
-- *Punti in comune con l'UDP:* anche il TCP possiede uno pseudo-header (identico a quello usato dall'UDP per IPv4/IPv6, essenziale per il calcolo del checksum). Inoltre, i primi due campi dell'header TCP sono la *Porta Sorgente* e la *Porta Destinazione* (entrambe da 16 bit), che si trovano nella stessa posizione e hanno la stessa semantica dell'UDP. Questa somiglianza non è una regola fissa per tutti i protocolli di livello 4 (esiste ad esempio l'SCTP, usato nelle reti mobili, che funziona in modo diverso), ma è dovuta al fatto che TCP e UDP sono stati progettati nello stesso periodo, spesso dalle stesse persone, all'interno della suite TCP/IP.
-- *Numeri di sequenza (Sequence e Acknowledgement Number):*  subito dopo le porte, troviamo due campi da 32 bit fondamentali:
+- *Punti in comune con l'UDP:* anche il TCP possiede uno pseudo-header (identico a quello usato dall'UDP per IPv4/IPv6, essenziale per il calcolo del checksum). Inoltre, i primi due campi dell'header TCP sono la *Porta Sorgente* e la *Porta Destinazione* (entrambe da 16 bit), che si trovano nella stessa posizione e hanno la stessa semantica dell'UDP. Esse vengono utilizzate dal TCP stesso per effettuare il multiplexing. Questa somiglianza non è una regola fissa per tutti i protocolli di livello 4 (esiste ad esempio l'SCTP, usato nelle reti mobili, che funziona in modo diverso), ma è dovuta al fatto che TCP e UDP sono stati progettati nello stesso periodo, spesso dalle stesse persone, all'interno della suite TCP/IP.
+- *Numeri di sequenza (Sequence e Acknowledgement Number):* subito dopo le porte, troviamo due campi da 32 bit fondamentali:
   - *Sequence Number*
   - *Acknowledgement Number*
   Questi sono il cuore del meccanismo di affidabilità del TCP.
@@ -410,7 +410,7 @@ Non si deve confondere il controllo di congestione nei nodi intermedi con il con
   Si occupa di mantenere un flusso "liscio" di pacchetti tra due endpoint. Chi trasmette dovrebbe conoscere la capacità dei buffer intermedi (impossibile). Chi trasmette deve stimare la velocità dei collegamenti intermedi (difficile).
 ]
 
-Come fa praticamente il TCP a regolare la velocità? Usa una "Congestion Window". Più è grande questa finestra, più dati trasmetto in un RTT. La teoria classica si basa sull'algoritmo *AIMD* (Additive Increase, Multiplicative Decrease): ogni volta che ricevo un ACK, aumento la finestra linearmente di 1; se rilevo una perdita, presumo ci sia congestione e dimezzo drasticamente la finestra.  Questo approccio crea il classico grafico a dente di sega e garantisce stabilità e *fairness* (equità) tra i vari utenti che si contendono la banda.
+Come fa praticamente il TCP a regolare la velocità? Usa una "Congestion Window". Più è grande questa finestra, più dati trasmetto in un RTT. La teoria classica si basa sull'algoritmo *AIMD* (Additive Increase, Multiplicative Decrease): ogni volta che ricevo un ACK, aumento la finestra linearmente di 1; se rilevo una perdita, presumo ci sia congestione e dimezzo drasticamente la finestra. Questo approccio crea il classico grafico a dente di sega e garantisce stabilità e *fairness* (equità) tra i vari utenti che si contendono la banda.
 
 Oggi però l'AIMD puro è superato. I sistemi operativi moderni usano diversi "flavors" (varianti) del TCP. Linux usa spesso il *Cubic*, mentre Google spinge per algoritmi basati sui ritardi come il *BBR*. Ognuno reagisce in modo diverso alla congestione.
 
@@ -458,11 +458,11 @@ Veniamo al concetto più critico: gli indirizzi. Nel disegno originale del TCP/I
 
 Ma chiariamo la gerarchia e lo scope (l'ambito di validità) degli indirizzi, per evitare fraintendimenti:
 
-- Indirizzi MAC (Livello 2): Servono per comunicare all'interno di una rete locale (es. Ethernet o Wi-Fi). Il loro scope finisce appena incontrate un router. Devono essere univoci all'interno dello stesso segmento di rete, altrimenti succedono disastri. Quanti indirizzi MAC ha una scheda di rete? Di norma uno, ma a livello software può riceverne e gestirne molti.
+- Indirizzi MAC (Livello 2): servono per comunicare all'interno di una rete locale (es. Ethernet o Wi-Fi). Il loro scope finisce appena incontrate un router. Devono essere univoci all'interno dello stesso segmento di rete, altrimenti succedono disastri. Quanti indirizzi MAC ha una scheda di rete? Di norma uno, ma a livello software può riceverne e gestirne molti.
 
-- Indirizzi IP (Livello 3): Servono per il routing end-to-end, da sorgente a destinazione. Quanti indirizzi IP può avere una singola scheda di rete? Quanti ne volete. Dimenticatevi la fandonia che a una scheda di rete corrisponda un solo indirizzo IP. Con IPv4 si usa spesso assegnarne uno solo per un problema di scarsità, ma in IPv6 averne multipli è la norma assoluta.
+- Indirizzi IP (Livello 3): servono per il routing end-to-end, da sorgente a destinazione. Quanti indirizzi IP può avere una singola scheda di rete? Quanti ne volete. Dimenticatevi la fandonia che a una scheda di rete corrisponda un solo indirizzo IP. Con IPv4 si usa spesso assegnarne uno solo per un problema di scarsità, ma in IPv6 averne multipli è la norma assoluta.
 
-- Indirizzi Alfanumerici (DNS, Livello 7): Nomi come www.unifi.it. Non esistono solo per aiutarvi a memorizzarli. Esistono per creare un livello di astrazione! Se il server del fioraio cambia provider (e quindi cambia indirizzo IP, che dipende strettamente dal routing e dall'Autonomous System a cui ci si aggancia), il DNS permette agli utenti di continuare a raggiungerlo digitando lo stesso nome. Quanti indirizzi IP può avere un dominio? Quanti ne volete. Quanti domini possono puntare allo stesso IP? Quanti ne volete.
+- Indirizzi Alfanumerici (DNS, Livello 7): nomi come `www.unifi.it`. Non esistono solo per aiutarvi a memorizzarli. Esistono per creare un livello di astrazione! Se il server del fioraio cambia provider (e quindi cambia indirizzo IP, che dipende strettamente dal routing e dall'Autonomous System a cui ci si aggancia), il DNS permette agli utenti di continuare a raggiungerlo digitando lo stesso nome. Quanti indirizzi IP può avere un dominio? Quanti ne volete. Quanti domini possono puntare allo stesso IP? Quanti ne volete.
 
 Un'ultima precisazione vitale sull'Information Hiding e il Modello OSI. Il modello OSI originale (con i suoi 7 livelli) prevedeva una netta separazione: ogni livello doveva fare il suo lavoro leggendo solo il proprio header, ignorando il contenuto del payload (information hiding). Questo manteneva l'architettura pulita, ma generava header giganteschi e inefficienze pesantissime.
 Il TCP/IP se n'è fregato. Il TCP/IP vìola l'information hiding in continuazione per ottimizzare le prestazioni. È per questo che i livelli OSI (Sessione, Presentazione, ecc.) non sono mai stati davvero implementati su larga scala e oggi usiamo i numeri dei livelli OSI (Layer 2, Layer 3, Layer 4) solo come vaga convenzione per capirci.
@@ -516,7 +516,7 @@ Questa architettura introduce topologie altamente complesse e stratificate. Un u
 
 Sebbene il NAT sia stato uno strumento essenziale per prolungare la longevità dell'IPv4, ha di fatto compromesso il paradigma *end-to-end* originario di Internet, introducendo enormi inefficienze nello sviluppo e nel funzionamento delle applicazioni distribuite. L'unica soluzione architetturale definitiva per superare questi ostacoli rimane l'adozione e la transizione completa al protocollo IPv6.
 
-= Protocollo IPv6 e Fondamenti di Sicurezza delle Reti
+= IPv6
 <RC_Lezione_2026.05.04.m4a>
 
 L'evoluzione delle infrastrutture di rete ha reso obsoleti molti dei paradigmi legati allo standard IPv4. Attualmente, l'IPv6 non costituisce un protocollo sperimentale o futuro, bensì lo standard *de facto* su cui transita la maggioranza del traffico Internet globale. Comprendere l'IPv6 è un requisito fondamentale per lo sviluppo e l'amministrazione delle reti moderne.
@@ -571,12 +571,7 @@ Ulteriori tipologie:
 L'IPv6 introduce il concetto di *scope*, ovvero per quanta distanza, in termini di hop, l'indirizzo continua ad avere _senso_.
 
 // TODO: aggiungere discorso su sicurezza+scope
-// La crittografia è solo uno strumento. Una delle basi della sicurezza di rete è la definizione delle cosiddette "zone di sicurezza": aree della rete in cui i dispositivi condividono le stesse esigenze e regole. Ad esempio, la rete a disposizione degli studenti universitari non può avere gli stessi privilegi della rete della segreteria amministrativa. Se uno studente fa danni, non possiamo licenziarlo; se lo fa un dipendente, sì.
-
-// Di solito, per separare queste zone si usano i firewall (oltre a tecniche più moderne come lo Zero Trust). Ma c'è un metodo ancora più basilare e drastico per isolare due zone: usare indirizzi con uno scope incompatibile. Se la zona A e la zona B usano entrambe solo indirizzi link local, e in mezzo c'è un router, le due zone non potranno mai comunicare. Il router semplicemente non instraderà i pacchetti.
-
-// Originariamente, l'idea degli indirizzi site local o organization local serviva proprio a questo: creare isolamento a livello di protocollo. Alla fine, però, questi indirizzi sono stati abbandonati perché gli amministratori di rete trovavano molto più logico, flessibile e naturale assegnare indirizzi globali a tutti e usare i firewall per gestire chi potesse parlare con chi.
-
+La crittografia è solo uno strumento. Una delle basi della sicurezza di rete è la definizione delle cosiddette "zone di sicurezza": aree della rete in cui i dispositivi condividono le stesse esigenze e regole. Ad esempio, la rete a disposizione degli studenti universitari non può avere gli stessi privilegi della rete della segreteria amministrativa. Se uno studente fa danni, non possiamo licenziarlo; se lo fa un dipendente, sì. Di solito, per separare queste zone si usano i firewall (oltre a tecniche più moderne come lo Zero Trust). Ma c'è un metodo ancora più basilare e drastico per isolare due zone: usare indirizzi con uno scope incompatibile. Se la zona A e la zona B usano entrambe solo indirizzi link local, e in mezzo c'è un router, le due zone non potranno mai comunicare. Il router semplicemente non instraderà i pacchetti. Originariamente, l'idea degli indirizzi site local o organization local serviva proprio a questo: creare isolamento a livello di protocollo. Alla fine, però, questi indirizzi sono stati abbandonati perché gli amministratori di rete trovavano molto più logico, flessibile e naturale assegnare indirizzi globali a tutti e usare i firewall per gestire chi potesse parlare con chi.
 
 Dopo l'avvio della scheda di rete, si avvia la configurazione dello stack IPv6. Come prima cosa, viene creato un indirizzo link local `fe80::/10`.
 #figure(image("images/2026-06-23-22-01-44.png", width: 50%))
@@ -607,7 +602,7 @@ L'IPv6 rivoluziona la gestione delle reti locali. Il concetto di *Subnet Mask* (
 === SLAAC
 #figure(image("images/2026-06-24-17-08-26.png", width: 50%))
 
-Lo *SLAAC* (Stateless Addess Autoconfiguration) è il meccanismo di autoconfigurazione di IPv6. Permette a due o più host, connessi anche da solo un cavo tra loro, che utilizzano IPv6 di ottenere automaticamente un indirizzo IP senza la presenza di un router. L'intero processo è basato sul protocollo *NDP* (Neighbor Discovery Protocol) che a sua volta incapsulata pacchetti ICMPv6. Il NDP definisce cinque (ma ne vedremo quattro) tipologie di messaggi:
+Lo *SLAAC* (Stateless Addess Autoconfiguration) è il meccanismo di autoconfigurazione di IPv6. Permette a due o più host, connessi anche da solo un cavo tra loro, che utilizzano IPv6 di ottenere automaticamente un indirizzo IP senza la presenza di un router. L'intero processo è basato sul protocollo *NDP* (Neighbor Discovery Protocol) che a sua volta incapsulata pacchetti ICMPv6. Il NDP sostituisce il protocollo ARP dell'IPv4, permettendo quindi di risolvere anche gli indirizzi MAC. Il NDP definisce cinque (ma ne vedremo quattro) tipologie di messaggi:
 
 + *Router Solicitation (RS)*: un host che fa uso di SLAAC, invierà automaticamente sulla rete dei pacchetti RS. Questi pacchetti servono per "sollecitare" eventuali router nella rete a presentarsi con il proprio IP in modo tale che l'host conosca il loro indirizzo. Nell'immagine sottostante si può notare come il PC1 invia un pacchetto RS contenente il proprio indirizzo IP (link-local autogenerato da MAC) e specificando come indirizzo di destinazione l'indirizzo *All-Routers Multicast*. In questo modo, soltanto i router considereranno questo pacchetto. Il tipo per RS è 133.
   #figure(image("images/2026-06-24-17-31-14.png", width: 50%))
@@ -626,6 +621,51 @@ Lo *SLAAC* (Stateless Addess Autoconfiguration) è il meccanismo di autoconfigur
 === Duplicate Address Detection (DAD)
 
 Al momento dell'autoconfigurazione dell'Interface ID (generato ad esempio tramite EUI-64 o meccanismi randomizzati), il dispositivo deve validarne l'univocità tramite il *DAD*. Questo processo invia una *Neighbor Solicitation* per l'indirizzo appena calcolato e attende una replica. Poiché il DAD si basa su un approccio "silenzio-assenso" (se scade il timer senza risposte, l'IP viene assunto libero), in reti wireless affollate o rumorose eventuali pacchetti persi possono portare a collisioni di IP, causando disservizi complessi e non facilmente rilevabili dagli switch di Livello 2.
+
+=== No more subnets
+L'IPv4 ha abituato al concetto di Subnet (sottorete) e di Netmask. In IPv4, per capire se un altro dispositivo è sulla stessa rete locale (e quindi se è possibile parlargli direttamente senza passare dal router), si esegue una semplice operazione di AND logico tra il proprio IP, l'IP di destinazione e la Netmask. Se i risultati coincidono, i due dispositivi si trovano nella stessa subnet. Questo meccanismo, però, si rompe in modo catastrofico se due computer hanno Netmask configurate in modo diverso (es. uno ha /24 e l'altro /16).
+
+In IPv6, la Netmask non esiste più. La lunghezza del prefisso (es. /64) non è una Netmask. E allora, come si fa a sapere se un indirizzo IPv6 è nella propria rete locale (on-link) o se bisogna passare dal router (off-link)?
+Semplice: non si fa. La risposta deve essere fornita esplicitamente dal router.
+
+Quando un router IPv6 invia un Router Advertisement, all'interno del pacchetto c'è un blocco chiamato PIO (Prefix Information Object). Questo PIO contiene il prefisso (es. `2001:db8::/64`) e una serie di bit (flag). Uno di questi è il bit `L` (On-Link).
+
+- Se il bit `L` è a 1, il router comunica che tutti gli host che usano questo prefisso sono collegati fisicamente alla stessa rete locale dell'host, che può quindi contattarli direttamente.
+
+- Se il bit `L` è a 0, il router comunica che, anche se questi host hanno lo stesso prefisso, non si trovano nella rete locale dell'host: i pacchetti devono essere inviati al router, che si occuperà di instradarli.
+
+- Se non è stato ricevuto nessun Router Advertisement, di default qualsiasi indirizzo (tranne i Link-Local) è considerato off-link. Tutto il traffico verrà inviato al Default Gateway.
+
+Ma cosa succede se un pacchetto viene inviato al router per un dispositivo che in realtà è fisicamente connesso allo stesso switch? Il router IPv6 lo inoltrerà al dispositivo corretto, ma subito dopo manderà indietro un messaggio ICMPv6 chiamato Redirect. Con questo messaggio, il router comunica che il mittente e quel destinatario specifico sono on-link e che dovrebbero parlarsi direttamente la prossima volta. In questo modo, il concetto di "rete locale" diventa dinamico e non è più vincolato rigidamente ai blocchi IP.
+
+Questa flessibilità permette configurazioni che in IPv4 sarebbero state assurde. Due computer possono essere collegati allo stesso switch pur avendo prefissi IP completamente diversi, e il router potrebbe dire a entrambi che sono on-link per certi indirizzi e off-link per altri.
+
+#example()[
+  Un esempio pratico: l'Internet delle Cose (IoT). Si supponga di avere in casa una rete Wi-Fi/Ethernet e un gateway Zigbee/Thread per dispositivi IoT (lampadine, sensori). I dispositivi Zigbee non hanno il MAC address a 48 bit del Wi-Fi, quindi non è possibile fare un bridge diretto tra le due reti. Il gateway deve per forza fare da router.
+  In IPv6, invece di impazzire creando sottoreti complesse, è possibile assegnare a tutta la casa e a tutta la rete IoT lo stesso identico prefisso /64. Per farlo funzionare, si configura il router principale in modo che dichiari quel prefisso come off-link (bit `L=0`). A quel punto, i computer Wi-Fi della casa invieranno i pacchetti destinati all'IoT al router principale; quest'ultimo, sapendo dove si trova il gateway Zigbee, instraderà i pacchetti a lui. È complicato all'inizio, ma sul lungo periodo scala infinitamente meglio rispetto all'uso disordinato di IP locali.
+]
+
+
+== DHCPv6
+
+E il DHCP in tutto questo? In IPv6 il suo ruolo cambia. Viene usato solo se il router lo impone. Nel PIO del Router Advertisement ci sono altri due flag importanti:
+
+- Il bit `M` (Managed): se è a 1, il router indica di usare il server DHCPv6 per ottenere l'indirizzo IPv6.
+
+- Il bit `O` (Other): se è a 1, il router indica di usare l'autoconfigurazione per generare l'indirizzo IP, ma di richiedere al server DHCPv6 le altre configurazioni accessorie (es. i server DNS, il dominio di ricerca).
+
+Inoltre, il DHCPv6 non identifica i client tramite il MAC address. Dato che oggi i dispositivi cambiano MAC address di continuo per ragioni di privacy (MAC randomization), usare il MAC manderebbe in tilt il server DHCP. Invece, si usa il *DUID* (DHCP Unique Identifier). Il DUID viene generato dal sistema operativo, di solito fondendo il MAC address originario e altri parametri, e rimane fisso e costante nel tempo, garantendo al server DHCP di riconoscere sempre lo stesso client.
+
+== Frammentazione e Path MTU Discovery
+Ogni rete fisica ha una dimensione massima per i pacchetti (es. 1500 byte per Ethernet). In IPv4, se un pacchetto arriva a un router intermedio e la rete successiva ha una MTU più piccola (es. 1492 byte per via di incapsulamenti PPPoE come nelle vecchie ADSL), il router "taglia" il pacchetto in due frammenti usando i campi di frammentazione dell'header IPv4. Questo crea un sovraccarico di lavoro (overhead) enorme per il router, che deve ricalcolare il Checksum e gestire la suddivisione.
+
+In IPv6, la regola è drastica: i router intermedi non frammentano mai i pacchetti.
+Se un router IPv6 riceve un pacchetto troppo grande per la rete successiva, lo scarta e manda indietro un messaggio ICMPv6 di errore chiamato *Packet Too Big*. Questo messaggio contiene la dimensione dell'MTU consentita. Il nodo sorgente riceve l'errore e aggiorna il suo Path MTU (PMTU) per quella specifica destinazione. Da quel momento in poi, sarà il nodo sorgente (e solo lui) a generare pacchetti più piccoli, inserendo un Extension Header di frammentazione se necessario.
+
+Questo sistema è infinitamente più efficiente per i router di dorsale, ma ha un punto debole mortale: gli amministratori di rete incompetenti. Spesso chi configura i firewall blocca totalmente il traffico ICMP, credendo di aumentare la sicurezza ("così non mi pingano!"). In IPv6, se si blocca l'ICMP, si bloccano anche i messaggi Packet Too Big. Il nodo sorgente non saprà mai perché i suoi pacchetti vengono scartati e la connessione andrà in stallo senza spiegazioni (i famosi "buchi neri" di rete).
+
+Infine, una salvaguardia imposta dall'IPv6: lo standard vieta l'esistenza di link con MTU inferiore a 1280 byte. Mentre in IPv4 potevano esistere reti con payload piccolissimi (ignorando il consiglio teorico dei 576 byte), in IPv6 il limite di 1280 byte è legge.
+E cosa succede con reti come il Bluetooth, LoRa o Zigbee (IEEE 802.15.4), che hanno MTU a livello fisico minuscole (spesso inferiori ai 100 byte)? Semplice: devono usare un Adaptation Layer (uno strato software intermedio, come 6LoWPAN) che si occupa di comprimere l'header IPv6 e gestire una frammentazione invisibile al livello IP superiore, garantendo all'IPv6 di vedere sempre e comunque i suoi 1280 byte garantiti.
 
 = Sicurezza delle Reti (Cybersecurity)
 
@@ -783,58 +823,6 @@ Le vulnerabilità dei protocolli di rete derivano tipicamente da tre categorie d
 // Per gli indirizzi Globali, il processo di autoconfigurazione è simile a quello dei Link-Local, ma i dispositivi non possono inventarsi il prefisso da soli. Hanno bisogno di un Router Advertisement (RA).
 // I router IPv6 inviano periodicamente questi messaggi (RA unsolicited) in multicast a tutti i nodi (ff02::1). Se un dispositivo appena acceso ha fretta, può inviare una Router Solicitation (RS) all'indirizzo multicast dei router (ff02::2), chiedendo: "C'è un router qui? Datemi i parametri!". In risposta, il router invia un RA che contiene, tra le altre cose, i prefissi Globali che il dispositivo può usare per autoconfigurarsi. Un piccolo avviso: la specifica originale dei RA non includeva la configurazione dei server DNS (è stata aggiunta dopo). Se avete a che fare con dispositivi vecchi o scritti male, potreste ricevere un IP ma non un DNS, rimanendo impossibilitati a navigare.
 
-// Ora passiamo al mal di testa vero. Se non capite questo, non avete capito come funziona l'instradamento in IPv6.
-
-// Siete stati abituati all'IPv4 e al concetto di Subnet (sottorete) e di Netmask. In IPv4, per capire se un altro dispositivo è sulla vostra stessa rete locale (e quindi se potete parlargli direttamente senza passare dal router), fate una semplice operazione di AND logico tra il vostro IP, l'IP di destinazione e la Netmask. Se i risultati coincidono, siete nella stessa subnet. Questo meccanismo, però, si rompe in modo catastrofico se due computer hanno Netmask configurate in modo diverso (es. uno ha /24 e l'altro /16).
-
-// In IPv6, la Netmask non esiste più. Dimenticatevela. La lunghezza del prefisso (es. /64) non è una Netmask. E allora, come fate a sapere se un indirizzo IPv6 è nella vostra rete locale (on-link) o se dovete passare dal router (off-link)?
-// Semplice: non lo fate. È una rivoluzione copernicana. In IPv6 non c'è deduzione logica. La risposta vi deve essere fornita esplicitamente dal router.
-
-// L'importanza del flag "On-Link" e il Neighbor Discovery
-// Quando un router IPv6 vi manda un Router Advertisement, all'interno del pacchetto c'è un blocco chiamato PIO (Prefix Information Object). Questo PIO contiene il prefisso (es. 2001:db8::/64) e una serie di bit (flag).
-// Uno di questi è il bit L (On-Link).
-
-// Se il bit L è a 1, il router vi sta dicendo: "Tutti gli host che usano questo prefisso sono collegati fisicamente alla tua stessa rete locale. Puoi contattarli direttamente".
-
-// Se il bit L è a 0, il router vi sta dicendo: "Anche se questi host hanno il tuo stesso prefisso, non sono nella tua rete locale. Devi mandare i pacchetti a me, ci penso io a instradarli".
-
-// Se non avete ricevuto nessun Router Advertisement, di default qualsiasi indirizzo (tranne i Link-Local) è considerato off-link. Invierete tutto al vostro Default Gateway.
-
-// Ma cosa succede se mandate un pacchetto al router per un dispositivo che in realtà è fisicamente connesso al vostro stesso switch? Il router IPv6 lo inoltrerà al dispositivo corretto, ma subito dopo vi manderà un messaggio ICMPv6 chiamato Redirect (che possiamo tradurre educatamente come: "Smettila di scocciarmi"). Con questo messaggio, il router vi dice: "Guarda che tu e quel destinatario specifico siete on-link. Parlatevi direttamente la prossima volta". In questo modo, il concetto di "rete locale" diventa dinamico e non è più vincolato rigidamente ai blocchi IP.
-
-// Questa flessibilità permette configurazioni che in IPv4 sarebbero state assurde. Potete avere due computer collegati allo stesso switch, ma con prefissi IP completamente diversi, e il router potrebbe dire a entrambi che sono on-link per certi indirizzi e off-link per altri.
-// Vi faccio un esempio pratico: l'Internet delle Cose (IoT). Supponiamo che abbiate in casa una rete Wi-Fi/Ethernet e un gateway Zigbee/Thread per dispositivi IoT (lampadine, sensori). I dispositivi Zigbee non hanno il MAC address a 48 bit del Wi-Fi, quindi non potete fare un bridge diretto tra le due reti. Il gateway deve per forza fare da router.
-// In IPv6, invece di impazzire creando sottoreti complesse, potete assegnare a tutta la casa e a tutta la rete IoT lo stesso identico prefisso /64. Per farlo funzionare, configurate il router principale in modo che dichiari quel prefisso come off-link (bit L=0). A quel punto, i vostri computer Wi-Fi invieranno i pacchetti destinati all'IoT al router principale; quest'ultimo, sapendo dove si trova il gateway Zigbee, instraderà i pacchetti a lui. È complicato all'inizio, ma sul lungo periodo scala infinitamente meglio rispetto all'uso disordinato di IP locali.
-
-// E per trovare il MAC address (o equivalente) del destinatario, una volta scoperto che è on-link? Si usa il Neighbor Discovery Protocol (NDP). L'NDP sostituisce il vecchio ARP dell'IPv4. Invece di inviare un fastidioso broadcast, il dispositivo sorgente usa un messaggio ICMPv6 chiamato Neighbor Solicitation, inviandolo a un indirizzo Multicast calcolato appositamente in base all'indirizzo IP di destinazione (il Solicited-node multicast address). Chi possiede quell'IP risponderà con un Neighbor Advertisement, confermando la sua presenza e il suo MAC address.
-
-// DHCPv6: Un ruolo diverso
-
-// E il DHCP in tutto questo? In IPv6 il suo ruolo cambia. Viene usato solo se il router ve lo ordina.
-// Nel PIO del Router Advertisement ci sono altri due flag importanti:
-
-// Il bit M (Managed): Se è a 1, il router vi dice: "Usa il server DHCPv6 per ottenere il tuo indirizzo IPv6".
-
-// Il bit O (Other): Se è a 1, il router vi dice: "Usa l'autoconfigurazione per farti l'indirizzo IP, ma chiedi al server DHCPv6 le altre configurazioni accessorie" (es. i server DNS, il dominio di ricerca).
-
-// Inoltre, il DHCPv6 non identifica i client tramite il MAC address. Dato che oggi i dispositivi cambiano MAC address di continuo per ragioni di privacy (MAC randomization), usare il MAC manderebbe in tilt il server DHCP. Invece, si usa il DUID (DHCP Unique Identifier). Il DUID viene generato dal sistema operativo, di solito fondendo il MAC address originario e altri parametri, e rimane fisso e costante nel tempo, garantendo al server DHCP di riconoscere sempre lo stesso client.
-
-// Frammentazione e Path MTU Discovery
-
-// Ultimo grande argomento di oggi: la frammentazione e il concetto di MTU (Maximum Transmission Unit).
-// Ogni rete fisica ha una dimensione massima per i pacchetti (es. 1500 byte per Ethernet). In IPv4, se un pacchetto arriva a un router intermedio e la rete successiva ha una MTU più piccola (es. 1492 byte per via di incapsulamenti PPPoE come nelle vecchie ADSL), il router "taglia" il pacchetto in due frammenti usando i campi di frammentazione dell'header IPv4. Questo crea un sovraccarico di lavoro (overhead) enorme per il router, che deve ricalcolare il Checksum e gestire la suddivisione.
-
-// In IPv6, la regola è drastica: i router intermedi non frammentano mai i pacchetti.
-// Se un router IPv6 riceve un pacchetto troppo grande per la rete successiva, lo scarta e manda indietro un messaggio ICMPv6 di errore chiamato Packet Too Big. Questo messaggio contiene la dimensione dell'MTU consentita.
-// Il nodo sorgente riceve l'errore e aggiorna il suo Path MTU (PMTU) per quella specifica destinazione. Da quel momento in poi, sarà il nodo sorgente (e solo lui) a generare pacchetti più piccoli, inserendo un Extension Header di frammentazione se necessario.
-
-// Questo sistema è infinitamente più efficiente per i router di dorsale, ma ha un punto debole mortale: gli amministratori di rete incompetenti. Spesso chi configura i firewall blocca totalmente il traffico ICMP, credendo di aumentare la sicurezza ("così non mi pingano!"). In IPv6, se bloccate l'ICMP, bloccate i messaggi Packet Too Big. Il nodo sorgente non saprà mai perché i suoi pacchetti vengono scartati e la connessione andrà in stallo senza spiegazioni (i famosi "buchi neri" di rete).
-
-// Infine, una salvaguardia imposta dall'IPv6: lo standard vieta l'esistenza di link con MTU inferiore a 1280 byte. Mentre in IPv4 potevano esistere reti con payload piccolissimi (ignorando il consiglio teorico dei 576 byte), in IPv6 il limite di 1280 byte è legge.
-// E cosa succede con reti come il Bluetooth, LoRa o Zigbee (IEEE 802.15.4), che hanno MTU a livello fisico minuscole (spesso inferiori ai 100 byte)? Semplice: devono usare un Adaptation Layer (uno strato software intermedio, come 6LoWPAN) che si occupa di comprimere l'header IPv6 e gestire una frammentazione invisibile al livello IP superiore, garantendo all'IPv6 di vedere sempre e comunque i suoi 1280 byte garantiti.
-
-// Direi che come mole di informazioni per oggi può bastare. Domani ci avventureremo nella sicurezza di rete vera e propria. Caffè meritato per tutti!
-
 // = RC_Lezione_2026.05.12_FULL.m4a
 // Ricominciamo e facciamo un po' di chiarezza, perché l'autoconfigurazione dell'IPv6 è un argomento che, se non lo capite a fondo, vi farà sbattere la testa contro il muro. Voi arrivate con dei preconcetti molto forti derivati dall'IPv4 e vi trovate spiazzati.
 
@@ -924,20 +912,18 @@ Le vulnerabilità dei protocolli di rete derivano tipicamente da tre categorie d
 
 // Qual è la lezione per noi ingegneri e scienziati? Quando progettate un protocollo, mai hard-codare (fissare) la lunghezza dei campi nell'header a livello binario fisso (es. "questo campo è da 16 bit e lo sarà per sempre"). Se un domani avrete bisogno di 32 bit, dovrete riscrivere l'intero protocollo. Oggi si tende a usare formati strutturati a oggetti (come TLV - Type, Length, Value) per garantire flessibilità futura.
 
-= Verso il Routing e l'Instradamento in Internet
+= Il Routing
+Il *routing* all'interno di una rete si divide principalmente in due paradigmi architetturali:
+- *Centralizzato*: un controllore globale possiede una mappatura onnisciente della topologia di rete (similmente a un navigatore satellitare) e determina a priori i percorsi ottimali per tutti i nodi.
+- *Distribuito*: ogni router deduce autonomamente il nodo successivo ("next hop") ideale basandosi su informazioni di stato locale e sullo scambio di dati con i nodi adiacenti.
 
-== Principi di Instradamento
-L'instradamento (routing) all'interno di una rete si divide principalmente in due paradigmi architetturali:
-- *Centralizzato*: Un controllore globale possiede una mappatura onnisciente della topologia di rete (similmente a un navigatore satellitare) e determina a priori i percorsi ottimali per tutti i nodi.
-- *Distribuito*: Ogni router deduce autonomamente il nodo successivo ("next hop") ideale basandosi su informazioni di stato locale e sullo scambio di dati con i nodi adiacenti.
-
-Per garantire elevati standard di resilienza, l'infrastruttura di Internet adotta il routing distribuito: in caso di guasto hardware o indisponibilità di un nodo, i router limitrofi sono in grado di ricalcolare dinamicamente un percorso alternativo. Su scala globale, un sistema centralizzato introdurrebbe un *single point of failure* critico, generando inoltre un overhead di comunicazioni di controllo incompatibile con le capacità della rete. 
+Per garantire elevati standard di resilienza, l'infrastruttura di Internet adotta il routing distribuito: in caso di guasto hardware o indisponibilità di un nodo, i router limitrofi sono in grado di ricalcolare dinamicamente un percorso alternativo. Su scala globale, un sistema centralizzato introdurrebbe un *single point of failure* critico, generando inoltre un overhead di comunicazioni di controllo incompatibile con le capacità della rete.
 Esiste teoricamente il *Source Routing*, una tecnica in cui l'host mittente codifica all'interno del pacchetto l'elenco esatto dei nodi da attraversare. Tale approccio è oggi rigorosamente interdetto sull'Internet pubblica per gravissime implicazioni di sicurezza informatica, in quanto consentirebbe a un attaccante di offuscare l'origine reale del traffico forzandone il rimbalzo su nodi arbitrari.
 
 I protocolli di routing distribuito si classificano ulteriormente in:
-- *Proattivi*: Il protocollo opera in *background* calcolando e aggiornando costantemente le tabelle di routing, indipendentemente dal traffico effettivo. Garantisce instradamenti immediati, ma consuma banda ininterrottamente.
-- *Reattivi*: L'esplorazione del percorso viene innescata esclusivamente *on-demand*, ovvero nel momento in cui si presenta la necessità di trasmettere un pacchetto.
-- *Flooding* (Inondazione): Il pacchetto viene replicato e inoltrato su tutte le interfacce disponibili, nella probabilità statistica di raggiungere prima o poi il destinatario. Pur essendo dispendioso in termini di risorse, in contesti di assoluta emergenza (o per reti fortemente instabili) rappresenta la strategia d'inoltro più robusta, se opportunamente controllata.
+- *Proattivi*: il protocollo opera in *background* calcolando e aggiornando costantemente le tabelle di routing, indipendentemente dal traffico effettivo. Garantisce instradamenti immediati, ma consuma banda ininterrottamente.
+- *Reattivi*: l'esplorazione del percorso viene innescata esclusivamente *on-demand*, ovvero nel momento in cui si presenta la necessità di trasmettere un pacchetto.
+- *Flooding*: il pacchetto viene replicato e inoltrato su tutte le interfacce disponibili, nella probabilità statistica di raggiungere prima o poi il destinatario. Pur essendo dispendioso in termini di risorse, in contesti di assoluta emergenza (o per reti fortemente instabili) rappresenta la strategia d'inoltro più robusta, se opportunamente controllata.
 
 <RC_Lezione_2026.05.18.m4a>
 == La Complessità del Routing: Teoria vs Pratica
@@ -950,18 +936,35 @@ La scelta del paradigma di routing dipende in larga misura dalla volatilità del
 Tuttavia, qualora la mutevolezza della rete sia talmente elevata da rendere obsoleto il percorso reattivo ancor prima della sua completa instaurazione, la topologia collassa e l'unica strategia d'inoltro in grado di garantire il recapito del pacchetto rimane il *flooding*.
 
 == Metriche e Pesi di Instradamento
-La modellazione algoritmica prevede l'assegnazione di "pesi" agli archi del grafo (i link di rete). A livello matematico, qualsiasi parametro di penalità imputabile a un nodo (es. probabilità di congestione) può essere formalmente traslato sui suoi archi incidenti. 
+La modellazione algoritmica prevede l'assegnazione di "pesi" agli archi del grafo (i link di rete). A livello matematico, qualsiasi parametro di penalità imputabile a un nodo (es. probabilità di congestione) può essere formalmente traslato sui suoi archi incidenti.
 
-La selezione della metrica ottimale è uno dei temi più critici della disciplina. Una valutazione puramente teorica porterebbe a favorire concetti quali la larghezza di banda residua, ideale per l'instradamento di trasferimenti *Delay-Tolerant*. Viceversa, per i flussi in tempo reale (*Real-Time flows* come lo streaming video o il gaming), la larghezza di banda assoluta perde rilevanza rispetto alla minimizzazione del *jitter* (la varianza del ritardo di trasmissione). Un ritardo di rete costante può essere facilmente assorbito mediante un buffer di riproduzione, mentre fluttuazioni costanti generano disservizi inaccettabili.
+La selezione della metrica ottimale è uno dei temi più critici. Una valutazione puramente teorica porterebbe a favorire concetti quali la larghezza di banda residua, ideale per l'instradamento di trasferimenti *Delay-Tolerant*. Viceversa, per i flussi in tempo reale (*Real-Time flows* come lo streaming video o il gaming), la larghezza di banda assoluta perde rilevanza rispetto alla minimizzazione del *jitter* (la varianza del ritardo di trasmissione). Un ritardo di rete costante può essere facilmente assorbito mediante un buffer di riproduzione, mentre fluttuazioni costanti generano disservizi inaccettabili.
 
 Ciò nonostante, l'inclusione di metriche dinamiche (congestione, latenza o jitter) all'interno dei pesi algoritmici genera gravi esiti applicativi. Poiché i valori misurati su una rete in attività oscillano a frequenze altissime, i protocolli innescherebbero variazioni continue delle rotte (effetto di instabilità noto come *route flapping*), rincorrendo gradienti transitori privi di significato statistico a lungo termine.
 
 A livello accademico è stata storicamente analizzata l'*Expected Transmission Count* (ETX) per le reti wireless, che stima la qualità del link in base al numero di ritrasmissioni necessarie per recapitare un pacchetto. Il limite strutturale di questa metrica è la necessità pregressa di traffico per la validazione statistica: in assenza di traffico, il router non dispone di dati. L'introduzione della sua variante speculativa, denominata *Optimistic ETX* (che in assenza di trasmissioni recenti assume ottimisticamente il link come privo di errori), portò i router a convergere disastrosamente verso percorsi instabili o interrotti, causando gravi colli di bottiglia.
+
 Di conseguenza, le soluzioni *enterprise* adottano quasi esclusivamente metriche statiche o semi-statiche: il conteggio dei salti (*hop count*) o la capacità trasmissiva nominale dell'arco. L'unico parametro dinamico raccomandabile, prettamente in ambito wireless, è il Rapporto Segnale-Rumore (SNR), la cui varianza fisica è predicibile e non dipende direttamente dal carico di traffico istantaneo.
 
-== Il Protocollo RIP (Routing Information Protocol) e l'Algoritmo di Bellman-Ford
-Tra i protocolli proattivi basati sui vettori di distanza, il RIP rappresenta lo standard di riferimento per la sua semplicità architetturale. Il funzionamento prevede che ciascun router trasmetta la propria tabella di routing completa ai soli nodi adiacenti a intervalli regolari (tipicamente ogni 30 secondi), o in modalità *triggered update* a seguito di variazioni di stato.
+== RIP (Routing Information Protocol)
+Tra i protocolli proattivi basati sui vettori di distanza, il *RIP* rappresenta lo standard di riferimento per la sua semplicità architetturale. Il funzionamento prevede che ciascun router trasmetta la propria tabella di routing completa ai soli nodi adiacenti a intervalli regolari (tipicamente ogni 30 secondi), o in modalità *triggered update* a seguito di variazioni di stato.
 Alla ricezione di una tabella, il router ricevente incrementa le metriche (quantificate in numero di *hop*) di un'unità. Se l'elaborazione evidenzia un costo cumulativo inferiore per una destinazione nota, il router aggiorna la propria tabella eleggendo il mittente come nuovo "Next Hop".
+
+- Dopo che il router si è avviato correttamente, applica la configurazione salvata e rileva inizialmente le proprie reti connesse direttamente. Quindi aggiunge gli indirizzi IP dell'interfaccia collegata direttamente alla sua tabella di instradamento.
+  #figure(image("images/2026-07-03-23-48-16.png", width: 60%))
+
+- Se viene configurato un protocollo di routing, il router scambia gli aggiornamenti di routing per conoscere eventuali percorsi remoti. Il router invia un pacchetto di aggiornamento con le informazioni sulla tabella di routing su tutte le interfacce. Il router riceve anche gli aggiornamenti dai router connessi direttamente e aggiunge nuove informazioni alla sua tabella di routing.
+  #figure(image("images/2026-07-03-23-48-24.png", width: 50%))
+
+- I router si scambiano le informazioni attraverso aggiornamenti periodici. I protocolli di routing Distance Vector utilizzano la tecnica Split horizon per evitare loop. Split horizon impedisce che le informazioni vengano inviate dalla stessa interfaccia da cui sono state ricevute.
+  #figure(image("images/2026-07-03-23-48-32.png", width: 50%))
+
+- Quando tutti i router dispongono di informazioni complete e accurate sull'intera rete, allora l’algoritmo di rete arriva alla convergenza, cioè le tabelle di routing sono stabili. Si dice tempo di convergenza il tempo impiegato dai router per condividere le informazioni, calcolare i percorsi migliori e aggiornare le tabelle di instradamento. Più veloce è il tempo di convergenza, migliore è il protocollo di routing.
+  #figure(image("images/2026-07-03-23-48-39.png", width: 50%))
+
+
+
+
 
 A livello distribuito, il RIP implementa l'algoritmo di Bellman-Ford. Pur consentendo l'identificazione del percorso minimo, l'algoritmo presenta una complessità computazionale asintotica pari a $V times E$ (dove $V$ indica il numero di vertici ed $E$ il numero di archi). Ne consegue che il tempo globale di convergenza dell'intera rete risulta teoricamente elevato. Nella realtà ingegneristica, la priorità ricade sul tempo minimo necessario per stabilire un instradamento valido end-to-end, il quale risulta direttamente proporzionale al diametro massimo del grafo di rete, rendendo il protocollo pienamente operativo in pochi minuti.
 
@@ -976,11 +979,15 @@ Il protocollo risolve tale problematica attraverso diverse implementazioni algor
 + *Split Horizon with Poison Reverse*: Ottimizzazione aggressiva del punto precedente, mediante la quale il router annuncia attivamente la rotta sull'interfaccia da cui l'ha appresa associandole artificialmente una metrica infinita (16), così da invalidarla per i nodi vicini.
 
 == Il Protocollo OSPF (Open Shortest Path First) e Dijkstra
-Contrapposto alla famiglia Distance-Vector, il protocollo OSPF si basa sull'algoritmo di routing Link-State di Dijkstra. Questo garantisce prestazioni teoretiche eccellenti in termini di calcolo (la complessità dell'algoritmo è $E + V log V$), ma impone vincoli hardware stringenti: affinché l'albero dei cammini minimi possa essere risolto, ogni router deve prima acquisire e mantenere nella propria memoria l'intera topologia della rete, generata attraverso il costante inoltro incrociato di *Link-State Advertisements* (LSA).
+Contrapposto alla famiglia Distance-Vector, il protocollo OSPF si basa sull'algoritmo di routing Link-State di Dijkstra. Questo garantisce prestazioni teoriche eccellenti in termini di calcolo (la complessità dell'algoritmo è $E + V log V$), ma impone vincoli hardware stringenti: affinché l'albero dei cammini minimi possa essere risolto, ogni router deve prima acquisire e mantenere nella propria memoria l'intera topologia della rete, generata attraverso il costante inoltro incrociato di *Link-State Advertisements* (LSA).
+
+#figure(image("images/2026-07-03-23-55-56.png"))
 
 Questa disseminazione capillare si traduce, in reti molto estese, in un duplice collo di bottiglia: il sovraccarico costante della banda per il traffico LSA e la saturazione dei processori. Ricevuto un aggiornamento topologico, ciascun router è costretto a reiterare l'algoritmo di Dijkstra ripartendo da zero; qualora la CPU non fosse sufficientemente prestante, il calcolo potrebbe essere interrotto dall'arrivo di una nuova notifica LSA, portando il nodo al collasso computazionale.
 
 Di conseguenza, l'OSPF possiede limiti drastici di scalabilità lineare. Il design del protocollo mitiga tale problema compartimentando l'infrastruttura logica in "Aree" gerarchiche. All'interno dell'Area, i router condividono un set topologico unificato ed eleggono specifici router di transito (*Area Border Router*), i quali aggregano e inoltrano il routing unicamente verso la dorsale logica (*Backbone*). Quest'architettura abbatte il carico computazionale, cedendo come contropartita l'ottimalità globale del percorso: la forzatura dell'instradamento sui *Border Router* genera cammini inter-area basati su ottimi puramente locali.
+
+#figure(image("images/2026-07-03-23-57-38.png"))
 
 <RC_Lezione_2026.05.19>
 == OSPF, Link-State e Software-Defined Networking (SDN)
@@ -1001,7 +1008,11 @@ Nel dominio dell'IoT domestico ed enterprise (Smart Home/Alexa), l'assenza di un
 == Oltre la propria rete: Il BGP e il routing tra Autonomous System
 I protocolli sinora discussi (RIP, OSPF, AODV) costituiscono *Interior Gateway Protocols* (IGP). L'implementazione e i parametri di un IGP soggiacciono interamente all'entità amministratrice del singolo dominio logico di rete (*Autonomous System* o AS).
 
+#figure(image("images/2026-07-03-23-59-56.png"))
+
 La comunicazione infrastrutturale e di transito fra AS disgiunti richiede invece l'impiego di un *Exterior Gateway Protocol* (EGP). All'atto pratico, l'unico standard di fatto in operatività sull'infrastruttura Internet mondiale è il *Border Gateway Protocol* (BGP). L'insediamento monopolistico del BGP deriva non dall'assoluta eccellenza computazionale del protocollo, ma dall'impossibilità tecnica e infrastrutturale di coordinare una sostituzione sincronizzata dell'ecosistema internet.
+
+#figure(image("images/2026-07-04-00-00-16.png"))
 
 Lo scopo funzionale del BGP disattende l'individuazione di percorsi con metriche matematiche ottime. Il focus algoritmico consiste nel determinare rotte globalmente "fattibili" che aderiscano scrupolosamente agli accordi economici e alle restrizioni burocratico-politiche di *peering* vigenti fra i soggetti amministratori. A titolo esplicativo, un ISP italiano devierà deliberatamente il traffico in transito per il suolo francese via Corsica, malgrado una minore rapidità topologica, in ossequio all'economicità del contratto di interscambio rispetto all'operatore confinante nel Nord Italia.
 
@@ -1016,37 +1027,37 @@ Il BGP configura l'architettura di Internet. Benché lento nell'assimilazione de
 
 // Internet usa il routing distribuito per motivi di resilienza: se un nodo crolla, i router vicini ricalcolano semplicemente un percorso alternativo. Un sistema centralizzato, su scala globale, sarebbe un single point of failure catastrofico e produrrebbe un overhead di comunicazioni di controllo inaccettabile. Esiste anche il *Source Routing*, dove il mittente del pacchetto specifica l'intero tragitto nodo per nodo ma in Internet è vietato per enormi motivi di sicurezza, poiché permetterebbe a un attaccante di mascherare l'origine reale del traffico facendolo rimbalzare a piacimento.
 
-// Il routing distribuito può essere *Proattivo* (il router mantiene le tabelle costantemente aggiornate, sprecando banda ma essendo pronto subito) o *Reattivo* (il router cerca il percorso solo quando deve effettivamente inviare qualcosa). E infine c'è il *Flooding*: invio il pacchetto a tutti sperando che prima o poi arrivi al destinatario. Sembra stupido e brutale, ma a volte (come per l'allarme antincendio) è la strategia di emergenza più efficace se implementata in modo controllato. 
+// Il routing distribuito può essere *Proattivo* (il router mantiene le tabelle costantemente aggiornate, sprecando banda ma essendo pronto subito) o *Reattivo* (il router cerca il percorso solo quando deve effettivamente inviare qualcosa). E infine c'è il *Flooding*: invio il pacchetto a tutti sperando che prima o poi arrivi al destinatario. Sembra stupido e brutale, ma a volte (come per l'allarme antincendio) è la strategia di emergenza più efficace se implementata in modo controllato.
 
 // <RC_Lezione_2026.05.18.m4a>
 // == La complessità del Routing: Teoria vs Pratica
-// Il problema del routing consiste, in sostanza, nel minimizzare un percorso all'interno di un grafo. I nostri amici teorici e matematici ci dicono che, dato un grafo, è sempre possibile calcolare il percorso ottimo. L'ingegnere, che invece deve far funzionare le cose nel mondo reale, risponde: "Ottima idea, peccato che io le cose le debba fare davvero, con limiti fisici e hardware". Tutti gli algoritmi di routing che trovate su Internet nascono proprio dall'esigenza di trovare un compromesso per avvicinarsi all'ottimo matematico, facendo i conti con la cruda realtà. 
+// Il problema del routing consiste, in sostanza, nel minimizzare un percorso all'interno di un grafo. I nostri amici teorici e matematici ci dicono che, dato un grafo, è sempre possibile calcolare il percorso ottimo. L'ingegnere, che invece deve far funzionare le cose nel mondo reale, risponde: "Ottima idea, peccato che io le cose le debba fare davvero, con limiti fisici e hardware". Tutti gli algoritmi di routing che trovate su Internet nascono proprio dall'esigenza di trovare un compromesso per avvicinarsi all'ottimo matematico, facendo i conti con la cruda realtà.
 
 // Ci scontriamo subito con diverse scelte progettuali. La prima è: quando calcolo il percorso? Le alternative principali sono tre:
 // + Proattivo: Costruisco le tabelle di routing in anticipo. Il protocollo gira in continuazione per mantenere aggiornati i pesi del grafo, indipendentemente dal fatto che ci sia o meno traffico da inviare.
 // + Reattivo: Costruisco il percorso solo quando ne ho effettivo bisogno, ovvero quando devo spedire un pacchetto.
 // + Flooding (Inondazione): Non calcolo alcun percorso. Mando semplicemente il pacchetto a tutti i nodi collegati e spero che prima o poi arrivi a destinazione.Esistono anche approcci più esoterici. Ad esempio, nelle reti "Full Optical", si usa a volte l'Hot Potato Routing: ricevo il pacchetto e lo inoltro a un vicino a caso. Sembra una follia, ma ha senso: in una rete completamente ottica, il tempo per leggere l'header del pacchetto (dovendo passare dal dominio ottico a quello elettrico e viceversa) è infinitamente superiore al tempo di trasmissione fisica. Se la rete è sufficientemente magliata (interconnessa), inoltrare a caso garantisce che il pacchetto arrivi a destinazione prima del tempo che si perderebbe a calcolare la porta d'uscita ottimale. Questo è un caso limite, ma vi dimostra che quando progettate il routing dovete considerare l'intero stack, inclusi i ritardi fisici dell'hardware.
 
-// == Quando conviene passare da un approccio proattivo a uno reattivo? 
+// == Quando conviene passare da un approccio proattivo a uno reattivo?
 // Immaginate una rete in cui gli archi (i link) si rompono o cambiano continuamente. In un protocollo proattivo, ogni minima variazione scatena l'invio di messaggi di aggiornamento a tutta la rete. Se le variazioni sono molto frequenti e il traffico dati effettivo è basso, finirete per saturare la rete solo con il traffico di controllo del routing. In questo scenario, un protocollo reattivo è decisamente migliore.
 
 // E se la rete cambia così velocemente che, nel tempo necessario a calcolare un percorso reattivo, la topologia è già mutata di nuovo? In quel caso, l'unica soluzione fisica e affidabile potrebbe essere il flooding.
 
 // == Metriche e Pesi
-// Per applicare la teoria dei grafi al routing, dobbiamo assegnare dei pesi ai rami (i link). Matematicamente, assegnare un costo a un nodo (es. la sua congestione o probabilità di perdere pacchetti) equivale ad assegnarlo a un ramo; ci sono formule per spostare il peso dal nodo all'arco. Ma come decidiamo questo peso? Qual è la metrica migliore? 
+// Per applicare la teoria dei grafi al routing, dobbiamo assegnare dei pesi ai rami (i link). Matematicamente, assegnare un costo a un nodo (es. la sua congestione o probabilità di perdere pacchetti) equivale ad assegnarlo a un ramo; ci sono formule per spostare il peso dal nodo all'arco. Ma come decidiamo questo peso? Qual è la metrica migliore?
 
 // Se leggete la letteratura scientifica, troverete di tutto, ma vi do un avvertimento: la maggior parte delle idee "intelligenti" sulla carta, nella pratica si rivelano disastrose. Se dovete trasferire un file gigantesco, verrebbe spontaneo usare la banda residua del link come metrica, per trovare il percorso più sgombro. Se invece state gestendo traffico audio, video o gaming (Real-Time flows rispetto ai Delay-Tolerant flows), la banda importa meno: ciò che conta è ridurre il jitter, ovvero la variazione del ritardo (la deviazione standard del ping). Un ritardo fisso è facilmente compensabile con un buffer (il classico pallino di caricamento su YouTube); un ritardo che oscilla in continuazione causa interruzioni e "lag" insopportabili. Allora, perché non inserire il jitter o la congestione direttamente come pesi matematici nei nostri algoritmi di routing? Perché per farlo dovreste poter misurare questi valori in tempo reale. E una misura in tempo reale su una rete viva oscilla in continuazione. Se il vostro algoritmo di routing reagisce a ogni minima oscillazione del jitter o della congestione, la rete diventerà totalmente instabile: i percorsi cambieranno ogni frazione di secondo (effetto "flapping"), inseguendo stati transitori che non hanno alcun significato pratico.
 
-// Vi faccio un esempio storico. Qualche tempo fa è stato proposto in un RFC di usare una metrica chiamata Expected Transmission Count (ETX) per le reti wireless: il router conta quante volte deve ritrasmettere un pacchetto prima che il nodo successivo lo riceva correttamente, e usa questo numero come indice di qualità del link. Sembra logico, vero? Ma c'è un problema enorme: per avere una statistica valida su quante volte ritrasmetti, devi prima avere dei pacchetti da trasmettere! Se la rete è a riposo, non hai dati. E se il link è talmente pessimo da farti perdere il contatto con il vicino? Per risolvere questo "dettaglio", gli stessi autori hanno proposto l'Optimistic ETX: "se non senti un nodo da un po', assumi ottimisticamente che il link sia diventato eccellente". Il risultato pratico? I router continuavano a switchare il traffico tra nodi stabili e nodi "ottimisticamente perfetti" (che in realtà erano irraggiungibili o pessimi), creando il caos. 
+// Vi faccio un esempio storico. Qualche tempo fa è stato proposto in un RFC di usare una metrica chiamata Expected Transmission Count (ETX) per le reti wireless: il router conta quante volte deve ritrasmettere un pacchetto prima che il nodo successivo lo riceva correttamente, e usa questo numero come indice di qualità del link. Sembra logico, vero? Ma c'è un problema enorme: per avere una statistica valida su quante volte ritrasmetti, devi prima avere dei pacchetti da trasmettere! Se la rete è a riposo, non hai dati. E se il link è talmente pessimo da farti perdere il contatto con il vicino? Per risolvere questo "dettaglio", gli stessi autori hanno proposto l'Optimistic ETX: "se non senti un nodo da un po', assumi ottimisticamente che il link sia diventato eccellente". Il risultato pratico? I router continuavano a switchare il traffico tra nodi stabili e nodi "ottimisticamente perfetti" (che in realtà erano irraggiungibili o pessimi), creando il caos.
 
 // Qual è la lezione? Quasi tutti i protocolli di routing commerciali seri usano metriche apparentemente "stupide" o statiche del secolo scorso: il numero di hop (salti) o la banda nominale del link. L'unico parametro dinamico di basso livello che ha senso usare (soprattutto nel wireless) è il Rapporto Segnale/Rumore, perché varia in modo prevedibile e dipende dalla fisica del mezzo, non dal traffico temporaneo.
 
 // == Il Protocollo RIP (Routing Information Protocol) e il Belman-Ford
-// Passiamo alle implementazioni pratiche dei protocolli proattivi. Il primo è il RIP (Routing Information Protocol). La leggenda narra che sia stato progettato scrivendolo su un tovagliolo al ristorante, ed è credibile, vista la sua estrema semplicità. Il funzionamento del RIP è banale: ogni router invia periodicamente (di solito ogni 30 secondi, o meno in caso di triggered updates) la propria tabella di routing a tutti i suoi vicini diretti. La tabella contiene i prefissi di rete conosciuti e il "costo" (la metrica, solitamente il numero di hop) per raggiungerli.Quando il router A riceve la tabella dal router B, prende tutte le metriche, ci somma 1 (o il costo preimpostato del link tra A e B) e confronta i risultati con la propria tabella. Se il percorso via B costa meno di quello che A già conosceva, A aggiorna la sua tabella impostando B come nuovo "Next Hop". 
+// Passiamo alle implementazioni pratiche dei protocolli proattivi. Il primo è il RIP (Routing Information Protocol). La leggenda narra che sia stato progettato scrivendolo su un tovagliolo al ristorante, ed è credibile, vista la sua estrema semplicità. Il funzionamento del RIP è banale: ogni router invia periodicamente (di solito ogni 30 secondi, o meno in caso di triggered updates) la propria tabella di routing a tutti i suoi vicini diretti. La tabella contiene i prefissi di rete conosciuti e il "costo" (la metrica, solitamente il numero di hop) per raggiungerli.Quando il router A riceve la tabella dal router B, prende tutte le metriche, ci somma 1 (o il costo preimpostato del link tra A e B) e confronta i risultati con la propria tabella. Se il percorso via B costa meno di quello che A già conosceva, A aggiorna la sua tabella impostando B come nuovo "Next Hop".
 
 // Nonostante la sua semplicità, il RIP implementa globalmente l'algoritmo di Bellman-Ford. Chi ha studiato gli algoritmi sa che Bellman-Ford trova sempre il percorso ottimo, proprio come l'algoritmo di Dijkstra, ma ha una complessità computazionale maggiore nel caso peggiore ($V times E$, vertici per archi). Questo significa che il suo tempo di convergenza totale (il tempo affinché tutta la rete raggiunga l'equilibrio ottimale dopo un cambiamento) può essere molto alto. Tuttavia, c'è un trucco: non ci interessa il tempo di convergenza totale, ci interessa il tempo minimo affinché tutti i router sappiano almeno qualcosa su come raggiungere le destinazioni. Questo tempo dipende dal diametro della rete (il numero massimo di salti da un capo all'altro). Se il diametro è 5 hop e l'aggiornamento avviene ogni 30 secondi, in un paio di minuti la rete è già utilizzabile.
 
-// Perché si usa il RIP se Dijkstra è teoricamente migliore? Per la facilità di implementazione. Il RIP richiede memoria zero (o quasi): non deve memorizzare l'intera mappa della rete, lavora solo aggiornando la propria tabellina riga per riga. Aumentare il numero di nodi in una rete RIP non appesantisce le CPU dei router esistenti, rendendolo estremamente scalabile dal punto di vista hardware.Il Count to Infinity e lo Split HorizonIl problema storico del RIP (e del Bellman-Ford distribuito) è il Count to Infinity. 
+// Perché si usa il RIP se Dijkstra è teoricamente migliore? Per la facilità di implementazione. Il RIP richiede memoria zero (o quasi): non deve memorizzare l'intera mappa della rete, lavora solo aggiornando la propria tabellina riga per riga. Aumentare il numero di nodi in una rete RIP non appesantisce le CPU dei router esistenti, rendendolo estremamente scalabile dal punto di vista hardware.Il Count to Infinity e lo Split HorizonIl problema storico del RIP (e del Bellman-Ford distribuito) è il Count to Infinity.
 
 // Immaginate tre router in fila: A, B e C, che puntano a una rete collegata a C. A sa di poter raggiungere la rete in 2 salti passando da B. B sa di raggiungerla in 1 salto passando da C.All'improvviso, il cavo tra C e la rete si trancia. C perde la connessione diretta e il suo costo va a infinito. Ma prima che C possa avvisare tutti, A manda il suo aggiornamento periodico a B: "Ehi, io posso raggiungere quella rete in 2 salti!". B, che ora vede C isolato, pensa: "Ottimo! Allora io posso passarci tramite A in 3 salti". B aggiorna la sua tabella e lo dice a C. C pensa: "Wow, B ha un percorso a 3 salti, allora io ci passo in 4!".I router continuano ad aggiornarsi a vicenda in un loop infinito (o meglio, in un circolo di annunci), incrementando la metrica all'infinito per una rete che in realtà è irraggiungibile.Per fermare questo disastro, il RIP stabilisce che Infinito = 16 (o 256 in alcune varianti). Appena la metrica raggiunge 16, la rete viene dichiarata ufficialmente "morta" e il loop si spezza. Si è scelto 16 perché matematicamente, su un contatore a 4 bit, 16 corrisponde a 0, rendendo il controllo molto rapido a livello binario.Per prevenire attivamente questo fenomeno, il RIP usa due tecniche:
 // + *Split Horizon*: Una regola semplice. Non annunciare mai a un vicino una rotta che hai imparato da quel vicino stesso. (Se ho imparato da te la strada per Roma, non vengo a dirti che so come arrivare a Roma passando da te).
@@ -1098,7 +1109,7 @@ Il BGP configura l'architettura di Internet. Benché lento nell'assimilazione de
 // Direi che come panoramica per oggi ci siamo. Domani abbandoniamo la teoria dei protocolli e vediamo come simulare tutto questo software su un computer.
 
 = (SIMULATORE)
-<RC_Lezione_2026.05.20.m4a> 
+<RC_Lezione_2026.05.20.m4a>
 == La Simulazione di Rete: Tra Teoria e Pratica
 L'altra volta ci siamo lasciati con il problema del routing e oggi chiudiamo il discorso parlando di come si studiano e si validano effettivamente le reti e i protocolli, perché la teoria sui libri è fondamentale, ma l'informatica e le telecomunicazioni richiedono la pratica. Se vi trovate a dover dimostrare che una vostra idea per una tesi funziona, o che una rete aziendale regge il carico, dovete passare all'atto pratico.
 
