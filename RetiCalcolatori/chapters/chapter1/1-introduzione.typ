@@ -1,4 +1,5 @@
 #import "../../../dvd.typ": *
+#set text(lang: "it")
 
 = Introduzione
 
@@ -118,18 +119,22 @@ Verranno trattate tre tipologie di indirizzi:
 
 Agli albori di Internet, gli indirizzi IP erano divisi rigidamente in *classi* predefinite (A, B, C), spezzando l'indirizzo in due blocchi fissi: `Net_Id` (identificativo della rete) e `Host_Id` (identificativo del dispositivo). Questo sistema gerarchico si è rivelato rapidamente inefficiente, portando alla creazione di tabelle di routing gigantesche.
 
-#figure(image("images/2026-06-19-10-40-55.png"))
+#figure(image("images/2026-06-19-10-40-55.png", width: 60%))
 
 La soluzione definitiva è stata l'introduzione del *CIDR* (Classless Inter-Domain Routing). Il CIDR elimina le vecchie classi e introduce una notazione flessibile basata su una barra (es. `150.217.8.0/24`), permettendo di accorpare e unificare blocchi di indirizzi adiacenti. In questo modo non c'è più una rigida distinzione tra la rete e la sottorete (Subnet), ottimizzando drasticamente la gestione degli indirizzi.
 
 Per capire dove inviare un pacchetto, i sistemi consultano una Tabella di Routing che mappa le destinazioni attraverso gateway e interfacce specifiche.
 
-#figure(image("images/2026-06-19-10-41-09.png"))
+#figure(image("images/2026-06-19-10-41-09.png", width: 60%))
 
 Per trovare la rotta corretta, il sistema applica un'operazione logica per verificare se l'IP di destinazione combacia con le reti conosciute: verifica che `DestIP && RTMask == RTDestIP`. Poiché un pacchetto potrebbe teoricamente soddisfare più regole contemporaneamente (ad esempio una rotta generica e una specifica), il sistema applica la regola del *Maximum Matching Entry* (o Longest Prefix Match): tra tutte le rotte compatibili, vince quella con il maggior numero di bit a 1 nella sua maschera di sottorete (Genmask). In parole povere, il pacchetto viene sempre instradato seguendo il percorso in assoluto più specifico che il router conosce.
+#pagebreak()
 
-= Protocolli
-Il protocollo DNS, se osserviamo lo stack TCP/IP o il modello ISO/OSI, risiede sopra il livello di trasporto, quindi è un livello applicativo. Ma attenzione non viene utilizzato come il protocollo HTTP o SMTP, il DNS è al servizio di altre applicazioni, pertanto è un protocollo livello 7 anomalo. Questo riconferma che i due modelli sono utili solo dal punto di vista teorico in quanto nella realtà è tutta un'altra storia.
+= Livello Applicativo
+#observation()[
+  Il protocollo DNS, se osserviamo lo stack TCP/IP o il modello ISO/OSI, risiede sopra il livello di trasporto, quindi è un livello applicativo. Ma attenzione non viene utilizzato come il protocollo HTTP o SMTP, il DNS è al servizio di altre applicazioni, pertanto è un protocollo livello 7 anomalo. Questo riconferma che i due modelli sono utili solo dal punto di vista teorico in quanto nella realtà è tutta un'altra storia.
+]
+
 
 == HTTP
 Il protocollo *HTTP* (HyperText Transfer Protocol) è l'archetipo dei sistemi REST (Representational State Transfer). Nasce per il web e utilizza messaggi divisi, similmente alle email, in Header (che dichiara cosa c'è nel messaggio e cosa farne) e Body (il contenuto).
@@ -185,12 +190,35 @@ Il DNS è un protocollo alla base del web moderno, senza di esso si fermerebbe i
 ]
 Non serve, attenzione, soltanto per comodità, ovvero per evitare di memorizzare gli indirizzi IP dei vari siti piuttosto che il loro nome (google.com invece di 142.250.184.195). Serve per il *Virtual Hosting* e per il *Cloud/Load Balancing*. Oggi, su un singolo indirizzo IP possono essere ospitati migliaia di siti web diversi. Quando viene effettuata una richiesta HTTP, inserite il nome del sito nell'header. Se il DNS non esistesse e usaste solo l'IP, il server di destinazione non saprebbe quale dei migliaia di siti (virtual host) si vuole visitare.
 
-Il processo di risoluzione degli indirizzi avviene per gradi: quando un utente inserisce un indirizzo (come `wikiflix.toolforge.org`), il computer controlla prima la propria cache locale (il local resolver). Se non trova la risposta, invia la richiesta a un server DNS dedicato, chiamato recursive resolver (spesso fornito dall'ISP).
+Il processo di risoluzione degli indirizzi avviene per gradi: quando un utente inserisce un indirizzo (come `wikiflix.toolforge.org`), il computer controlla prima la propria cache locale (il local resolver). Se non trova la risposta, invia la richiesta a un server DNS dedicato, chiamato recursive resolver (spesso fornito dall'ISP). Ci sono 3 classi di server DNS organizzati in una gerarchia:
+
+1. *Root*: forniscono l'IP dei server TLD.
+2. *Top-level domain (TLD)*: forniscono l'IP dei server Authoritative.
+3. *Authoritative*: forniscono i record DNS di una specifica organizzazione.
 
 Questo resolver procede suddividendo il nome di dominio nelle sue componenti gerarchiche, partendo dall'elemento più a destra. Innanzitutto, interroga i server Root, i quali forniscono l'indirizzo dei server responsabili per i domini di primo livello (Top-Level Domain, come `.org`). Successivamente, il resolver interroga il server `.org`, che a sua volta indica il server autorevole per il dominio di secondo livello, `toolforge.org`. Infine, interrogando il server di `toolforge.org`, il resolver ottiene l'indirizzo IP definitivo associato a `wikiflix.toolforge.org`. In ogni fase di questo percorso, i server possono sfruttare sistemi di caching per restituire le risposte precedentemente memorizzate, velocizzando notevolmente il processo per le richieste successive.
 
-#figure(image("images/2026-07-02-23-16-50.png"))
+#figure(image("images/2026-07-05-22-10-52.png", width: 70%), caption: "Gerarchia server DNS")
 
+Le query ai server DNS possono essere di tipo *ricorsivo* o *iterativo*:
+
+#grid(
+  columns: 2,
+  [#figure(
+    image("images/2026-07-05-22-16-37.png", height: 30%),
+    caption: "Esempio query iterativa: il server contattato risponde con il nome del server da contattare.",
+  )],
+  [#figure(
+    image("images/2026-07-05-22-16-22.png", height: 30%),
+    caption: "Esempio query ricorsiva: affida il compito di tradurre il nome al server DNS contattato.",
+  )],
+)
+
+#figure(image("images/2026-07-05-22-20-00.png", width: 70%), caption: "Esempio pacchetto richiesta DNS")
+#figure(
+  image("images/2026-07-05-22-20-21.png", width: 70%),
+  caption: "Esempio pacchetto richiesta DNS con risposte multiple",
+)
 === Vulnerabilità
 Il *DNS* è particolarmente critico dal punto di vista della sicurezza per vari motivi:
 
@@ -219,17 +247,17 @@ Per risolvere il paradosso della privacy intrinseco in DoH e DoT — dove il res
 
 Il funzionamento prevede che il client crittografi la propria richiesta DNS (utilizzando la chiave pubblica del resolver finale, detto Target, tramite HPKE) e la invii prima al Proxy via HTTPS. Il Proxy non possiede la chiave per decifrare il contenuto, quindi non sa cosa stia cercando l'utente, ma conoscendone l'indirizzo IP, funge da tramite inoltrando la richiesta cifrata al Target per conto del client. Il Target, a sua volta, decifra la query e prepara la risposta (che può essere firmata via DNSSEC), ma la invia al Proxy senza conoscere l'indirizzo IP del client originale. In questo modo, il Proxy conosce l'identità del client ma non il contenuto della richiesta, mentre il Target conosce il contenuto ma ignora l'identità dell'utente, garantendo un livello di privacy (oblivion) nettamente superiore.
 
-= Socket
+== Socket
 Nella storia di Internet, l'introduzione delle socket ha rappresentato una vera e propria rivoluzione. Sono state inventate a Berkeley, in concomitanza con lo sviluppo dei sistemi UNIX. Il parallelismo alla base delle socket era legato all'hardware dell'epoca (negli anni '70 non c'erano i dischi rigidi moderni, ma si usavano molto i nastri magnetici). Per scrivere su un nastro si usava una `write` sequenziale, e per leggere si usava una `read` sequenziale. Le socket usano esattamente la stessa semantica: per trasmettere dati usi una `send` (o una scrittura sequenziale), e per riceverli usi una `receive` (una lettura che va a riempire un blocco di memoria).
 
-== Blocking vs Non-Blocking
+=== Blocking vs Non-Blocking
 La prima grande complicazione nello sviluppo di reti riguarda il comportamento del programma quando tenta di leggere o scrivere dati. Esistono due tipi principali di socket:
 
 - *Socket Bloccanti*: come suggerisce il nome, inviando o richiedendo la lettura di dati, il programma si "blocca" su quell'istruzione e non passa alla successiva finché i dati non sono stati scritti tutti, non sono stati ricevuti a sufficienza, o non scade un timeout. Sono più semplici da usare: basta controllare il codice di errore o il numero di byte restituiti.
 
 - *Socket Non Bloccanti*: i dati da inviare sono passati al sistema operativo e il programma continua immediatamente la sua esecuzione. In fase di lettura, la socket restituisce subito i dati se sono già disponibili; altrimenti, istruisce il sistema operativo a mandare una notifica (callback) quando i dati arriveranno.
 
-== Struttura
+=== Struttura
 
 Aprendo il terminale (su Linux/Mac) e digitando `man socket`, è possibile  trovare la documentazione per creare una socket in C (ma i concetti si applicano a Python, Java, Rust, ecc.). La funzione principale richiede tre parametri:
 
@@ -258,11 +286,14 @@ Aprendo il terminale (su Linux/Mac) e digitando `man socket`, è possibile  trov
 + *Protocol*: generalmente si imposta a `0`, delegando al *sistema operativo* la scelta del protocollo di default per quel dominio e quel tipo. Lo si specifica solo se si vogliono forzare protocolli particolari.
 
 Questa funzione restituisce un numero intero. Se l'intero è negativo, significa che c'è stato un errore (es. dominio non supportato, permessi mancanti). Se l'intero è positivo, rappresenta l'ID della socket. Il kernel dei sistemi operativi Unix/Linux è scritto in C, che è un linguaggio procedurale. Ecco perché la funzione non restituisce un "oggetto socket", ma un semplice numero identificativo (un *file descriptor*), che verrà usato come fosse il riferimento a quell'oggetto per tutte le operazioni successive.
+#pagebreak()
 
-= Livello trasporto (SLIDE 06)
+= Livello trasporto
 A livello di trasporto abbiamo protocolli *connection-oriented* e *protocolli connectionless*. I protocolli di livello 4 sono definiti "end-to-end", ovvero vanno dalla sorgente alla destinazione e i nodi intermedi della rete teoricamente se ne dovrebbero disinteressare. Se volessimo fare un paragone con il modello OSI - cosa sconsigliata di fare all'esame - diremmo che il livello Trasporto del TCP/IP fa cose che non gli competono, sobbarcandosi anche funzioni che l'OSI relegherebbe al livello di sessione. Il suo scopo primario è fare *multiplexing* e *demultiplexing*, fornire degli indirizzi di livello 4 ed eventualmente occuparsi del controllo di congestione e di flusso.
 
 Il multiplexing, nelle reti, significa prendere i dati generati da più processi (ad esempio, un'applicazione che usa una socket TCP e un'altra che usa UDP) e infilarli insieme su un unico canale fisico di trasmissione. Il demultiplexing è l'esatto opposto in fase di ricezione. Per poter fare questo smistamento, ogni livello della pila protocollare deve avere nell'header un'informazione che identifichi a chi è destinato il payload: nel frame Ethernet c'è il campo EtherType, nell'IP c'è il campo Protocol, e a livello di trasporto sono usate le Porte.
+
+#figure(image("images/2026-07-05-22-26-35.png", width: 60%))
 
 == UDP vs TCP
 Nel modello connection-oriented, come il TCP, il livello 4 esegue una fase di setup iniziale. Una volta stabilita la connessione, si ha la certezza che i dati arriveranno e si potrà comunicare in modo efficiente. I grandi svantaggi sono che permette solo comunicazioni uno-a-uno e, soprattutto, richiede il mantenimento continuo di uno "stato" della connessione. Poiché il livello IP sottostante è inaffidabile e invia i pacchetti ognuno per i fatti suoi, tutto l'enorme carico di mantenere in piedi la connessione e verificarne l'affidabilità ricade sul TCP.
@@ -270,7 +301,7 @@ Nel modello connection-oriented, come il TCP, il livello 4 esegue una fase di se
 L'UDP, al contrario, è connectionless ed è molto più affine all'IP: prende un pacchetto, lo manda e spera che arrivi. È una comunicazione monodirezionale, non ha fasi di setup e permette di inviare dati a un destinatario specifico, in multicast a molti o in broadcast a tutti. Il lato negativo è che si perde completamente la garanzia di consegna. L'UDP non dà alcun feedback sull'arrivo dei dati; se serve sapere se un pacchetto è giunto a destinazione, sarà necessario programmare un sistema di conferma a livello applicativo. Questo, però, lo rende un protocollo estremamente leggero e veloce, non essendoci alcuno stato da mantenere in memoria.
 
 Il modo migliore per capire come funziona l'UDP è guardare il suo header, che è lungo appena 8 byte.
-#figure(image("images/2026-06-20-17-37-16.png"), caption: "UDP a sx, UDP-Lite a dx")
+#figure(image("images/2026-06-20-17-37-16.png", width: 80%), caption: "UDP a sx, UDP-Lite a dx")
 
 Contiene solo quattro campi: la porta sorgente, la porta destinazione, la lunghezza e un checksum per il controllo degli errori. La lunghezza è essenziale perché permette al sistema ricevente di sapere esattamente quanta memoria allocare in modo dinamico prima ancora di finire di leggere l'intero pacchetto. Non essendoci numeri di sequenza o acknowledgement, si tratta di un protocollo sostanzialmente vuoto.
 
@@ -287,7 +318,7 @@ Quando il programma apre una socket, le viene assegnata una porta locale. E' pos
 
 #pagebreak()
 
-= TCP (SLIDE 08)
+= TCP
 <RC_Lezione_2026.03.30.m4a>
 L'header del TCP è molto più complicato di quello dell'UDP e, a differenza di quest'ultimo, non ha una dimensione fissa.
 
@@ -403,14 +434,36 @@ Originariamente il TCP usava ACK cumulativi (confermando tutto fino a un certo p
 Non si deve confondere il controllo di congestione nei nodi intermedi con il controllo di flusso al ricevitore. Se si trasmette a una velocità elevata ma il computer ricevente è un dispositivo IoT poco potente, la sua memoria si saturerà. Il controllo di flusso serve proprio a sincronizzare la velocità del trasmettitore con le risorse di chi riceve, per evitare che i pacchetti vengano scartati alla fine del viaggio.
 
 #observation("Controllo del flusso")[
-  Si occupa di mantenere un flusso "liscio" di pacchetti tra due endpoint. Chi trasmette deve conoscere le capacità del ricevitore. Chi trasmette deve stimare il RTT e la velocità della rete.
+  È un servizio di adattamento della velocità (speed-matching service) che serve a sincronizzare la velocità del trasmettitore con le capacità di ricezione ed elaborazione del destinatario. Il suo scopo principale è evitare che il mittente saturi il buffer del ricevitore inviando troppi dati troppo velocemente. Nel protocollo TCP, questo viene gestito facendo sì che il ricevitore comunichi costantemente al mittente la dimensione della sua *receive window* (finestra di ricezione), informandolo in modo dinamico su quanto spazio libero è rimasto nel proprio buffer.
+]
+
+#example("Controllo del flusso")[
+  Il protocollo TCP implementa il controllo di flusso per evitare che il mittente saturi il buffer del destinatario, utilizzando una variabile dinamica chiamata finestra di ricezione (receive window - `rwnd`). Poiché il TCP è full-duplex, entrambi i lati della connessione mantengono una propria `rwnd` distinta.
+  Si supponga un trasferimento di un file dall'Host A all'Host B:
+
+  + *Lato ricevitore (Host B)*: l'Host B alloca per la connessione un buffer di ricezione di dimensione fissa denominato `RcvBuffer`. Il livello di occupazione temporanea di questo buffer dipende da due variabili:
+    - `LastByteRcvd`: l'ultimo byte arrivato dalla rete e memorizzato nel buffer.
+    - `LastByteRead`: l'ultimo byte effettivamente letto e prelevato dal buffer dall'applicazione.
+    Per evitare l'overflow, la quantità di dati momentaneamente parcheggiati nel buffer (`LastByteRcvd - LastByteRead`) non deve superare la dimensione del buffer stesso. Lo spazio libero rimanente, ovvero la finestra di ricezione dinamica, viene calcolato con la formula:
+    #align(center, [`rwnd = RcvBuffer - [LastByteRcvd - LastByteRead]`])
+    L'Host B comunica costantemente questo spazio disponibile inserendo il valore di `rwnd` nell'apposito campo dell'header di ogni segmento TCP che invia all'Host A.
+
+  + *Lato mittente (Host A)*: l'Host A deve assicurarsi di non iniettare nella rete più dati di quanti B possa accettarne. Per farlo, traccia a sua volta due variabili:
+    - `LastByteSent`: l'ultimo byte trasmesso.
+    - `LastByteAcked`: l'ultimo byte di cui ha ricevuto riscontro (ACK).
+    La differenza tra queste due variabili, ovvero `LastByteSent - LastByteAcked`, rappresenta la quantità di dati "in volo" (trasmessi ma non ancora confermati).
+    Per garantire che il buffer di B non vada mai in overflow, per tutta la durata della connessione l'Host A autolimita le sue trasmissioni assicurandosi che i dati in volo siano sempre minori o uguali all'ultimo valore di `rwnd` ricevuto:
+    #align(center, [`LastByteSent - LastByteAcked ≤ rwnd`])
+
+  #figure(image("images/2026-07-05-22-43-52.png"))
 ]
 
 #observation("Controllo della congestione")[
-  Si occupa di mantenere un flusso "liscio" di pacchetti tra due endpoint. Chi trasmette dovrebbe conoscere la capacità dei buffer intermedi (impossibile). Chi trasmette deve stimare la velocità dei collegamenti intermedi (difficile).
+  È un servizio pensato per il benessere dell'infrastruttura di Internet nel suo insieme. Interviene quando troppi nodi tentano di trasmettere dati a velocità eccessive per la rete. Il suo scopo è evitare che le connessioni inondino di traffico i collegamenti e i router intermedi, impedendo così che i buffer (le code) dei router si riempiano provocando perdite di pacchetti e latenze elevate. Nel TCP, il mittente regola la propria velocità di trasmissione manipolando una variabile interna chiamata congestion window in risposta agli eventi di congestione (come la perdita di pacchetti).
 ]
 
-Come fa praticamente il TCP a regolare la velocità? Usa una "Congestion Window". Più è grande questa finestra, più dati trasmetto in un RTT. La teoria classica si basa sull'algoritmo *AIMD* (Additive Increase, Multiplicative Decrease): ogni volta che ricevo un ACK, aumento la finestra linearmente di 1; se rilevo una perdita, presumo ci sia congestione e dimezzo drasticamente la finestra. Questo approccio crea il classico grafico a dente di sega e garantisce stabilità e *fairness* (equità) tra i vari utenti che si contendono la banda.
+Come fa praticamente il TCP a regolare la velocità? Usa una *congestion window*. Più è grande questa finestra, più dati trasmetto in un RTT. La teoria classica si basa sull'algoritmo *AIMD* (Additive Increase, Multiplicative Decrease): ogni volta che ricevo un ACK, aumento la finestra linearmente di 1; se rilevo una perdita, presumo ci sia congestione e dimezzo drasticamente la finestra. Questo approccio crea il classico grafico a dente di sega e garantisce stabilità e *fairness* (equità) tra i vari utenti che si contendono la banda.
+#figure(image("images/2026-07-05-22-48-05.png", width: 50%), caption: "Grafico AIMD.")
 
 Oggi però l'AIMD puro è superato. I sistemi operativi moderni usano diversi "flavors" (varianti) del TCP. Linux usa spesso il *Cubic*, mentre Google spinge per algoritmi basati sui ritardi come il *BBR*. Ognuno reagisce in modo diverso alla congestione.
 
@@ -419,6 +472,7 @@ Oggi però l'AIMD puro è superato. I sistemi operativi moderni usano diversi "f
 ]
 
 Uno dei metodi più recenti è l'*AQM* (Active Queue Management). Piuttosto che aspettare che la coda di un router si riempia del tutto e provochi un disastro, l'AQM fa una cosa molto intelligente: inizia a scartare intenzionalmente *qualche* pacchetto in anticipo.  Questo segnale "sveglia" il controllo di congestione del TCP prima che sia troppo tardi. Senza algoritmi come RED, CoDel o FQ-CoDel nei router intermedi, la latenza su Internet sarebbe insopportabile e non potremmo fare, ad esempio, videochiamate.
+#pagebreak()
 
 = IPv4
 <RC_Lezione_2026.04.27.m4a>
@@ -467,8 +521,8 @@ Ma chiariamo la gerarchia e lo scope (l'ambito di validità) degli indirizzi, pe
 Un'ultima precisazione vitale sull'Information Hiding e il Modello OSI. Il modello OSI originale (con i suoi 7 livelli) prevedeva una netta separazione: ogni livello doveva fare il suo lavoro leggendo solo il proprio header, ignorando il contenuto del payload (information hiding). Questo manteneva l'architettura pulita, ma generava header giganteschi e inefficienze pesantissime.
 Il TCP/IP se n'è fregato. Il TCP/IP vìola l'information hiding in continuazione per ottimizzare le prestazioni. È per questo che i livelli OSI (Sessione, Presentazione, ecc.) non sono mai stati davvero implementati su larga scala e oggi usiamo i numeri dei livelli OSI (Layer 2, Layer 3, Layer 4) solo come vaga convenzione per capirci.
 
-
-= Il Routing e l'evoluzione delle classi IP
+#pagebreak()
+= Il Routing e l'evoluzione delle classi IP ???
 <RC_Lezione_2026.04.28.m4a>
 Oggi dobbiamo dare un'occhiata all'IPv6 e al NAT. Ma prima, una precisazione vitale sull'IPv4: dimenticate le "classi" IP. Se sento qualcuno all'esame parlare di Classe A, Classe B o Classe C in un contesto moderno, gli tolgo dei punti. Le classi sono un concetto storico, nato obsoleto ed estremamente inefficiente.
 
@@ -484,6 +538,7 @@ Il problema gigantesco è che questa ricerca non si può fare con una semplice b
 
 Come si fa a farlo velocemente in router di fascia alta? Si usa la Memoria Ternaria (TCAM). Mentre la memoria classica ragiona in bit (0 e 1), la memoria ternaria aggiunge un terzo stato: "Non importa" (Don't Care). Questo permette all'hardware di confrontare l'indirizzo di destinazione con l'intera tabella di routing in un singolo ciclo di clock. È una tecnologia potentissima, essenziale per i router di dorsale, ma costa un'ira di Dio. Ed è per questo che un router domestico costa cinquanta euro e un router professionale ne costa decine di migliaia.
 
+#pagebreak()
 = Il NAT (Network Address Translation)
 
 Il Network Address Translation (NAT) è stato introdotto negli anni '90 come soluzione transitoria per arginare l'esaurimento degli indirizzi IPv4, in attesa dell'implementazione su larga scala dello standard IPv6. L'approccio si basa sulla definizione di blocchi di indirizzi IP "privati" (come le sottoreti 192.168.0.0/16 o 10.0.0.0/8), utilizzabili liberamente all'interno di reti locali aziendali o domestiche. Tuttavia, non essendo univoci a livello globale, tali indirizzi non sono instradabili sulla rete Internet pubblica.
@@ -666,6 +721,7 @@ Questo sistema è infinitamente più efficiente per i router di dorsale, ma ha u
 
 Infine, una salvaguardia imposta dall'IPv6: lo standard vieta l'esistenza di link con MTU inferiore a 1280 byte. Mentre in IPv4 potevano esistere reti con payload piccolissimi (ignorando il consiglio teorico dei 576 byte), in IPv6 il limite di 1280 byte è legge.
 E cosa succede con reti come il Bluetooth, LoRa o Zigbee (IEEE 802.15.4), che hanno MTU a livello fisico minuscole (spesso inferiori ai 100 byte)? Semplice: devono usare un Adaptation Layer (uno strato software intermedio, come 6LoWPAN) che si occupa di comprimere l'header IPv6 e gestire una frammentazione invisibile al livello IP superiore, garantendo all'IPv6 di vedere sempre e comunque i suoi 1280 byte garantiti.
+#pagebreak()
 
 = Sicurezza delle Reti (Cybersecurity)
 
@@ -911,7 +967,7 @@ Le vulnerabilità dei protocolli di rete derivano tipicamente da tre categorie d
 // All'inizio, la finestra di ricezione era piccola (al massimo 65.000 byte), quindi indovinare il numero esatto alla cieca richiedeva migliaia di tentativi, rendendo l'attacco lungo e rumoroso. Con l'avvento delle reti veloci, però, è stato introdotto il Window Scaling, che ingrandisce la finestra a dismisura (sino a GigaByte di dati "accettabili"). Questo ha drasticamente ridotto i tentativi necessari: oggi un attaccante può indovinare la finestra giusta inviando solo quattro pacchetti ciechi. Ha trasformato un attacco teorico in una vulnerabilità letale. La mitigazione applicata in fretta e furia è stata dire ai router: "Accetta il Reset solo se il Sequence Number è esattamente quello immediatamente successivo all'ultimo pacchetto ricevuto, senza margini di tolleranza". Una toppa, ma ha funzionato.
 
 // Qual è la lezione per noi ingegneri e scienziati? Quando progettate un protocollo, mai hard-codare (fissare) la lunghezza dei campi nell'header a livello binario fisso (es. "questo campo è da 16 bit e lo sarà per sempre"). Se un domani avrete bisogno di 32 bit, dovrete riscrivere l'intero protocollo. Oggi si tende a usare formati strutturati a oggetti (come TLV - Type, Length, Value) per garantire flessibilità futura.
-
+#pagebreak()
 = Il Routing
 Il *routing* all'interno di una rete si divide principalmente in due paradigmi architetturali:
 - *Centralizzato*: un controllore globale possiede una mappatura onnisciente della topologia di rete (similmente a un navigatore satellitare) e determina a priori i percorsi ottimali per tutti i nodi.
@@ -925,15 +981,20 @@ I protocolli di routing distribuito si classificano ulteriormente in:
 - *Reattivi*: l'esplorazione del percorso viene innescata esclusivamente *on-demand*, ovvero nel momento in cui si presenta la necessità di trasmettere un pacchetto.
 - *Flooding*: il pacchetto viene replicato e inoltrato su tutte le interfacce disponibili, nella probabilità statistica di raggiungere prima o poi il destinatario. Pur essendo dispendioso in termini di risorse, in contesti di assoluta emergenza (o per reti fortemente instabili) rappresenta la strategia d'inoltro più robusta, se opportunamente controllata.
 
+La scelta del paradigma di routing dipende in larga misura dalla volatilità della topologia di rete. In uno scenario caratterizzato da instabilità dei link fisici (frequenti disconnessioni o variazioni), un protocollo proattivo inonderebbe la rete di messaggi di aggiornamento a ogni singola fluttuazione. In contesti dove il volume del traffico dati è contenuto ma la topologia è altamente dinamica, l'approccio reattivo si rivela di gran lunga più efficiente.
+Tuttavia, qualora la mutevolezza della rete sia talmente elevata da rendere obsoleto il percorso reattivo ancor prima della sua completa instaurazione, la topologia collassa e l'unica strategia d'inoltro in grado di garantire il recapito del pacchetto rimane il *flooding*.
+
+I protocolli sono inoltre classificati in base a come si scambiano informazioni:
+- *Distance-Vector*: ogni router può scambiare informazioni soltanto con i suoi router vicini. Ogni router contiene al suo interno una tabella "Vettore delle distanze" che associa ad un'interfaccia un costo in termini di hop. I router non conoscono l'intera topologia della rete.
+- *Link-State*: ogni router invia informazioni a tutte le reti direttamente connesse in broadcast su ogni interfaccia tranne quella di origine. Sono algoritmi lenti a convergere e che richiedono molta memoria e potenza di calcolo.
+#figure(image("images/2026-07-03-23-59-56.png"))
+
+
 <RC_Lezione_2026.05.18.m4a>
-== La Complessità del Routing: Teoria vs Pratica
+== La Complessità del Routing
 Da un punto di vista puramente matematico, il routing è assimilabile alla ricerca del cammino minimo all'interno di un grafo pesato. Tuttavia, mentre la teoria dei grafi garantisce la calcolabilità dell'ottimo teorico, l'applicazione ingegneristica è vincolata ai limiti fisici, ai tempi di latenza e all'hardware degli apparati di rete. _I protocolli reali costituiscono dunque approssimazioni dell'ottimo matematico_.
 
 Si considerino, ad esempio, approcci limite come l'*Hot Potato Routing* (in cui un pacchetto viene immediatamente smistato a un vicino casuale pur di svuotare i buffer). Questo paradigma trova fondamento razionale nelle reti "Full Optical": in queste architetture, il tempo necessario per la conversione elettro-ottica (fondamentale per leggere l'header del pacchetto e interrogare la tabella di routing) risulta nettamente superiore al tempo di propagazione fisica. Di conseguenza, in una topologia fortemente magliata, l'inoltro cieco può paradossalmente garantire latenze inferiori rispetto a un'elaborazione del percorso ottimo. Ciò dimostra come la progettazione algoritmica debba sempre integrarsi con le specificità dello strato fisico.
-
-== Approccio Proattivo vs Reattivo
-La scelta del paradigma di routing dipende in larga misura dalla volatilità della topologia di rete. In uno scenario caratterizzato da instabilità dei link fisici (frequenti disconnessioni o variazioni), un protocollo proattivo inonderebbe la rete di messaggi di aggiornamento a ogni singola fluttuazione. In contesti dove il volume del traffico dati è contenuto ma la topologia è altamente dinamica, l'approccio reattivo si rivela di gran lunga più efficiente.
-Tuttavia, qualora la mutevolezza della rete sia talmente elevata da rendere obsoleto il percorso reattivo ancor prima della sua completa instaurazione, la topologia collassa e l'unica strategia d'inoltro in grado di garantire il recapito del pacchetto rimane il *flooding*.
 
 == Metriche e Pesi di Instradamento
 La modellazione algoritmica prevede l'assegnazione di "pesi" agli archi del grafo (i link di rete). A livello matematico, qualsiasi parametro di penalità imputabile a un nodo (es. probabilità di congestione) può essere formalmente traslato sui suoi archi incidenti.
@@ -970,7 +1031,7 @@ A livello distribuito, il RIP implementa l'algoritmo di Bellman-Ford. Pur consen
 
 La sopravvivenza del RIP a scapito di algoritmi più efficienti (come Dijkstra) risiede nei costi computazionali: l'impronta in memoria è quasi nulla (ogni nodo manipola unicamente le metriche relative senza allocare l'intera topologia) e l'aumento della cardinalità dei nodi non satura proporzionalmente i cicli di CPU, garantendo un'altissima scalabilità in termini di risorse hardware.
 
-=== Il problema del Count to Infinity e lo Split Horizon
+=== Count to Infinity e Split Horizon
 La vulnerabilità principale degli algoritmi Distance-Vector distribuiti è il fenomeno del *Count to Infinity*. Se un collegamento cessa di funzionare, i router adiacenti, condividendosi tabelle obsolete non ancora sincronizzate con il guasto, innescano un *loop* di instradamento in cui i costi vengono reciprocamente incrementati all'infinito per una destinazione irraggiungibile.
 
 Il protocollo risolve tale problematica attraverso diverse implementazioni algoritmiche:
@@ -987,7 +1048,7 @@ Questa disseminazione capillare si traduce, in reti molto estese, in un duplice 
 
 Di conseguenza, l'OSPF possiede limiti drastici di scalabilità lineare. Il design del protocollo mitiga tale problema compartimentando l'infrastruttura logica in "Aree" gerarchiche. All'interno dell'Area, i router condividono un set topologico unificato ed eleggono specifici router di transito (*Area Border Router*), i quali aggregano e inoltrano il routing unicamente verso la dorsale logica (*Backbone*). Quest'architettura abbatte il carico computazionale, cedendo come contropartita l'ottimalità globale del percorso: la forzatura dell'instradamento sui *Border Router* genera cammini inter-area basati su ottimi puramente locali.
 
-#figure(image("images/2026-07-03-23-57-38.png"))
+#figure(image("images/2026-07-03-23-57-38.png", width: 60%))
 
 <RC_Lezione_2026.05.19>
 == OSPF, Link-State e Software-Defined Networking (SDN)
@@ -998,14 +1059,14 @@ Tuttavia, configurando l'OSPF per basare le metriche di rotta esclusivamente sul
 Questa rigidità algoritmica giustifica la migrazione dell'industria verso il paradigma *Software-Defined Networking* (SDN). Nell'architettura SDN, le funzioni del "cervello" dei router (il Control Plane algoritmico come OSPF o RIP) sono delegate a un server di controllo centralizzato (*SDN Controller*), riducendo fisicamente i router a semplici elaboratori di commutazione dei pacchetti (*Data Plane* o *Network Elements*).
 Il Controller riceve dati di telemetria dalle infrastrutture, calcola metriche istantanee multi-parametro e sovrascrive le tabelle di inoltro dei vari interruttori sfruttando protocolli di configurazione (*OpenFlow*). A causa delle stringenti necessità di bassa latenza tra le comunicazioni di gestione, l'SDN non scala sull'Internet pubblica, ma rappresenta l'attuale standard progettuale intra-struttura nei Data Center e nelle topologie Cloud/Kubernetes.
 
-== Reti Mesh e IoT: L'esigenza di soluzioni Ad-Hoc
+== Reti Mesh e IoT
 Laddove non via sia un'infrastruttura cablata (es. costellazioni di droni o sistemi di sensori estesi per ambito agricolo), si introducono le *Reti Mesh* (o *Ad-Hoc Networks*). In queste reti destrutturate, il router perde la sua accezione di entità fisica esclusiva, in quanto ogni dispositivo finale agisce simultaneamente da client e nodo di inoltro (multi-hop) basandosi sulla sovrapposizione delle limitate coperture dei moduli radioelettrici.
 
 Il panorama dei protocolli operativi è frammentato: l'offerta include approcci reattivi come l'AODV (che invia query esplorative per tracciare percorsi on-demand), proattivi ottimizzati come l'OLSR, e varianti sperimentali di flooding condizionato come B.A.T.M.A.N. o Meshtastic.
 
 Nel dominio dell'IoT domestico ed enterprise (Smart Home/Alexa), l'assenza di un vero standard universale ha spinto all'adozione del consorzio *Thread*. Paradossalmente, all'interno della rete Thread, la base dei calcoli di instradamento è delegata ad un'architettura derivata dal RIP. Benché in netta contrapposizione alle classiche specifiche del wireless dinamico, la sua implementazione pratica risponde ai requisiti minimi fintantoché la topologia IoT rimane rigidamente stazionaria; a seguito di variazioni topologiche (come la rilocazione di un nodo), l'intera rete mesh si espone al collasso del framework di instradamento.
 
-== Oltre la propria rete: Il BGP e il routing tra Autonomous System
+== Il BGP e il routing tra Autonomous System
 I protocolli sinora discussi (RIP, OSPF, AODV) costituiscono *Interior Gateway Protocols* (IGP). L'implementazione e i parametri di un IGP soggiacciono interamente all'entità amministratrice del singolo dominio logico di rete (*Autonomous System* o AS).
 
 #figure(image("images/2026-07-03-23-59-56.png"))
@@ -1107,10 +1168,10 @@ Il BGP configura l'architettura di Internet. Benché lento nell'assimilazione de
 // Il BGP è il protocollo che regge Internet. È vecchio, è macchinoso, impiega interi minuti (se non ore) a propagare i cambiamenti a livello globale. Ma è stabile. Ed è anche il protocollo che, se configurato con malizia (o per errore, creando i famosi "buchi neri" di routing), permette di creare la cosiddetta Splinternet, ovvero isolare intere nazioni dal resto della rete globale.
 
 // Direi che come panoramica per oggi ci siamo. Domani abbandoniamo la teoria dei protocolli e vediamo come simulare tutto questo software su un computer.
-
-= (SIMULATORE)
+#pagebreak()
+= SIMULATORE
 <RC_Lezione_2026.05.20.m4a>
-== La Simulazione di Rete: Tra Teoria e Pratica
+== La Simulazione di Rete
 L'altra volta ci siamo lasciati con il problema del routing e oggi chiudiamo il discorso parlando di come si studiano e si validano effettivamente le reti e i protocolli, perché la teoria sui libri è fondamentale, ma l'informatica e le telecomunicazioni richiedono la pratica. Se vi trovate a dover dimostrare che una vostra idea per una tesi funziona, o che una rete aziendale regge il carico, dovete passare all'atto pratico.
 
 Quali sono le vostre scelte?
@@ -1121,7 +1182,7 @@ Quali sono le vostre scelte?
 
 Questo ci porta a un concetto fondamentale teorizzato nel 1969 e ancora oggi attualissimo, il "Durable Nonsense". Il Durable Nonsense si verifica quando si produce una ricerca estremamente rigorosa e matematicamente ineccepibile, ma basata su presupposti totalmente fuori dalla realtà. Il risultato è una sciocchezza monumentale ("nonsense") che però, proprio per la sua patina di rigore scientifico, dura nel tempo ("durable") e viene citata per anni.Ad esempio, se studiate in modo impeccabile come avviene il passaggio di connessione Wi-Fi (handover) tra due antenne in un corridoio con pareti di metallo massiccio, la ricerca è formalmente perfetta. Peccato che non esista alcun corridoio in metallo massiccio nella realtà (a parte un rifugio antiatomico). I risultati che otterrete saranno matematicamente veri, ma totalmente inapplicabili. Nel 2001, una famosa ricercatrice di nome Sally Floyd smontò una fetta enorme della ricerca accademica sulle reti dimostrando proprio questo. Fino a quel momento, i simulatori e i modelli matematici assumevano che il traffico Internet (generato dai server web o dalle applicazioni) avesse una distribuzione statistica predicibile e governabile dal Teorema del Limite Centrale (ad esempio, traffico poissoniano o a bitrate costante). Sally Floyd dimostrò, dati reali alla mano, che il traffico Internet ha una natura "frattale" (Self-Similar o a invarianza di scala), con distribuzioni a coda lunga (come Pareto o Weibull) che non possiedono una varianza finita. Se il traffico non rispetta il Teorema del Limite Centrale, significa che aggregando migliaia di utenti, il traffico non si "spiana" su una comoda curva Gaussiana, ma mantiene picchi (spike) spaventosi e imprevedibili. Se progettate la memoria (i buffer) di un router o la banda di una rete usando un modello statistico sbagliato, state creando del Durable Nonsense: la matematica torna, ma il router nella realtà andrà in congestione in cinque minuti.
 
-== Gli strumenti giusti: Da Matlab ai Discrete-Event Simulators
+== Da Matlab ai Discrete-Event Simulators
 Come evitiamo di produrre spazzatura? Usando gli strumenti adatti per ogni livello dello stack.S e volete studiare il Livello Fisico (come i segnali elettrici o radio si propagano nell'aria, le modulazioni o le probabilità di errore per bit), usare un simulatore di rete è inutile. Lì la matematica governa suprema: si usano software come Matlab o librerie Python avanzate per processare il segnale.Quando però si sale dal Livello 2 (MAC) fino al Livello 4 (Trasporto) o Applicativo, la matematica pura esplode. Lì servono i Simulatori di Rete a Eventi Discreti (Discrete-Event Simulators), come NS-3 (che tra l'altro contribuisco a sviluppare).
 
 Cos'è una simulazione a eventi discreti? A differenza dei modelli continui (dove lo stato del sistema viene ricalcolato ogni nanosecondo), in un simulatore a eventi discreti il tempo avanza solo quando "succede qualcosa".Se il nodo A inizia a trasmettere un pacchetto al nodo B al tempo $T_0$, sappiamo che il pacchetto finirà di essere trasmesso al tempo $T_1$ (calcolabile in base alla lunghezza del pacchetto e alla banda). Nel lasso di tempo tra $T_0$ e $T_1$, lo stato del sistema (il cavo o il canale radio) non cambia: è semplicemente "Occupato". Il simulatore quindi non fa nessun calcolo intermedio; inserisce l'evento di "Fine Trasmissione" in una coda cronologica (Scheduler) e "salta" direttamente al momento $T_1$, eseguendo la funzione associata. Questo rende i calcoli computazionalmente leggeri e permette di simulare reti immense. Ovviamente, quanto in dettaglio volete spingervi dipende da voi: volete simulare il tempo preciso di inizio e fine pacchetto per intercettare eventuali collisioni simultanee sul canale, o vi basta simulare che un messaggio astratto è partito ed è arrivato? Più dettagli inserite (come l'ARP, il Neighbor Discovery, o le collisioni a livello fisico), più la simulazione sarà lenta e complessa, ma anche più aderente alla realtà. La vera abilità del ricercatore sta nel capire quali "rumori di fondo" scartare per alleggerire la simulazione, senza alterare la validità dei risultati.
@@ -1129,7 +1190,7 @@ Cos'è una simulazione a eventi discreti? A differenza dei modelli continui (dov
 == Simulazione Monte Carlo, Topologie e Affidabilità
 Se fate una singola simulazione e funziona, avete dimostrato ben poco. Una simulazione genera solo una istanza di un sistema complesso, vincolata ai semi (seed) del generatore di numeri pseudocasuali che avete impostato.Per avere una vera validità scientifica dovete applicare il Metodo Monte Carlo: ripetere la stessa simulazione decine o centinaia di volte, variando leggermente le condizioni iniziali (i seed, la posizione geografica dei nodi, l'orario di generazione del traffico, i tassi di errore). E non basta variare i numeri: dovreste anche variare, in modo programmato, la topologia della rete. Non potete simulare un protocollo per edifici scolastici mappando alla perfezione l'edificio in cui ci troviamo ora. Quella dimostrerebbe che il protocollo funziona in questo plesso, non in un plesso generico.Dal Metodo Monte Carlo otterrete una nuvola di risultati, da cui dovrete estrarre medie, mediane, varianze e, soprattutto, gli Intervalli di Confidenza. Nel 2026, presentare un grafico senza intervalli di confidenza (o, ancora meglio, senza un "Violin Plot" che mostri chiaramente l'intera distribuzione e l'eventuale multimodalità dei dati) significa farsi deridere dalla comunità scientifica. Se il risultato di un simulatore combacia esattamente al millimetro con il modello teorico matematico, significa semplicemente che nel simulatore avete replicato alla lettera le stesse assunzioni iper-semplificate che avevate fatto sulla carta, rendendo la simulazione un puro e inutile esercizio di stile. La simulazione serve proprio per scoprire come il sistema reagisce quando la teoria pura incontra le imperfezioni e i ritardi (le "code") del mondo reale.
 
-== Come simulare: Reinventare la ruota o usare le librerie?
+== Come simulare
 Quando costruite un simulatore, a livello base (MAC/Livello 2) dovete scrivere codice C++ (o simili) per simulare l'accesso al mezzo (tempi di ritardo, re-trasmissioni CSMA/CD, ecc.), perché è hardware-specifico.Ma quando salite a livello Trasporto, vi trovate davanti a un bivio. Se dovete simulare l'algoritmo QUIC o il TCP:
 - Ve lo riscrivete da zero: Ci perdete 6 mesi, commettete errori, ma avete il controllo totale per modificare ogni singola virgola dell'algoritmo per i vostri esperimenti.
 - Usate una libreria reale (es. PicoQUIC o l'implementazione del TCP di Linux): La integrate direttamente nel simulatore tramite wrapper. Funzionerà perfettamente, ma se dovete "bucare" la logica interna della libreria per testare una variante del protocollo, sarà molto più ostico.
