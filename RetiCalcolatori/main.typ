@@ -10,7 +10,7 @@
 
   #pagebreak()
 
-  #include "chapters/chapter1/1-introduzione.typ"
+  #include "chapters/chapter1/1-introduzione-pulito.typ"
 ]
 
 
