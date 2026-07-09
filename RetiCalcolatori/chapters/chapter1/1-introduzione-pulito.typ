@@ -13,7 +13,14 @@ La struttura di una rete può essere analizzata sotto diversi punti di vista:
 - *Topologia IP (Logica)*: come fluiscono i dati attraverso la rete basandosi sull'indirizzamento IP e le decisioni di routing. Non sempre rispecchia la topologia fisica. In questo cavo ogni dispositivo con un indirizzo IP è un nodo.
 - *Topologia application-level*: come comunicano le applicazioni (es. reti Overlay, P2P, CDN). Ogni applicazione è un vertice.
 
-// TODO: mancherebbe parte su circuit-switching, packet-switching!
+== Commutazione (Switching)
+Prima di analizzare Internet, è necessario chiarire *come* i dati attraversano una rete di nodi intermedi. Esistono tre paradigmi storici di commutazione:
+
+- *Circuit Switching*: prima di scambiare dati viene stabilito un percorso fisico dedicato tra sorgente e destinazione, che resta riservato per l'intera durata della comunicazione. È il modello della telefonia tradizionale. Garantisce banda e latenza costanti, ma è inefficiente: le risorse restano allocate anche quando non si trasmette nulla (silenzi, pause) e serve una fase di setup iniziale prima di poter comunicare.
+
+- *Message Switching*: non esiste un circuito dedicato. L'intero messaggio viene inviato a un nodo intermedio, che lo memorizza per intero e lo inoltra al nodo successivo quando il collegamento è libero (approccio *store-and-forward*). Elimina lo spreco del circuito riservato, ma obbliga ogni nodo a bufferizzare messaggi potenzialmente enormi e introduce ritardi elevati: un messaggio molto grande può monopolizzare un collegamento bloccando tutti gli altri. È il progenitore concettuale del packet switching (la stessa logica store-and-forward la si ritrova, ad esempio, nell'architettura storica dell'email e delle BBS).
+
+- *Packet Switching*: il messaggio viene suddiviso in unità più piccole (i *pacchetti*), ciascuna dotata di un header con le informazioni di instradamento e inoltrata in modo *indipendente*. I pacchetti condividono i collegamenti con quelli di altre comunicazioni, possono seguire percorsi diversi e vengono riassemblati a destinazione. È il modello su cui si basa Internet: massimizza l'utilizzo della banda, non richiede un circuito dedicato ed è estremamente resiliente (se un nodo cade, i pacchetti successivi vengono instradati altrove).
 
 == Internet 101
 Le idee alla base di Internet si diffusero intorno agli anni sessanta. Non è stato creato dal nulla, ma costruito passo dopo passo. Sebbene finanziato inizialmente dal Dipartimento della Difesa USA (progetto ARPANET), il suo sviluppo è stato guidato principalmente dai centri di ricerca nazionali e universitari.
@@ -72,8 +79,9 @@ Un Autonomous System è un concetto *amministrativo*, non di routing: è un bloc
 
 In una rete possiamo distinguere tre categorie principali di dispositivi:
 
-1. *Host (L7)*: I dispositivi finali (End Systems) dove risiedono le applicazioni (client e server). Sono l'origine e la destinazione del traffico. Sono identificati univocamente da indirizzi IP.
-2. *Router/Gateway (L3 o L7)*: Dispositivi intermedi, usati principalmente per indirizzare i pacchetti. Hanno bisogno di un'interfaccia IP per ogni subnet a cui sono connessi. Se instradano il traffico a livello 3 (IP) senza modificarlo si parla di *Router*; se operano fino al livello 7 (Applicativo) agendo sul contenuto della sessione si parla di *Gateway* o *Proxy*.
+1. *Host L7*: I dispositivi finali (End Systems) dove risiedono le applicazioni (client e server). Sono l'origine e la destinazione del traffico. Sono identificati univocamente da indirizzi IP.
+2. *Router L3*: dispositivi intermedi, usati principalmente per indirizzare i pacchetti. Hanno bisogno di un'interfaccia IP per ogni subnet a cui sono connessi. Instradano il traffico a livello 3 (IP) senza modificarlo.
+3. *Gateway/Proxy L7*: dispositivi intermedi che operano fino al livello 7 (Applicativo) agendo sul contenuto della sessione.
 
 All'interno di una rete, un host sorgente, generalmente:
 + Crea un pacchetto indirizzato a un host destinatario.
@@ -114,7 +122,7 @@ Il modello OSI prevede una rigida separazione: ogni livello dovrebbe leggere sol
 Lo stack TPC/IP è molto più semplice dell'ISO/OSI.
 #figure(image("images/2026-06-18-23-25-56.png", width: 30%))
 - L7 Livello Application: composto dai protocolli applicativi come ftp, smtp, http, etc...
-- L7 Livello Transport: composto dai protocolli per il trasferimento dei dati end-to-end come TCP, UDP, QUICK, etc...
+- L4 Livello Transport: composto dai protocolli per il trasferimento dei dati end-to-end come TCP, UDP, QUICK, etc...
 - L3 Livello Network: composto dai protocolli per il routing sorgente-destinazione come IP, ICMP, ARP, RARP, etc...
 - L2 Livello Data Link: composto dai protocolli per le comunicazioni locali come PPP, ethernet, etc...
 
