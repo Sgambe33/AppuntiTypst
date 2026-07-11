@@ -561,11 +561,13 @@ Una delle maggiori inefficienze dell'IPv4 è l'header a dimensione variabile (da
 
 In IPv6, l'header principale è stato fissato a una dimensione costante di *40 byte* e il Checksum è stato eliminato (delegando il controllo di integrità ai livelli datalink e di trasporto, data l'alta affidabilità dei mezzi trasmissivi odierni come la fibra ottica). Le opzioni aggiuntive sono state delegate a strutture separate denominate *Extension Headers*. Un router *intermedio* analizza esclusivamente l'header fisso; se il campo `Next Header` indica un protocollo di livello superiore (TCP, UDP...) o un'estensione non pertinente al routing nodo-a-nodo, il router inoltra il pacchetto sfruttando percorsi di commutazione accelerati via hardware (*Fast Path*), ovvero ignora gli header successivi e inoltra. Se invece vale zero, significa che subito dopo c'è un Hop-by-Hop Extension Header che deve essere analizzato da ogni router sul percorso.
 
-#figure(image("images/2026-06-23-18-11-46.png", width: 60%), caption: "Header IPv6")
+#figure(image("images/2026-07-11-12-45-02.png", width: 70%), caption: "Differenze tra header IPv4 e IPv6.")
 
 == Classificazione degli Indirizzi IPv6
 
-La notazione degli indirizzi IPv6 utilizza una rappresentazione esadecimale a gruppi separati da due punti (es. `2001:0db8:85a3::8a2e:0370:7334`), in cui la doppia coppia di due punti (`::`) abbrevia una sequenza contigua di zeri. Negli URL l'indirizzo va racchiuso tra parentesi quadre (es. `http://[2001:db8::1]`). Il prefisso `2001:db8::/32` è riservato alla documentazione e non è instradabile in produzione. La struttura tipologica è altamente razionalizzata. Rientrano tra i tipi di indirizzo *Unicast*, quindi (uno a uno):
+La notazione degli indirizzi IPv6 utilizza una rappresentazione esadecimale a gruppi separati da due punti (es. `2001:0db8:85a3::8a2e:0370:7334`), in cui la doppia coppia di due punti (`::`) abbrevia una sequenza contigua di zeri (e può comparire *una sola volta* per indirizzo, altrimenti risulterebbe ambigua). Negli URL l'indirizzo va racchiuso tra parentesi quadre (es. `http://[2001:db8::1]`). Il prefisso `2001:db8::/32` è riservato alla documentazione e non è instradabile in produzione. La struttura tipologica è altamente razionalizzata.
+
+Rientrano tra i tipi di indirizzo *Unicast* (comunicazione uno a uno):
 
 - *Global Unicast (`2000::/3`)*: indirizzi pubblici, instradabili a livello globale. Garantiscono l'univocità dell'host su Internet. Al fine di mitigare i rischi di tracciamento (privacy), i sistemi operativi moderni generano ciclicamente indirizzi Global Unicast temporanei per la navigazione.
 
@@ -573,12 +575,14 @@ La notazione degli indirizzi IPv6 utilizza una rappresentazione esadecimale a gr
 
 - *Unique Local (ULA) (`fc00::/7`)*: analoghi agli indirizzi IP privati dell'IPv4, pensati per reti isolate (l'uso combinato con il NAT66 (IPv6-to-IPv6 NAT) è fortemente sconsigliato).
 
-- *Unspecified (`::/128`)*: indirizzo composto da soli zeri, impiegato esclusivamente in contesti di inizializzazione.
+Esistono poi degli *indirizzi speciali*, che non rappresentano una normale destinazione unicast:
+
+- *Unspecified (`::/128`)*: indirizzo composto da soli zeri, che indica l'*assenza di un indirizzo*. Non è assegnabile a un'interfaccia ed è impiegato esclusivamente in contesti di inizializzazione (es. come indirizzo sorgente durante il DAD).
 
 - *Loopback (`::1/128`)*: equivalente all'indirizzo localhost `127.0.0.1` dell'IPv4.
 
 Altre tipologie di indirizzi sono:
-- *Multicast (`ff00::/8`)*: l'IPv6 abbandona completamente il concetto di Broadcast a favore del Multicast, in questo modo è possibile inviare pacchetti a più destinatari simultaneamente. Gli indirizzi Multicast integrano un campo *Scope* per definire l'ambito di validità (es. `ff02` per il link-local). Il secondo byte definisce quanto lontano può arrivare il pacchetto. Gruppi multicast, identificati dall'ultimo pezzo, notevoli includono l'*All-nodes* (`ff02::1`) e l'*All-routers* (`ff02::2`).
+- *Multicast (`ff00::/8`)*: l'IPv6 abbandona completamente il concetto di Broadcast a favore del Multicast, in questo modo è possibile inviare pacchetti a più destinatari simultaneamente. La struttura di un indirizzo Multicast è `1111 1111` (il primo byte, `ff`) seguito da 4 bit di *Flag* e 4 bit di *Scope*: è quest'ultimo campo (il nibble basso del secondo byte) a definire l'ambito di validità, ovvero quanto lontano può arrivare il pacchetto (es. `ff02` per il link-local). Gruppi multicast, identificati dall'ultimo pezzo, notevoli includono l'*All-nodes* (`ff02::1`) e l'*All-routers* (`ff02::2`).
   #observation(multiple: true)[
     + Perché si usa quasi solo l'`ff02`? Perché fare routing Multicast a livello globale (usando protocolli come il *PIM Sparse Mode*) è un incubo ingegneristico. Il Multicast locale, invece, è comodo, sicuro e non appesantisce i router.
     + I driver delle schede di rete possono filtrare i pacchetti a livello hardware, evitando di interrompere la CPU per il traffico non di competenza. Questo permette di filtrare efficientemente i pacchetti in base al loro scope. A livello datalink, un indirizzo Multicast IPv6 viene tradotto in un indirizzo MAC che unisce il prefisso fisso `33:33` agli ultimi 32 bit (4 byte) dell'indirizzo Multicast, così che la scheda di rete possa decidere in hardware se il pacchetto la riguarda.
@@ -620,7 +624,7 @@ L'IPv6 rivoluziona la gestione delle reti locali. Il concetto di *Subnet Mask* (
 === SLAAC
 #figure(image("images/2026-06-24-17-08-26.png", width: 50%))
 
-Lo *SLAAC* (Stateless Addess Autoconfiguration) è il meccanismo di autoconfigurazione di IPv6. Permette a due o più host, connessi anche da solo un cavo tra loro, che utilizzano IPv6 di ottenere automaticamente un indirizzo IP senza la presenza di un router. L'intero processo è basato sul protocollo *NDP* (Neighbor Discovery Protocol) che a sua volta incapsulata pacchetti ICMPv6. Il NDP sostituisce il protocollo ARP dell'IPv4, permettendo quindi di risolvere anche gli indirizzi MAC. Il NDP definisce cinque (ma ne vedremo quattro) tipologie di messaggi:
+Lo *SLAAC* (Stateless Address Auto Configuration) è il meccanismo di autoconfigurazione di IPv6. Permette a due o più host, connessi anche da solo un cavo tra loro, che utilizzano IPv6 di ottenere automaticamente un indirizzo IP senza la presenza di un router. L'intero processo è basato sul protocollo *NDP* (Neighbor Discovery Protocol) che a sua volta incapsulata pacchetti ICMPv6. Il NDP sostituisce il protocollo ARP dell'IPv4, permettendo quindi di risolvere anche gli indirizzi MAC. Il NDP definisce cinque (ma ne vedremo quattro) tipologie di messaggi:
 
 + *Router Solicitation (RS)*: un host che fa uso di SLAAC, invierà automaticamente sulla rete dei pacchetti RS. Questi pacchetti servono per "sollecitare" eventuali router nella rete a presentarsi con il proprio IP in modo tale che l'host conosca il loro indirizzo. Nell'immagine sottostante si può notare come il PC1 invia un pacchetto RS contenente il proprio indirizzo IP (link-local autogenerato da MAC) e specificando come indirizzo di destinazione l'indirizzo *All-Routers Multicast*. In questo modo, soltanto i router considereranno questo pacchetto. Il tipo per RS è 133.
   #figure(image("images/2026-06-24-17-31-14.png", width: 50%))
@@ -670,7 +674,7 @@ Questa flessibilità permette configurazioni che in IPv4 sarebbero state assurde
 
 == DHCPv6
 
-E il DHCP in tutto questo? In IPv6 il suo ruolo cambia. Viene usato solo se il router lo impone. Nel PIO del Router Advertisement ci sono altri due flag importanti:
+E il DHCP in tutto questo? In IPv6 il suo ruolo cambia. Viene usato solo se il router lo impone. Nel Router Advertisement ci sono altri due flag importanti:
 
 - Il bit `M` (Managed): se è a 1, il router indica di usare il server DHCPv6 per ottenere l'indirizzo IPv6.
 
