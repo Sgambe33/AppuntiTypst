@@ -505,7 +505,12 @@ Uno dei metodi più recenti è l'*AQM* (Active Queue Management). Piuttosto che 
 
 = NAT (Network Address Translation)
 
-Il Network Address Translation (NAT) è stato introdotto negli anni '90 come soluzione transitoria per arginare l'esaurimento degli indirizzi IPv4, in attesa dell'implementazione su larga scala dello standard IPv6. L'approccio si basa sulla definizione di blocchi di indirizzi IP "privati" (come le sottoreti 192.168.0.0/16 o 10.0.0.0/8), utilizzabili liberamente all'interno di reti locali aziendali o domestiche. Tuttavia, non essendo univoci a livello globale, tali indirizzi non sono instradabili sulla rete Internet pubblica.
+Il Network Address Translation (NAT) è stato introdotto negli anni '90 come soluzione transitoria per arginare l'esaurimento degli indirizzi IPv4, in attesa dell'implementazione su larga scala dello standard IPv6. L'approccio si basa sulla definizione di blocchi di indirizzi IP "privati":
+
+
+#definition("Indirizzi Privati (RFC 1918)")[
+  L'Internet Engineering Task Force (IETF) ha riservato tre blocchi di indirizzi IP per l'uso all'interno di reti private: `10.0.0.0/8`, `172.16.0.0/12` e `192.168.0.0/16`. Questi indirizzi non sono univoci a livello globale e non possono essere instradati nella rete Internet pubblica.
+]
 
 Il NAT, posizionato tipicamente sul router di confine, agisce traducendo gli indirizzi IP privati dei dispositivi della rete interna in uno o più indirizzi IP pubblici, consentendo così l'accesso a Internet. Ne esistono tre varianti principali:
 
@@ -515,25 +520,82 @@ Il NAT, posizionato tipicamente sul router di confine, agisce traducendo gli ind
 + *NAT Dinamico*: associa dinamicamente un IP pubblico, prelevato da un pool predefinito, a un IP privato nel momento in cui questo genera traffico in uscita. L'indirizzo pubblico viene poi rilasciato al termine della sessione di comunicazione. Tale meccanismo opera secondo una logica "first-come, first-served" e presenta forti limitazioni: l'esaurimento temporaneo degli IP nel pool preclude l'accesso a Internet per tutti gli altri dispositivi della rete locale.
   #figure(image("images/2026-06-23-12-13-29.png", width: 70%))
 
-+ *NAPT / PAT *: consente a molteplici dispositivi di una rete privata di accedere a Internet utilizzando un singolo indirizzo IPv4 pubblico (rapporto N:1 tra indirizzi privati e indirizzo pubblico). Il PAT sfrutta i numeri di porta di livello di trasporto per tracciare le diverse sessioni di comunicazione, alterando la porta sorgente durante la traslazione e potendo gestire teoricamente fino a $2^{16}$ (65.536) connessioni simultanee. Questa tecnica introduce però alcune problematiche:
-  - *Violazione dell'astrazione dei livelli*: costringe un apparato di livello 3 (il router) a ispezionare i pacchetti fino al livello 4 (TCP/UDP). L'eventuale adozione di futuri protocolli privi del concetto di "porta" renderebbe il NAPT inefficace, venendo a mancare l'elemento chiave per la traslazione.
-  - *Incompatibilità con i protocolli di sicurezza*: il NAT altera l'intestazione IP originale, compromettendo l'integrità richiesta da protocolli di sicurezza come IPsec in modalità AH (Authentication Header). Il ricevente, rilevando una discrepanza tra l'header modificato e la firma crittografica, scarterà il pacchetto. Le contromisure necessarie (come il *NAT Traversal* tramite l'incapsulamento del traffico crittografato all'interno di ulteriori datagrammi UDP) introducono *overhead* aggiuntivo, sprecano larghezza di banda e generano gravi interferenze tra i meccanismi di controllo della congestione a causa di tunnel annidati (es. TCP-over-TCP).
++ *NAPT / PAT *: consente a molteplici dispositivi di una rete privata di accedere a Internet utilizzando un singolo indirizzo IPv4 pubblico (rapporto N:1 tra indirizzi privati e indirizzo pubblico). Il PAT sfrutta i numeri di porta di livello di trasporto per tracciare le diverse sessioni di comunicazione, alterando la porta sorgente durante la traslazione e potendo gestire teoricamente fino a $2^{16}$ (65.536) connessioni simultanee. Il NAPT fa uso di una NAT Translation Table:
+  - Pacchetto in uscita (Interfaccia Interna): Quando un host interno invia un datagramma verso l'esterno, il NAT cerca un binding (una regola di traslazione) esistente. Se non esiste, crea un nuovo binding assegnando una nuova porta sorgente, sostituisce l'indirizzo IP privato con quello pubblico del router, ricalcola i checksum e inoltra il pacchetto.
+  - Pacchetto in ingresso (Interfaccia Esterna): Quando un pacchetto arriva dalla rete pubblica, il NAT consulta la tabella usando l'IP e la porta di destinazione. Se trova un binding, riscrive l'IP e la porta per inoltrarlo all'host locale.
+  #observation()[
+    Se un pacchetto arriva sull'interfaccia esterna e non esiste un binding corrispondente nella tabella, il NAT non sa a chi inoltrarlo e scarta (drop) il pacchetto.
+  ]
 
-== NAT non deterministico
 
-L'utilizzo del NAT introduce un comportamento non deterministico nelle comunicazioni. Nel caso del protocollo *connection-oriented* TCP, la gestione dello stato è lineare: l'apertura (flag SYN) e la chiusura (flag FIN o RST) della connessione dettano chiaramente al NAT quando creare e distruggere la relativa regola di traduzione (*binding*).
 
-Per il protocollo UDP (*connectionless*), l'assenza di meccanismi espliciti di instaurazione e terminazione della sessione rende la gestione complessa. Il NAT deve creare un *binding* temporaneo al passaggio del primo pacchetto, basandosi su timer di inattività (timeout) per rimuoverlo. Un timeout eccessivamente breve provoca disconnessioni casuali (critiche nel gaming o nello streaming), mentre uno troppo lungo comporta un inutile spreco di risorse sul router. Di conseguenza, le applicazioni moderne (come software VoIP o messaggistica) sono obbligate a implementare meccanismi di *keep-alive*, inviando periodici pacchetti fittizi al solo scopo di impedire la chiusura della porta da parte del NAT.
 
-Ulteriori complicanze si riscontrano nel *Referral Handover*, tipico delle comunicazioni Peer-to-Peer. Quando un client contatta un server di segnalazione, quest'ultimo memorizza l'IP pubblico e la porta assegnati dal NAT del client. Se un secondo utente cerca di connettersi direttamente al primo utilizzando quelle coordinate, il tentativo fallisce quasi sempre: molti NAT (come i *Symmetric NAT* o i *Port-Restricted NAT*) applicano policy di filtraggio rigorose, accettando traffico in ingresso unicamente se proveniente dall'indirizzo IP originariamente contattato dall'host interno. Questo costringe a far transitare inutilmente il traffico multimediale attraverso server centralizzati (relay).
 
-== NAT in cascata (Carrier-Grade NAT)
 
-L'esaurimento terminale degli indirizzi IPv4 ha spinto gli Internet Service Provider (ISP) ad adottare il *Carrier-Grade NAT* (CGNAT). In questa configurazione, non solo il modem domestico esegue una prima traslazione (CPE NAT), ma l'infrastruttura dell'ISP applica un ulteriore livello di NAT a monte per ottimizzare l'uso degli IP pubblici.
+// Questa tecnica introduce però alcune problematiche:
+// - *Violazione dell'astrazione dei livelli*: costringe un apparato di livello 3 (il router) a ispezionare i pacchetti fino al livello 4 (TCP/UDP). L'eventuale adozione di futuri protocolli privi del concetto di "porta" renderebbe il NAPT inefficace, venendo a mancare l'elemento chiave per la traslazione.
+// - *Incompatibilità con i protocolli di sicurezza*: il NAT altera l'intestazione IP originale, compromettendo l'integrità richiesta da protocolli di sicurezza come IPsec in modalità AH (Authentication Header). Il ricevente, rilevando una discrepanza tra l'header modificato e la firma crittografica, scarterà il pacchetto. Le contromisure necessarie (come il *NAT Traversal* tramite l'incapsulamento del traffico crittografato all'interno di ulteriori datagrammi UDP) introducono *overhead* aggiuntivo, sprecano larghezza di banda e generano gravi interferenze tra i meccanismi di controllo della congestione a causa di tunnel annidati (es. TCP-over-TCP).
 
-Questa architettura introduce topologie altamente complesse e stratificate. Un utente potrebbe vedersi assegnare IP pubblici differenti per flussi diretti verso destinazioni geografiche diverse (ad esempio, un IP per le connessioni verso il Giappone e un altro per quelle verso gli Stati Uniti). Questa imprevedibilità rende inefficaci le tradizionali tecniche di *NAT Traversal* (come il protocollo STUN), le quali falliscono nel catalogare o aggirare comportamenti così complessi.
+== Gestione degli stati
 
-Sebbene il NAT sia stato uno strumento essenziale per prolungare la longevità dell'IPv4, ha di fatto compromesso il paradigma *end-to-end* originario di Internet, introducendo enormi inefficienze nello sviluppo e nel funzionamento delle applicazioni distribuite. L'unica soluzione architetturale definitiva per superare questi ostacoli rimane l'adozione e la transizione completa al protocollo IPv6.
+L'utilizzo del NAT introduce un comportamento non deterministico nelle comunicazioni. Nel caso del protocollo *connection-oriented* TCP, la gestione dello stato è lineare: l'apertura (flag SYN) e la chiusura (flag FIN o RST) della connessione dettano chiaramente al NAT quando creare e distruggere il relativo binding.
+
+Per il protocollo UDP (*connectionless*), l'assenza di meccanismi espliciti di instaurazione e terminazione della sessione rende la gestione complessa. Il NAT deve creare un *binding* temporaneo al passaggio del primo pacchetto, basandosi su timer di inattività (es. Timer Refresh di tipo Bidirectional, Outbound o Inbound) per rimuoverlo. Un timeout eccessivamente breve provoca disconnessioni casuali (critiche nel gaming o nello streaming), mentre uno troppo lungo comporta un inutile spreco di risorse sul router. Di conseguenza, le applicazioni moderne (come software VoIP o messaggistica) sono obbligate a implementare meccanismi di *keep-alive*, inviando periodici pacchetti fittizi al solo scopo di impedire la chiusura della porta da parte del NAT.
+
+#definition("Tipologie di timers")[
+  + Bidirectional: il timer viene aggiornato da pacchetti sia in entrata che in uscita.
+  + Outbound: solo i pacchetti in uscita aggiornano il timer.
+  + Inbound: solo i pacchetti in entrata aggiornano il timer.
+]
+
+#observation()[
+  Per l'UDP, il comportamento del NAT è governato da filtri che determinano l'accettazione dei pacchetti in ingresso. Questi filtri classificano i NAT in quattro tipologie: *Symmetric*, *Full Cone*, *Restricted Cone* e *Port Restricted Cone*.
+]
+
+=== Comportamenti NAT UDP
++ *Full Cone NAT (Endpoint Independent)*\
+  #figure(image("images/2026-07-13-13-24-00.png", width: 60%))
+  - Funzionamento: è la modalità più permissiva. Quando un host interno invia un pacchetto UDP all'esterno, il NAT alloca una porta pubblica e crea un binding. Da quel momento in poi, la porta pubblica del router rimane aperta e qualsiasi host esterno (da qualunque indirizzo IP e qualunque porta) può inviare pacchetti a quella porta; il NAT li inoltrerà tutti all'host interno.
+  - Criticità: questa modalità garantisce il funzionamento di quasi tutte le applicazioni UDP, ma presenta gravissimi problemi di sicurezza (chiunque può fare network scanning o inviare traffico arbitrario verso la porta aperta) ed è inefficiente perché "brucia" una porta pubblica per ogni applicazione.
+
++ *Restricted Cone NAT (Endpoint Address Dependent)*\
+  #figure(image("images/2026-07-13-13-24-11.png", width: 60%))
+  - Funzionamento: il filtro di accettazione si basa esclusivamente sull'indirizzo IP. Il NAT inoltra un pacchetto in ingresso verso l'host interno solo e soltanto se l'host interno aveva precedentemente inviato un pacchetto verso quello specifico indirizzo IP esterno.
+  - Caratteristica: la porta sorgente utilizzata dall'host esterno per rispondere non ha importanza, il NAT verifica solo che l'IP mittente sia tra quelli già contattati
+
++ *Port Restricted Cone NAT (Endpoint Port Dependent)*\
+  #figure(image("images/2026-07-13-13-24-26.png", width: 60%))
+
+  - Funzionamento: è una variazione più rigida della precedente. Il filtro in ingresso valuta sia l'indirizzo IP che la porta. L'host esterno può raggiungere l'host interno solo se l'host locale aveva precedentemente inviato un pacchetto verso quello specifico IP esterno e verso quella specifica porta. Ogni traffico proveniente da porte esterne diverse viene silenziosamente scartato.
+
++ *Symmetric NAT (Endpoint Address and Port Dependent)*\
+  #figure(image("images/2026-07-13-13-24-46.png", width: 60%))
+  - Funzionamento: è la modalità che si comporta in modo più simile alla rigorosa gestione del TCP. Non solo il filtro in ingresso è strettissimo (solo l'host e la porta specificamente contattati per primi possono rispondere usando quel varco), ma il comportamento di binding muta a seconda della destinazione. Se un host interno contatta la destinazione A, il NAT gli assegna la porta pubblica X. Se lo stesso host interno, usando la stessa porta sorgente locale, contatta la destinazione B, il Symmetric NAT gli assegnerà una porta pubblica Y completamente diversa.
+  - Criticità nel Referral Handover: questa modalità distrugge le comunicazioni Peer-to-Peer. Se l'host interno contatta un server di signaling (come un server STUN o SIP) per farsi conoscere, il server vedrà la porta pubblica X. Quando l'host proverà a contattare direttamente il suo "Peer" finale, il Symmetric NAT cambierà la porta esterna in Y. Il Peer tenterà inutilmente di rispondere alla porta X, rendendo impossibile la comunicazione diretta senza passare per server intermedi.
+
+== Criticità del NAT
+Di seguito le principali criticità introdotte dal NAT:
+
+=== Incompatibilità con Protocolli senza Porte
+Il NAPT si basa sull'esistenza delle porte per effettuare il multiplexing. Protocolli di livello superiore che non utilizzano porte, come l'ICMP o l'SCTP (Stream Control Transmission Protocol), vengono rotti dal NAT, a meno che il router non venga specificamente programmato per decodificarne le strutture, violando l'information hiding.
+
+=== Distruzione della Sicurezza (IPsec e VPN)
+Il NAT e la crittografia di livello di rete spesso si escludono a vicenda.
+Se si utilizza il protocollo IPsec in modalità AH (Authentication Header), la firma crittografica include l'indirizzo IP e le porte originali. Quando il NAT modifica questi campi, il destinatario rileva una firma non valida e scarta il pacchetto.
+
+Per aggirare il problema, le VPN incapsulano il traffico IPsec all'interno di payload UDP (NAT Traversal). Questo non solo introduce un overhead (es. 28 byte aggiuntivi), ma porta a conflitti nel Controllo di Congestione. Annidando un protocollo TCP all'interno di un altro tunnel TCP/UDP, in caso di perdita di pacchetti i due algoritmi di multiplicative decrease si attivano simultaneamente, facendo crollare drammaticamente la larghezza di banda e causando oscillazioni incontrollabili.
+
+=== Il Problema del Referral Handover e STUN
+In applicazioni Peer-to-Peer, VoIP (es. protocollo SIP/VoLTE) e gaming, un host contatta un server di segnalazione dichiarando il proprio indirizzo IP e porta per farsi chiamare da un altro peer (*Referral Handover*). Sotto NAT, l'indirizzo privato dell'host è inutile per l'esterno. Il protocollo *STUN* (Simple Traversal of UDP Through NATs, RFC 3489) fu creato per permettere alle applicazioni di scoprire il proprio indirizzo pubblico e il tipo di NAT.
+#observation()[Lo STUN è oggi considerato deprecato e inaffidabile. Questo perché i NAT sono non-deterministici (possono cambiare mappatura a seconda del carico o della destinazione) e perché nel percorso di rete si trovano frequentemente NAT in cascata, rendendo impossibile ottenere una risposta utile.]
+
+=== Carrier-Grade NAT (NAT in Cascata) e Port Multiplexing
+Gli ISP moderni, avendo esaurito anche loro gli IP pubblici, applicano spesso un secondo livello di NAT all'interno della loro infrastruttura (CGNAT). Ciò crea scenari paradossali in cui un utente esce con un IP pubblico per raggiungere una destinazione (es. Tokyo) e con un altro IP pubblico per un'altra destinazione (es. Los Angeles). Inoltre, le tecniche dei router per gestire l'esaurimento delle porte generano comportamenti anomali:
+- *Port Preservation*: il NAT cerca di non cambiare il numero di porta interno. Se due host interni richiedono la stessa porta, il primo vince e al secondo viene cambiata. Se il secondo insiste, il router potrebbe far scadere il binding del primo, causando malfunzionamenti casuali.
+- *Port Multiplexing*: Il NAT cerca di far uscire più host interni usando la stessa porta esterna, discriminando in base alla destinazione. Funziona a basso carico, ma genera fallimenti ("mutando forma") in condizioni di alto traffico.
+
+=== Sicurezza e UPnP (Universal Plug and Play)
+Il protocollo IGD (Internet Gateway Device) via UPnP permette ai dispositivi interni (es. console, NAS) di chiedere al NAT di aprire automaticamente delle porte in ingresso per abilitare connessioni entranti. Questo meccanismo agisce all'insaputa dell'utente e del firewall, creando gravissimi buchi di sicurezza (Security Issues), lasciando porte permanenti aperte e causando conflitti se due dispositivi interni richiedono la stessa porta.
 #pagebreak()
 
 = IPv6
@@ -775,12 +837,27 @@ A livello distribuito, il RIP implementa l'algoritmo di Bellman-Ford. Pur consen
 La sopravvivenza del RIP a scapito di algoritmi più efficienti (come Dijkstra) risiede nei costi computazionali: l'impronta in memoria è quasi nulla (ogni nodo manipola unicamente le metriche relative senza allocare l'intera topologia) e l'aumento della cardinalità dei nodi non satura proporzionalmente i cicli di CPU, garantendo un'altissima scalabilità in termini di risorse hardware.
 
 === Count to Infinity e Split Horizon
-La vulnerabilità principale degli algoritmi Distance-Vector distribuiti è il fenomeno del *Count to Infinity*. Se un collegamento cessa di funzionare, i router adiacenti, condividendosi tabelle obsolete non ancora sincronizzate con il guasto, innescano un *loop* di instradamento in cui i costi vengono reciprocamente incrementati all'infinito per una destinazione irraggiungibile.
 
-Il protocollo risolve tale problematica attraverso diverse implementazioni algoritmiche:
-+ *Definizione dell'Infinito*: La metrica è limitata superiormente a 16 (rappresentabile a livello di bit come lo 0 matematico in logica binaria a 4 bit). Il raggiungimento di tale limite sancisce l'immediata irraggiungibilità della rete, interrompendo il ciclo iterativo.
-+ *Split Horizon*: Regola tassativa per cui un router cessa di annunciare l'esistenza di una determinata rotta sull'interfaccia di rete da cui la rotta stessa è stata appresa.
-+ *Split Horizon with Poison Reverse*: Ottimizzazione aggressiva del punto precedente, mediante la quale il router annuncia attivamente la rotta sull'interfaccia da cui l'ha appresa associandole artificialmente una metrica infinita (16), così da invalidarla per i nodi vicini.
+La vulnerabilità principale degli algoritmi di routing *Distance-Vector* (basati sui vettori di distanza) è il noto problema del *Count to Infinity* (conteggio all'infinito). Quando un collegamento fisico cessa di funzionare, i router adiacenti potrebbero condividere tabelle di instradamento ormai obsolete prima che l'informazione sul guasto si sia propagata uniformemente. Questo ritardo di sincronizzazione innesca un loop di instradamento in cui i router continuano ad aggiornarsi a vicenda, incrementando artificialmente e all'infinito il costo per raggiungere una destinazione che, di fatto, è diventata irraggiungibile.
+
+#example("Il problema del Count to Infinity")[
+  #figure(image("images/2026-07-12-23-17-01.png"))
+  Consideriamo una topologia in cui l'algoritmo di Bellman-Ford ha raggiunto la convergenza. In questa fase di stabilità, ogni router possiede le voci di instradamento corrette: il router B sa di poter raggiungere la rete C con un costo pari a 1, mentre il router A sa di poter raggiungere C passando per B con un costo totale pari a 2.
+
+  #figure(image("images/2026-07-12-23-17-10.png"))
+  Se il collegamento tra B e C si interrompe, B rileva il guasto e deduce di non poter più raggiungere C tramite quel link, rimuovendo la rotta dalla propria tabella. Tuttavia, prima che B riesca a inviare un aggiornamento per notificare il guasto, potrebbe ricevere un normale aggiornamento periodico da A. In questo messaggio, A continua ad annunciare (erroneamente) di poter raggiungere C con un costo di 2.
+  Poiché B sa di poter raggiungere A con un costo di 1, accetta questa rotta ingannevole credendo che A disponga di un percorso alternativo. B aggiorna così la sua tabella, impostando una rotta verso C via A con un costo pari a 3 (1 + 2). Al ciclo successivo, A riceverà la nuova tabella di B (costo 3) e aggiornerà a sua volta il proprio costo a 4 (1 + 3). I due router continueranno a scambiarsi queste informazioni errate, incrementando la metrica verso l'infinito.
+]
+
+Per mitigare e risolvere questa problematica strutturale, i protocolli (come il RIP) implementano specifici accorgimenti algoritmici:
+
++ *Definizione dell'Infinito*: per impedire che il conteggio prosegua illimitatamente, la metrica massima viene limitata superiormente a un valore prefissato, tipicamente 16 (rappresentabile a livello di bit come lo 0 matematico in una logica binaria a 4 bit). Il raggiungimento di tale soglia sancisce l'immediata irraggiungibilità della rete (*unreachable*), spezzando così il ciclo iterativo.
+
++ *Split Horizon*: è una regola tassativa di prevenzione dei loop. Stabilisce che un router non deve mai annunciare l'esistenza di una determinata rotta sull'interfaccia di rete dalla quale quella stessa rotta è stata originariamente appresa (es. se A ha imparato da B come arrivare a C, A non dirà mai a B che sa come arrivare a C).
+  #figure(image("images/2026-07-12-23-18-01.png"))
+
++ *Route Poisoning (e Poison Reverse)*: si tratta di un'ottimizzazione aggressiva dello Split Horizon. Anziché omettere in silenzio la rotta, il router annuncia attivamente la rotta compromessa sull'interfaccia da cui l'ha appresa, ma le associa forzatamente e in modo artificiale una metrica infinita (16). In questo modo, la rotta viene istantaneamente ed esplicitamente invalidata per i nodi adiacenti, accelerando drasticamente il tempo di convergenza in caso di guasto.
+  #figure(image("images/2026-07-12-23-17-54.png"))
 
 == Il Protocollo OSPF (Open Shortest Path First) e Dijkstra
 Contrapposto alla famiglia Distance-Vector, il protocollo OSPF si basa sull'algoritmo di routing Link-State di Dijkstra. Questo garantisce prestazioni teoriche eccellenti in termini di calcolo (la complessità dell'algoritmo è $E + V log V$), ma impone vincoli hardware stringenti: affinché l'albero dei cammini minimi possa essere risolto, ogni router deve prima acquisire e mantenere nella propria memoria l'intera topologia della rete, generata attraverso il costante inoltro incrociato di *Link-State Advertisements* (LSA).
