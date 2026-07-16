@@ -121,7 +121,7 @@ Il modello OSI prevede una rigida separazione: ogni livello dovrebbe leggere sol
 == Stack TCP/IP
 Lo stack TPC/IP è molto più semplice dell'ISO/OSI.
 #figure(image("images/2026-06-18-23-25-56.png", width: 30%))
-- L7 Livello Application: composto dai protocolli applicativi come ftp, smtp, http, etc...
+- L5 Livello Application: composto dai protocolli applicativi come FTP, SMTP, HTTP, etc...
 - L4 Livello Transport: composto dai protocolli per il trasferimento dei dati end-to-end come TCP, UDP, QUICK, etc...
 - L3 Livello Network: composto dai protocolli per il routing sorgente-destinazione come IP, ICMP, ARP, RARP, etc...
 - L2 Livello Data Link: composto dai protocolli per le comunicazioni locali come PPP, ethernet, etc...
@@ -131,7 +131,7 @@ Verranno trattate tre tipologie di indirizzi. Per ciascuna è importante capirne
 
 - *Indirizzi MAC (Livello 2)*: servono per comunicare all'interno di una rete locale (Ethernet, Wi-Fi). Il loro scope termina appena si incontra un router. Devono essere univoci all'interno dello stesso segmento di rete, altrimenti si generano conflitti. Una scheda di rete ha di norma un solo indirizzo MAC, ma a livello software può riceverne e gestirne molti.
 - *Indirizzi numerici (IP, Livello 3)*: necessari per il routing end-to-end, da sorgente a destinazione. Una scheda di rete può avere un numero arbitrario di indirizzi IP: con IPv4 se ne assegna spesso uno solo per un problema di scarsità, ma in IPv6 averne multipli è la norma.
-- *Indirizzi alfanumerici (DNS, Livello 7)*: nomi come `www.unifi.it`. Non servono solo a facilitare la memorizzazione, ma soprattutto a creare un livello di *astrazione*: se un server cambia provider (e quindi indirizzo IP), il DNS permette agli utenti di continuare a raggiungerlo con lo stesso nome. Un dominio può puntare a un numero arbitrario di IP, e uno stesso IP può ospitare un numero arbitrario di domini.
+- *Indirizzi alfanumerici (DNS, Livello 5)*: nomi come `www.unifi.it`. Non servono solo a facilitare la memorizzazione, ma soprattutto a creare un livello di *astrazione*: se un server cambia provider (e quindi indirizzo IP), il DNS permette agli utenti di continuare a raggiungerlo con lo stesso nome. Un dominio può puntare a un numero arbitrario di IP, e uno stesso IP può ospitare un numero arbitrario di domini.
 
 #observation()[
   #figure(image("images/2026-06-18-23-30-30.png"))
@@ -149,7 +149,7 @@ Per capire dove inviare un pacchetto, i sistemi consultano una *Tabella di Routi
 
 #figure(image("images/2026-06-19-10-41-09.png", width: 60%))
 
-Per trovare la rotta corretta, il sistema applica un'operazione logica per verificare se l'IP di destinazione combacia con le reti conosciute: verifica che `DestIP && RTMask == RTDestIP`. Poiché un pacchetto potrebbe teoricamente soddisfare più regole contemporaneamente (ad esempio una rotta generica e una specifica), il sistema applica la regola del *Maximum Matching Entry* (o Longest Prefix Match): tra tutte le rotte compatibili, vince quella con il maggior numero di bit a 1 nella sua maschera di sottorete (Genmask). In parole povere, il pacchetto viene sempre instradato seguendo il percorso in assoluto più specifico che il router conosce.
+Per trovare la rotta corretta, il sistema applica un'operazione logica per verificare se l'IP di destinazione combacia con le reti conosciute: verifica che `DestIP && SubNetMask == RTDestIP`. Poiché un pacchetto potrebbe teoricamente soddisfare più regole contemporaneamente (ad esempio una rotta generica e una specifica), il sistema applica la regola del *Maximum Matching Entry* (o Longest Prefix Match): tra tutte le rotte compatibili, vince quella con il maggior numero di bit a 1 nella sua maschera di sottorete (Genmask). In parole povere, il pacchetto viene sempre instradato seguendo il percorso in assoluto più specifico che il router conosce.
 
 Il problema è che questa ricerca non si può eseguire con una semplice bisezione o con alberi di ricerca standard, perché non si può escludere a priori che più in fondo alla tabella ci sia una regola più specifica: ogni pacchetto costringe quindi il router a scandagliare gran parte della tabella. Come si fa a farlo velocemente nei router di fascia alta? Si usa la *Memoria Ternaria* (TCAM). Mentre la memoria classica ragiona in bit (0 e 1), la memoria ternaria aggiunge un terzo stato: "Non importa" (*Don't Care*). Questo permette all'hardware di confrontare l'indirizzo di destinazione con l'intera tabella di routing in un singolo ciclo di clock. È una tecnologia potentissima ed essenziale per i router di dorsale, ma estremamente costosa: è questo il motivo per cui un router domestico costa poche decine di euro e un router professionale può costarne decine di migliaia.
 #pagebreak()
@@ -375,10 +375,6 @@ Il *Sequence Number* rappresenta la posizione del primo byte dei dati che stanno
 
 L'*Acknowledgment Number* è la controparte esatta del Sequence Number, ed è il meccanismo con cui il TCP garantisce che i dati siano arrivati correttamente a destinazione. Così come il Sequence Number conta i byte inviati, l'Acknowledgment Number serve per indicare al mittente quali byte sono stati ricevuti con successo.
 
-#observation()[
-  Originariamente il TCP usava ACK cumulativi (confermando tutto fino a un certo punto), il che lo rendeva simile a un Go-Back-N. Oggi, nelle reti ad altissima velocità dove il Round Trip Time permette di avere migliaia di pacchetti "in volo", si usano i Selective Acknowledgement (SACK). Attenzione però: le opzioni come SACK devono essere negoziate all'apertura della connessione e allungano l'header TCP, riducendo lo spazio per i dati reali.
-]
-
 == Flag di controllo
 
 I flag TCP servono a gestire lo stato della connessione:
@@ -460,6 +456,11 @@ Ma se i pacchetti si perdono, come vengono gestiti? Il TCP gestisce anche questo
 
 #figure(image("images/2026-06-20-17-56-01.png"))
 
+#observation()[
+  Originariamente il TCP usava ACK cumulativi (confermando tutto fino a un certo punto), il che lo rendeva simile a un Go-Back-N. Oggi, nelle reti ad altissima velocità dove il Round Trip Time permette di avere migliaia di pacchetti "in volo", si usano i *Selective Acknowledgement* (SACK). *Attenzione però: le opzioni come SACK devono essere negoziate all'apertura della connessione e allungano l'header TCP, riducendo lo spazio per i dati reali*.
+]
+
+
 === Controllo del flusso e della congestione
 Non si deve confondere il controllo di congestione nei nodi intermedi con il controllo di flusso al ricevitore. Se si trasmette a una velocità elevata ma il computer ricevente è un dispositivo IoT poco potente, la sua memoria si saturerà. Il controllo di flusso serve proprio a sincronizzare la velocità del trasmettitore con le risorse di chi riceve, per evitare che i pacchetti vengano scartati alla fine del viaggio.
 
@@ -521,17 +522,12 @@ Il NAT, posizionato tipicamente sul router di confine, agisce traducendo gli ind
 + *NAT Dinamico*: associa dinamicamente un IP pubblico, prelevato da un pool predefinito, a un IP privato nel momento in cui questo genera traffico in uscita. L'indirizzo pubblico viene poi rilasciato al termine della sessione di comunicazione. Tale meccanismo opera secondo una logica "first-come, first-served" e presenta forti limitazioni: l'esaurimento temporaneo degli IP nel pool preclude l'accesso a Internet per tutti gli altri dispositivi della rete locale.
   #figure(image("images/2026-06-23-12-13-29.png", width: 70%))
 
-+ *NAPT / PAT *: consente a molteplici dispositivi di una rete privata di accedere a Internet utilizzando un singolo indirizzo IPv4 pubblico (rapporto N:1 tra indirizzi privati e indirizzo pubblico). Il PAT sfrutta i numeri di porta di livello di trasporto per tracciare le diverse sessioni di comunicazione, alterando la porta sorgente durante la traslazione e potendo gestire teoricamente fino a $2^{16}$ (65.536) connessioni simultanee. Il NAPT fa uso di una NAT Translation Table. Un binding, all'interno di quest'ultima, è identificato da `{IP, Proto, Port}(int)`.
++ *NAPT / PAT *: consente a molteplici dispositivi di una rete privata di accedere a Internet utilizzando un singolo indirizzo IPv4 pubblico (rapporto N:1 tra indirizzi privati e indirizzo pubblico). Il PAT sfrutta i numeri di porta di livello di trasporto per tracciare le diverse sessioni di comunicazione, alterando la porta sorgente durante la traslazione e potendo gestire teoricamente fino a $2^{16}$ (65.536) connessioni simultanee. Il NAPT fa uso di una NAT Translation Table. Un binding, all'interno di quest'ultima, è identificato da `{IP, Proto, Port}(interni) <=> {IP, Proto, Port}(esterni)`.
   - Pacchetto in uscita (Interfaccia Interna): quando un host interno invia un datagramma verso l'esterno, il NAT cerca un binding (una regola di traslazione) esistente. Se non esiste, crea un nuovo binding assegnando una nuova porta sorgente, sostituisce l'indirizzo IP privato con quello pubblico del router, ricalcola i checksum e inoltra il pacchetto.
   - Pacchetto in ingresso (Interfaccia Esterna): quando un pacchetto arriva dalla rete pubblica, il NAT consulta la tabella usando l'IP e la porta di destinazione. Se trova un binding, riscrive l'IP e la porta per inoltrarlo all'host locale.
   #observation()[
     Se un pacchetto arriva sull'interfaccia esterna e non esiste un binding corrispondente nella tabella, il NAT non sa a chi inoltrarlo e scarta (drop) il pacchetto.
   ]
-
-
-
-
-
 
 // Questa tecnica introduce però alcune problematiche:
 // - *Violazione dell'astrazione dei livelli*: costringe un apparato di livello 3 (il router) a ispezionare i pacchetti fino al livello 4 (TCP/UDP). L'eventuale adozione di futuri protocolli privi del concetto di "porta" renderebbe il NAPT inefficace, venendo a mancare l'elemento chiave per la traslazione.
@@ -567,7 +563,7 @@ Per il protocollo UDP (*connectionless*), l'assenza di meccanismi espliciti di i
 + *Port Restricted Cone NAT (Endpoint Port Dependent)*\
   #figure(image("images/2026-07-13-13-24-26.png", width: 60%))
 
-  - Funzionamento: è una variazione più rigida della precedente. Il filtro in ingresso valuta sia l'indirizzo IP che la porta. L'host esterno può raggiungere l'host interno solo se l'host locale aveva precedentemente inviato un pacchetto verso quello specifico IP esterno e verso quella specifica porta. Ogni traffico proveniente da porte esterne diverse viene silenziosamente scartato.
+  - Funzionamento: è una variazione della precedente. Il filtro in ingresso valuta  la porta. L'host esterno può raggiungere l'host interno solo se l'host locale aveva precedentemente inviato un pacchetto verso quella specifica porta. Ogni traffico proveniente da porte esterne diverse viene silenziosamente scartato.
 
 + *Symmetric NAT (Endpoint Address and Port Dependent)*\
   #figure(image("images/2026-07-13-13-24-46.png", width: 60%))
@@ -647,7 +643,7 @@ Esistono poi degli *indirizzi speciali*, che non rappresentano una normale desti
 Altre tipologie di indirizzi sono:
 - *Multicast (`ff00::/8`)*: l'IPv6 abbandona completamente il concetto di Broadcast a favore del Multicast, in questo modo è possibile inviare pacchetti a più destinatari simultaneamente. La struttura di un indirizzo Multicast è `1111 1111` (il primo byte, `ff`) seguito da 4 bit di *Flag* e 4 bit di *Scope*: è quest'ultimo campo (il nibble basso del secondo byte) a definire l'ambito di validità, ovvero quanto lontano può arrivare il pacchetto (es. `ff02` per il link-local). Gruppi multicast, identificati dall'ultimo pezzo, notevoli includono l'*All-nodes* (`ff02::1`) e l'*All-routers* (`ff02::2`).
   #observation(multiple: true)[
-    + Perché si usa quasi solo l'`ff02`? Perché fare routing Multicast a livello globale (usando protocolli come il *PIM Sparse Mode*) è un incubo ingegneristico. Il Multicast locale, invece, è comodo, sicuro e non appesantisce i router.
+    + *Attenzione: gli indirizzi di tipo multicast non sono stati introdotti con IPv6, sono presenti anche in IPv4 anche se poco utilizzati.* Possono essere usati, per esempio, per inviare messaggi a tutti i router della rete che fanno uso di uno specifico protocollo di routing.
     + I driver delle schede di rete possono filtrare i pacchetti a livello hardware, evitando di interrompere la CPU per il traffico non di competenza. Questo permette di filtrare efficientemente i pacchetti in base al loro scope. A livello datalink, un indirizzo Multicast IPv6 viene tradotto in un indirizzo MAC che unisce il prefisso fisso `33:33` agli ultimi 32 bit (4 byte) dell'indirizzo Multicast, così che la scheda di rete possa decidere in hardware se il pacchetto la riguarda.
   ]
 
