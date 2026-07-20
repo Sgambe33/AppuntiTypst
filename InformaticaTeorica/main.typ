@@ -1,4 +1,5 @@
 #import "../dvd.typ": *
+#import "@preview/in-dexter:0.7.2": *
 
 #dvdtyp(
   title: "Appunti Informatica Teorica",
@@ -13,4 +14,9 @@
   #include "chapters/chapter1/1-introduzione.typ"
   #include "chapters/chapter2/2-turing.typ"
   #include "chapters/chapter3/3-complessita.typ"
+
+  #pagebreak()
+  #columns(2)[
+    #make-index(title: "Indice Analitico")
+  ]
 ]
