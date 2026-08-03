@@ -159,12 +159,6 @@
 }
 
 #let thmtext(t, color: rgb("#000000")) = {
-  let a = t.children
-  if (a.at(0) == [ ]) {
-    a.remove(0)
-  }
-  t = a.join()
-
   text(font: "New Computer Modern", fill: color)[#t]
 }
 
