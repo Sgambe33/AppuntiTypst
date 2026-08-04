@@ -5,90 +5,79 @@
 
 = Macchine di Turing
 
-// TODO: Fare il disegno del nastro
-La macchina di Turing è un modello di calcolo che serve a descrivere il concetto di algoritmo. Ha le seguenti caratteristiche:
-- È composta da un *nastro unidimensionale* infinito, sia da destra che da sinistra.
+// TODO: metere caption con i credits per l'immagine: https://aturingmachine.com/
+#figure(image("images/turing-machine.png", width: 80%))
+
+Introducendo le funzioni $mu$-ricorsive abbiamo visto una proposta di definizione di algoritmo, che restituisce formalmente l'idea intuitiva di funzione computabile. In questo capitolo vediamo una proposta equivalente del concetto di algoritmo: la *Macchina di Turing* (MdT). Una MdT ha le seguenti caratteristiche:
+
+- è composta da un *nastro unidimensionale* infinito, sia da destra che da sinistra.
 - Il nastro è diviso in *celle* che possono contenere informazioni.
 - Le informazioni che si possono scrivere sul nastro sono *simboli* da un *alfabeto finito $Sigma$* definito inizialmente. Questo alfabeto contiene sempre un *simbolo privilegiato (\*)* che serve per denotare una *cella vuota* ed è normalmente implicito e non scritto tra i simboli dell'alfabeto.
-- C'è una *testina* che si occupa della *lettura/scrittura*, spostandosi a destra e a sinistra, indicando una cella ad ogni spostamento. Ogni spostamento della testina è definito *passo di calcolo* o *transizione*.
+- C'è una *testina* che si occupa della *lettura/scrittura*, spostandosi a destra ($D$) e a sinistra ($S$), indicando una cella ad ogni spostamento. Ogni spostamento della testina è definito *passo di calcolo* o *transizione*.
 - La macchina ha un insieme di stati di memoria _Q_ = {$q_0, q_1, dots, q_n$}. Lo stato $q_0$ è chiamato stato iniziale e in seguito a una *transizione*, la macchina può cambiare stato.
 
-Una transizione è una quadrupla i cui primi due elementi determinano una *configurazione*. Una tipica transizione in *MdT* è la seguente:
+Una transizione è una quadrupla i cui primi due elementi, stato attuale e simbolo letto, determinano una *configurazione*. In particolare, la quadrupla è fatta così:
 $
-  Q times Sigma times (Sigma union {D, S}) times Q in.rev & (overbracket(q\, x, "configurazione"), alpha, accent(q, ~)) \
-  "Con:" & q in Q, x in Sigma, alpha in Sigma union {D, S}, accent(q, ~) in Q \
-  "Funzionale nei primi" & " 2 argomenti"
+   (overbracket(q\, x, "configurazione"), overbracket(alpha, "azione svolta"), overbracket(accent(q, ~), "stato finale")) & in Q times Sigma times (Sigma union {D, S}) times Q
 $
-
+ed è funzionale nei primi 2 argomenti, cioè fissati uno stato e un simbolo ci sono al più 2 simboli azione-stato associabili alla configurazione (la transizione è unica). L'azione svolta $alpha$ può essere una lettura/scrittura di un simbolo o uno spostamento della testina a destra o a sinistra.
 #index[Macchina di Turing]#index[Transizione]#index[Configurazione]
 #definition()[
   Una *macchina di Turing* è un sottoinsieme dell'insieme: $ Q times Sigma times (Sigma union {D, S}) times Q $
-  cioè è una lista di transizioni (cioè una lista di quadruple funzionali nei primi 2 argomenti).
+  cioè è una lista finita di transizioni (ovvero una lista di quadruple funzionali nei primi 2 argomenti).
 ]
 
 #example(multiple: true)[
-  // TODO: AGGIUNGERE DISEGNI ESEMPI DEI NASTRI
+
   1)  #block($ quad space &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a ")q_1\
   &q_0 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e cambia lo stato a ")q_1\ $)
+Questa è una macchina "inutile", nel senso che fa un passo e termina subito perchè non ci sono transizioni definite per lo stato $q_1$.\
 
-  2) #block($ quad space &q_0 && * && D space && q_0 text(": Se la cella corrente è vuota, la testina si sposta a destra e non cambia stato")\
+  2)#image("images/example2TM.png",width: 65%)
+  #block($ quad space &q_0 && * && D space && q_0 text(": Se la cella corrente è vuota, la testina si sposta a destra e non cambia stato")\
   &q_0 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e cambia lo stato a ")q_1\
-  &q_1 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e non cambia")\ & && && && quad quad text("stato")\ $)
+  &q_1 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e non cambia stato") $)
+Quando la macchina è in $q_1$ non ha una transizione che descrive cosa fare incontrando una cella vuota quindi la macchina termina nel momento in cui finisce di scandire la prima "stringa" (sequenza) di 1 consecutivi.\
 
-  3) #block($ quad space &q_0 && * && 1 space && q_0 text(": Se la cella corrente è vuota, scrivo 1 e non cambia stato")\
+  3)#image("images/example3TM.png",width: 65%)
+  #block($ quad space &q_0 && * && 1 space && q_0 text(": Se la cella corrente è vuota, scrivo 1 e non cambia stato")\
   &q_0 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e cambia lo stato a ")q_1\
   &q_1 && * && 1 && q_1 text(": Se la cella corrente è vuota, scrivo 1 e non cambia stato")\
   &q_1 && 1 && 1 && q_0 text(": Se la cella corrente è 1, riscrivo 1 e cambio lo stato a ")q_0 $)
+Questa macchina non termina mai e riempie il nastro di simboli 1.
 
-  4) #block($ quad space &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a") q_1\
+  4)#image("images/example4TM.png",width: 65%)
+   #block($ quad space &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a") q_1\
   &q_1 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra non cambia stato ")\
   &q_1 && * && 1 && q_2 text(": Se la cella corrente è vuota, scrivo 1 e cambia lo stato a ")q_2\
   &q_2 && 1 && S && q_2 text(": Se la cella corrente è 1, la testina si sposta a sinistra e non cambia lo stato") $)
+Questa MdT aggiunge un simbolo 1 alla fine della stringa di 1 consecutivi e poi torna all'inizio del nastro. Quindi, se la stringa rappresenta un numero naturale in codifica unaria, questa MdT calcola il suo sucessore.
 ]
 
 #index[MdT che calcola una funzione]
 #definition()[
-  Una Macchina di Turing (MdT) _M_ calcola una funzione $f: Sigma^* -> Sigma^*$ quando, scritta una stringa $w in Sigma^*$ sul nastro e posta la testina di _M_ sulla prima cella vuota a sinistra di _w_, dopo l'esecuzione di _M_ su _w_, la testina si trova nella prima cella vuota a sinistra di $f(w)$.
+  Una Macchina di Turing (MdT) _M_ calcola una funzione $f: Sigma^* -> Sigma^*$ quando, scritta una stringa $w in Sigma^*$ sul nastro e posta la testina di _M_ sulla prima cella vuota a sinistra di _w_, dopo l'esecuzione di _M_ su _w_, la testina si trova nella prima cella vuota a sinistra dell'output $f(w)$.
 ]
 
 #example()[
-  Creiamo una MdT che calcola la somma di due numeri naturali scritti in codifica unaria (con il simbolo $1$). I numeri scelti nell'esempio sono 2 e 3:
-  #figure(image("./images/image-2.png", width: 50%))
-
-  // TODO: rifare l'immagine
-  #block(
-    $
-      quad space &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a ") q_1\
-      &q_1 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra non cambia stato ")\
-      &q_1 && * && 1 && q_2 text(": Se la cella corrente è vuota, scrivo 1 e cambia lo stato a ")q_2\
-      &q_2 && 1 && D && q_2 text(": Se la cella corrente è 1, la testina si sposta a destra e non cambia lo stato")\
-      &q_2 && * && S && q_3 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ")q_3\
-      &q_3 && 1 && * && q_3 text(": Se la cella corrente è 1, scrivo * e non cambia lo stato")\
-      &q_3 && * && S && q_4 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ")q_4\
-      &q_4 && 1 && * && q_4 text(": Se la cella corrente è 1, scrivo * e non cambia lo stato")\
-      &q_4 && * && S && q_5 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ")q_5\n &q_5 && 1 && S && q_5 text(": Finché legge 1, la testina si sposta a sinistra; si ferma sulla cella vuota")\ & && && && quad quad text("a inizio stringa")
-    $,
-  )
+  Creiamo una MdT che calcola la funzione somma tra due numeri naturali rappresentati in codifica unaria (con il simbolo $1$). I numeri scelti in questo esempio sono 3 e 2:
+  #figure(image("images/EsempioMdTSomma.png", width: 60%))
+  #block($ &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a ") q_1 $)
+  #block($ &q_1 && space 1 space && D space && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra non cambia stato ") $)
+  #block($ &q_1 && * && 1 space && q_2 text(": Se la cella corrente è vuota, scrivo 1 e cambia lo stato a ") q_2 $)
+  #block($ &q_2 && space 1 space && D space && q_2 text(": Se la cella corrente è 1, la testina si sposta a destra e non cambia lo stato") $)
+  #block($ &q_2 && * && S space && q_3 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ") q_3 $)
+  #block($ &q_3 && space 1 && * space && q_3 text(": Se la cella corrente è 1, scrivo * e non cambia lo stato") $)
+  #block($ &q_3 && * && S space && q_4 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ") q_4 $)
+  #block($ &q_4 && space 1 && * space && q_4 text(": Se la cella corrente è 1, scrivo * e non cambia lo stato") $)
+  #block($ &q_4 && * && S space && q_5 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ") q_5 $)
+  #block($ &q_5 && space 1 space && S space && q_5 text(": Finché legge 1, la testina si sposta a sinistra; si ferma sulla cella vuota")\ & && && && quad quad text("a inizio stringa") $)
 ]
-
-// TODO: Rifare
 - Caso di #underline("una singola stringa in input:")
 #image("./images/image.png")
 - Caso di #underline("input composto da più stringhe:")
 #image("./images/image-1.png")
-
-#index[Funzione τ-ricorsiva]
-#definition()[
-  Una funzione $f: NN^k -> NN$ si dice *$tau$-ricorsiva* quando $exists M$ MdT che calcola $f$
-]
-
-== Tesi di Church (per le funzioni $tau$-ricorsive)
-#index[Tesi di Church]
-La classe delle funzioni computabili coincide con la classe delle funzioni $tau$-ricorsive.
-
-// TODO:AGGIUNGERE IMMAGINI
-#example(multiple: true)[
-  + MDT che, data una stringa su {a, b}, scambia le 'a' con le 'b'. Rappresentazione grafica di una MDT: \
+Per maggiore chiarezza, rappresenteremo graficamente le MdT in questo modo (simile a quanto visto per gli automi a stati finiti in altri corsi): \
     #figure(diagram(
       node-stroke: 0.9pt,
       cell-size: 5mm,
@@ -96,22 +85,36 @@ La classe delle funzioni computabili coincide con la classe delle funzioni $tau$
 
       node((0, 0), $q$, name: <qs>),
       node((3, 0), $accent(q, ~)$, name: <qf>),
-      node((-1, 0), [*$q x alpha accent(q, ~)$*], stroke: 0pt),
+      node((-1, 0), [la transizione *$q x alpha accent(q, ~)$* è:], stroke: 0pt),
 
-      edge(<qs>, <qf>, "-|>", $x \/ alpha$),
-
+      edge(<qs>, <qf>, "-|>", $x \/ alpha$),))
+#pagebreak()
+== Tesi di Church (per le funzioni $tau$-ricorsive)
+#index[Funzione $tau$-ricorsiva]
+#definition()[
+  Una funzione $f: NN^k -> NN$ si dice *$tau$-ricorsiva* quando $exists M$ MdT che calcola $f$
+]
+#index[Tesi di Church]
+#proposition[La classe delle funzioni computabili coincide con la classe delle funzioni $tau$-ricorsive.]
+Vale quindi la stessa tesi vista per le funzioni $mu$-ricorsive, in questo senso sono proposte equivalenti.
+#example(multiple: true)[
+  + MdT che, data una stringa su {a, b}, scambia le 'a' con le 'b' (e poi riporta la testina all'inizio): \
+    #figure(image("images/esempioMdTScambiaLettere.png", width: 70%))
+    #figure(diagram(
+      node-stroke: 0.9pt,
+      cell-size: 5mm,
+      spacing: 3mm,
       node((0, 2), $q_0$, name: <0>),
       node((3, 2), $q_1$, name: <1>),
       node((6, 2), $q_2$, name: <2>),
-
-      edge(<0>, <1>, "-|>", $* \/ D$),
+      edge(<0>, <1>, "-|>", $* \/ D$, bend: 30deg),
       edge(<1>, <2>, "-|>", $b \/ a \ a \/ b$, bend: 30deg),
       edge(<2>, <1>, "-|>", $a, b \/ D$, bend: 30deg),
+      edge(<1>, <0>, "-|>", $* \/ S$, bend: 30deg),
+      edge(<0>, <0>, "-|>", $a,b \/ S$, bend: 130deg),
     ))
-  + MDT che scrive la copia di una stringa unaria. Simbolo aggiuntivo (di lavoro): X
-    // FIXME: con queste transizioni la macchina produce la copia ma lascia la stringa
-    // originale marcata con X (nastro finale: *XX*11*). Manca una fase finale che
-    // ripristini le X in 1 prima di fermarsi.
+  + MdT che scrive la copia di una stringa unaria. Introduciamo un simbolo aggiuntivo "di lavoro" X per semplificare la strategia. Questo non fa parte dell'alfabeto e alla fine il nastro non dovrà contenere X.
+  #figure(image("images/esempioMdTCopiaStringa.jpeg", width: 100%))
     #figure(diagram(
       node-stroke: 0.9pt,
       cell-size: 5mm,
@@ -133,13 +136,16 @@ La classe delle funzioni computabili coincide con la classe delle funzioni $tau$
       edge(<4>, <4>, "-|>", $1, * \/ S$, bend: 130deg, loop-angle: 180deg),
       edge(<4>, <1>, "-|>", $X \/ D$),
       edge(<1>, <5>, "-|>", $* \/ S$),
+      edge(<5>, <5>, "-|>", $1 \/ S \ X \/ 1$, bend: 130deg, loop-angle: 0deg),
     ))
 ]
+#pagebreak()
+== MdT come accettatori di linguaggi
+Dato un alfabeto $Sigma$ e un linguaggio $L subset.eq Sigma^*$, ci chiediamo se una stringa $w in Sigma^*$ appartiene a $L$. Per rispondere a questa domanda possiamo costruire una MdT $M$ che, data in input la stringa $w$, determina se $w in L$. In tal caso, si dice che $M$ *accetta* la stringa $w$. In generale, $M$ accetta il linguaggio $L$ se quest'ultimo è l'insieme di tutte e sole le stringhe che $M$ è in grado di accettare, ovvero $L = L(M)$ ("$L$ è il linguaggio accettato dalla MdT $M$"). Vediamo due modi in cui una MdT può accettare un linguaggio: per stati finali o per arresto.
 
-== MDT come accettatori di linguaggi
 === Accettazione per stati finali
 Accettazione di una stringa per stati finali:
-- $Q$: insieme degli stati di una MDT
+- $Q$: insieme degli stati di una MdT
 - $F subset.eq Q$: insieme degli stati finali
 
 #index[Accettazione per stati finali]
@@ -147,28 +153,29 @@ Accettazione di una stringa per stati finali:
   _M_ accetta la stringa  _w_ *per stati finali* quando l'esecuzione di _M_ su input _w_ termina in uno stato finale.
 ]
 #definition()[
-  $L subset.eq Sigma^*$ si dice *accettato per stati finali* da una MDT _M_ quando $w in L$ sse _M_ accetta _w_ per stati finali $--> L = L(M)$
+  $L subset.eq Sigma^*$ si dice *accettato per stati finali* da una MdT _M_ quando $w in L$ sse _M_ accetta _w_ per stati finali (quindi si ha $L = L(M)$)
 ]
 #index[Linguaggio ricorsivamente enumerabile]
 #definition()[
-  Se _L_ è t.c. $exists M$ MDT per cui $L = L(M)$ (_L_ è il linguaggio delle M), _L_ si dice *ricorsivamente enumerabile*
+  Se _L_ è t.c. $exists M$ MdT per cui $L = L(M)$, _L_ si dice *ricorsivamente enumerabile*
 ]
-
 #index[Linguaggio ricorsivo]
+#definition()[
+    Se _M_ è una MDT che termina su ogni input, allora $L(M)$ si dice *ricorsivo*
+]
 #observation()[
-  Se _M_ è una MDT che termina su ogni input, allora $L(M)$ si dice *ricorsivo*
-
   #block(
     $
       #underline("Via tesi di church"): & bold("ric. enum." <--> "semidecidibile") \
                                         & bold("ricorsivo" <--> "decidibile")
     $,
   )
+    Cioè, grazie alla tesi di Church abbiamo un'equivalenza tra i concetti intuitivi (che parlano genericamente di "algoritmi") di decidibile/semidecidbile e i concetti formali di ricorsività delle MdT: dire che un linguaggio è ricorsivo è equivalente a dire che è decidibile (esiste un algoritmo che risolve il problema in tempo finito per ogni input). Inoltre, dire che un linguaggio è ricorsivamente enumerabile è equivalente a dire che è semidecidibile (esiste un algoritmo che risolve il problema in tempo finito per ogni input appartenente al linguaggio, mentre per gli input non appartenenti al linguaggio l'algoritmo può non terminare mai).
 ]
 
-
 #example(multiple: true)[
-  + MDT che accetta il linguaggio $(a|b)^* a a(a|b)^*$
+  + MdT che accetta il linguaggio $(a|b)^* a a(a|b)^*$ (deve essere rilevata una (sotto)stringa "aa"):
+  \
     $
       #grid(
         columns: 14,
@@ -222,7 +229,6 @@ Accettazione di una stringa per stati finali:
         & F = {q_3} $),
       )
     $
-  //#image("/assets/image.png")
   + MdT che accetta il linguaggio ${a^i b^i c^i | i >= 0} subset.eq {a, b, c}^*$
     #grid(
       rows: 3,
@@ -276,7 +282,6 @@ Accettazione di una stringa per stati finali:
         edge(<7>, <7>, "-|>", $y, z\/D$, bend: 130deg, loop-angle: 180deg),
         edge(<7>, <8>, "-|>", $*\/*$),
       )),
-      // TODO: chiedere a Lorenzi se è errore o altro
     )
     L'importante è che ad ogni errore corrisponda uno stato, non che ogni stato preveda errori $->$ la macchina è costruita per andare avanti soltanto se tutto funziona
 ]
@@ -284,26 +289,25 @@ Accettazione di una stringa per stati finali:
 === Accettazione per arresto
 #index[Accettazione per arresto]
 #definition()[
-  Una MdT M accetta per arresto quando M, eseguita su _w_, termina.
+  Una MdT $M$ accetta per arresto quando $M$, eseguita su _w_, termina.
 ]
-L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato da M per arresto
+L'insieme delle stringhe accettate da $M$ per arresto è il *linguaggio* accettato da $M$ per arresto
 
 #proposition()[
-  Dato un linguaggio L:
+  Dato un linguaggio $L$:
   #grid(
     columns: (0.15fr, 100pt, 40pt, 100pt, 0.15fr),
     align: (right, right, center + horizon, left, left),
-    [], [$exists$ MdT M che accetta L per stati finali], [$<==>$], [$exists$ MdT M che accetta L per arresto], [],
+    [], [$exists$ MdT $M$ che accetta $L$ per stati finali], [$<==>$], [$exists$ MdT $M$ che accetta $L$ per arresto], [],
   )
 ]
 
 #proof()[
-  \ $<==)$ Sia N MdT che accetta L per arresto. La MdT ottenuta da N, designando ogni stato come finale, è una MdT che accetta L per stati finali.
-  \ $==>)$ M MdT che accetta L per stati finali. Su input _w_ ci sono 3 casi:
+  \ $<==)$ Sia $N$ MdT che accetta $L$ per arresto. La MdT ottenuta da $N$, designando ogni stato come finale, è una MdT che accetta $L$ per stati finali.
+  \ $==>)$ M MdT che accetta $L$ per stati finali. Su input _w_ ci sono 3 casi:
   - M termina su uno stato finale (OK, anche per arresto)
   - M non termina (OK, non accettata in entrambi i modi)
-  - M termina ma in uno stato non finale: costruiamo una MdT N in questo modo. N ha le stesse transizioni di M più le seguenti:
-    + $forall q in Q \\ F, forall x in Sigma t.c.$ non ci sono transizioni di M con $underbrace("configurazione", "coppia(stato, simbolo)")$ $q x$, aggiungiamo le transizioni $q x x accent(q, ~)$, $accent(q, ~) x x accent(q, ~)$ (dove $accent(q, ~)$ è un nuovo stato).
+  - M termina ma in uno stato non finale: costruiamo una MdT $N$ in questo modo. $N$ ha le stesse transizioni di $M$ più le seguenti: $forall q in Q \\ F, forall x in Sigma $ t.c. non ci sono transizioni di $M$ con configurazione $q x$, aggiungiamo le transizioni $q x x accent(q, ~)$, $accent(q, ~) x x accent(q, ~)$ (dove $accent(q, ~)$ è un nuovo stato).
 
   #figure(diagram(
     node-stroke: 0.9pt,
@@ -317,36 +321,23 @@ L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato
     edge(<0>, <1>, "-|>", $x\/x$),
     edge(<1>, <1>, "-|>", $x\/x$, bend: 130deg, loop-angle: 0deg),
   ))
+  Praticamente, quando $M$ termina in uno stato non finale, entra in un nuovo stato $accent(q, ~)$ in cui va in loop (non termina). Quindi $N$ termina solo se $M$ termina in uno stato finale.
 ]
 
-#example(multiple: true, "Esercizi esame")[
-  + L è accettato per *unico stato finale* quando $exists M$ MdT con un solo stato finale che accetta L. Dimostrare L accettato per stati finali *sse* L è accettato per unico stato finale.
-    \ Risposta:
+#example(multiple: true, "Esercizi d'esame")[
++ $L$ è accettato per *unico stato finale* quando $exists M$ MdT con un solo stato finale che accetta $L$. Dimostrare $L$ accettato per stati finali se e solo se $L$ è accettato per unico stato finale. *Dimostrazione*:
     \ $<==)$ Ovvio,
-    \ $==>)$ M MdT che accetta L per stati finali. Costruiamo N aggiungendo un nuovo stato $accent(q, ~)$ che M raggiungerà ogni volta che termina in uno stato finale (inoltre $accent(q, ~)$ sarà l'unico stato finale di N).
+    \ $==>)$ $M$ MdT che accetta $L$ per stati finali. Costruiamo $N$ aggiungendo un nuovo stato $accent(q, ~)$ che M raggiungerà ogni volta che termina in uno stato finale (inoltre $accent(q, ~)$ sarà l'unico stato finale di $N$) $ space square$
 
-  + M accetta _w_ *per ingresso* quando, durante l'esecuzione di M su un input _w_, la MdT entra in uno stato finale. Un linguaggio L è accettato da M per ingresso quando $exists$ M MdT  che accetta tutte e sole le stringhe di L per ingresso.
-    \ DIM che L è accettato per stati finali sse L è accettato per ingresso.
++ $M$ accetta _w_ *per ingresso* quando, durante l'esecuzione di $M$ su un input _w_, la MdT entra in uno stato finale. Un linguaggio $L$ è accettato da $M$ per ingresso quando $exists M$ MdT  che accetta tutte e sole le stringhe di $L$ per ingresso. Dimostrare che $L$ è accettato per stati finali se e solo se $L$ è accettato per ingresso. *Dimostrazione*:
+  \ $==>$) $M$ MDT che accetta _$L$_ per stati finali.\
+  $M$' che accetta per ingresso si costruisce a partire da $M$, aggiungendo un nuovo stato $tilde(q)$ (che sarà l'unico stato finale) e transizioni che portano in $tilde(q)$ da ogni stato finale in corrispondenza di caratteri per cui non ci sono transizioni uscenti in $M$.
+
+  $<==$) $M$ MDT che accetta _L_ per ingresso.\
+  $M$' MDT che accetta $L$ per stati finali si ottiene da $M$ eliminando tutte le transizioni uscenti dagli stati finali $ space square$
 ]
 
-// Lezione 11/03/26
-#index[Accettazione per ingresso]
-#definition()[
-  Una MdT _M_ accetta _w_ *per ingresso* quando, durante l'esecuzione di _M_ su _w_, la macchina entra in uno stato finale. Un linguaggio _L_ è accettato da _M_ per ingresso quando _M_ accetta per ingresso tutte e sole le stringhe di _L_.
-]
-
-#proposition()[
-  _L_ è accettato per stati finali $<==>$ _L_ è accettato per ingresso
-]
-#proof()[
-  \ $==>$ M MDT che accetta _L_ per stati finali.\
-  M'  che accetta per ingresso si costruisce a partire da M, aggiungendo un nuovo stato $tilde(q)$ (che sarà l'unico stato finale) e transizioni che portano in $tilde(q)$ da ogni stato finale in corrispondenza a caratteri per cui non ci sono transizioni uscenti in M.
-
-  $<==$ M MDT che accetta _L_ per ingresso.\
-  M' MDT che accetta L per stati finali si ottiene da M eliminando tutte le transizioni uscenti dagli stati finali.
-]
-
-== MDT multitraccia
+== MdT multitraccia
 
 #index[MdT multitraccia]
 #definition()[
@@ -356,76 +347,77 @@ L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato
 
   Possiamo definirla come una lista di transizioni della forma (con k = numero tracce):
   $
-    underbrace(q, Q), underbrace((x_1, dots, x_k), Sigma^k), underbrace(alpha, (Sigma^k union {D, S})), underbrace(accent(q, ~), Q)
+    (q, (x_1, dots, x_k), alpha, accent(q, ~)) in Q times Sigma^k times (Sigma^k union {D, S}) times Q
   $
 ]
-
+#figure(image("images/MdTmultitraccia.png", width: 60%))
+C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
 #proposition()[
   Fissato un $k in NN$, un linguaggio $L$ è accettato da una MdT a $k$ tracce $<==>$ $L$ è accettato da una MdT standard (a una sola traccia)
 ]
 #proof()[
-  \ $<==)$ Ovvio. Posso simulare una MdT con una traccia usando una MdT a $k$ tracce in cui ignoro (cioè lascio vuoto) il contenuto di tutte le tracce tranne la prima).
-  \ $==>)$ M MdT a k-tracce che accetta L, posso ottenere una MdT M' che accetta L a una traccia semplicemente sostituendo l'alfabeto $Sigma$ di M con $Sigma^k$, eseguendo  le medesime transizioni (Se in M si legge, dal basso verso l'alto, a, b, a, \*, a in 5 celle diverse, in M' si leggerà la quintupla (a, b, a, \*, a) in una sola cella).
+  \ $<==)$ Ovvio. Posso simulare una MdT con una traccia usando una MdT a $k$ tracce in cui ignoro (cioè lascio vuoto) il contenuto di tutte le tracce tranne la prima.
+  \ $==>)$ $M$ MdT a $k$ tracce che accetta $L$, posso ottenere una MdT $M'$ che accetta $L$ a una traccia semplicemente sostituendo l'alfabeto $Sigma$ di $M$ con $Sigma^k$, eseguendo  le medesime transizioni (se in $M$ si legge, dal basso verso l'alto, a, b, a, \*, a in $k=5$ celle diverse, in $M'$ si leggerà la quintupla (a, b, a, \*, a) in una sola cella).
 ]
 
-== MDT limitata a sinistra
+== MdT limitata a sinistra
 
 #index[MdT limitata a sinistra]
 #definition()[
-  MdT *limitata a sinistra*
+  Questa è una MdT *limitata a sinistra* (il nastro è infinito solo verso destra):
   #figure(image("images/2026-03-11-12-08-24.png"))
   possiamo usare MdT limitate a sinistra per accettare stringhe nello stesso modo di quelle classiche, con l'accortezza che un'operazione di spostamento a sinistra a partire dalla prima cella causa il rifiuto della stringa. *Da ora in poi, quando si parla di MdT standard si fa riferimento a questo tipo di MdT.*
 ]
 
 #proposition()[
-  Un linguaggio $L$ è accettato da una _MdT_ classica $<==>$ $L$ è accettato da una _MdT_ con nastro limitato a sinistra.
+  Un linguaggio $L$ è accettato da una MdT classica $<==>$ $L$ è accettato da una MdT limitata a sinistra.
 ]
 #proof()[
-  $<==)$ Sia $M'$ una _MdT_ con nastro limitato a sinistra. Per simulare una computazione di $M'$ usando una _MdT_ classica $M$, possiamo scrivere sul nastro un particolare simbolo, per esempio \#, che indichi che tale cella è quella iniziale. Quando una computazione di questa _MdT_ cerca di portare la testina a sinistra di tale simbolo, facciamo in modo che un'altra computazione faccia terminare la _MdT_ rifiutando la stringa.
+  $<==)$ Sia $M'$ una MdT con nastro limitato a sinistra che accetta $L$. Per simulare una computazione di $M'$ usando una MdT classica $M$, possiamo scrivere sul nastro un particolare simbolo, per esempio \#, che indichi che tale cella è quella iniziale. Quando una computazione di questa MdT cerca di portare la testina a sinistra di tale simbolo, facciamo in modo che un'altra computazione faccia terminare la MdT rifiutando la stringa.
   #figure(image("images/2026-03-11-12-09-22.png"))
 
-  $==>)$ Sia $M$ una _MdT_ classica. Consideriamo una _MdT_ $M'$ con nastro limitato a sinistra che abbia due tracce. Per simulare una computazione di $M$ su $M'$, si considera il nastro di $M$ (che è infinito sia a destra che a sinistra) e si assegna alla prima cella vuota a sinistra della stringa in input la posizione 0. A sinistra di tale  posizione avremo una numerazione  negativa delle celle, mentre alla sua destra  le celle avranno una numerazione  crescente positiva.
+  $==>)$ Sia $M$ una MdT classica che accetta $L$. Consideriamo una MdT $M'$ con nastro limitato a sinistra che abbia due tracce. Per simulare una computazione di $M$ su $M'$, si considera il nastro di $M$ (che è infinito sia a destra che a sinistra) e si assegna alla prima cella vuota a sinistra della stringa in input la posizione 0. A sinistra di tale  posizione avremo una numerazione  negativa delle celle, mentre alla sua destra  le celle avranno una numerazione  crescente positiva.
   #figure(image("images/2026-03-11-12-11-42.png"))
 
-  Possiamo sistemare il contenuto a destra della posizione 0 nella prima traccia della _MdT_ $M'$, mentre nella seconda traccia ci sarà l'eventuale contenuto delle celle a sinistra della posizione 0.
+  Possiamo sistemare il contenuto a destra della posizione 0 nella prima traccia della MdT $M'$, mentre nella seconda traccia ci sarà l'eventuale contenuto delle celle a sinistra della posizione 0.
   #figure(image("images/2026-03-11-12-12-01.png"))
 
-  In questo modo, a una transizione di $M$ che fa spostare la testina a sinistra della posizione 0 corrisponde una transizione di $M'$ che fa spostare la testina sulla seconda traccia. Spostamenti verso sinistra sono quindi convertiti in spostamenti verso destra e viceversa.
+  In questo modo, a una transizione di $M$ che fa spostare la testina a sinistra della posizione 0 corrisponde una transizione di $M'$ che fa spostare la testina sulla seconda traccia. Essendo le MdT multitraccia accettate da MdT standard e viceversa, vale che $L$ è accettato da questa MdT limitata a sinistra.
 ]
 
 == MDT multinastro
 
 #index[MdT multinastro]
 #definition()[
-  Una Macchina di Turing multinastro è una _MdT_ che opera su più nastri di lettura/scrittura indipendenti tra di loro, con una testina per ogni nastro.
+  Una Macchina di Turing multinastro è una MdT che opera su più nastri di lettura/scrittura indipendenti tra di loro, con una testina per ogni nastro.
   #figure(image("images/2026-03-11-12-29-21.png"))
 
-  La tipica transizione di una _MdT_ multinastro è:
+  La tipica transizione di una MdT multinastro è:
   $
     q_i (x_1, … , x_k) (alpha_1, … , alpha_k) q_j --> cases("con" alpha_i in Sigma "operazione di scrittura, oppure", alpha_i in {D,S} "operazione di spostamento")
   $
-  E quindi $Q times Sigma^k times (Sigma union {D,S})^k times Q$
+  E quindi le transizioni appartengono all'insieme $Q times Sigma^k times (Sigma union {D,S})^k times Q$
 ]
 
 #proposition()[
-  Un linguaggio $L$ è accettato da una _MdT_ standard $<==>$ $L$ è accettato da una _MdT_ multinastro con $k$ nastri.
+  Un linguaggio $L$ è accettato da una MdT standard $<==>$ $L$ è accettato da una MdT multinastro con $k$ nastri.
 ]
 #proof()[
 
   $==>)$ Ovvio, basta ignorare i nastri in eccesso.
 
-  $<==)$ M MdT a $k$ nastri che accetta L, facciamo vedere che esiste una MdT M' a $2k+1$ tracce che accetta L. Più precisamente facciamo vedere che ogni singola transizione di una computazione di M può essere simulata da un gruppetto di transizioni di M'.
+  $<==)$ M MdT a $k$ nastri che accetta $L$, facciamo vedere che esiste una MdT $M'$ a $2k+1$ tracce che accetta $L$. Più precisamente facciamo vedere che ogni singola transizione di una computazione di $M$ può essere simulata da un gruppetto di transizioni di $M'$.
 
-  Poniamo $k=2$. Vogliamo cercare di simulare una singola transizione della _MdT_ $M$ a 2 nastri con un gruppetto di transizioni di una _MdT_ $M'$ a 5 tracce (perché $5 = 2k + 1$ con $k = 2$).
+  Poniamo $k=2$. Vogliamo cercare di simulare una singola transizione della MdT $M$ a 2 nastri con un gruppetto di transizioni di una MdT $M'$ a 5 tracce (perché $5 = 2k + 1$ con $k = 2$).
   #figure(image("images/2026-03-11-12-41-50.png"))
 
   - Le tracce 1 e 3 rappresentano il contenuto dei nastri 1 e 2 di $M$ rispettivamente;
-  - Le tracce 2 e 4 rappresentano la posizione della testina nei nastri 1 e 2 di $M$, rispettivamente (la cella corrispondente alla posizione della testina contiene un particolare simbolo, per es. x);
+  - Le tracce 2 e 4 rappresentano rispettivamente la posizione della testina nei nastri 1 e 2 di $M$ (la cella corrispondente alla posizione della testina contiene un particolare simbolo, per es. x);
   - La traccia 5 contiene nella prima posizione il solo simbolo \#, che serve per riposizionare la testina a inizio nastro.
 
   I passi con cui $M'$ simula una transizione di $M$ sono i seguenti:
 
-  1. Prima vengono raccolte tutte le informazioni, riguardanti le celle lette sui due nastri (e memorizzate, ad esempio, utilizzando un opportuno insieme di stati)
+  1. Prima vengono raccolte tutte le informazioni, riguardanti le celle lette sui due nastri. Queste informazioni possono essere memorizzate, ad esempio, definendo opportunamente l'insieme degli stati: la macchina, ogni volta che incontra il marcatore della traccia $i$, legge il simbolo corrispondente e lo memorizza cambiando il proprio stato interno.  Tecnicamente, l'insieme degli stati di $M'$ viene quindi esteso a un prodotto cartesiano del tipo $Q times (Sigma union {*})^k$, dove le componenti aggiuntive fungono da buffer temporaneo. Alla fine della scansione, lo stato di $M'$ contiene tutte le informazioni necessarie per decidere la transizione della macchina multinastro originale;
   2. Cerca sulla traccia 2 il simbolo x, che corrisponde alla posizione della testina del nastro 1 di $M$;
   3. Legge sulla traccia 1 il simbolo nella cella la cui posizione è indicata dalla x sulla traccia 2 e compie l'operazione di scrittura, se deve, altrimenti compie l'operazione di spostamento della testina operando sulla traccia 2 e riscrivendo la x in corrispondenza della sua nuova posizione;
   4. Torna all'inizio del nastro sfruttando la traccia 5, ovvero quando legge il simbolo \# si ferma (perché tale simbolo indica l'inizio del nastro);
@@ -450,11 +442,11 @@ L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato
 
   + Se non si verifica nessuna delle condizioni di arresto, i nastri vengono riconfigurati per il confronto con il quadrato perfetto successivo.\
     a) Una $X$ viene aggiunta all'estremità destra della stringa di $X$ sul nastro 2.\
-    b) Due copie della stringa sul nastro 3 vengono aggiunte all'estremità destra della stringa sul nastro 2. Questo costruisce una sequenza di $(k + 1)^2$ simboli $X$ sul nastro 2.\
+    b) Due copie della stringa sul nastro 3 vengono aggiunte all'estremità destra della stringa sul nastro 2. Con i passi a) e b) si è costruita una sequenza di $(k + 1)^2 = k^2 + 2k + 1$ simboli $X$ sul nastro 2, ossia il successivo quadrato perfetto.\
     c) Una $X$ viene aggiunta all'estremità destra della stringa di $X$ sul nastro 3. Questo costruisce una sequenza di $k + 1$ simboli $X$ sul nastro 3.\
     d) Le testine dei nastri vengono quindi riposizionate in posizione uno dei rispettivi nastri.
 
-  + La computazione continua dal passo 2.
+  + La computazione riparte dal passo 2.
 
   Tracciando la computazione per la stringa di input $a a a a a$, il passo 1 produce la configurazione:
 
@@ -466,11 +458,11 @@ L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato
   La parte (c) del passo 3 riformatta i nastri 2 e 3 in modo che la stringa di input possa essere confrontata con il successivo quadrato perfetto.
 
   #figure(image("images/2026-03-11-16-14-40.png", width: 50%))
-  Un'altra iterazione del passo 2 si ferma e rifiuta l'input.
+  Un'altra iterazione del passo 2 si ferma e rifiuta l'input (la stringa di input è più corta del quadrato perfetto sul nastro 2).
 
   #figure(image("images/2026-03-11-16-14-51.png", width: 50%))
-
-  //TODO Rifare il grafico
+  
+  Ecco la rappresentazione grafica dell'MdT multinastro che accetta questo linguaggio:
   #figure(image("images/2026-03-11-16-18-25.png"))
 ]
 
@@ -489,7 +481,7 @@ L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato
 ]
 
 #example()[
-  Dato l'alfabeto $Sigma={a, b, c}$ e un linguaggio _L_ definito su tale alfabeto ($L={w in Sigma^* | exists$ $"un'occorrenza di "c"immediatamente preceduta da "a b" oppure immediatamente"$$"seguita da " a b}$)
+  Dato l'alfabeto $Sigma={a, b, c}$ e un linguaggio _L_ definito su tale alfabeto t.c. $L={w in Sigma^* | exists$ $"un'occorrenza di "c" immediatamente preceduta da "a b" oppure immediatamente"$$"seguita da" a b}$
   #image("/assets/image-1.png")
   Nell'immagine cambiare i passaggi da q3 a q4 in b/b e da q6 a q7 a a/a
 ]
@@ -508,8 +500,7 @@ L'insieme delle stringhe accettate da M per arresto è il *linguaggio* accettato
 ]
 Questo significa che il grado di non determinismo corrisponde al numero massimo di svolte che la macchina M può prendere in un'unica transizione, leggendo lo stesso input.
 
-Applichiamo il tutto all'esempio precedente. \
-Dato $q in Q, x in Sigma$, codifichiamo le transizioni di M MdT non deterministica, aventi _qx_ come primi 2 elementi, utilizzando gli interi da 1 a $delta$, possibilmente codifichiamo la stessa transizione con più etichette:
+Applichiamo il tutto all'esempio precedente. Dato $q in Q, x in Sigma$, codifichiamo le transizioni di M MdT non deterministica, aventi _qx_ come primi 2 elementi, utilizzando gli interi da 1 a $delta$, possibilmente codifichiamo la stessa transizione con più etichette:
 
 #grid(
   columns: (.30fr, 0.20fr, 0.20fr, 0.3fr),
@@ -552,8 +543,8 @@ Di seguito alcuni esempi di possibili computazioni sulla stringa $w = a c a b$:
 #index[Funzione parziale computabile]
 #definition()[
   Una funzione parziale $f: A --> B$ si dice *parziale computabile* quando $exists M$ algoritmo t.c. $forall x in A:$
-  - Se $x in "Dom"(f)$, M eseguito su _x_ restituisce in output $f(x) --> f$ *converge* su _x_, $f(x)arrow.b$
-  - Se $x in.not "Dom"(f)$, M su _x_ non termina $--> f$ *diverge* su _x_, $f(x)arrow.t$
+  - Se $x in "Dom"(f)$, M eseguito su _x_ restituisce in output $f(x) --> f$ *converge* su _x_, in simboli: $f(x)arrow.b$
+  - Se $x in.not "Dom"(f)$, M su _x_ non termina $--> f$ *diverge* su _x_, in simboli: $f(x)arrow.t$
 ]
 
 Lavoriamo su $NN$ in codifica unaria
@@ -566,8 +557,8 @@ Lavoriamo su $NN$ in codifica unaria
 
 === Tesi di Church per funzioni parziali $tau$-ricorsive
 #index[Tesi di Church]
-La classe delle funzioni parziali computabili coincide con la classe delle funzioni parziali $tau$-ricorsive
-
+#proposition[La classe delle funzioni parziali computabili coincide con la classe delle funzioni parziali $tau$-ricorsive]
+Questa è la *forma generalizzata* della tesi di Church, che inizialmente avevamo presentato solo per funzioni totali. Si evidenzia che il modello della MdT è in grado di descrivere il comportamento di qualunque algoritmo, inclusa la sua capacità (o incapacità) di terminare.
 #proposition()[
   $forall M$ MdT standard, $forall k in NN$\
   $exists!$ funzione parziale computabile $f$ t.c. M calcola $f: NN^k --> NN$
@@ -581,7 +572,7 @@ La classe delle funzioni parziali computabili coincide con la classe delle funzi
 
 #index[Codifica delle MdT]#index[Enumerazione delle MdT]
 #proposition()[
-  L'insieme delle MdT è *enumerabile*.
+  L'insieme delle MdT è enumerabile.
 ]
 #proof()[
   La strategia che si utilizza è quella di trovare una codifica binaria per le MdT in questo modo:
@@ -667,7 +658,7 @@ La classe delle funzioni parziali computabili coincide con la classe delle funzi
   - Se $overline(n) in.not K$, allora $f(overline(n)) = 0$ per definizione di $f$; ma $overline(n) in.not K$ significa $f_(overline(n)) (overline(n)) arrow.t$ e, poiché $f = f_(overline(n))$, dovrebbe essere $f(overline(n)) arrow.t$, mentre invece converge a 0: un altro assurdo.
 ]
 
-== Problema dell'arresto
+== Problema dell'arresto (Halting problem)
 #index[Problema dell'arresto]
 #definition("Problema dell'arresto")[
   Data una macchina di Turing M e un numero naturale $n$, determinare se M su input $n$ termina.
@@ -682,7 +673,7 @@ La classe delle funzioni parziali computabili coincide con la classe delle funzi
 
 Una definizione alternativa del problema dell'arresto è:
 #definition()[
-  Data una Macchina di Turing $M$ e una stringa $w$, determinare se $M$ su input $w$ termina.
+  Data una MdT $M$ e una stringa $w$, determinare se $M$ su input $w$ termina.
 ]
 Tale definizione è equivalente perché:
 - Ogni numero naturale si può codificare come stringa di un opportuno alfabeto,
@@ -813,7 +804,7 @@ Questo risultato è dato da:
     ))
 ]
 
-== Problema del nastro vuoto (BTP)
+== Problema del nastro vuoto (Blank Tape Problem)
 #index[Problema del nastro vuoto (BTP)]
 #problem()[
   Data una MdT M, determinare se l'esecuzione di M termina su nastro vuoto.
@@ -876,7 +867,7 @@ Restringiamo la classe dei linguaggi semidecidibili:
 #definition()[
   Indichiamo con $cal(P)$ una qualunque *proprietà di un linguaggio semidecidibile* e con $cal(L)_cal(P)$ l'insieme di linguaggi semidicidibile che soddisfano $cal(P)$, cioè
   $
-    & cal(L)_cal(P)= { L "semidecidibile" | L "soddisfa" cal(P)} "o, equivalentemente" \
+    & cal(L)_cal(P)= { L "semidecidibile" | L "soddisfa" cal(P)} "o, equivalentemente," \
     & cal(L)_cal(P)={R(M) | L(M) "soddisfa" cal(P)}
   $
 
@@ -907,8 +898,7 @@ Restringiamo la classe dei linguaggi semidecidibili:
         $L(N)=emptyset in.not cal(L)_cal(P)$\
         $R(M)w in.not cal(L)_"HALT" => R(N) in.not cal(L)_cal(P)$
 
-  + $cal(P)$ proprietà non banale\
-    Supponiamo che il linguaggio vuoto $emptyset$ soddisfi la proprietà $cal(P)$, allora  $emptyset$ non soddisfa $not cal(P)$ e, per la dimostrazione precedente, $cal(L)_(not cal(P))$ non è decidibile
+  + $cal(P)$ proprietà non banale. Supponiamo che il linguaggio vuoto $emptyset$ soddisfi la proprietà $cal(P)$, allora  $emptyset$ non soddisfa $not cal(P)$ e, per la dimostrazione precedente, $cal(L)_(not cal(P))$ non è decidibile
 
     Per assurdo: $cal(L)_cal(P)$ è decidibile $=> cal(L)_(not cal(P)) union {"stringhe che non codificano MdT"} "decidibile" => cal(L)_(not cal(P)) "decidibile, assurdo"$
 ]

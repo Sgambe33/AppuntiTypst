@@ -893,3 +893,4 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
 #proposition()[
   La classe delle *funzioni computabili* coincide con la classe delle *funzioni $mu$-ricorsive*.
 ]
+#pagebreak()
