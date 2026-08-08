@@ -7,12 +7,12 @@
 //30.03.2026
 = Complessità computazionale
 
-Si suppone adesso di avere dei problemi decidibili, cioè dei problemi per cui abbiamo trovato una soluzione. Quello che ci chiediamo è: quante risorse di tempo e di spazio richiede questa soluzione? Qual è la sua complessità computazionale?
+Conclusa l'analisi sulla calcolabilità, ci concentriamo ora sulla classe dei problemi decidibili, ovvero quei problemi per i quali è garantita l'esistenza di un algoritmo risolutivo che termini in tempo finito per ogni input. Quello che ci chiediamo è: qual è la complessità computazionale di questi problemi? Ovvero, quante risorse in termini di tempo e spazio richiede la sua risoluzione?
 
 == Complessità temporale
 #index[Complessità in tempo]
 #definition()[
-  Data una MdT M standard, la complessità in tempo di M è determinata dalla funzione time complexity $t c_M$. Tale funzione calcola quanto ci mette M a terminare su una stringa w in input ed è definita nel seguente modo:
+  Data una MdT M standard, la complessità in tempo di M è determinata dalla funzione *time complexity* ($t c_M$). Tale funzione calcola quanto ci mette M a terminare su una stringa w in input ed è definita nel seguente modo:
   $
     t c_M : NN -> NN\
     t c_M (n) = "# transizioni eseguite da M su una stringa di lunghezza n nel caso peggiore."
@@ -1964,7 +1964,7 @@ $
   Complessivamente, l'algoritmo descritto sopra è esponenziale nella lunghezza di x.
 ]
 
-== Complessità in spazio di M
+== Complessità in spazio
 
 #index[Complessità in spazio]
 #definition()[
