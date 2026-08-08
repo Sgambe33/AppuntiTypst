@@ -9,7 +9,7 @@ Lo studio dell'informatica teorica affronta due importanti argomenti:
 - La teoria della computabilità;
 - La teoria della complessità computazionale.
 
-La teoria della computabilità si prefigge lo scopo di trovare delle definizioni formali che si avvicinino il più possibile al concetto di algoritmo, dato che l'algoritmo è un concetto primitivo e non esiste una sua definizione formale.
+La teoria della computabilità si prefigge lo scopo di trovare delle definizioni formali che si avvicinino il più possibile al concetto di algoritmo, dato che l'algoritmo è un concetto primitivo e non esiste una sua definizione formale. Di conseguenza poi si vuole anche indagare se un dato problema è calcolabile o meno da un algoritmo.
 
 La teoria della complessità computazionale si occupa, dato un problema, di determinare la quantità minima di risorse (usualmente tempo e spazio) necessaria ad un algoritmo per risolvere tale problema.
 
