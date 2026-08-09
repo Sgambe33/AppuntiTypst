@@ -52,7 +52,7 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 #figure(image("images/2026-03-03-17-57-48.png", width: 50%))
 
 #observation()[
-  In verità, il modo in cui il procedimento è illustrato è quello per le stringhe di lunghezza 2. Per passare a stringhe di lunghezza $k$ occorre un ragionamento induttivo; supponendo che le stringhe di lunghezza $k-1$ siano state già tutte enumerate, si fa la procedura descritta sopra mettendo sulle colonne le stringhe di lunghezza $k-1$, elencate secondo l'enumerazione che abbiamo per induzione, e sulle righe i simboli dell'alfabeto.
+  Per passare a stringhe di lunghezza $k$ occorre un ragionamento induttivo; supponendo che le stringhe di lunghezza $k-1$ siano state già tutte enumerate, si fa la procedura descritta sopra mettendo sulle colonne le stringhe di lunghezza $k-1$, elencate secondo l'enumerazione che abbiamo per induzione, e sulle righe i simboli dell'alfabeto.
 ]
 #observation()[
   $Sigma$ enumerabile $==> Sigma^*$ enumerabile.\ Infatti, possiamo enumerare tutte le stringhe di lunghezza 0, poi tutte le stringhe di lunghezza 1, poi tutte le stringhe di lunghezza 2, e così via.
@@ -75,7 +75,7 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 ]
 
 #observation()[
-  In generale, l'implicazione inversa *non* vale: $L$ enumerabile $arrow.r.double.not L$ decidibile. Questo perché se voglio capire se una stringa $x$ appartiene ad un linguaggio $L$ infinito con un algoritmo di enumerazione, potrei dover scorrere L all'infinito senza mai trovare $x$. Vale però il risultato della proposizione seguente, dove $L^c = Sigma^* \\ L$.
+  In generale, l'implicazione inversa *non* vale: $L$ enumerabile $arrow.r.double.not L$ decidibile. Questo perché se voglio capire se una stringa $x$ appartiene ad un linguaggio $L$ infinito con un algoritmo di enumerazione, potrei dover scorrere $L$ all'infinito senza mai trovare $x$. Vale però il risultato della proposizione seguente, dove $L^c = Sigma^* \\ L$.
 ]
 
 #proposition()[
@@ -85,10 +85,12 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
   ($==>$) $L$ è decidibile $==> L$ è enumerabile è già stato dimostrato nella precedente proposizione.
 
   Per dimostrare che $L$ decidibile $==> L^c$ enumerabile possiamo usare l'algoritmo di enumerazione per $L$ della proposizione precedente modificando le operazioni finali:
-  - Sia $w_i$ la i-esima stringa di $Sigma^*$;
-  - Eseguo $M$ su $w_i$;
-    - Se $w_i in.not L$, la scrivo;
-    - Altrimenti no.
+  #pseudocode-list[
+    + Sia $w_i$ la i-esima stringa di $Sigma^*$;
+    + Eseguo $M$ su $w_i$;
+      + Se $w_i in.not L$, la scrivo;
+      + Altrimenti no.
+  ]
 
   ($<==$) Sia $M$ un algoritmo di enumerazione per $L$ e $M^c$ un algoritmo di enumerazione per $L^c$. $M$ elenca tutti gli elementi di $L$: $w_1, w_2, dots$ e $M^c$ elenca gli elementi di $L^c$: $v_1, v_2, dots$. Dobbiamo cercare un algoritmo di decisione per $L$.
 
@@ -132,7 +134,7 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 
 #index[Linguaggio semidecidibile]
 #definition()[
-  Un linguaggio $L$ è semidecidibile quando esiste un algoritmo $M$ che, data una stringa $w in Sigma^*$, $M$ termina su $w$ se $w in L$, altrimenti $M$ non termina.
+  Un linguaggio $L$ è *semidecidibile* quando esiste un algoritmo $M$ che, data una stringa $w in Sigma^*$, $M$ termina su $w$ se $w in L$, altrimenti $M$ non termina.
 ]
 
 #observation()[
@@ -143,7 +145,7 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
   $L$ è enumerabile $<==> L$ è semidecidibile.
 ]
 #proof()[
-  ($==> $) Sia $M$ un algoritmo di enumerazione per $L$, che produce via via le stringhe $w_1, w_2, w_3, dots$ del linguaggio. Un algoritmo di semidecisione per $L$ è il seguente: data $w in Sigma^*$, faccio partire $M$ e confronto $w$ con le stringhe prodotte man mano. Se $w in L$, prima o poi $w$ compare tra le stringhe prodotte da $M$: l'algoritmo termina e accetta $w$. Se invece $w in.not L$, l'algoritmo non termina.
+  ($==>$) Sia $M$ un algoritmo di enumerazione per $L$, che produce via via le stringhe $w_1, w_2, w_3, dots$ del linguaggio. Un algoritmo di semidecisione per $L$ è il seguente: data $w in Sigma^*$, faccio partire $M$ e confronto $w$ con le stringhe prodotte man mano. Se $w in L$, prima o poi $w$ compare tra le stringhe prodotte da $M$: l'algoritmo termina e accetta $w$. Se invece $w in.not L$, l'algoritmo non termina.
 
   ($<==$) Sia $M$ un algoritmo di semidecisione per $L$. Costruiamo una tabella che ha per righe le stringhe $w_1, w_2, dots$ di $Sigma^*$ e per colonne i passi di esecuzione di $M$, e la visitiamo con il procedimento diagonale di Cantor. Per ogni stringa $w_i$ ci sono due possibilità: o $M$ su $w_i$ esegue infiniti passi, oppure no. Se durante la visita in diagonale incontro una posizione vuota, significa che $M$ su quella stringa ha terminato dopo un numero finito di passi, e allora aggiungo tale stringa alla lista.
 
@@ -206,7 +208,7 @@ Prima di procedere, osserviamo che la scelta della rappresentazione dei numeri n
   - $S(underbrace(1 dots 1, n+1)) = underbrace(1 dots 1, n+2)$, cioè basta aggiungere un simbolo in fondo alla stringa;
 
   - $C_0^((k))$ ritorna 0 a prescindere dalla codifica;
-  
+
   - $epsilon_j^((k))$ codifica gli argomenti, scorre la lista degli argomenti e, arrivata al $j$-esimo, lo scrive.
 ]
 
@@ -395,7 +397,7 @@ Vediamo ora i due "costruttori" di funzioni, a partire dalle iniziali: la compos
   $
     d: NN^2 -> NN, quad d(x, y) = |x - y|
   $
-  Si ha che $d(x, y) = minus.dot(x,y) + (minus.dot(y,x))$: uno dei due addendi dà il risultato corretto a seconda che $x <= y$ oppure $x > y$, mentre l'altro vale 0:
+  Si ha che $d(x, y) = minus.dot(x, y) + (minus.dot(y, x))$: uno dei due addendi dà il risultato corretto a seconda che $x <= y$ oppure $x > y$, mentre l'altro vale 0:
   $
     d(x, y) = (x minus.dot y) + (y minus.dot x) = (s compose (minus.dot compose (epsilon_1^((2)), epsilon_2^((2))), minus.dot compose (epsilon_2^((2)), epsilon_1^((2)))))(x, y)
   $
@@ -617,7 +619,7 @@ Vediamo il caso in cui vogliamo calcolare la somma di più argomenti, però il n
   Sia $R subset.eq NN^(k+1)$. La funzione $f: NN^k -> NN$ si dice ottenuta per *minimalizzazione* da $R$ quando
   $
     f(arrow(x)) = cases(
-      min{z in NN | (arrow(x), z) in R}\, & "se tale insieme è non vuoto",
+      min{z in NN | (arrow(x), z) in R}\, space & "se tale insieme è non vuoto",
       0\, & "altrimenti"
     )
   $
@@ -630,7 +632,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
   Sia $R subset.eq NN^(k+1)$. La funzione $f: NN^(k+1) -> NN$ si dice ottenuta per *minimalizzazione limitata* da $R$ quando
   $
     f(arrow(x), y) = cases(
-      min{z <= y | (arrow(x), z) in R}\, & "se tale insieme è non vuoto",
+      min{z <= y | (arrow(x), z) in R}\, space & "se tale insieme è non vuoto",
       0\, & "altrimenti"
     )
   $
@@ -678,8 +680,8 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
   $
   dove
   $
-    R_1 &= {(arrow(x), y, t) | exists z, 0 <= z <= y: (arrow(x), z) in R} \
-    R_2 &= {(arrow(x), y, t) | (arrow(x), y, t) in.not R_1 "e" (arrow(x), y+1) in R}
+    R_1 & = {(arrow(x), y, t) | exists z, 0 <= z <= y: (arrow(x), z) in R} \
+    R_2 & = {(arrow(x), y, t) | (arrow(x), y, t) in.not R_1 "e" (arrow(x), y+1) in R}
   $
   Per costruzione $f(arrow(x), y+1) = phi(arrow(x), y, f(arrow(x), y))$; resta da mostrare che $phi$ è *_rp_*.
 
@@ -749,7 +751,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
 
   Possiamo fare due osservazioni chiave su $g$:
   - $g$ è computabile: dato un input $x$, è possibile costruire un algoritmo che trovi la funzione $f_x$ nell'enumerazione, ne calcoli il valore per l'argomento $x$ e vi sommi $1$.
-  - Esiste un indice $n$ tale per cui $g = f_n$: per la nostra ipotesi di partenza, essendo $g$ computabile, essa deve essere anche rp. Pertanto, deve necessariamente comparire all'interno dell'enumerazione.
+  - Esiste un indice $n$ tale per cui $g = f_n$: per la nostra ipotesi di partenza, essendo $g$ computabile, essa deve essere anche *_rp_*. Pertanto, deve necessariamente comparire all'interno dell'enumerazione.
 
   Se valutiamo la funzione per l'input $n$, per definizione otteniamo:
   $
@@ -851,13 +853,13 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
 
 #index[Funzione regolare]
 #definition()[
-  Sia $g$ una funzione, con $g: NN^(k+1) -> NN$. Essa si dice regolare quando
+  Sia $g$ una funzione, con $g: NN^(k+1) -> NN$. Essa si dice *regolare* quando
   $
     forall arrow(x) in NN^k, exists y in NN quad "t.c." quad g(arrow(x), y) = 0
   $
 ]
 #definition()[
-  Una funzione $f: NN^k -> NN$ si dice ottenuta per minimalizzazione da $g: NN^(k+1) -> NN$ regolare quando
+  Una funzione $f: NN^k -> NN$ si dice *ottenuta per minimalizzazione* da $g: NN^(k+1) -> NN$ regolare quando
   $ f(arrow(x)) = min{y in NN | g(arrow(x), y) = 0} $
 ]
 

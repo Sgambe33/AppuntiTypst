@@ -10,7 +10,7 @@
 
 Introducendo le funzioni $mu$-ricorsive abbiamo visto una proposta di definizione di algoritmo, che restituisce formalmente l'idea intuitiva di funzione computabile. In questo capitolo vediamo una proposta equivalente del concetto di algoritmo: la *Macchina di Turing* (MdT). Una MdT ha le seguenti caratteristiche:
 
-- è composta da un *nastro unidimensionale* infinito, sia da destra che da sinistra.
+- E' composta da un *nastro unidimensionale* infinito, sia da destra che da sinistra.
 - Il nastro è diviso in *celle* che possono contenere informazioni.
 - Le informazioni che si possono scrivere sul nastro sono *simboli* da un *alfabeto finito $Sigma$* definito inizialmente. Questo alfabeto contiene sempre un *simbolo privilegiato (\*)* che serve per denotare una *cella vuota* ed è normalmente implicito e non scritto tra i simboli dell'alfabeto.
 - C'è una *testina* che si occupa della *lettura/scrittura*, spostandosi a destra ($D$) e a sinistra ($S$), indicando una cella ad ogni spostamento. Ogni spostamento della testina è definito *passo di calcolo* o *transizione*.
@@ -18,7 +18,7 @@ Introducendo le funzioni $mu$-ricorsive abbiamo visto una proposta di definizion
 
 Una transizione è una quadrupla i cui primi due elementi, stato attuale e simbolo letto, determinano una *configurazione*. In particolare, la quadrupla è fatta così:
 $
-   (overbracket(q\, x, "configurazione"), overbracket(alpha, "azione svolta"), overbracket(accent(q, ~), "stato finale")) & in Q times Sigma times (Sigma union {D, S}) times Q
+  (overbracket(q\, x, "configurazione"), overbracket(alpha, "azione svolta"), overbracket(accent(q, ~), "stato finale")) & in Q times Sigma times (Sigma union {D, S}) times Q
 $
 ed è funzionale nei primi 2 argomenti, cioè fissati uno stato e un simbolo ci sono al più 2 simboli azione-stato associabili alla configurazione (la transizione è unica). L'azione svolta $alpha$ può essere una lettura/scrittura di un simbolo o uno spostamento della testina a destra o a sinistra.
 #index[Macchina di Turing]#index[Transizione]#index[Configurazione]
@@ -29,29 +29,45 @@ ed è funzionale nei primi 2 argomenti, cioè fissati uno stato e un simbolo ci 
 
 #example(multiple: true)[
 
-  1)  #block($ quad space &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a ")q_1\
-  &q_0 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e cambia lo stato a ")q_1\ $)
-Questa è una macchina "inutile", nel senso che fa un passo e termina subito perchè non ci sono transizioni definite per lo stato $q_1$.\
+  + #block(
+      $
+        quad space &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a ")q_1\
+        &q_0 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e cambia lo stato a ")q_1\
+      $,
+    )
+    Questa è una macchina "inutile", nel senso che fa un passo e termina subito perché non ci sono transizioni definite per lo stato $q_1$.\
 
-  2)#image("images/example2TM.png",width: 65%)
-  #block($ quad space &q_0 && * && D space && q_0 text(": Se la cella corrente è vuota, la testina si sposta a destra e non cambia stato")\
-  &q_0 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e cambia lo stato a ")q_1\
-  &q_1 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e non cambia stato") $)
-Quando la macchina è in $q_1$ non ha una transizione che descrive cosa fare incontrando una cella vuota quindi la macchina termina nel momento in cui finisce di scandire la prima "stringa" (sequenza) di 1 consecutivi.\
+  + #image("images/example2TM.png", width: 65%)
+    #block(
+      $
+        quad space &q_0 && * && D space && q_0 text(": Se la cella corrente è vuota, la testina si sposta a destra e non cambia stato")\
+        &q_0 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e cambia lo stato a ")q_1\
+        &q_1 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e non cambia stato")
+      $,
+    )
+    Quando la macchina è in $q_1$ non ha una transizione che descrive cosa fare incontrando una cella vuota quindi la macchina termina nel momento in cui finisce di scandire la prima "stringa" (sequenza) di 1 consecutivi.\
 
-  3)#image("images/example3TM.png",width: 65%)
-  #block($ quad space &q_0 && * && 1 space && q_0 text(": Se la cella corrente è vuota, scrivo 1 e non cambia stato")\
-  &q_0 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e cambia lo stato a ")q_1\
-  &q_1 && * && 1 && q_1 text(": Se la cella corrente è vuota, scrivo 1 e non cambia stato")\
-  &q_1 && 1 && 1 && q_0 text(": Se la cella corrente è 1, riscrivo 1 e cambio lo stato a ")q_0 $)
-Questa macchina non termina mai e riempie il nastro di simboli 1.
+  + #image("images/example3TM.png", width: 65%)
+    #block(
+      $
+        quad space &q_0 && * && 1 space && q_0 text(": Se la cella corrente è vuota, scrivo 1 e non cambia stato")\
+        &q_0 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e cambia lo stato a ")q_1\
+        &q_1 && * && 1 && q_1 text(": Se la cella corrente è vuota, scrivo 1 e non cambia stato")\
+        &q_1 && 1 && 1 && q_0 text(": Se la cella corrente è 1, riscrivo 1 e cambio lo stato a ")q_0
+      $,
+    )
+    Questa macchina non termina mai e riempie il nastro di simboli 1.
 
-  4)#image("images/example4TM.png",width: 65%)
-   #block($ quad space &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a") q_1\
-  &q_1 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra non cambia stato ")\
-  &q_1 && * && 1 && q_2 text(": Se la cella corrente è vuota, scrivo 1 e cambia lo stato a ")q_2\
-  &q_2 && 1 && S && q_2 text(": Se la cella corrente è 1, la testina si sposta a sinistra e non cambia lo stato") $)
-Questa MdT aggiunge un simbolo 1 alla fine della stringa di 1 consecutivi e poi torna all'inizio del nastro. Quindi, se la stringa rappresenta un numero naturale in codifica unaria, questa MdT calcola il suo sucessore.
+  + #image("images/example4TM.png", width: 65%)
+    #block(
+      $
+        quad space &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a") q_1\
+        &q_1 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra non cambia stato ")\
+        &q_1 && * && 1 && q_2 text(": Se la cella corrente è vuota, scrivo 1 e cambia lo stato a ")q_2\
+        &q_2 && 1 && S && q_2 text(": Se la cella corrente è 1, la testina si sposta a sinistra e non cambia lo stato")
+      $,
+    )
+    Questa MdT aggiunge un simbolo 1 alla fine della stringa di 1 consecutivi e poi torna all'inizio del nastro. Quindi, se la stringa rappresenta un numero naturale in codifica unaria, questa MdT calcola il suo sucessore.
 ]
 
 #index[MdT che calcola una funzione]
@@ -62,37 +78,44 @@ Questa MdT aggiunge un simbolo 1 alla fine della stringa di 1 consecutivi e poi 
 #example()[
   Creiamo una MdT che calcola la funzione somma tra due numeri naturali rappresentati in codifica unaria (con il simbolo $1$). I numeri scelti in questo esempio sono 3 e 2:
   #figure(image("images/EsempioMdTSomma.png", width: 60%))
-  #block($ &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a ") q_1 $)
-  #block($ &q_1 && space 1 space && D space && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra non cambia stato ") $)
-  #block($ &q_1 && * && 1 space && q_2 text(": Se la cella corrente è vuota, scrivo 1 e cambia lo stato a ") q_2 $)
-  #block($ &q_2 && space 1 space && D space && q_2 text(": Se la cella corrente è 1, la testina si sposta a destra e non cambia lo stato") $)
-  #block($ &q_2 && * && S space && q_3 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ") q_3 $)
-  #block($ &q_3 && space 1 && * space && q_3 text(": Se la cella corrente è 1, scrivo * e non cambia lo stato") $)
-  #block($ &q_3 && * && S space && q_4 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ") q_4 $)
-  #block($ &q_4 && space 1 && * space && q_4 text(": Se la cella corrente è 1, scrivo * e non cambia lo stato") $)
-  #block($ &q_4 && * && S space && q_5 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ") q_5 $)
-  #block($ &q_5 && space 1 space && S space && q_5 text(": Finché legge 1, la testina si sposta a sinistra; si ferma sulla cella vuota")\ & && && && quad quad text("a inizio stringa") $)
+  #block(
+    $
+      &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a ") q_1\
+      &q_1 && space 1 space && D space && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra non cambia stato ")\
+      &q_1 && * && 1 space && q_2 text(": Se la cella corrente è vuota, scrivo 1 e cambia lo stato a ") q_2\
+      &q_2 && space 1 space && D space && q_2 text(": Se la cella corrente è 1, la testina si sposta a destra e non cambia lo stato")\
+      &q_2 && * && S space && q_3 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ") q_3\
+      & q_3 && space 1 && * space && q_3 text(": Se la cella corrente è 1, scrivo * e non cambia lo stato")\
+      &q_3 && * && S space && q_4 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ") q_4\
+      & q_4 && space 1 && * space && q_4 text(": Se la cella corrente è 1, scrivo * e non cambia lo stato")\
+      &q_4 && * && S space && q_5 text(": Se la cella corrente è vuota, la testina si sposta a sinistra e cambia lo stato a ") q_5\
+      &q_5 && space 1 space && S space && q_5 text(": Finché legge 1, la testina si sposta a sinistra; si ferma sulla cella vuota")\ & && && && quad quad text("a inizio stringa")
+    $,
+  )
 ]
 - Caso di #underline("una singola stringa in input:")
 #image("./images/image.png")
 - Caso di #underline("input composto da più stringhe:")
 #image("./images/image-1.png")
 Per maggiore chiarezza, rappresenteremo graficamente le MdT in questo modo (simile a quanto visto per gli automi a stati finiti in altri corsi): \
-    #figure(diagram(
-      node-stroke: 0.9pt,
-      cell-size: 5mm,
-      spacing: 3mm,
+#figure(diagram(
+  node-stroke: 0.9pt,
+  cell-size: 5mm,
+  spacing: 3mm,
 
-      node((0, 0), $q$, name: <qs>),
-      node((3, 0), $accent(q, ~)$, name: <qf>),
-      node((-1, 0), [la transizione *$q x alpha accent(q, ~)$* è:], stroke: 0pt),
+  node((0, 0), $q$, name: <qs>),
+  node((3, 0), $accent(q, ~)$, name: <qf>),
+  node((-1, 0), [la transizione *$q x alpha accent(q, ~)$* è:], stroke: 0pt),
 
-      edge(<qs>, <qf>, "-|>", $x \/ alpha$),))
+  edge(<qs>, <qf>, "-|>", $x \/ alpha$),
+))
+
 #pagebreak()
+
 == Tesi di Church (per le funzioni $tau$-ricorsive)
 #index[Funzione $tau$-ricorsiva]
 #definition()[
-  Una funzione $f: NN^k -> NN$ si dice *$tau$-ricorsiva* quando $exists M$ MdT che calcola $f$
+  Una funzione $f: NN^k -> NN$ si dice *$tau$-ricorsiva* quando $exists M$ MdT che calcola $f$.
 ]
 #index[Tesi di Church]
 #proposition[La classe delle funzioni computabili coincide con la classe delle funzioni $tau$-ricorsive.]
@@ -115,29 +138,29 @@ Vale quindi la stessa tesi vista per le funzioni $mu$-ricorsive, in questo senso
     ))
   + MdT che scrive la copia di una stringa unaria. Introduciamo un simbolo aggiuntivo "di lavoro" X per semplificare la strategia. Questo non fa parte dell'alfabeto e alla fine il nastro non dovrà contenere X.
   #figure(image("images/esempioMdTCopiaStringa.jpeg", width: 100%))
-    #figure(diagram(
-      node-stroke: 0.9pt,
-      cell-size: 5mm,
-      spacing: 3mm,
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    cell-size: 5mm,
+    spacing: 3mm,
 
-      node((-3, 0), $q_0$, name: <0>),
-      node((0, 0), $q_1$, name: <1>),
-      node((2, 2), $q_2$, name: <2>),
-      node((0, 4), $q_3$, name: <3>),
-      node((-2, 2), $q_4$, name: <4>),
-      node((3, 0), $q_5$, name: <5>),
+    node((-3, 0), $q_0$, name: <0>),
+    node((0, 0), $q_1$, name: <1>),
+    node((2, 2), $q_2$, name: <2>),
+    node((0, 4), $q_3$, name: <3>),
+    node((-2, 2), $q_4$, name: <4>),
+    node((3, 0), $q_5$, name: <5>),
 
-      edge(<0>, <1>, "-|>", $* \/ D$),
-      edge(<1>, <2>, "-|>", $1 \/ X$),
-      edge(<2>, <2>, "-|>", $X, 1 \/ D$, bend: 130deg, loop-angle: 0deg),
-      edge(<2>, <3>, "-|>", $* \/ D$, label-anchor: "north-west"),
-      edge(<3>, <3>, "-|>", $1 \/ D$, bend: 130deg, loop-angle: -90deg),
-      edge(<3>, <4>, "-|>", $* \/ 1$, label-anchor: "north-east"),
-      edge(<4>, <4>, "-|>", $1, * \/ S$, bend: 130deg, loop-angle: 180deg),
-      edge(<4>, <1>, "-|>", $X \/ D$),
-      edge(<1>, <5>, "-|>", $* \/ S$),
-      edge(<5>, <5>, "-|>", $1 \/ S \ X \/ 1$, bend: 130deg, loop-angle: 0deg),
-    ))
+    edge(<0>, <1>, "-|>", $* \/ D$),
+    edge(<1>, <2>, "-|>", $1 \/ X$),
+    edge(<2>, <2>, "-|>", $X, 1 \/ D$, bend: 130deg, loop-angle: 0deg),
+    edge(<2>, <3>, "-|>", $* \/ D$, label-anchor: "north-west"),
+    edge(<3>, <3>, "-|>", $1 \/ D$, bend: 130deg, loop-angle: -90deg),
+    edge(<3>, <4>, "-|>", $* \/ 1$, label-anchor: "north-east"),
+    edge(<4>, <4>, "-|>", $1, * \/ S$, bend: 130deg, loop-angle: 180deg),
+    edge(<4>, <1>, "-|>", $X \/ D$),
+    edge(<1>, <5>, "-|>", $* \/ S$),
+    edge(<5>, <5>, "-|>", $1 \/ S \ X \/ 1$, bend: 130deg, loop-angle: 0deg),
+  ))
 ]
 #pagebreak()
 == MdT come accettatori di linguaggi
@@ -153,15 +176,15 @@ Accettazione di una stringa per stati finali:
   _M_ accetta la stringa  _w_ *per stati finali* quando l'esecuzione di _M_ su input _w_ termina in uno stato finale.
 ]
 #definition()[
-  $L subset.eq Sigma^*$ si dice *accettato per stati finali* da una MdT _M_ quando $w in L$ sse _M_ accetta _w_ per stati finali (quindi si ha $L = L(M)$)
+  $L subset.eq Sigma^*$ si dice *accettato per stati finali* da una MdT _M_ quando $w in L$ se e solo se _M_ accetta _w_ per stati finali (quindi si ha $L = L(M)$).
 ]
 #index[Linguaggio ricorsivamente enumerabile]
 #definition()[
-  Se _L_ è t.c. $exists M$ MdT per cui $L = L(M)$, _L_ si dice *ricorsivamente enumerabile*
+  Se _L_ è t.c. $exists M$ MdT per cui $L = L(M)$, _L_ si dice *ricorsivamente enumerabile*.
 ]
 #index[Linguaggio ricorsivo]
 #definition()[
-    Se _M_ è una MDT che termina su ogni input, allora $L(M)$ si dice *ricorsivo*
+  Se _M_ è una MdT che termina su ogni input, allora $L(M)$ si dice *ricorsivo*.
 ]
 #observation()[
   #block(
@@ -170,67 +193,68 @@ Accettazione di una stringa per stati finali:
                                         & bold("ricorsivo" <--> "decidibile")
     $,
   )
-    Cioè, grazie alla tesi di Church abbiamo un'equivalenza tra i concetti intuitivi (che parlano genericamente di "algoritmi") di decidibile/semidecidbile e i concetti formali di ricorsività delle MdT: dire che un linguaggio è ricorsivo è equivalente a dire che è decidibile (esiste un algoritmo che risolve il problema in tempo finito per ogni input). Inoltre, dire che un linguaggio è ricorsivamente enumerabile è equivalente a dire che è semidecidibile (esiste un algoritmo che risolve il problema in tempo finito per ogni input appartenente al linguaggio, mentre per gli input non appartenenti al linguaggio l'algoritmo può non terminare mai).
+  Cioè, grazie alla tesi di Church abbiamo un'equivalenza tra i concetti intuitivi (che parlano genericamente di "algoritmi") di decidibile/semidecidbile e i concetti formali di ricorsività delle MdT: dire che un linguaggio è ricorsivo è equivalente a dire che è decidibile (esiste un algoritmo che risolve il problema in tempo finito per ogni input). Inoltre, dire che un linguaggio è ricorsivamente enumerabile è equivalente a dire che è semidecidibile (esiste un algoritmo che risolve il problema in tempo finito per ogni input appartenente al linguaggio, mentre per gli input non appartenenti al linguaggio l'algoritmo può non terminare mai).
 ]
 
 #example(multiple: true)[
   + MdT che accetta il linguaggio $(a|b)^* a a(a|b)^*$ (deve essere rilevata una (sotto)stringa "aa"):
   \
-    $
-      #grid(
-        columns: 14,
-        rows: 1,
-        stroke: .5pt,
-        inset: 5pt,
-        [\*],
-        [b],
-        [b],
-        [b],
-        [a],
-        [b],
-        [b],
-        [a],
-        [
-          #place(top + center, dy: -20pt)[
-            #set text(size: 8pt)
-            #stack(dir: ttb, spacing: 2pt, $q_3$, sym.triangle.b.small)
-          ]
-          a
-        ],
-        [b],
-        [a],
-        [a],
-        [a],
-        [b],
-      )\
-      #grid(
-        columns: (0.025fr, 0.6fr, 0.3fr, 0.075fr),
-        rows: 2,
-        stroke: none,
-        [],
-        grid.cell(rowspan: 2, diagram(
-          node-stroke: 0.9pt,
-          cell-size: 5mm,
-          spacing: 3mm,
-
-          node((0, 0), $q_0$, name: <0>),
-          node((2, 0), $q_1$, name: <1>),
-          node((4, 0), $q_2$, name: <2>),
-          node((6, 0), $q_3$, name: <3>, extrude: (-2, 0)),
-
-          edge(<0>, <1>, "-|>", $*\/D$),
-          edge(<1>, <1>, "<|-", bend: 130deg, $b\/D$, loop-angle: 70deg, label-anchor: "south-east", label-pos: 60%),
-          edge(<1>, <2>, "-|>", bend: 30deg, $a\/D$),
-          edge(<2>, <1>, "-|>", bend: 30deg, $b\/D$),
-          edge(<2>, <3>, "-|>", $a\/a$),
-        )),
-        grid.cell(rowspan: 2, align: (left + horizon), $ & Q = {q_0, q_1, q_2, q_3} \
-        \
-        & F = {q_3} $),
-      )
-    $
-  + MdT che accetta il linguaggio ${a^i b^i c^i | i >= 0} subset.eq {a, b, c}^*$
+  $
     #grid(
+      columns: 14,
+      rows: 1,
+      stroke: .5pt,
+      inset: 5pt,
+      [\*],
+      [b],
+      [b],
+      [b],
+      [a],
+      [b],
+      [b],
+      [a],
+      [
+        #place(top + center, dy: -20pt)[
+          #set text(size: 8pt)
+          #stack(dir: ttb, spacing: 2pt, $q_3$, sym.triangle.b.small)
+        ]
+        a
+      ],
+      [b],
+      [a],
+      [a],
+      [a],
+      [b],
+    )\
+    #grid(
+      columns: (0.025fr, 0.6fr, 0.3fr, 0.075fr),
+      rows: 2,
+      stroke: none,
+      [],
+      grid.cell(rowspan: 2, diagram(
+        node-stroke: 0.9pt,
+        cell-size: 5mm,
+        spacing: 3mm,
+
+        node((0, 0), $q_0$, name: <0>),
+        node((2, 0), $q_1$, name: <1>),
+        node((4, 0), $q_2$, name: <2>),
+        node((6, 0), $q_3$, name: <3>, extrude: (-2, 0)),
+
+        edge(<0>, <1>, "-|>", $*\/D$),
+        edge(<1>, <1>, "<|-", bend: 130deg, $b\/D$, loop-angle: 70deg, label-anchor: "south-east", label-pos: 60%),
+        edge(<1>, <2>, "-|>", bend: 30deg, $a\/D$),
+        edge(<2>, <1>, "-|>", bend: 30deg, $b\/D$),
+        edge(<2>, <3>, "-|>", $a\/a$),
+      )),
+      grid.cell(rowspan: 2, align: (left + horizon), $ & Q = {q_0, q_1, q_2, q_3} \
+      \
+      & F = {q_3} $),
+    )
+  $
+  + MdT che accetta il linguaggio ${a^i b^i c^i | i >= 0} subset.eq {a, b, c}^*$
+    #align(center, grid(
+      align: center + horizon,
       rows: 3,
       columns: 1,
       grid.cell([
@@ -249,40 +273,40 @@ Accettazione di una stringa per stati finali:
           [\*], [x], [x], [x], [y], [y], [y], [z], [z], [z],
         )
       ]),
-      grid.cell(align: center + horizon, diagram(
-        node-stroke: 0.9pt,
-        cell-size: 1mm,
-        node-inset: 4pt,
-        spacing: 3mm,
-        label-size: 7.5pt,
+    ))
+    #align(center, diagram(
+      node-stroke: 0.9pt,
+      cell-size: 1mm,
+      node-inset: 4pt,
+      spacing: 3mm,
+      label-size: 7.5pt,
 
-        node((2, 0), $q_0$, name: <0>),
-        node((4, 0), $q_1$, name: <1>),
-        node((6, 0), $q_2$, name: <2>),
-        node((8, 0), $q_3$, name: <3>),
-        node((8, 3), $q_4$, name: <4>),
-        node((6, 3), $q_5$, name: <5>),
-        node((4, 3), $q_6$, name: <6>),
-        node((1, 3), $q_7$, name: <7>),
-        node((1, 6), $q_8$, name: <8>, extrude: (-2, 0)),
+      node((2, 0), $q_0$, name: <0>),
+      node((4, 0), $q_1$, name: <1>),
+      node((6, 0), $q_2$, name: <2>),
+      node((8, 0), $q_3$, name: <3>),
+      node((8, 3), $q_4$, name: <4>),
+      node((6, 3), $q_5$, name: <5>),
+      node((4, 3), $q_6$, name: <6>),
+      node((1, 3), $q_7$, name: <7>),
+      node((1, 6), $q_8$, name: <8>, extrude: (-2, 0)),
 
-        edge(<0>, <1>, "-|>", $*\/D$, bend: 30deg),
-        edge(<1>, <1>, "-|>", $a\/x$, bend: 130deg),
-        edge(<1>, <2>, "-|>", $x\/D$, label-side: right),
-        edge(<1>, <7>, "-|>", $y\/D$, bend: -15deg, label-pos: 65%),
-        edge(<1>, <8>, "-|>", $*\/*$, bend: -20deg, label-side: left, label-pos: 65%),
-        edge(<2>, <2>, "-|>", $a, y\/D$, bend: 130deg),
-        edge(<2>, <3>, "-|>", $b\/y$, label-side: right),
-        edge(<3>, <4>, "-|>", $y\/D$, label-side: left),
-        edge(<4>, <4>, "-|>", $b, z\/D$, bend: -130deg, loop-angle: 135deg),
-        edge(<4>, <5>, "-|>", $c\/z$),
-        edge(<5>, <6>, "-|>", $z\/S$),
-        edge(<6>, <6>, "-|>", $a, b, y, z\/S$, bend: -130deg),
-        edge(<6>, <1>, "-|>", $x\/D$, label-side: left),
-        edge(<7>, <7>, "-|>", $y, z\/D$, bend: 130deg, loop-angle: 180deg),
-        edge(<7>, <8>, "-|>", $*\/*$),
-      )),
-    )
+      edge(<0>, <1>, "-|>", $*\/D$, bend: 30deg),
+      edge(<1>, <1>, "-|>", $a\/x$, bend: 130deg),
+      edge(<1>, <2>, "-|>", $x\/D$, label-side: right),
+      edge(<1>, <7>, "-|>", $y\/D$, bend: -15deg, label-pos: 65%),
+      edge(<1>, <8>, "-|>", $*\/*$, bend: -20deg, label-side: left, label-pos: 65%),
+      edge(<2>, <2>, "-|>", $a, y\/D$, bend: 130deg),
+      edge(<2>, <3>, "-|>", $b\/y$, label-side: right),
+      edge(<3>, <4>, "-|>", $y\/D$, label-side: left),
+      edge(<4>, <4>, "-|>", $b, z\/D$, bend: -130deg, loop-angle: 135deg),
+      edge(<4>, <5>, "-|>", $c\/z$),
+      edge(<5>, <6>, "-|>", $z\/S$),
+      edge(<6>, <6>, "-|>", $a, b, y, z\/S$, bend: -130deg),
+      edge(<6>, <1>, "-|>", $x\/D$, label-side: left),
+      edge(<7>, <7>, "-|>", $y, z\/D$, bend: 130deg, loop-angle: 180deg),
+      edge(<7>, <8>, "-|>", $*\/*$),
+    ))\
     L'importante è che ad ogni errore corrisponda uno stato, non che ogni stato preveda errori $->$ la macchina è costruita per andare avanti soltanto se tutto funziona
 ]
 
@@ -291,23 +315,23 @@ Accettazione di una stringa per stati finali:
 #definition()[
   Una MdT $M$ accetta per arresto quando $M$, eseguita su _w_, termina.
 ]
-L'insieme delle stringhe accettate da $M$ per arresto è il *linguaggio* accettato da $M$ per arresto
+L'insieme delle stringhe accettate da $M$ per arresto è il *linguaggio* accettato da $M$ per arresto.
 
 #proposition()[
   Dato un linguaggio $L$:
   #grid(
-    columns: (0.15fr, 100pt, 40pt, 100pt, 0.15fr),
-    align: (right, right, center + horizon, left, left),
-    [], [$exists$ MdT $M$ che accetta $L$ per stati finali], [$<==>$], [$exists$ MdT $M$ che accetta $L$ per arresto], [],
+    columns: (0.45fr, 40pt, 0.45fr),
+    align: (right, center + horizon, left),
+    [$exists$ MdT $M$ che accetta $L$ per stati finali], [$<==>$], [$exists$ MdT $M$ che accetta $L$ per arresto],
   )
 ]
 
 #proof()[
   \ $<==)$ Sia $N$ MdT che accetta $L$ per arresto. La MdT ottenuta da $N$, designando ogni stato come finale, è una MdT che accetta $L$ per stati finali.
-  \ $==>)$ M MdT che accetta $L$ per stati finali. Su input _w_ ci sono 3 casi:
-  - M termina su uno stato finale (OK, anche per arresto)
-  - M non termina (OK, non accettata in entrambi i modi)
-  - M termina ma in uno stato non finale: costruiamo una MdT $N$ in questo modo. $N$ ha le stesse transizioni di $M$ più le seguenti: $forall q in Q \\ F, forall x in Sigma $ t.c. non ci sono transizioni di $M$ con configurazione $q x$, aggiungiamo le transizioni $q x x accent(q, ~)$, $accent(q, ~) x x accent(q, ~)$ (dove $accent(q, ~)$ è un nuovo stato).
+  \ $==>)$ $M$ MdT che accetta $L$ per stati finali. Su input _w_ ci sono 3 casi:
+  - $M$ termina su uno stato finale (OK, anche per arresto)
+  - $M$ non termina (OK, non accettata in entrambi i modi)
+  - $M$ termina ma in uno stato non finale: costruiamo una MdT $N$ in questo modo. $N$ ha le stesse transizioni di $M$ più le seguenti: $forall q in Q \\ F, forall x in Sigma$ t.c. non ci sono transizioni di $M$ con configurazione $q x$, aggiungiamo le transizioni $q x x accent(q, ~)$, $accent(q, ~) x x accent(q, ~)$ (dove $accent(q, ~)$ è un nuovo stato).
 
   #figure(diagram(
     node-stroke: 0.9pt,
@@ -325,27 +349,32 @@ L'insieme delle stringhe accettate da $M$ per arresto è il *linguaggio* accetta
 ]
 
 #example(multiple: true, "Esercizi d'esame")[
-+ $L$ è accettato per *unico stato finale* quando $exists M$ MdT con un solo stato finale che accetta $L$. Dimostrare $L$ accettato per stati finali se e solo se $L$ è accettato per unico stato finale. *Dimostrazione*:
-    \ $<==)$ Ovvio,
-    \ $==>)$ $M$ MdT che accetta $L$ per stati finali. Costruiamo $N$ aggiungendo un nuovo stato $accent(q, ~)$ che M raggiungerà ogni volta che termina in uno stato finale (inoltre $accent(q, ~)$ sarà l'unico stato finale di $N$) $ space square$
+  + $L$ è accettato per *unico stato finale* quando $exists M$ MdT con un solo stato finale che accetta $L$. Dimostrare $L$ accettato per stati finali se e solo se $L$ è accettato per unico stato finale.\
+    #proof()[
+      \ $<==)$ Ovvio.
+      \ $==>)$ $M$ MdT che accetta $L$ per stati finali. Costruiamo $N$ aggiungendo un nuovo stato $accent(q, ~)$ che M raggiungerà ogni volta che termina in uno stato finale (inoltre $accent(q, ~)$ sarà l'unico stato finale di $N$).
+    ]
 
-+ $M$ accetta _w_ *per ingresso* quando, durante l'esecuzione di $M$ su un input _w_, la MdT entra in uno stato finale. Un linguaggio $L$ è accettato da $M$ per ingresso quando $exists M$ MdT  che accetta tutte e sole le stringhe di $L$ per ingresso. Dimostrare che $L$ è accettato per stati finali se e solo se $L$ è accettato per ingresso. *Dimostrazione*:
-  \ $==>$) $M$ MDT che accetta _$L$_ per stati finali.\
-  $M$' che accetta per ingresso si costruisce a partire da $M$, aggiungendo un nuovo stato $tilde(q)$ (che sarà l'unico stato finale) e transizioni che portano in $tilde(q)$ da ogni stato finale in corrispondenza di caratteri per cui non ci sono transizioni uscenti in $M$.
+  + $M$ accetta _w_ *per ingresso* quando, durante l'esecuzione di $M$ su un input _w_, la MdT entra in uno stato finale. Un linguaggio $L$ è accettato da $M$ per ingresso quando $exists M$ MdT  che accetta tutte e sole le stringhe di $L$ per ingresso. Dimostrare che $L$ è accettato per stati finali se e solo se $L$ è accettato per ingresso.\
+    #proof()[
+      \ $==>$) $M$ MdT che accetta _$L$_ per stati finali.\
+      $M'$ che accetta per ingresso si costruisce a partire da $M$, aggiungendo un nuovo stato $tilde(q)$ (che sarà l'unico stato finale) e transizioni che portano in $tilde(q)$ da ogni stato finale in corrispondenza di caratteri per cui non ci sono transizioni uscenti in $M$.
 
-  $<==$) $M$ MDT che accetta _L_ per ingresso.\
-  $M$' MDT che accetta $L$ per stati finali si ottiene da $M$ eliminando tutte le transizioni uscenti dagli stati finali $ space square$
+      $<==$) $M$ MdT che accetta _L_ per ingresso.\
+      $M'$ MdT che accetta $L$ per stati finali si ottiene da $M$ eliminando tutte le transizioni uscenti dagli stati finali.
+    ]
+
 ]
 
 == MdT multitraccia
 
 #index[MdT multitraccia]
 #definition()[
-  MDT multitraccia con:
+  MdT multitraccia con:
   - $Sigma$ alfabeto
   - $Q$ insieme degli stati
 
-  Possiamo definirla come una lista di transizioni della forma (con k = numero tracce):
+  Possiamo definirla come una lista di transizioni della forma (con $k$ = numero tracce):
   $
     (q, (x_1, dots, x_k), alpha, accent(q, ~)) in Q times Sigma^k times (Sigma^k union {D, S}) times Q
   $
@@ -372,7 +401,7 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
 #proposition()[
   Un linguaggio $L$ è accettato da una MdT classica $<==>$ $L$ è accettato da una MdT limitata a sinistra.
 ]
-#proof()[
+#proof()[\
   $<==)$ Sia $M'$ una MdT con nastro limitato a sinistra che accetta $L$. Per simulare una computazione di $M'$ usando una MdT classica $M$, possiamo scrivere sul nastro un particolare simbolo, per esempio \#, che indichi che tale cella è quella iniziale. Quando una computazione di questa MdT cerca di portare la testina a sinistra di tale simbolo, facciamo in modo che un'altra computazione faccia terminare la MdT rifiutando la stringa.
   #figure(image("images/2026-03-11-12-09-22.png"))
 
@@ -385,7 +414,7 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
   In questo modo, a una transizione di $M$ che fa spostare la testina a sinistra della posizione 0 corrisponde una transizione di $M'$ che fa spostare la testina sulla seconda traccia. Essendo le MdT multitraccia accettate da MdT standard e viceversa, vale che $L$ è accettato da questa MdT limitata a sinistra.
 ]
 
-== MDT multinastro
+== MdT multinastro
 
 #index[MdT multinastro]
 #definition()[
@@ -406,7 +435,7 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
 
   $==>)$ Ovvio, basta ignorare i nastri in eccesso.
 
-  $<==)$ M MdT a $k$ nastri che accetta $L$, facciamo vedere che esiste una MdT $M'$ a $2k+1$ tracce che accetta $L$. Più precisamente facciamo vedere che ogni singola transizione di una computazione di $M$ può essere simulata da un gruppetto di transizioni di $M'$.
+  $<==)$ $M$ MdT a $k$ nastri che accetta $L$, facciamo vedere che esiste una MdT $M'$ a $2k+1$ tracce che accetta $L$. Più precisamente facciamo vedere che ogni singola transizione di una computazione di $M$ può essere simulata da un gruppetto di transizioni di $M'$.
 
   Poniamo $k=2$. Vogliamo cercare di simulare una singola transizione della MdT $M$ a 2 nastri con un gruppetto di transizioni di una MdT $M'$ a 5 tracce (perché $5 = 2k + 1$ con $k = 2$).
   #figure(image("images/2026-03-11-12-41-50.png"))
@@ -418,11 +447,11 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
   I passi con cui $M'$ simula una transizione di $M$ sono i seguenti:
 
   1. Prima vengono raccolte tutte le informazioni, riguardanti le celle lette sui due nastri. Queste informazioni possono essere memorizzate, ad esempio, definendo opportunamente l'insieme degli stati: la macchina, ogni volta che incontra il marcatore della traccia $i$, legge il simbolo corrispondente e lo memorizza cambiando il proprio stato interno.  Tecnicamente, l'insieme degli stati di $M'$ viene quindi esteso a un prodotto cartesiano del tipo $Q times (Sigma union {*})^k$, dove le componenti aggiuntive fungono da buffer temporaneo. Alla fine della scansione, lo stato di $M'$ contiene tutte le informazioni necessarie per decidere la transizione della macchina multinastro originale;
-  2. Cerca sulla traccia 2 il simbolo x, che corrisponde alla posizione della testina del nastro 1 di $M$;
-  3. Legge sulla traccia 1 il simbolo nella cella la cui posizione è indicata dalla x sulla traccia 2 e compie l'operazione di scrittura, se deve, altrimenti compie l'operazione di spostamento della testina operando sulla traccia 2 e riscrivendo la x in corrispondenza della sua nuova posizione;
+  2. Cerca sulla traccia 2 il simbolo $x$, che corrisponde alla posizione della testina del nastro 1 di $M$;
+  3. Legge sulla traccia 1 il simbolo nella cella la cui posizione è indicata dalla $x$ sulla traccia 2 e compie l'operazione di scrittura, se deve, altrimenti compie l'operazione di spostamento della testina operando sulla traccia 2 e riscrivendo la $x$ in corrispondenza della sua nuova posizione;
   4. Torna all'inizio del nastro sfruttando la traccia 5, ovvero quando legge il simbolo \# si ferma (perché tale simbolo indica l'inizio del nastro);
-  5. Cerca sulla traccia 4 il simbolo x, che corrisponde alla posizione della testina del nastro 2 di $M$;
-  6. Legge sulla traccia 3 il simbolo nella cella la cui posizione è indicata dalla x sulla traccia 4 e compie l'operazione di scrittura, se deve, altrimenti compie l'operazione di spostamento della testina operando sulla traccia 4 e riscrivendo la x in corrispondenza della sua nuova posizione;
+  5. Cerca sulla traccia 4 il simbolo $x$, che corrisponde alla posizione della testina del nastro 2 di $M$;
+  6. Legge sulla traccia 3 il simbolo nella cella la cui posizione è indicata dalla $x$ sulla traccia 4 e compie l'operazione di scrittura, se deve, altrimenti compie l'operazione di spostamento della testina operando sulla traccia 4 e riscrivendo la $x$ in corrispondenza della sua nuova posizione;
   7. Torna all'inizio del nastro.
 ]
 
@@ -461,7 +490,7 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
   Un'altra iterazione del passo 2 si ferma e rifiuta l'input (la stringa di input è più corta del quadrato perfetto sul nastro 2).
 
   #figure(image("images/2026-03-11-16-14-51.png", width: 50%))
-  
+
   Ecco la rappresentazione grafica dell'MdT multinastro che accetta questo linguaggio:
   #figure(image("images/2026-03-11-16-18-25.png"))
 ]
@@ -473,7 +502,7 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
   Una MdT si dice *non deterministica* quando le transizioni non sono necessariamente funzionali nei primi due argomenti.
 ]
 #observation()[
-  Dalla definizione sopra, emerge che Le MdT deterministiche (o standard) sono MdT non deterministiche, ma il viceversa non è sempre vero.
+  Dalla definizione sopra, emerge che le MdT deterministiche (o standard) sono MdT non deterministiche, ma il viceversa non è sempre vero.
 ]
 
 #definition()[
@@ -484,43 +513,43 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
   Dato l'alfabeto $Sigma={a, b, c}$ e un linguaggio _L_ definito su tale alfabeto t.c. $L={w in Sigma^* | exists "un'occorrenza di "c" immediatamente preceduta da "a b" oppure immediatamente"$$"seguita da" a b}$, scrivere la MdT che accetta $L$.
   \
   \
-  #grid(
-      rows: 3,
-      columns: 1,
-      grid.cell([
-        #grid(
-          columns: 13,
-          stroke: .5pt,
-          inset: 5pt,
-          [\*], [a], [b], [a], [a], [c], [b], [a], [b], [c], [a], [a], [b]
-        )
-      ]),
-      grid.cell(align: center + horizon, diagram(
-            node-stroke: 0.9pt,
-            cell-size: 1mm,
-            node-inset: 4pt,
-            spacing: 3mm,
-            label-size: 7.5pt,
+  #figure(grid(
+    rows: 3,
+    columns: 1,
+    grid.cell([
+      #grid(
+        columns: 13,
+        stroke: .5pt,
+        inset: 5pt,
+        [\*], [a], [b], [a], [a], [c], [b], [a], [b], [c], [a], [a], [b],
+      )
+    ]),
+  ))
+  #figure(diagram(
+    node-stroke: 0.9pt,
+    cell-size: 1mm,
+    node-inset: 4pt,
+    spacing: 3mm,
+    label-size: 7.5pt,
 
-            node((0, 0), $q_0$, name: <0>),
-            node((4, 0), $q_1$, name: <1>),
-            node((8, 0), $q_2$, name: <2>),
-            node((12, 0), $q_3$, name: <3>),
-            node((16, 0), $q_4$, name: <4>, extrude: (-2, 0)),
-            node((4, 5), $q_5$, name: <5>),
-            node((8, 5), $q_6$, name: <6>),
-            node((12, 5), $q_7$, name: <7>, extrude: (-2, 0)),
+    node((0, 0), $q_0$, name: <0>),
+    node((4, 0), $q_1$, name: <1>),
+    node((8, 0), $q_2$, name: <2>),
+    node((12, 0), $q_3$, name: <3>),
+    node((16, 0), $q_4$, name: <4>, extrude: (-2, 0)),
+    node((4, 5), $q_5$, name: <5>),
+    node((8, 5), $q_6$, name: <6>),
+    node((12, 5), $q_7$, name: <7>, extrude: (-2, 0)),
 
-            edge(<0>, <1>, "-|>", $*\/D$),
-            edge(<1>, <1>, "-|>", $a, b, c\/D$, bend: 130deg, loop-angle: 90deg),
-            edge(<1>, <2>, "-|>", $c\/D$),
-            edge(<2>, <3>, "-|>", $a\/D$),
-            edge(<3>, <4>, "-|>", $b\/b$),
-            edge(<1>, <5>, "-|>", $c\/S$),
-            edge(<5>, <6>, "-|>", $b\/S$),
-            edge(<6>, <7>, "-|>", $a\/a$),
-          ))
-  )
+    edge(<0>, <1>, "-|>", $*\/D$),
+    edge(<1>, <1>, "-|>", $a, b, c\/D$, bend: 130deg, loop-angle: 90deg),
+    edge(<1>, <2>, "-|>", $c\/D$),
+    edge(<2>, <3>, "-|>", $a\/D$),
+    edge(<3>, <4>, "-|>", $b\/b$),
+    edge(<1>, <5>, "-|>", $c\/S$),
+    edge(<5>, <6>, "-|>", $b\/S$),
+    edge(<6>, <7>, "-|>", $a\/a$),
+  ))
 ]
 
 #index[Grado di non determinismo]
@@ -531,9 +560,9 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
   $
   Calcolato al variare di $accent(q, tilde) in Q, accent(x, tilde) in Sigma$
 ]
-Questo significa che il grado di non determinismo corrisponde al numero massimo di svolte che la macchina M può prendere in un'unica transizione, leggendo lo stesso input.
+Questo significa che il grado di non determinismo corrisponde al numero massimo di svolte che la macchina $M$ può prendere in un'unica transizione, leggendo lo stesso input.
 
-Applichiamo il tutto all'esempio precedente. Dato $q in Q, x in Sigma$, codifichiamo le transizioni di M MdT non deterministica, aventi _qx_ come primi 2 elementi, utilizzando gli interi da 1 a $delta = 3$, possibilmente codifichiamo la stessa transizione con più etichette:
+Applichiamo il tutto all'esempio precedente. Dato $q in Q, x in Sigma$, codifichiamo le transizioni di $M$ MdT non deterministica, aventi _qx_ come primi 2 elementi, utilizzando gli interi da 1 a $delta = 3$, possibilmente codifichiamo la stessa transizione con più etichette:
 
 #grid(
   columns: (.30fr, 0.20fr, 0.20fr, 0.3fr),
@@ -571,13 +600,13 @@ Le $1,2,3$ indicano le transizioni per cui data quella coppia stato-simbolo la s
 
 #index[Funzione parziale]
 #definition()[
-  Dati due insiemi _A_ e _B_, una funzione $f$ si dice *funzione parziale* da _A_ a _B_ quando $exists D subset.eq A$ tale che $f: D --> B$ è una funzione
+  Dati due insiemi _A_ e _B_, una funzione $f$ si dice *funzione parziale* da _A_ a _B_ quando $exists D subset.eq A$ tale che $f: D --> B$ è una funzione.
   #figure(image("images/funzParz.png", width: 30%))
 ]
 
 #index[Funzione totale]
 #definition()[
-  Una funzione parziale $f$ da _A_ a _B_ si dice *funzione totale* quando $D = A$, cioè quando $f$ è definita su tutto _A_, ossia $forall x in A space exists y in B | f(x) = y$ (una funzione totale è quindi una funzione nel senso comune del termine)
+  Una funzione parziale $f$ da _A_ a _B_ si dice *funzione totale* quando $D = A$, cioè quando $f$ è definita su tutto _A_, ossia $forall x in A space exists y in B | f(x) = y$ (una funzione totale è quindi una funzione nel senso comune del termine).
 ]
 
 #index[Funzione parziale computabile]
@@ -587,7 +616,7 @@ Le $1,2,3$ indicano le transizioni per cui data quella coppia stato-simbolo la s
   - Se $x in.not "Dom"(f)$, $M$ su _x_ non termina $--> f$ *diverge* su _x_, in simboli: $f(x)arrow.t$
 ]
 
-Lavoriamo su $NN$ in codifica unaria
+Lavoriamo su $NN$ in codifica unaria.
 #index[Funzione parziale τ-ricorsiva]
 #definition()[
   Una funzione parziale $f: NN^k --> NN$ si dice *parziale $tau$-ricorsiva* quando $exists M$ MdT che, $forall accent(x, arrow) in NN^k:$
@@ -597,23 +626,23 @@ Lavoriamo su $NN$ in codifica unaria
 
 === Tesi di Church per funzioni parziali $tau$-ricorsive
 #index[Tesi di Church]
-#proposition[La classe delle funzioni parziali computabili coincide con la classe delle funzioni parziali $tau$-ricorsive]
+#proposition[La classe delle funzioni parziali computabili coincide con la classe delle funzioni parziali $tau$-ricorsive.]
 Questa è la *forma generalizzata* della tesi di Church, che inizialmente avevamo presentato solo per funzioni totali. Si evidenzia che il modello della MdT è in grado di descrivere il comportamento di qualunque algoritmo, inclusa la sua capacità (o incapacità) di terminare.
 #proposition()[
-  $forall M$ MdT standard, $forall k in NN space exists!$ funzione parziale computabile $f: NN^k --> NN$ t.c. $M$ calcola $f$
+  $forall M$ MdT standard, $forall k in NN space exists!$ funzione parziale computabile $f: NN^k --> NN$ t.c. $M$ calcola $f$.
 ]
-#proof()[
+#proof()[\
   Definisco $f$ funzione parziale da $NN^k$ in $NN$ come segue:\
   $forall accent(x, arrow) in NN^k$, eseguo $M$ su $accent(x, arrow)$:
   - Se $M$ termina, $f(accent(x, arrow))$ è dato in unario dal numero di "uni" che si trovano sul nastro al termine dell'esecuzione.
-  - Se $M$ non termina, $f(accent(x, arrow))arrow.t$
+  - Se $M$ non termina, $f(accent(x, arrow))arrow.t$.
 ]
 
 #index[Codifica delle MdT]#index[Enumerazione delle MdT]
 #proposition()[
-  L'insieme delle MdT è enumerabile (ovvero, esiste un algoritmo che genera in ordine lessicografico e per lunghezza crescente tutte le MdT)
+  L'insieme delle MdT è enumerabile (ovvero, esiste un algoritmo che genera in ordine lessicografico e per lunghezza crescente tutte le MdT).
 ]
-#proof()[
+#proof()[\
   La strategia che si utilizza è quella di codificare ogni MdT con una stringa binaria.
   - *Codifica degli stati*: ogni stato viene codificato con il suo indice scritto in unario.
   $
@@ -635,14 +664,17 @@ Questa è la *forma generalizzata* della tesi di Church, che inizialmente avevam
     - 1 zero separa i simboli;
     - 2 zeri separano le transizioni;
     - 3 zeri inizio e fine della codifica della MdT (utile nel caso in cui la MdT debba essere data in pasto ad un'altra MdT).
-    - in questo modo si può definire una *lista delle transizioni*: 000"TR1"00"TR2"00...00"TRn"000
+    - in questo modo si può definire una *lista delle transizioni*:
+      #align(center, [000"TR1"00"TR2"00...00"TRn"000])
 
   #example("Codifica dell'intera MdT")[
     - $q_0 * D q_0$
     - $q_0 1 D q_1$
     - $q_1 1 D q_1$
     $
-      q_0 <-> 1 space q_1 <-> 11 space 1<->1 space *<->11 space D<->111 space S<->1111
+      & q_0 <-> 1    && q_1 <-> 11 \
+      & 1<->1        && *<->11 \
+      & D<->111 quad && S<->1111
     $
     La MdT viene codificata come:
     $
@@ -673,8 +705,8 @@ Questa è la *forma generalizzata* della tesi di Church, che inizialmente avevam
 #theorem()[
   Sia $K= { a in NN | overbracket(M_a "termina quando la eseguo su a", f_a (a)↓)}$, con $M_a$ che rappresenta la $a$-esima
   MdT prodotta dall'algoritmo di enumerazione precedente.
-  1. K è semidecidibile
-  2. K non è decidibile.
+  1. $K$ è semidecidibile
+  2. $K$ non è decidibile.
 ]
 #proof()[
   1. Dobbiamo definire un algoritmo di semidecisione per $K$: dato $a in NN$, eseguo l'algoritmo di enumerazione delle MdT per ottenere $M_a$, quindi eseguo $M_a$ su $a$:
@@ -703,7 +735,7 @@ Questa è la *forma generalizzata* della tesi di Church, che inizialmente avevam
 ]
 
 #theorem("Teorema dell'arresto V1")[
-L'insieme $R={(n,m) in NN^2 | M_n "termina su" m}$ è semidecidibile ma non è decidibile   (il problema dell'arresto è indecidibile).
+  L'insieme $R={(n,m) in NN^2 | M_n "termina su" m}$ è semidecidibile ma non è decidibile   (il problema dell'arresto è indecidibile).
 ]
 #proof()[\
   Se per assurdo $R$ fosse decidibile, allora potrei decidere, in particolare, se $(n,n) in R space (forall n in NN)$. Ma tale "sottoproblema" è equivalente al problema di decisione per $K$, che abbiamo dimostrato essere indecidibile.
@@ -729,7 +761,7 @@ Tale definizione è equivalente perché:
   4. Se $m in accent(g, dot.double)(Sigma^*)$, esiste un algoritmo per calcolare $w in Sigma^*$ tale che $accent(g, dot.double)(w)=m$
 ]
 
-#figure(image("images/diagrammaProblemi.png", width: 60%))
+#figure(image("images/diagrammaProblemi.png", width: 50%))
 Vediamo quindi la formulazione alternativa del Teorema dell'arresto, dal punto di vista dei linguaggi formali.
 #index[Linguaggio del problema dell'arresto]
 #definition()[
@@ -761,11 +793,11 @@ Vediamo quindi la formulazione alternativa del Teorema dell'arresto, dal punto d
   Esiste una MdT universale che calcola le funzioni parziali computabili unarie.
 ]
 #observation()[
-La MdT universale è un concetto fondamentale per la teoria della computabilità e per l'informatica tutta. Essa dimostra che esiste un'unica macchina in grado di simulare qualsiasi altra macchina, a condizione che le informazioni sulla macchina da simulare e il suo input siano fornite in un formato appropriato. In particolare introduce il concetto di "programma come dato", che troviamo in molti contesti informatici, tra cui:
+  La MdT universale è un concetto fondamentale per la teoria della computabilità e per l'informatica tutta. Essa dimostra che esiste un'unica macchina in grado di simulare qualsiasi altra macchina, a condizione che le informazioni sulla macchina da simulare e il suo input siano fornite in un formato appropriato. In particolare introduce il concetto di "programma come dato", che troviamo in molti contesti informatici, tra cui:
 
-    - *Interpreti:* se $R(M)$ è il codice sorgente, $w$ sono i dati di input passati al programma, allora la MdT universale $U$ è l'interprete che legge il codice riga per riga e ne simula il comportamento su _w_.
-    - *Sistemi Operativi:* Il SO è esso stesso un programma in esecuzione e agisce come una MdT universale. Tratta i file eseguibili come codifiche $R(M)$, li carica dal disco alla RAM e ne fa simulare/eseguire il comportamento dalla CPU. In questo senso si nota anche l'impatto che questo concetto ha avuto sull'hardware con l'architettura di von Neumann, che ha permesso di avere un unico processore in grado di eseguire programmi diversi, a condizione che siano forniti in un formato appropriato.
-    - *Architettura di Von Neumann:* l'impatto della MdT universale riguarda anche l'hardware. Proprio come una MdT universale $U$ accetta sul suo nastro sia la codifica $R(M)$ che i dati $w$, questa architettura memorizza indistintamente *istruzioni* e *dati* nella stessa Memoria Centrale (RAM). Questo permette a un'unica CPU (hardware fisso) di comportarsi come infinite macchine diverse (simularne il comportamento) semplicemente cambiando i dati in memoria, senza dover modificare l'hardware.
+  - *Interpreti:* se $R(M)$ è il codice sorgente, $w$ sono i dati di input passati al programma, allora la MdT universale $U$ è l'interprete che legge il codice riga per riga e ne simula il comportamento su _w_.
+  - *Sistemi Operativi:* il SO è esso stesso un programma in esecuzione e agisce come una MdT universale. Tratta i file eseguibili come codifiche $R(M)$, li carica dal disco alla RAM e ne fa simulare/eseguire il comportamento dalla CPU. In questo senso si nota anche l'impatto che questo concetto ha avuto sull'hardware con l'architettura di von Neumann, che ha permesso di avere un unico processore in grado di eseguire programmi diversi, a condizione che siano forniti in un formato appropriato.
+  - *Architettura di Von Neumann:* l'impatto della MdT universale riguarda anche l'hardware. Proprio come una MdT universale $U$ accetta sul suo nastro sia la codifica $R(M)$ che i dati $w$, questa architettura memorizza indistintamente *istruzioni* e *dati* nella stessa Memoria Centrale (RAM). Questo permette a un'unica CPU (hardware fisso) di comportarsi come infinite macchine diverse (simularne il comportamento) semplicemente cambiando i dati in memoria, senza dover modificare l'hardware.
 ]
 
 == Riducibilità fra linguaggi
@@ -785,10 +817,11 @@ Un tema centrale della teoria della computabilità è quello di stabilire se un 
   + $f$ è una riduzione da $L_1$ a $L_2$ e $L_1$ è indecidibile $=> L_2$ indecidibile
 ]
 
-#proof()[ (solo del punto 1)
+#proof()[
+  (solo del punto 1)
   $F$ MdT che calcola $f$. $M_2$ MdT che decide $L_2$. MdT che decide $L_1$ su $w in Sigma_1^*$:
-      - uso $F$ per calcolare $f(w) in Sigma_2^*$;
-      - uso $M_2$ per decidere se $f(w) in L_2$
+  - uso $F$ per calcolare $f(w) in Sigma_2^*$;
+  - uso $M_2$ per decidere se $f(w) in L_2$
 ]
 #example(multiple: true)[
   + $L_1 = {u u | u = a^i b^i c^i, i>=0} subset.eq {a,b,c}^*$
@@ -805,19 +838,19 @@ Un tema centrale della teoria della computabilità è quello di stabilire se un 
     node-stroke: 0.9pt,
     cell-size: 12mm,
     spacing: (1mm, 4mm),
-    label-size: 7.5pt,
+    label-size: 10.5pt,
 
     // --- Flusso Input Valido (xy*) ---
     node((0, 0), $q_0$, name: <0>),
     node((3, 0), $q_1$, name: <1>),
     node((6, 0), $q_2$, name: <2>),
     node((9, 0), $q_3$, name: <3>),
-    node((9, 2), $q_(3a)$, name: <3a>, shape:circle),
+    node((9, 2), $q_(3a)$, name: <3a>, shape: circle),
 
     // --- Flusso Errore ---
     node((6, 2), $q_4$, name: <4>),
     node((3, 2), $q_5$, name: <5>),
-    node((3, 3.5), $q_(5a)$, name: <5a>, shape:circle),
+    node((3, 3.5), $q_(5a)$, name: <5a>, shape: circle),
     node((0, 2), $q_6$, name: <6>),
     node((0, 3.5), $q_7$, name: <7>),
 
@@ -826,7 +859,7 @@ Un tema centrale della teoria della computabilità è quello di stabilire se un 
     edge(<1>, <2>, "-|>", $x \/ D$),
     edge(<2>, <2>, "-|>", $y \/ D$, bend: -130deg, loop-angle: -90deg),
     edge(<2>, <3>, "-|>", $* \/ S$),
-    
+
     // cancellazione: Scrive * andando in q3a, poi si sposta a S tornando in q3
     edge(<3>, <3a>, "-|>", $x,y \/ *$, bend: -30deg),
     edge(<3a>, <3>, "-|>", $* \/ S$, bend: -30deg),
@@ -837,11 +870,11 @@ Un tema centrale della teoria della computabilità è quello di stabilire se un 
     edge(<2>, <4>, "-|>", $x \/ D$),
     // Ingresso diretto a q5 per stringa vuota
     edge(<1>, <5>, "-|>", $* \/ S$),
-    
+
     // Fase 1 Errore: Scorri a destra fino al blank (qui facciamo 1 sola azione: D)
     edge(<4>, <4>, "-|>", $x,y \/ D$, bend: -130deg, loop-angle: 90deg),
     edge(<4>, <5>, "-|>", $* \/ S$),
-    
+
     // Fase 2 Errore:  cancellazione
     edge(<5>, <5a>, "-|>", $x,y \/ *$, bend: 30deg),
     edge(<5a>, <5>, "-|>", $* \/ S$, bend: 30deg),
@@ -855,20 +888,18 @@ Un tema centrale della teoria della computabilità è quello di stabilire se un 
 == Problema del nastro vuoto (Blank Tape Problem)
 #index[Problema del nastro vuoto (BTP)]
 #problem()[
-  Data una MdT $M$, determinare se l'esecuzion di $M$ termina su nastro vuoto.
+  Data una MdT $M$, determinare se l'esecuzione di $M$ termina su nastro vuoto.
 ]
 
 #proposition()[
-  BTP è indecidibile
+  BTP è indecidibile.
 ]
 
 #proof()[
   Descriviamo una riduzione dal problema dell'arresto al problema del nastro vuoto
-  #block(
-    $
-      cal(L)_("HALT")={R(M)w | M "termina su" w}; cal(L)_("BTP") = {R(M) | M "termina su nastro vuoto"}
-    $,
-  )
+  $
+    cal(L)_("HALT")={R(M)w | M "termina su" w}; cal(L)_("BTP") = {R(M) | M "termina su nastro vuoto"}
+  $
   data _x_ stringa:
   - se _x_ *non* è della forma $R(M)w$, pongo $f(x)$ uguale a una stringa fissata che non codifica alcuna MdT (per esempio 1), così che $f(x) in.not cal(L)_("BTP")$;
   - altrimenti, se $x = R(M)w$, costruisco la stringa $R(N)$, con $N$ MdT, t.c. N opera come segue, su input _y_:
@@ -906,7 +937,9 @@ Data una MdT $M$ e il linguaggio semidecidibile $L = L(M)$ associato ad $M$, pos
   - cancello _y_;
   - scrivo _w_;
   - eseguo _M_ su _w_:
+
     + se $R(M)w in cal(L)_"HALT"$, ovvero _M_ termina su _w_, allora _N_ termina su ogni $y$, quindi $R(N) in cal(L)_(Sigma^*)$ (cioè $L(N) = Sigma^*$);
+
     + se $R(M)w in.not cal(L)_"HALT"$, ovvero _M_ non termina su _w_, allora _N_ non termina su nessun $y$, quindi $R(N) in.not cal(L)_(Sigma^*)$ (cioè $L(N) = emptyset$).
     Poiché non abbiamo un algoritmo per decidere $cal(L)_"HALT"$, non possiamo avere un algoritmo per decidere $cal(L)_(Sigma^*)$, che quindi è indecidibile.
 ]
@@ -944,7 +977,7 @@ Adesso generalizziamo questo concetto di proprietà di un linguaggio semidecidib
     #figure(image("images/rice.png", width: 35%))
     Quindi, non avendo un algoritmo per decidere $cal(L)_"HALT"$, non possiamo avere un algoritmo per decidere $cal(L)_cal(P)$.
   + $cal(P)$ proprietà non banale. Supponiamo che il linguaggio vuoto $emptyset$ soddisfi la proprietà $cal(P)$: allora  $emptyset$ non soddisfa $not cal(P)$. Essendo $cal(P)$ non banale, lo è anche $not cal(P)$ e quindi per il punto 1 di questa dimostrazione $cal(L)_(not cal(P))$ non è decidibile.\ Supponiamo per assurdo che $cal(L)_cal(P)$ sia decidibile. Allora si ha che $cal(L_P)^c = cal(L)_(not cal(P)) union {"stringhe che non codificano MdT"}$ deve essere decidibile, e dunque anche  $cal(L)_(not cal(P))$: assurdo.
-    
+
   #figure(image("images/rice2.png", width: 35%))
 ]
 #example(multiple: true)[
@@ -953,41 +986,41 @@ Adesso generalizziamo questo concetto di proprietà di un linguaggio semidecidib
     Posso applicare il teorema di Rice, perché la proprietà è non banale: per esempio, il linguaggio che contiene solo la stringa "0" soddisfa la proprietà, ma il linguaggio che contiene solo "10" non la soddisfa. Quindi il problema è indecidibile.
 
   2. Data $M$ MdT, determinare se l'insieme degli stati di $M$ ha cardinalità maggiore di 50, nell'ipotesi che non ci siano stati inutili (ciò che si vuole è stabilire se questo problema è decidibile o meno).\
-  
+
     Non posso applicare il teorema di Rice, perchè la proprietà è basata su un attributo "strutturale" della macchina (il numero di stati) e non su una proprietà del linguaggio. Cioè, per esempio, potrei avere una macchina $M_1$ con soli 2 stati che accetta un linguaggio $L$, e un'altra macchina $M_2$ con 100 stati che accetta lo stesso linguaggio $L$: si ha $L(M_1) = L(M_2)$, cioè entrambe le macchine accettano il linguaggio, ma la proprietà richiesta vale solo per $M_2$ per come è implementata la macchina.\ In questo caso il problema è decidibile, perché posso contare gli stati di $M$ scorrendo la codifica della MdT e verificare se sono più di 50.
 ]
 #definition()[
-  $M$ MdT è *riproducibile* quando $exists$ $M' != M$ t.c. $L(M) = L(M')$
+  $M$ MdT è *riproducibile* quando $exists$ $M' != M$ t.c. $L(M) = L(M')$.
 ]
 #observation()[
-  Ogni MdT è riproducibile (basta aggiungere stati/transizioni inutili)
+  Ogni MdT è riproducibile (basta aggiungere stati/transizioni inutili).
 ]
 #example(multiple: true)[
-1. Dato un linguaggio semidecidibile $L$, determinare se esiste una MdT riproducibile $M$ che accetta $L$.\
- 
- Questo è decidibile, in quanto  tutti i linguaggi hanno tale proprietà (vedi osservazione sopra). 
+  1. Dato un linguaggio semidecidibile $L$, determinare se esiste una MdT riproducibile $M$ che accetta $L$.\
 
-2.   Dato un linguaggio semidecidibile $L$, determinare se $exists$ MdT riproducibile con meno di 10 stati che accetta $L$:\
- 
- $cal(L) = {R(M) | L(M) "è accettato da una MdT riproducibile con meno di 10 stati"}$.\ Ci sono linguaggi che sono accettati da MdT con meno di 10 stati e ci sono linguaggi accettati da solo da MdT con più di 10 stati (per esempio un linguaggio fatto da stringhe lunghe più di 10 caratteri). La proprietà è non banale, quindi per il teorema di Rice $cal(L)$ non è decidibile.
+    Questo è decidibile, in quanto  tutti i linguaggi hanno tale proprietà (vedi osservazione sopra).
+
+  2. Dato un linguaggio semidecidibile $L$, determinare se $exists$ MdT riproducibile con meno di 10 stati che accetta $L$:\
+
+    $cal(L) = {R(M) | L(M) "è accettato da una MdT riproducibile con meno di 10 stati"}$.\ Ci sono linguaggi che sono accettati da MdT con meno di 10 stati e ci sono linguaggi accettati da solo da MdT con più di 10 stati (per esempio un linguaggio fatto da stringhe lunghe più di 10 caratteri). La proprietà è non banale, quindi per il teorema di Rice $cal(L)$ non è decidibile.
 ]
 Riprendiamo in mano la tesi di Church.
 #proposition()[
-  Ogni funzione $mu$-ricorsiva è $tau$-ricorsiva
+  Ogni funzione $mu$-ricorsiva è $tau$-ricorsiva.
 ]
 #proof()[
   (un'idea della dimostrazione). Per induzione strutturale sulla costruzione di una funzione $mu$-ricorsiva. Dobbiamo mostrare che ogni funzione che si trova in coda ad una derivazione $mu$-ricorsiva è calcolabile da una MdT (ovvero è $tau$-ricorsiva).
 
   1. *Caso base*: le funzioni iniziali $C_0^(k)$, $S$ e $epsilon_j^(k)$ sono $tau$-ricorsive: una MdT per il calcolo del successore l'abbiamo già vista, la funzione costante zero invece è calcolata da una MdT che cancella l'input e scrive un singolo "1" (zero in unario) e infine le proiezioni sono calcolate da MdT che scansionano il nastro e mantengono solo l'argomento $j$-esimo cancellando gli altri.
   2. *Passo induttivo*: supponiamo che le funzioni che compongono la derivazione $mu$-ricorsiva siano $tau$-ricorsive:
-    - *Composizione generalizzata*: 
-        sia $f(arrow(x)) = h(g_1(arrow(x)), dots, g_m(arrow(x)))$. Per ipotesi induttiva, esistono le MdT $G_1, dots, G_m$ e $H$ che calcolano rispettivamente le funzioni $g_1, dots, g_m$ e $h$. La MdT che calcola $f$ opera nel seguente modo:
-        - *Copia degli argomenti*: scrive sul nastro i parametri dell'input $arrow(x)$ (separati da una cella vuota) e ne crea una copia.
-        - *Calcolo dei componenti*: utilizza la MdT $G_1$ per calcolare il primo argomento di $h$. Successivamente, effettua una nuova copia dei parametri $arrow(x)$ e usa la MdT $G_2$ per calcolare il secondo argomento, proseguendo così per tutti i $g_i$.
-        - *Esecuzione della funzione esterna*: una volta ottenuti sul nastro tutti i valori $g_1(arrow(x)), dots, g_m (arrow(x))$, la macchina esegue la MdT $H$ su tali risultati per ottenere il valore finale $h(g_1, dots, g_m)$.
-        - *Pulizia*: il nastro viene ripulito dai parametri iniziali e dai calcoli intermedi, scrivendo il risultato finale e sovrascrivendo i dati di partenza.
-        
-    - *Ricorsione primitiva (RP)*: 
+    - *Composizione generalizzata*:
+      sia $f(arrow(x)) = h(g_1(arrow(x)), dots, g_m(arrow(x)))$. Per ipotesi induttiva, esistono le MdT $G_1, dots, G_m$ e $H$ che calcolano rispettivamente le funzioni $g_1, dots, g_m$ e $h$. La MdT che calcola $f$ opera nel seguente modo:
+      - *Copia degli argomenti*: scrive sul nastro i parametri dell'input $arrow(x)$ (separati da una cella vuota) e ne crea una copia.
+      - *Calcolo dei componenti*: utilizza la MdT $G_1$ per calcolare il primo argomento di $h$. Successivamente, effettua una nuova copia dei parametri $arrow(x)$ e usa la MdT $G_2$ per calcolare il secondo argomento, proseguendo così per tutti i $g_i$.
+      - *Esecuzione della funzione esterna*: una volta ottenuti sul nastro tutti i valori $g_1(arrow(x)), dots, g_m (arrow(x))$, la macchina esegue la MdT $H$ su tali risultati per ottenere il valore finale $h(g_1, dots, g_m)$.
+      - *Pulizia*: il nastro viene ripulito dai parametri iniziali e dai calcoli intermedi, scrivendo il risultato finale e sovrascrivendo i dati di partenza.
+
+    - *Ricorsione primitiva (RP)*:
       sia $f$ definita per RP da $g$ e $h$. Per ipotesi induttiva, esistono le MdT $G$ e $H$ che calcolano tali funzioni. La MdT che calcola $f(arrow(x), y)$ implementa il seguente processo iterativo:
       - *Inizializzazione*: scrive sul nastro gli argomenti $arrow(x)$ (separati da una cella vuota) e il valore di $y$. Aggiunge in fondo un contatore $i$ (inizialmente $0$) e una copia dei parametri $arrow(x)$.
       - *Caso Base ($i=0$)*: la macchina usa la MdT $G$ per calcolare il valore iniziale $f(arrow(x), 0) = g(arrow(x))$. Se l'input $y$ era $0$, la computazione termina qui dopo la pulizia del nastro.
@@ -996,8 +1029,8 @@ Riprendiamo in mano la tesi di Church.
         - Riscrive sul nastro gli argomenti $arrow(x)$, il contatore $i$ e il valore della funzione $f$ calcolato al passo precedente.
         - Esegue la MdT $H$ per ottenere il nuovo valore $f(arrow(x), i+1)$.
       - *Terminazione*: il ciclo si ripete finché il contatore raggiunge il valore desiderato ($i = y$). A quel punto, la macchina pulisce il nastro e restituisce il risultato finale $f(arrow(x), y)$.
-      
-    - *Minimalizzazione*: 
+
+    - *Minimalizzazione*:
       sia $g$ una funzione regolare e $f(arrow(x)) = min{y | g(arrow(x), y) = 0}$. Per ipotesi induttiva, esiste la MdT $G$ che calcola $g$. La MdT che calcola $f$ implementa un ciclo di ricerca:
       - *Preparazione*: scrive sul nastro i valori $arrow(x)$ separati da una cella vuota e un contatore $y$ inizializzato a $0$. Crea anche una copia di $arrow(x)$ e del contatore $y$.
       - *Verifica della condizione*: utilizza la MdT $G$ per calcolare il valore di $g(arrow(x), y)$.
