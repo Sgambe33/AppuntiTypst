@@ -971,7 +971,7 @@ Adesso generalizziamo questo concetto di proprietà di un linguaggio semidecidib
  
  $cal(L) = {R(M) | L(M) "è accettato da una MdT riproducibile con meno di 10 stati"}$.\ Ci sono linguaggi che sono accettati da MdT con meno di 10 stati e ci sono linguaggi accettati da solo da MdT con più di 10 stati (per esempio un linguaggio fatto da stringhe lunghe più di 10 caratteri). La proprietà è non banale, quindi per il teorema di Rice $cal(L)$ non è decidibile.
 ]
-Riprendiamo in mano la tesi di Church,
+Riprendiamo in mano la tesi di Church.
 #proposition()[
   Ogni funzione $mu$-ricorsiva è $tau$-ricorsiva
 ]
