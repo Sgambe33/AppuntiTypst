@@ -45,7 +45,7 @@ Adesso definiamo le notazioni asintotiche:
   $
   ovvero il rapporto tra queste due funzioni rimane compreso tra un valore minimo e un valore massimo.
 ]
-#figure(image("images/notazioniAsintotiche.png"))
+#figure(image("images/notazioniAsintotiche.png", width: 70%))
 #index[Notazione o piccolo]
 #definition("Notazione o piccolo")[
   Siano $f,g : NN ->NN$. Allora $f in o(g)$, quando $f$ è di un ordine di grandezza strettamente inferiore a $g$, va all'infinito molto più lentamente rispetto a $g$. Cioè, formalmente:
@@ -55,7 +55,7 @@ Adesso definiamo le notazioni asintotiche:
 ]
 
 #observation()[
-  $f=o(g) => f=O(g)$
+  $f in o(g) => f in O(g)$
 ]
 
 #index[Funzioni asintotiche]
@@ -67,7 +67,7 @@ Adesso definiamo le notazioni asintotiche:
 ]
 
 #observation()[
-  $f tilde g => f = Theta(g)$
+  $f tilde g => f in Theta(g)$
 ]
 #example()[
   Sia $M$ una MdT che accetta il linguaggio $L$ delle stringhe palindrome binarie sull'alfabeto $Sigma = {a,b}$. Mostriamo come $M$ procede per controllare se la stringa in input sia palindroma o no:
@@ -84,8 +84,7 @@ Adesso definiamo le notazioni asintotiche:
     $
   - La lunghezza della stringa è un numero dispari $n=2k-1$:
     $
-      [1+2 + (2k-2)] + [1+2 + (2k-3)] + [1+2 + (2k-4)] + dots+ [1+2 + 2] + [1+2 + 1] \ = 4+ sum_(i=0)^(2k-2) (3+i) = 4 + 3 dot (2k-1) + sum_(i=1)^(2k-2) i \
-      = 4+3(2k-1) + frac((2k-2)(2k-1), 2) = frac(n(n-1), 2)+3n+4
+      [1+2 + (2k-2)] + [1+2 + (2k-3)] + [1+2 + (2k-4)] + dots+ [1+2 + 2] + [1+2 + 1] \ = 4+ sum_(i=0)^(2k-2) (3+i) = 4+3(2k-1) + frac((2k-2)(2k-1), 2) = 4+3n + frac(n(n-1), 2)
     $
   Quindi, in conclusione, abbiamo che la complessità è di tipo polinomiale, più precisamente è quadratica. ($Theta(n^2)$)
 ]
@@ -97,7 +96,7 @@ Adesso definiamo le notazioni asintotiche:
 
 === Complessità nelle MdT multinastro
 #proposition()[
-  $M$ MdT a $k$ nastri ($k>1$) che accetta $L$ con complessità $t c_M (n)=f(n)=>$ esiste una MdT $M'$ standard equivalente che accetta $L$ e tale che $t c_M' (n) = O(f(n)^2)$
+  $M$ MdT a $k$ nastri ($k>1$) che accetta $L$ con complessità $t c_M (n)=f(n)=>$ esiste una MdT $M'$ standard equivalente che accetta $L$ tale che $t c_M' (n) = O(f(n)^2)$.
 ]
 #proof()[
   Consideriamo una MdT $M$ a $k$ nastri e prendiamo la MdT $M'$ a $2k+1$ tracce che è equivalente a $M$ già descritta nella prima parte del corso (Proposizione 2.5.1), ma ricordiamo com'è fatta per $k=2$:
@@ -109,9 +108,121 @@ Adesso definiamo le notazioni asintotiche:
   $
 ]
 #example([
-  #figure(image("images/esempioComplessitaMdtMultinastro.png", width: 100%))
-  Nota sullo stile: non è necessario nelle transizioni tipo $(b, b)\/(S, D)$ scrivere parentesi e virgole, cioè si può scrivere $b b\/S D$\
-  *ci sarebbe da spiegare perchè la complessità è data da 1 + 2n + ... perché non mi è chiaro*
+  Sia $L$ il linguaggio delle stringhe palindrome sull'alfabeto $Sigma = {a, b}$. Costruiamo una $M d T$ $M$ a due nastri che accetti $L$. La strategia da seguire è la seguente:
+
+  - Copiare la stringa in input (scritta sul primo nastro) sul secondo nastro;
+  - Portare una delle due testine all'inizio del nastro e l'altra alla fine;
+  - Confrontare le due stringhe muovendo le testine in direzioni opposte.
+
+  La $M d T$ $M$ in questione è la seguente:
+
+  #align(center)[
+    #cetz.canvas({
+      import cetz.draw: *
+
+      let r = 0.45
+      let dx = 3.5
+
+      set-style(mark: (end: ">", fill: black))
+
+      // Nodi / Stati
+      circle((0, 0), radius: r, name: "q0")
+      content("q0.center", $q_0$)
+
+      circle((dx, 0), radius: r, name: "q1")
+      content("q1.center", $q_1$)
+
+      circle((dx * 2, 0), radius: r, name: "q2")
+      content("q2.center", $q_2$)
+
+      circle((dx * 3, 0), radius: r, name: "q3")
+      content("q3.center", $q_3$)
+
+      // Stato di accettazione (doppio cerchio)
+      circle((dx * 4, 0), radius: r, name: "q4")
+      circle("q4.center", radius: r - 0.1)
+      content("q4.center", $q_4$)
+
+      // Freccia iniziale
+      line((-1.2, 0), (-0.45, 0), mark: (end: ">"))
+
+      // Transizioni lineari
+      line((r, 0), (dx - r, 0), mark: (end: ">"), name: "t01")
+      content("t01.mid", [$(*,*) \/ (D,D)$], anchor: "south", padding: 0.1)
+
+      line((dx + r, 0), (dx * 2 - r, 0), mark: (end: ">"), name: "t12")
+      content("t12.mid", [$(*,*) \/ (*,S)$], anchor: "south", padding: 0.1)
+
+      line((dx * 2 + r, 0), (dx * 3 - r, 0), mark: (end: ">"), name: "t23")
+      content("t23.mid", [$(*,*) \/ (S,D)$], anchor: "south", padding: 0.1)
+
+      line((dx * 3 + r, 0), (dx * 4 - r, 0), mark: (end: ">"), name: "t34")
+      content("t34.mid", [$(*,*) \/ (*,*)$], anchor: "south", padding: 0.1)
+
+      // Parametri per la curvatura dei loop
+      let loop_x = 0.25
+      let loop_y = 0.38
+      let ctrl_x = 0.6
+      let ctrl_y = 1.6
+
+      // Loop superiore q1
+      bezier(
+        (dx - loop_x, loop_y),
+        (dx + loop_x, loop_y),
+        (dx - ctrl_x, ctrl_y),
+        (dx + ctrl_x, ctrl_y),
+        mark: (end: ">"),
+        name: "q1_top",
+      )
+      content("q1_top.mid", anchor: "south", padding: 0.1, align(center)[$(b,*) \/ (b,b)$ \ $(a,*) \/ (a,a)$])
+
+      // Loop inferiore q1
+      bezier(
+        (dx - loop_x, -loop_y),
+        (dx + loop_x, -loop_y),
+        (dx - ctrl_x, -ctrl_y),
+        (dx + ctrl_x, -ctrl_y),
+        mark: (end: ">"),
+        name: "q1_bot",
+      )
+      content("q1_bot.mid", anchor: "north", padding: 0.1, align(center)[$(a,a) \/ (D,D)$ \ $(b,b) \/ (D,D)$])
+
+      // Loop superiore q2
+      bezier(
+        (dx * 2 - loop_x, loop_y),
+        (dx * 2 + loop_x, loop_y),
+        (dx * 2 - ctrl_x, ctrl_y),
+        (dx * 2 + ctrl_x, ctrl_y),
+        mark: (end: ">"),
+        name: "q2_top",
+      )
+      content("q2_top.mid", anchor: "south", padding: 0.1, align(center)[$(*,b) \/ (*,S)$ \ $(*,a) \/ (*,S)$])
+
+      // Loop superiore q3
+      bezier(
+        (dx * 3 - loop_x, loop_y),
+        (dx * 3 + loop_x, loop_y),
+        (dx * 3 - ctrl_x, ctrl_y),
+        (dx * 3 + ctrl_x, ctrl_y),
+        mark: (end: ">"),
+        name: "q3_top",
+      )
+      content("q3_top.mid", anchor: "south", padding: 0.1, align(center)[$(b,b) \/ (S,D)$ \ $(a,a) \/ (S,D)$])
+    })
+  ]
+
+  Studiamo la complessità: in questo caso, il *caso peggiore* col massimo numero di transizioni si ha nel caso in cui la stringa viene *accettata*.
+  $ t c_M (n) = 1 + 2n + 1 + n + 1 + n + 1 = 4n + 4 = Theta(n) $
+  La complessità è *polinomiale*, è un polinomio di primo grado (*lineare*).
+  - $1$ passo: posizionamento sul primo carattere ($q_0 arrow q_1$).
+  - $2n$ passi: copia del nastro 1 sul nastro 2 ($q_1$).
+  - $1$ passo: lettura del vuoto a fine stringa ($q_1 arrow q_2$).
+  - $n$ passi: riavvolgimento del nastro 2 fino all'inizio ($q_2$).
+  - $1$ passo: allineamento testine sui bordi opposti ($q_2 arrow q_3$).
+  - $n$ passi: confronto incrociato dei caratteri ($q_3$).
+  - $1$ passo: transizione allo stato di accettazione finale ($q_3 arrow q_4$).
+
+  Nota sullo stile: non è necessario nelle transizioni tipo $(b, b)\/(S, D)$ scrivere parentesi e virgole, cioè si può scrivere $b b\/S D$.
 ])
 === Complessità nelle MdT non deterministiche
 #definition()[
@@ -445,8 +556,8 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
   SAT è NP-difficile.
 ]
 #observation()[
-    Vista la complessità della dimostrazione, all'orale viene spesso chiesto solo qualche passaggio.
-  ]
+  Vista la complessità della dimostrazione, all'orale viene spesso chiesto solo qualche passaggio.
+]
 #proof()[
   Vogliamo dimostrare che $forall L in "NP"$, esiste una riduzione polinomiale da $L$ a $S A T$. Dire che $L in "NP"$ equivale a considerare una $M d T$ $M$ non deterministica polinomiale che accetta $L$. Sia $p(n) = t_(C M)(n)$ (cioè $p(n)$ è la complessità della macchina di Turing $M$). Per semplicità, supponiamo che $forall$ stringa $w$ di lunghezza $n$, il numero di transizioni di $M$ su $w$ sia esattamente $p(n)$ e che $M$ sia una $M d T$ standard limitata a sinistra con le celle numerate.
 
@@ -942,7 +1053,6 @@ Le clausole di $p$ possono essere:
       let l1 = (0, 1.5)
       let l2 = (0, 0)
       let l3 = (0, -1.5)
-
 
       let r1 = (5, 1.5)
       let r2 = (5, 0)
@@ -1524,7 +1634,6 @@ Le clausole di $p$ possono essere:
   bezier("in_3", "in_1", (8.0, y-in - 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
   bezier("out_1", "out_3", (8.0, y-out + 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
 
-
   // // ==========================================
   // // 4. Collegamenti Main Spine (Lo scheletro)
   // // ==========================================
@@ -1537,7 +1646,6 @@ Le clausole di $p$ possono essere:
 
   // o4 -> e1 (back edge grande a sinistra, x = -7.0)
   line("o4", (16, -4.0), (-7.0, -4.0), (-7.0, 17.0), (0, 17.0), "e1", mark: (end: ">"))
-
 
   // // ==========================================
   // // 5. Routing Variabili <-> Clausola
@@ -1554,7 +1662,6 @@ Le clausole di $p$ possono essere:
   // // x3 <-> Clausola
   // line("f3_0", (20.0, 13.5), (20.0, 10.5), ("in_3.x", 10.5), "in_3", mark: (end: ">"))
   // line("out_3", ("out_3.x", 5.5), (12.0, 5.5), (12.0, 12.0), "f3_1", mark: (end: ">"))
-
 
   // // ==========================================
   // // 6. Testi e Annotazioni a mano
