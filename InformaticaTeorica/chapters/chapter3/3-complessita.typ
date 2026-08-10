@@ -236,40 +236,101 @@ Adesso definiamo le notazioni asintotiche:
 #proposition()[
   Sia _M_ MdT non deterministica che accetta il linguaggio _L_:
   $
-    & t c_M(n) = f(n)=> exists M' "MdT deterministica che accetta "L space t.c. \
-    & t c_M'(n)=Omicron(f(n) dot delta^(f(n)))
+    t c_M (n) = f(n)=> exists M' "MdT deterministica che accetta "L space t.c. space t c_M'(n)=Omicron(f(n) dot delta^(f(n)))
   $
+  con $delta$ grado di non determinismo di $M$.
 ]
 
 #proof()[
-  _M'_ MdT deterministica equivalente a _M_
+  Costruiamo $M'$ MdT deterministica a 3 nastri che esplori l'albero delle computazioni della MdT non deterministica $M$.Poiché $M$ ha un grado di non determinismo pari a $delta$, in ogni passo della computazione può scegliere tra $delta$ transizioni diverse. L'insieme di tutte le possibili esecuzioni forma un albero in cui ogni nodo ha al massimo $delta$ figli.
 
   #grid(
-    columns: (0.05fr, 0.1fr, 0.3fr, 0.3fr, 0.3fr, 0.05fr),
+    columns: (0.1fr, 0.1fr, 0.3fr, 0.3fr, 0.3fr, 0.05fr),
     rows: 3,
     row-gutter: 5pt,
     stroke: none,
-    [], [3], [Computazioni di M], [$(m_1, m_2, dots, m_(f(n)))$], [$1 <= m_i <= delta$], [],
-    [], [2], [Simulazione di M], [], [], [],
-    [], [1], [INPUT], [], [], [],
+    [Nastro], [3], [Computazioni di M], [$(m_1, m_2, dots, m_(f(n)))$], [$1 <= m_i <= delta$], [],
+    [Nastro], [2], [Simulazione di M], [], [], [],
+    [Nastro], [1], [INPUT], [], [], [],
   )
 
-  - Numero di computazioni di M di lunghezza $f(n)$ su input di lunghezza $n$: $<= delta^(f(n))$
-  - Numero di transizioni eseguite da M su una stringa di lunghezza $n$: $<= f(n)$
+  - Numero di computazioni (rami dell'albero) di $M$ di lunghezza $f(n)$ su input di lunghezza $n$ è $<= delta^(f(n))$.
+  - Numero di transizioni eseguite da $M$ su una stringa di lunghezza $n$: $<= f(n)$
 
   Quindi: $t c_M'(n)=Omicron(f(n) dot delta^(f(n)))$
 ]
 #example()[
   #image("images/2026-04-01-11-50-50.png")
-  // TODO: CORREGGERE L'ESEMPIO, CASO PEGGIORE: NON ACCETTA LA STRINGA
-  #image("images/2026-04-01-11-55-00.png")
+  #align(center)[
+    #cetz.canvas({
+      import cetz.draw: *
 
-  Caso peggiore: rifiuto, precisamente la computazione in cui copio tutta la stringa sul secondo nastro.
-  #block(
-    $
-      t c_M(n)= 1 + 2n
-    $,
-  )
+      let r = 0.5
+      let dx = 4.0
+
+      set-style(mark: (end: ">", fill: black))
+
+      // Stati
+      circle((0, 0), radius: r, name: "q0")
+      content("q0.center", $q_0$)
+
+      circle((dx, 0), radius: r, name: "q1")
+      content("q1.center", $q_1$)
+
+      circle((dx * 2, 0), radius: r, name: "q2")
+      content("q2.center", $q_2$)
+
+      circle((dx * 2.8, 0), radius: r, name: "q3")
+      circle("q3.center", radius: r - 0.08)
+      content("q3.center", $q_3$)
+
+      // Freccia iniziale
+      line((-1.2, 0), "q0.west", mark: (end: ">"))
+
+      // q0 -> q1
+      line("q0.east", "q1.west", name: "t01", mark: (end: ">"))
+      content("t01.mid", anchor: "south", padding: 0.1, [
+        $(*,*) \/ (D,D)$
+      ])
+
+      // q1 loops
+      let loop_h = 1.6
+      let loop_w = 0.6
+      bezier("q1.north-west", "q1.north-east", (dx - loop_w, loop_h), (dx + loop_w, loop_h), name: "q1_top", mark: (
+        end: ">",
+      ))
+      content("q1_top.mid", anchor: "south", padding: 0.1, align(center)[$(a,*) \/ (a,a)$ \ $(b,*) \/ (b,b)$])
+
+      bezier("q1.south-west", "q1.south-east", (dx - loop_w, -loop_h), (dx + loop_w, -loop_h), name: "q1_bot", mark: (
+        end: ">",
+      ))
+      content("q1_bot.mid", anchor: "north", padding: 0.1, align(center)[$(a,a) \/ (D,D)$ \ $(b,b) \/ (D,D)$])
+
+      // q1 -> q2 (due frecce)
+      bezier("q1.east", "q2.west", (dx + 1.2, 0.4), (dx * 2 - 1.2, 0.4), name: "t12_top", mark: (end: ">"))
+      content("t12_top.mid", anchor: "south", padding: 0.1, align(center)[$(a,*) \/ (D,S)$ \ $(b,*) \/ (D,S)$])
+
+      bezier("q1.east", "q2.west", (dx + 1.2, -0.4), (dx * 2 - 1.2, -0.4), name: "t12_bot", mark: (end: ">"))
+      content("t12_bot.mid", anchor: "north", padding: 0.1, align(center)[$(a,*) \/ (a,S)$ \ $(b,*) \/ (b,S)$])
+
+      // q2 loop
+      bezier(
+        "q2.north-west",
+        "q2.north-east",
+        (dx * 2 - loop_w, loop_h),
+        (dx * 2 + loop_w, loop_h),
+        name: "q2_top",
+        mark: (end: ">"),
+      )
+      content("q2_top.mid", anchor: "south", padding: 0.1, align(center)[$(a,a) \/ (D,S)$ \ $(b,b) \/ (D,S)$])
+
+      // q2 -> q3
+      line("q2.east", "q3.west", name: "t23", mark: (end: ">"))
+      content("t23.mid", anchor: "south", padding: 0.1, [$(*,*) \/ (*,*)$])
+    })
+  ]
+
+  Il caso peggiore si ha quando la MdT rifiuta la stringa, più precisamente la computazione in cui copio tutta la stringa sul secondo nastro $t c_M (n)= 1 + 2n$.
 ]
 == Classi P e NP
 Alla luce delle considerzioni fatte sui vari tipi di MdT, definiamo le seguenti classi di linguaggi (o "problemi", più in generale):
