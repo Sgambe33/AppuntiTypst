@@ -12,40 +12,43 @@ Conclusa l'analisi sulla calcolabilità, ci concentriamo ora sulla classe dei pr
 == Complessità temporale
 #index[Complessità in tempo]
 #definition()[
-  Data una MdT $M$ standard, la complessità in tempo di $M$ è determinata dalla funzione *time complexity* ($t c_M$). Tale funzione calcola quanto ci mette $M$ a terminare su una stringa w in input ed è definita nel seguente modo:
+  Data una MdT $M$ standard, la complessità in tempo di $M$ è determinata dalla funzione *time complexity* ($t c_M$). Tale funzione calcola quanto ci mette $M$ a terminare su una stringa $w$ in input ed è definita nel seguente modo:
   $
     t c_M : NN -> NN\
-    t c_M (n) = "# transizioni eseguite da M su una stringa di lunghezza n nel caso peggiore."
+    t c_M (n) = "# transizioni eseguite da "M" su una stringa di lunghezza" n" nel caso peggiore."
   $
 ]
-
+Adesso definiamo le notazioni asintotiche:
 #index[Notazione O grande]
 #definition("Notazione O grande")[
-  Siano $f,g : NN ->NN$. Allora $f in O(g)$, quando scegliendo un $n$ molto grande, il rapporto tra queste due funzioni tende a rimanere limitato, non sorpassa mai un certo valore costante. Si può scrivere così:
+  Siano $f,g : NN ->NN$. Allora $f in O(g)$ quando
   $
-    exists C > 0, exists n_0 in NN, forall n gt.eq n_0 : frac(f(n), g(n)) lt.eq C "oppure" f(n) lt.eq C dot g(n)
+    exists C > 0, exists n_0 in NN, forall n gt.eq n_0 : frac(f(n), g(n)) lt.eq C "ossia" f(n) lt.eq C dot g(n)
   $
+  ovvero quando, scegliendo un $n$ molto grande, il rapporto tra queste due funzioni tende a rimanere limitato, non sorpassa mai un certo valore costante.
 ]
 
 #index[Notazione Omega]
 #definition("Notazione Omega")[
-  Siano $f,g : NN ->NN$. Allora $f in Omega(g)$, quando il rapporto tra queste due funzioni sta sempre sopra ad un certo valore costante. Si può scrivere così:
+  Siano $f,g : NN ->NN$. Allora $f in Omega(g)$ quando
   $
     exists D > 0, exists n_0 in NN, forall n gt.eq n_0 : frac(f(n), g(n)) gt.eq D "oppure" f(n) gt.eq D dot g(n)
   $
+  ovvero quando quando il rapporto tra queste due funzioni sta sempre sopra ad un certo valore costante.
 ]
 
 #index[Notazione Theta]
 #definition("Notazione Theta")[
-  Siano $f,g : NN ->NN$. Allora $f in Theta(g)$, quando $f in O(g)$ e $f in Omega(g)$, cioè quando il rapporto tra queste due funzioni rimane compreso tra un valore minimo e un valore massimo. Si può scrivere così:
+  Siano $f,g : NN ->NN$. Allora $f in Theta(g)$, quando $f in O(g)$ e $f in Omega(g)$, cioè quando
   $
     exists C,D > 0, exists n_0 in NN, forall n gt.eq n_0 : C lt.eq frac(f(n), g(n)) lt.eq D
   $
+  ovvero il rapporto tra queste due funzioni rimane compreso tra un valore minimo e un valore massimo.
 ]
-
+#figure(image("images/notazioniAsintotiche.png"))
 #index[Notazione o piccolo]
 #definition("Notazione o piccolo")[
-  Siano $f,g : NN ->NN$. Allora $f in o(g)$, quando $f$ è di un ordine di grandezza strettamente inferiore a $g$, va all'infinito molto più lentamente rispetto a $g$. Si può scrivere come:
+  Siano $f,g : NN ->NN$. Allora $f in o(g)$, quando $f$ è di un ordine di grandezza strettamente inferiore a $g$, va all'infinito molto più lentamente rispetto a $g$. Cioè, formalmente:
   $
     lim_(n->infinity) f(n)/g(n) = 0
   $
@@ -56,7 +59,7 @@ Conclusa l'analisi sulla calcolabilità, ci concentriamo ora sulla classe dei pr
 ]
 
 #index[Funzioni asintotiche]
-#definition("Funzioni asintotiche")[
+#definition("Equivalenza asintotica")[
   Siano $f,g : NN ->NN$. Allora $f tilde g$, ($f$ asintotica $g$) quando le due funzioni all'infinito tendono ad attaccarsi. Si può scrivere come:
   $
     lim_(n->infinity) f(n)/g(n) = 1
@@ -73,12 +76,13 @@ Conclusa l'analisi sulla calcolabilità, ci concentriamo ora sulla classe dei pr
   3. Se trova lo stesso simbolo, lo cancella e torna a inizio stringa (ripete dal punto 1), finché la stringa non finisce.
   4. Altrimenti termina.
   #figure(image("images/2026-03-30-12-20-44.png", width: 60%))
-  In questo caso, il caso peggiore (ovvero il massimo numero di transizioni) si ha quando la stringa viene accettata. Distinguiamo due casi:
-  - La lunghezza $n=2k$ della stringa è un numero pari:
+  In questo caso, il caso peggiore (ovvero quello in cui si ha il massimo numero di transizioni) si ha quando la stringa viene accettata. Distinguiamo due casi:
+
+  - La lunghezza della stringa è un numero pari $n=2k$:
     $
       [1+2 + (2k-1)] + [1+2 + (2k-2)] + [1+2 + (2k-3)] + dots+ [1+2 + 2] + [1+2 + 1] \ = 2 + sum_(i=0)^(2k-1) (3+i) = 2 + sum_(i=0)^(2k-1)(3) + sum_(i=0)^(2k-1)(i) = 2+3 dot 2k + frac(2k(2k-1), 2) = frac(n(n-1), 2)+3n+2
     $
-  - La lunghezza $n=2k-1$ della stringa è un numero dispari:
+  - La lunghezza della stringa è un numero dispari $n=2k-1$:
     $
       [1+2 + (2k-2)] + [1+2 + (2k-3)] + [1+2 + (2k-4)] + dots+ [1+2 + 2] + [1+2 + 1] \ = 4+ sum_(i=0)^(2k-2) (3+i) = 4 + 3 dot (2k-1) + sum_(i=1)^(2k-2) i \
       = 4+3(2k-1) + frac((2k-2)(2k-1), 2) = frac(n(n-1), 2)+3n+4
@@ -86,26 +90,30 @@ Conclusa l'analisi sulla calcolabilità, ci concentriamo ora sulla classe dei pr
   Quindi, in conclusione, abbiamo che la complessità è di tipo polinomiale, più precisamente è quadratica. ($Theta(n^2)$)
 ]
 
-=== Complessità nelle MDT multitraccia
+=== Complessità nelle MdT multitraccia
 #proposition()[
-  Sia $M$ una MdT multitraccia che accetta $L$, avente complessità in tempo $t c_M (n)=f(n) =>$ esiste una MdT $M'$ standard (equivalente a $M$) che accetta $L$ tale che $t c_M' (n) = f(n)$. Ovvero hanno la stessa complessità.
+  $M$ MdT multitraccia che accetta $L$, avente complessità in tempo $t c_M (n)=f(n) =>$ esiste una MdT $M'$ standard che accetta $L$ tale che $t c_M' (n) = f(n)$. Ovvero hanno la stessa complessità temporale (compiono lo stesso numero di transizioni).
 ]
 
-=== Complessità nelle MDT multinastro
+=== Complessità nelle MdT multinastro
 #proposition()[
-  Sia $M$ una MdT a $k$ nastri ($k>1$) che accetta $L$ con complessità $t c_M (n)=f(n)=>$ esiste una MdT $M'$ standard equivalente che accetta $L$ e tale che $t c_M' (n) = O(f(n)^2)$
+  $M$ MdT a $k$ nastri ($k>1$) che accetta $L$ con complessità $t c_M (n)=f(n)=>$ esiste una MdT $M'$ standard equivalente che accetta $L$ e tale che $t c_M' (n) = O(f(n)^2)$
 ]
 #proof()[
-  Consideriamo una MdT $M$ a $k$ nastri e prendiamo la MdT $M'$ a $2k+1$ tracce che è equivalente a $M$ già descritta nella prima parte del corso. Sia $w$ una stringa di lunghezza $n$ su cui eseguiamo $M$ e supponiamo che $M$ su $w$ esegua $f(n)$ transizioni. Vediamo quante transizioni di $M'$ sono necessarie per simulare la t-esima transizione di $M$ su $w$.
-  - Momento della raccolta delle informazioni (la testina di $M'$ si   sposta sulle tracce in corrispondenza della posizione delle testine  dei nastri per leggere i simboli e salvarli nello stato):  La testina si sposta al massimo per t volte (perché stiamo   analizzando la t-esima transizione), legge il simbolo e torna   indietro, per cui fa t passi avanti, $t$ passi indietro per tutti i $k$ nastri di $M$: $2t dot k + 2 t dot k = 4 t k$
+  Consideriamo una MdT $M$ a $k$ nastri e prendiamo la MdT $M'$ a $2k+1$ tracce che è equivalente a $M$ già descritta nella prima parte del corso (Proposizione 2.5.1), ma ricordiamo com'è fatta per $k=2$:
+  #figure(image("images/MdTmultitracciaPerSimulareMdTmultinastro.png", width: 60%))
+  Sia $w$ una stringa di lunghezza $n$ su cui eseguiamo $M$ e supponiamo che $M$ su $w$ esegua $f(n)$ transizioni. Vediamo prima quante transizioni di $M'$ sono necessarie per simulare la $t$-esima transizione di $M$ su $w$: dapprima si ha il momento della raccolta delle informazioni, in cui la testina di $M'$ si   sposta sulle tracce in corrispondenza della posizione delle testine dei nastri per leggere i simboli e salvarli nello stato. La posizione di ciascuna testina simulata può trovarsi a distanza al massimo $t$ dalla posizione iniziale, perché alla $t$-esima transizione una testina può essersi spostata di al massimo di $t$ celle. Giunti alla cella, si legge il simbolo e si torna indietro: per cui vengono fatti al massimo $t$ passi avanti e $t$ passi indietro per tutti i $k$ nastri di $M$, dunque il costo di questa fase è $2t k$ (vedere la Proposizione 2.5.1 per i passaggi in dettaglio). Per simulare correttamente la transizione poi si deve eseguirla effettivamente, quindi tornare sulla $k$ posizioni per effettuare scritture/spostamenti delle testine simulate, e anche in questo caso il costo è $2t k$. Quindi la stima del numero massimo di transizioni che $M'$ deve effettuare per simulare la $t$-esima transizione di $M$ è $2t k + 2t k = 4t k$.\ A questo punto possiamo stimare il limite superiore del numero di transizioni eseguite da $M'$ su input di lunghezza $n$ nel caso peggiore:
   $
-    sum_(t=1)^(f(n)) 4 t k quad ("stima limite sup. del num. di trans. nel caso peggiore" ) =\
+    sum_(t=1)^(f(n)) 4 t k quad =
     4k dot sum_(t=1)^(f(n)) t = 4k dot frac(f(n) dot (f(n)+1), 2) = Omicron(f(n)^2)
   $
 ]
-
-#figure(image("images/2026-03-30-13-14-10.png", width: 60%))
-
+#example([
+  #figure(image("images/esempioComplessitaMdtMultinastro.png", width: 100%))
+  Nota sullo stile: non è necessario nelle transizioni tipo $(b, b)\/(S, D)$ scrivere parentesi e virgole, cioè si può scrivere $b b\/S D$\
+  *ci sarebbe da spiegare perchè la complessità è data da 1 + 2n + ... perché non mi è chiaro*
+])
+=== Complessità nelle MdT non deterministiche
 #definition()[
   Data una MdT _M_ non deterministica, la *complessità in tempo* di _M_ è determinata dalla funzione:
   $
@@ -140,8 +148,6 @@ Conclusa l'analisi sulla calcolabilità, ci concentriamo ora sulla classe dei pr
 
   Quindi: $t c_M'(n)=Omicron(f(n) dot delta^(f(n)))$
 ]
-
-#pagebreak()
 #example()[
   #image("images/2026-04-01-11-50-50.png")
   // TODO: CORREGGERE L'ESEMPIO, CASO PEGGIORE: NON ACCETTA LA STRINGA
@@ -154,7 +160,8 @@ Conclusa l'analisi sulla calcolabilità, ci concentriamo ora sulla classe dei pr
     $,
   )
 ]
-
+== Classi P e NP
+Alla luce delle considerzioni fatte sui vari tipi di MdT, definiamo le seguenti classi di linguaggi (o "problemi", più in generale):
 #index[Classe P]
 #definition()[
   $bold(P)={L "linguaggio" | exists M "MdT det. che accetta "L space t.c. t c_M(n)=Omicron(n^r), exists r in NN}$
@@ -165,7 +172,7 @@ Conclusa l'analisi sulla calcolabilità, ci concentriamo ora sulla classe dei pr
 ]
 
 #observation()[
-  $P subset.eq "NP"$, perché le MdT deterministiche sono un caso particolare di MdT non deterministiche.
+  $P subset.eq "NP"$, perché le MdT deterministiche sono un caso particolare di MdT non deterministiche. Vale anche l'inclusione nel verso opposto? Non si sa, è un problema aperto.
 ]
 
 #problem()[
@@ -436,10 +443,10 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
 #index[Teorema di Cook]
 #theorem("Teorema di Cook")[
   SAT è NP-difficile.
-  #observation()[
+]
+#observation()[
     Vista la complessità della dimostrazione, all'orale viene spesso chiesto solo qualche passaggio.
   ]
-]
 #proof()[
   Vogliamo dimostrare che $forall L in "NP"$, esiste una riduzione polinomiale da $L$ a $S A T$. Dire che $L in "NP"$ equivale a considerare una $M d T$ $M$ non deterministica polinomiale che accetta $L$. Sia $p(n) = t_(C M)(n)$ (cioè $p(n)$ è la complessità della macchina di Turing $M$). Per semplicità, supponiamo che $forall$ stringa $w$ di lunghezza $n$, il numero di transizioni di $M$ su $w$ sia esattamente $p(n)$ e che $M$ sia una $M d T$ standard limitata a sinistra con le celle numerate.
 
@@ -552,7 +559,7 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
   })
 }))
 
-I due diagrammi illustrano in modo visivo le due possibili soluzioni al problema aperto dell'informatica teorica, *P vs NP*. Il diagramma di sinistra mostra lo scenario più accreditato ($"P" != "NP"$), in cui l'insieme dei problemi verificabili in tempo polinomiale (NP) è rigidamente diviso tra problemi facilmente risolvibili (P), i problemi più complessi in assoluto a cui tutti gli altri sono riconducibili (NP-Completi) e una fascia di mezzo (NP-Intermedi) che non ricade in nessuna delle due. Il diagramma a destra, al contrario, rappresenta lo scenario catastrofico: se venisse dimostrato che $"P" = "NP"$, l'intera struttura collasserebbe e, dato che ogni problema verificabile diventerebbe automaticamente anche facile da risolvere, quasi tutti i problemi in NP coinciderebbero per definizione con la classe degli NP-Completi.
+I due diagrammi illustrano in modo visivo le due possibili soluzioni al più grande problema aperto dell'informatica teorica, *P vs NP*. Il diagramma di sinistra mostra lo scenario più accreditato ($"P" != "NP"$), in cui l'insieme dei problemi verificabili in tempo polinomiale (NP) è rigidamente diviso tra problemi facilmente risolvibili (P), i problemi più complessi in assoluto a cui tutti gli altri sono riconducibili (NP-Completi) e una fascia di mezzo (NP-Intermedi) che non ricade in nessuna delle due. Il diagramma a destra, al contrario, rappresenta lo scenario catastrofico: se venisse dimostrato che $"P" = "NP"$, l'intera struttura collasserebbe e, dato che ogni problema verificabile diventerebbe automaticamente anche facile da risolvere, quasi tutti i problemi in NP coinciderebbero per definizione con la classe degli NP-Completi.
 
 
 #proposition()[
@@ -598,8 +605,7 @@ I due diagrammi illustrano in modo visivo le due possibili soluzioni al problema
 == Problema 3-SAT
 #index[Problema 3-SAT]
 #problem("3-SAT")[
-  Dato un polinomio booleano $p$ in 3-CNF\*, determinare se $p$ è soddisfacibile.\
-  (\*) Ogni clausola contiene esattamente 3 letterali
+  Dato un polinomio booleano $p$ in 3-CNF (ogni clausola contiene esattamente 3 letterali), determinare se $p$ è soddisfacibile.
 ]
 #observation()[
   3-SAT $in$ NP.
