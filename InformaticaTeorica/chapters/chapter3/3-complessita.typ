@@ -101,9 +101,9 @@ Adesso definiamo le notazioni asintotiche:
 #proof()[
   Consideriamo una MdT $M$ a $k$ nastri e prendiamo la MdT $M'$ a $2k+1$ tracce che è equivalente a $M$ già descritta nella prima parte del corso (Proposizione 2.5.1), ma ricordiamo com'è fatta per $k=2$:
   #figure(image("images/MdTmultitracciaPerSimulareMdTmultinastro.png", width: 60%))
-  Sia $w$ una stringa di lunghezza $n$ su cui eseguiamo $M$ e supponiamo che $M$ su $w$ esegua $f(n)$ transizioni. Vediamo prima quante transizioni di $M'$ sono necessarie per simulare la $t$-esima transizione di $M$ su $w$: dapprima si ha il momento della raccolta delle informazioni, in cui la testina di $M'$ si   sposta sulle tracce in corrispondenza della posizione delle testine dei nastri per leggere i simboli e salvarli nello stato. La posizione di ciascuna testina simulata può trovarsi a distanza al massimo $t$ dalla posizione iniziale, perché alla $t$-esima transizione una testina può essersi spostata di al massimo di $t$ celle. Giunti alla cella, si legge il simbolo e si torna indietro: per cui vengono fatti al massimo $t$ passi avanti e $t$ passi indietro per tutti i $k$ nastri di $M$, dunque il costo di questa fase è $2t k$ (vedere la Proposizione 2.5.1 per i passaggi in dettaglio). Per simulare correttamente la transizione poi si deve eseguirla effettivamente, quindi tornare sulla $k$ posizioni per effettuare scritture/spostamenti delle testine simulate, e anche in questo caso il costo è $2t k$. Quindi la stima del numero massimo di transizioni che $M'$ deve effettuare per simulare la $t$-esima transizione di $M$ è $2t k + 2t k = 4t k$.\ A questo punto possiamo stimare il limite superiore del numero di transizioni eseguite da $M'$ su input di lunghezza $n$ nel caso peggiore:
+  Sia $w$ una stringa di lunghezza $n$ su cui eseguiamo $M$ e supponiamo che $M$ su $w$ esegua $f(n)$ transizioni. Vediamo prima quante transizioni di $M'$ sono necessarie per simulare la $t$-esima transizione di $M$ su $w$: dapprima si ha il momento della raccolta delle informazioni, in cui la testina di $M'$ si   sposta sulle tracce in corrispondenza della posizione delle testine dei nastri per leggere i simboli e salvarli nello stato. La posizione di ciascuna testina simulata può trovarsi a distanza al massimo $t$ dalla posizione iniziale, perché alla $t$-esima transizione una testina può essersi spostata di al massimo di $t$ celle. Giunti alla cella, si legge il simbolo e si torna indietro: per cui vengono fatti al massimo $t$ passi avanti e $t$ passi indietro per tutti i $k$ nastri di $M$, dunque il costo di questa fase è $2t k$ (vedere la Proposizione 2.5.1 per i passaggi in dettaglio). Per simulare correttamente la transizione poi si deve eseguirla effettivamente, quindi tornare sulla posizione $k$ per effettuare scritture/spostamenti delle testine simulate, e anche in questo caso il costo è $2t k$. Quindi la stima del numero massimo di transizioni che $M'$ deve effettuare per simulare la $t$-esima transizione di $M$ è $2t k + 2t k = 4t k$.\ A questo punto possiamo stimare il limite superiore del numero di transizioni eseguite da $M'$ su input di lunghezza $n$ nel caso peggiore:
   $
-    sum_(t=1)^(f(n)) 4 t k quad =
+    sum_(t=1)^(f(n)) 4 t k =
     4k dot sum_(t=1)^(f(n)) t = 4k dot frac(f(n) dot (f(n)+1), 2) = Omicron(f(n)^2)
   $
 ]
@@ -213,7 +213,7 @@ Adesso definiamo le notazioni asintotiche:
 
   Studiamo la complessità: in questo caso, il *caso peggiore* col massimo numero di transizioni si ha nel caso in cui la stringa viene *accettata*.
   $ t c_M (n) = 1 + 2n + 1 + n + 1 + n + 1 = 4n + 4 = Theta(n) $
-  La complessità è *polinomiale*, è un polinomio di primo grado (*lineare*).
+  La complessità è *polinomiale*, è un polinomio di primo grado (*lineare*):
   - $1$ passo: posizionamento sul primo carattere ($q_0 arrow q_1$).
   - $2n$ passi: copia del nastro 1 sul nastro 2 ($q_1$).
   - $1$ passo: lettura del vuoto a fine stringa ($q_1 arrow q_2$).
@@ -228,36 +228,41 @@ Adesso definiamo le notazioni asintotiche:
 #definition()[
   Data una MdT _M_ non deterministica, la *complessità in tempo* di _M_ è determinata dalla funzione:
   $
-    t c_M = & \# "transizioni eseguite da una computazione di M su una stringa di lunghezza "n \
+    t c_M (n) = & \# "transizioni eseguite da una computazione di" M "su una stringa di lunghezza "n \
             & "nel caso peggiore".
   $
 ]
 
 #proposition()[
-  Sia _M_ MdT non deterministica che accetta il linguaggio _L_:
-  $
-    t c_M (n) = f(n)=> exists M' "MdT deterministica che accetta "L space t.c. space t c_M'(n)=Omicron(f(n) dot delta^(f(n)))
-  $
-  con $delta$ grado di non determinismo di $M$.
+  Sia _M_ MdT non deterministica che accetta il linguaggio _L_ e tale che $t c_M (n) = f(n)$. Allora $exists M' "MdT deterministica che accetta "L space "t.c." space t c_M'(n)=Omicron(f(n) dot delta^(f(n)))$, con $delta$ grado di non determinismo di $M$.
 ]
 
-#proof()[
-  Costruiamo $M'$ MdT deterministica a 3 nastri che esplori l'albero delle computazioni della MdT non deterministica $M$.Poiché $M$ ha un grado di non determinismo pari a $delta$, in ogni passo della computazione può scegliere tra $delta$ transizioni diverse. L'insieme di tutte le possibili esecuzioni forma un albero in cui ogni nodo ha al massimo $delta$ figli.
+#proof()[  
+Costruiamo una MdT deterministica $M'$ a tre nastri che simula
+sistematicamente tutte le possibili computazioni di $M$.
+La macchina $M'$ usa i tre nastri nel modo seguente:
 
-  #grid(
-    columns: (0.1fr, 0.1fr, 0.3fr, 0.3fr, 0.3fr, 0.05fr),
-    rows: 3,
-    row-gutter: 5pt,
-    stroke: none,
-    [Nastro], [3], [Computazioni di M], [$(m_1, m_2, dots, m_(f(n)))$], [$1 <= m_i <= delta$], [],
-    [Nastro], [2], [Simulazione di M], [], [], [],
-    [Nastro], [1], [INPUT], [], [], [],
-  )
-
-  - Numero di computazioni (rami dell'albero) di $M$ di lunghezza $f(n)$ su input di lunghezza $n$ è $<= delta^(f(n))$.
-  - Numero di transizioni eseguite da $M$ su una stringa di lunghezza $n$: $<= f(n)$
-
-  Quindi: $t c_M'(n)=Omicron(f(n) dot delta^(f(n)))$
+- sul nastro 1 mantiene l'input;
+- sul nastro 2 simula una computazione di $M$;
+- sul nastro 3 mantiene la sequenza $(m_1, dots, m_(f(n)))$ che determina le scelte non deterministiche della computazione da simulare.
+Poiché $M$ ha grado di non determinismo $delta$, a ogni passo della
+computazione può scegliere tra al più $delta$ transizioni. Una possibile
+computazione di lunghezza al più $f(n)$ può quindi essere descritta da
+una sequenza
+$
+(m_1, m_2, dots, m_(f(n))), quad 1 <= m_i <= delta,
+$
+dove $m_i$ indica quale delle possibili transizioni di $M$ viene scelta
+all'$i$-esimo passo. Il numero di possibili sequenze, e quindi di possibili computazioni da simulare, è al più $delta^(f(n))$: infatti, per ciascuno degli al più $f(n)$ passi vi sono al più $delta$
+possibili scelte.\
+Per ciascuna di queste computazioni, $M'$ deve simulare al più $f(n)$
+transizioni di $M$, poiché $t c_M(n)=f(n)$ (dove $n$ è la lunghezza dell'input). Pertanto, nel caso peggiore, $M'$ simula al più $delta^(f(n))$ computazioni, ciascuna di costo al più $f(n)$. Ne segue
+$
+t c_(M')(n)
+  = O(f(n) dot delta^(f(n))).
+$
+Se almeno una delle computazioni simulate accetta, $M'$ accetta;
+se nessuna accetta, $M'$ rifiuta. Quindi $M'$ è equivalente a $M$.
 ]
 #example()[
   #image("images/2026-04-01-11-50-50.png")
@@ -330,7 +335,7 @@ Adesso definiamo le notazioni asintotiche:
     })
   ]
 
-  Il caso peggiore si ha quando la MdT rifiuta la stringa, più precisamente la computazione in cui copio tutta la stringa sul secondo nastro $t c_M (n)= 1 + 2n$.
+  La prima transizione (dall'alto) che va da $q_1$ a $q_2$ gestisce il caso di stringhe di lunghezza dispari (si salta il simbolo centrale nel nastro 1 e poi si parte col confronto), l'altra quelle di lunghezza pari (la testina sul nastro 1 è già in posizione corretta, bisogna solo spostare quella del nastro 2). Il caso peggiore si ha quando la MdT rifiuta la stringa, più precisamente la computazione in cui copio tutta la stringa sul secondo nastro: la macchina sceglie nondeterministicamente se continuare a copiare o meno, quindi può darsi che scelga una computazione in cui tutta la stringa viene copiata e quindi $t c_M (n)= 1 + 2n$ (costo 1 per la transzione $q_0 -> q_1$, poi fa 2 operazioni (copia e spostamento) per $n$ simboli in $q_1$ e si arresta).
 ]
 == Classi P e NP
 Sebbene le complessità di alcuni algoritmi ($n^3, n^4, ...$) siano considerate elevate, noi saremo più permissivi e considereremo efficienti tutte le complessità polinomiali. Alla luce delle considerazioni fatte sulle varie tipologie di MdT, definiamo le seguenti classi di linguaggi (o "problemi", più in generale):
