@@ -421,7 +421,7 @@ Dal punto di vista della complessità in tempo, che rappresentiamo in funzione d
 - Controllo della sequenza: per ogni iterazione del ciclo:
   - controllo che il nuovo vertice non sia già comparso: $O(n log n)$;
   - verifico che ci sia un arco dal vertice precedente al nuovo vertice: $O(k log n)$;
-  - riposizioni la testina del nastro 3: $O(n log n)$;
+  - riposiziono  la testina del nastro 3: $O(n log n)$;
   - ci sono al più $n$ iterazioni, dunque la complessità è $O(k log n)$ per iterazione, ossia $O(n k log n)$ in totale.
 Complessivamente si ha:
 $
@@ -431,78 +431,70 @@ da questo deduciamo anche che HAM $in N P$ (in realtà andrebbe considerata la l
 == Riducibilità polinomiale fra linguaggi
 #index[Riduzione polinomiale]
 #definition()[
-  Dati 2 linguaggi $L_1$, $L_2$ con $L_1 subset.eq Sigma_1^*$ e $L_2 subset.eq Sigma_2^*$. Si dice che $L_1$ è *polinomialmente riducibile* a $L_2$ quando:
+  Dati $L_1$, $L_2$ linguaggi, $L_1 subset.eq Sigma_1^*$ e $L_2 subset.eq Sigma_2^*$, si dice che $L_1$ è *polinomialmente riducibile* a $L_2$ quando:
   - $L_1$ è riducibile a $L_2$, cioè $exists f: Sigma_1^* -> Sigma_2^*$ tale che:
     - $forall w in Sigma_1^*, space w in L_1 <=> f(w) in L_2$
     - $f$ è computabile
-  - $f$ è computabile in tempo polinomiale (usando una MdT)
+  - $f$ è computabile in tempo polinomiale
+  In questo caso $f$ si dice *riduzione polinomiale* da $L_1$ a $L_2$ e se $F$ è la MdT che la calcola si ha che $t c_F (n) in O(n^r)$, $r in NN$
 ]
 #proposition()[
-  Sia $f$ una riduzione polinomiale da $L_1$ a $L_2$ e $L_2 in P => L_1 in P$.
+  Sia $f$ una riduzione polinomiale da $L_1 subset.eq Sigma_1^*$ a $L_2 subset.eq Sigma_2^*$ e $L_2 in P$. Allora $L_1 in P$.
 ]
 #proof()[
   Dobbiamo costruire una MdT deterministica, che chiameremo $N$, che decida il linguaggio $L_1$ in tempo polinomiale su un input $w in Sigma_1^*$.
 
   Dalle ipotesi del teorema sappiamo che:
   - Esiste una riduzione polinomiale $f: Sigma_1^* -> Sigma_2^*$ da $L_1$ a $L_2$.
-  - Sia $F$ la MdT che calcola $f$ in tempo $T_F (n) in O(n^r)$, dove $n = |w|$.
-  - Poiché $L_2 in P$, sia $M$ la MdT deterministica che decide $L_2$ in tempo $T_M (k) in O(k^s)$, dove $k$ è la lunghezza del suo input.
+  - Sia $F$ la MdT che calcola $f$ in tempo $t c_F (n) in O(n^r)$, dove $n = |w|$.
+  - Poiché $L_2 in P$, sia $M$ la MdT deterministica che decide $L_2$ in tempo $t c_M (k) in O(k^s)$, dove $k$ è la lunghezza del suo input.
 
   Costruiamo la macchina $N$ applicando la seguente strategia sull'input $w$:
   1. Calcoliamo $f(w)$ usando la macchina $F$.
   2. Eseguiamo la macchina $M$ sull'input $f(w)$ per decidere se $f(w) in L_2$.
   3. $N$ accetta $w$ se e solo se $M$ accetta $f(w)$.
 
-  Analisi della complessità temporale di $N$: la lunghezza della stringa output $f(w)$ non può superare il numero di passi compiuti da $F$ per generarla. Pertanto, la lunghezza dell'input che passiamo a $M$ è limitata da $|f(w)| <= T_F (n) in O(n^r)$.
+  Analisi della complessità temporale di $N$: la lunghezza della stringa output $f(w)$ non può superare il numero di passi compiuti da $F$ per generarla. Pertanto, la lunghezza dell'input che passiamo a $M$ è limitata da $|f(w)| <= t c_F (n) in O(n^r)$.
 
   Il tempo totale impiegato da $N$ è la somma del tempo di $F$ e del tempo di $M$:
   $
-    t c_N (n) & = t c_F (n) + t c_M (|f(w)|) \
-              & = O(n^r) + O((n^r)^s) \
+    t c_N (n) & = t c_F (n) + t c_M (n^r) = \
+              & = O(n^r) + O((n^r)^s) = \
               & = O(n^r) + O(n^(r s)) = O(n^(r s))
   $
-
-  Poiché $r$ ed $s$ sono costanti, $r s$ è a sua volta una costante. Il tempo di esecuzione di $N$ è limitato da un polinomio, dimostrando quindi che $L_1 in P$. La composizione di due polinomi è ancora un polinomio.
+  Il tempo di esecuzione di $N$ è limitato da un polinomio, dimostrando quindi che $L_1 in P$.
 ]
 === Problemi NP-difficili e NP-completi
 #index[NP-difficile]
 #definition()[
-  Un linguaggio $L$ si dice *NP-DIFFICILE* quando $forall Q in "NP"$, $exists f$ riduzione polinomiale da $Q$ a $L$ (_L is no harder than Q_).
+  Un linguaggio $L$ si dice *NP-difficile* quando $forall Q in "NP"$, $Q$ è polinomialmente riducibile a $L$ ("$L$ è difficile al più quanto $Q$").
 ]
 
 #index[NP-completo]
 #definition()[
-  Un linguaggio $L$ si dice *NP-COMPLETO* quando:
-  - $L$ è NP-DIFFICILE
+  Un linguaggio $L$ si dice *NP-completo* quando:
+  - $L$ è NP-difficile
   - $L in "NP"$
 ]
 
 #observation()[
-  La classe dei linguaggi *"NP-completi"* (indicata con $"NPC"$) è l'insieme dei linguaggi che appartengono a $"NP"$ e che sono contemporaneamente *"NP-difficili"*. Essa costituisce quindi una sottoclasse di $"NP"$. $"NPC" = { L | L in "NP" " e " L " è NP-difficile" }$
-
-  Di conseguenza, vale banalmente la relazione:
-  $"NPC" subset.eq "NP"$
+  La classe dei linguaggi NP-completi (indicata con NPC) è una sottoclasse di $"NP"$. $"NPC" = { L | L in "NP" " e " L " è NP-difficile" }$. Di conseguenza, vale  $"NPC" subset.eq "NP"$.
 ]
 
-
-//TODO: questa dimostrazione non la trovo sugli appunti, me la sono inventata?
 #proposition()[
   Se esiste un linguaggio $L$ tale che $L in "NPC"$ e $L in "P"$, allora $"P" = "NP"$.
 ]
 #proof()[
-  Per definizione, sappiamo già che $"P" subset.eq "NP"$. Per dimostrare l'uguaglianza $"P" = "NP"$, è quindi sufficiente dimostrare l'inclusione opposta: $"NP" subset.eq "P"$.
+  Per definizione, sappiamo che $"P" subset.eq "NP"$. Quindi è sufficiente dimostrare che $"NP" subset.eq "P"$.
 
   Sia $Q in "NP"$ un linguaggio arbitrario.
-  Poiché $L in "NPC"$, per definizione $L$ è *"NP-difficile"*. Di conseguenza, esiste una riduzione polinomiale $f$ da $Q$ a $L$ ($Q <=_p L$).
-  Inoltre, per ipotesi $L in "P"$, quindi esiste una Macchina di Turing Deterministica (MdT) $M$ che decide $L$ in tempo polinomiale.
+  Poiché $L in "NPC"$, allora $exists$ una riduzione polinomiale $f$ da $Q$ a $L$. Inoltre, $L in "P"$, quindi esiste una MdT $M$ che accetta $L$ in tempo polinomiale.
 
-  Costruiamo una MdT deterministica, che chiameremo $M'$, per decidere $Q$ su un generico input $w in Sigma^*$:
-  1. Calcoliamo $f(w)$. Poiché $f$ è una riduzione polinomiale, questo passo richiede un tempo polinomiale rispetto a $|w|$.
-  2. Eseguiamo la macchina $M$ sull'input $f(w)$ per decidere se $f(w) in L$. Poiché $M$ opera in tempo polinomiale e la dimensione di $f(w)$ è limitata da un polinomio, anche questo passo richiede tempo polinomiale.
-  3. $M'$ accetta l'input se e solo se $M$ accetta $f(w)$.
+  Costruiamo una MdT deterministica $M'$ per decidere $Q$ su input $w$:
+  1. Calcoliamo $f(w)$. Poiché $f$ è una riduzione polinomiale, questo passo richiede un tempo polinomiale.
+  2. Usiamo la macchina $M$ sull'input $f(w)$ per decidere se $f(w) in L$. Poiché $M$ opera in tempo polinomiale e la dimensione di $f(w)$ è limitata da un polinomio, anche questo passo richiede tempo polinomiale.
 
-  La macchina $M'$ è deterministica e decide $Q$ terminando in un tempo totale polinomiale. Ne consegue che $Q in "P"$.
-  Data l'arbitrarietà di $Q$, abbiamo dimostrato che ogni problema in $"NP"$ è anche in $"P"$, ovvero $"NP" subset.eq "P"$. Dunque, $"P" = "NP"$.
+  La macchina $M'$ è deterministica e decide $Q$ terminando in un tempo totale polinomiale. Ne consegue che $Q in "P"$. Data l'arbitrarietà di $Q$, abbiamo dimostrato che ogni problema in $"NP"$ è anche in $"P"$, ovvero $"NP" subset.eq "P"$. Dunque, $"P" = "NP"$.
 ]
 
 //15.04.2026
