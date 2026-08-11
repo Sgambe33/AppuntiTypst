@@ -108,13 +108,13 @@ Adesso definiamo le notazioni asintotiche:
   $
 ]
 #example([
-  Sia $L$ il linguaggio delle stringhe palindrome sull'alfabeto $Sigma = {a, b}$. Costruiamo una $M d T$ $M$ a due nastri che accetti $L$. La strategia da seguire è la seguente:
+  Sia $L$ il linguaggio delle stringhe palindrome sull'alfabeto $Sigma = {a, b}$. Costruiamo una MdT $M$ a due nastri che accetti $L$. La strategia da seguire è la seguente:
 
   - Copiare la stringa in input (scritta sul primo nastro) sul secondo nastro;
   - Portare una delle due testine all'inizio del nastro e l'altra alla fine;
   - Confrontare le due stringhe muovendo le testine in direzioni opposte.
 
-  La $M d T$ $M$ in questione è la seguente:
+  La MdT $M$ in questione è la seguente:
 
   #align(center)[
     #cetz.canvas({
@@ -333,18 +333,18 @@ Adesso definiamo le notazioni asintotiche:
   Il caso peggiore si ha quando la MdT rifiuta la stringa, più precisamente la computazione in cui copio tutta la stringa sul secondo nastro $t c_M (n)= 1 + 2n$.
 ]
 == Classi P e NP
-Alla luce delle considerzioni fatte sui vari tipi di MdT, definiamo le seguenti classi di linguaggi (o "problemi", più in generale):
+Sebbene le complessità di alcuni algoritmi ($n^3, n^4, ...$) siano considerate elevate, noi saremo più permissivi e considereremo efficienti tutte le complessità polinomiali. Alla luce delle considerazioni fatte sulle varie tipologie di MdT, definiamo le seguenti classi di linguaggi (o "problemi", più in generale):
 #index[Classe P]
 #definition()[
-  $bold(P)={L "linguaggio" | exists M "MdT det. che accetta "L space t.c. t c_M(n)=Omicron(n^r), exists r in NN}$
+  $bold(P)={L "linguaggio" | exists M "MdT det. che accetta "L "t.c." t c_M (n)=Omicron(n^r), exists r in NN}$
 ]
 #index[Classe NP]
 #definition()[
-  $bold(N P)={L "linguaggio" | exists M "MdT non det. che accetta "L space t.c. t c_M(n)=Omicron(n^r), exists r in NN}$
+  $bold(N P)={L "linguaggio" | exists M "MdT non det. che accetta "L "t.c." t c_M (n)=Omicron(n^r), exists r in NN}$
 ]
 
 #observation()[
-  $P subset.eq "NP"$, perché le MdT deterministiche sono un caso particolare di MdT non deterministiche. Vale anche l'inclusione nel verso opposto? Non si sa, è un problema aperto.
+  P $subset.eq "NP"$, perché le MdT deterministiche sono un caso particolare di MdT non deterministiche. Vale anche l'inclusione nel verso opposto? Non si sa, è un problema aperto.
 ]
 
 #problem()[
@@ -357,51 +357,49 @@ Alla luce delle considerzioni fatte sui vari tipi di MdT, definiamo le seguenti 
 === Problema del circuito hamiltoniano
 
 Dato un grafo orientato $G=(V, E)$, con:
-- _V_ = insieme dei vertici,
-- _E_ = insieme degli archi
-- $|V|=n=$ cardinalità dell'insieme dei vertici
+- _V_ insieme dei vertici,
+- _E_ insieme degli archi
+- $|V|=n$ cardinalità dell'insieme dei vertici
 
 
 #index[Circuito hamiltoniano]#index[Cammino hamiltoniano]
 #definition()[
   Dato un grafo orientato $G=(V, E)$, un *circuito hamiltoniano* in _G_ è una sequenza $(x_1,x_2, dots, x_(n-1), x_n, x_1)$ di vertici t.c.
   $
-    forall i (x_i, x_(i+1)) in E quad quad ((x_n, x_1) in E) "e" V={x_1, dots, x_n}
+    forall i, space (x_i, x_(i+1)) in E quad quad ((x_n, x_1) in E) "e" V={x_1, dots, x_n}
   $
 
-  In parole povere, un *circuito hamiltoniano* è un  ciclo che passa una e una sola volta da tutti i vertici di un grafo.
+  In parole povere, un *circuito hamiltoniano* è un percorso che passa una e una sola volta da tutti i vertici di un grafo.
 ]
-
-Codifica di $G=(V,E), V={1, 2, dots, n}$:
+Affinché una MdT possa lavorare con i grafi è necessario codificare quest'ultimi. Codifica di $G=(V,E), V={1, 2, dots, n}$:
 
 - Codifica dei vertici: uso la codifica binaria;
 - Codifica degli archi: $(x_i, x_j) arrow.squiggly x_i\#x_j$;
-- Codifica del grafo: Codifica della lista degli archi $+ n$. Per separare gli archi nella codifica si usa \#\# e per separare *$n$* si usa \#\#\#.
+- Codifica del grafo: codifica della lista degli archi $+ n$. Per separare gli archi nella codifica si usa \#\# e per separare *$n$* si usa \#\#\#.
 
 $
   dots space x_i\#x_j\#\#x_(i+1)\#x_(j+1)\#\# space dots space \#\#\#n
 $
 
-Per fare ciò si usa una MdT a 4 nastri:
-+ Contiene la rappresentazione del grafo in input;
-+ Contiene le sequenze dei nodi generati (che iniziano e terminano con il nodo *1*);
-+ È quello di lavoro, cioè quello che si usa per vedere se la sequenza è hamiltoniana: ci si scrive tutti i nodi che passano il controllo;
-+ È il nastro di fine computazione, serve per indicare quando devo smettere di generare sequenze perché contiene l'ultima sequenza da controllare;
+Un'implementazione _naive_ di una MdT che tenta di risolvere questo problema fa uso di 4 nastri:
+- Nastro 1: contiene la rappresentazione del grafo in input;
+- Nastro 2: contiene la sequenza dei nodi attualmente in analisi (lunga $n+1$, inizia e termina con il nodo 1);
+- Nastro 3: è quello di lavoro, cioè quello che si usa per vedere se la sequenza è hamiltoniana: ci si scrive tutti i nodi che passano il controllo;
+- Nastro 4: serve per indicare quando fermare la generazione, contiene l'ultima sequenza possibile da controllare;
 
-Si può fare anche con 3 nastri confrontando il contenuto del nastro 2 con la n nel nastro 1
-
-- Scrivo sul nastro 4 la stringa da generare ($1 **$)
-- Sul nastro 2 genero una dopo l'altra, in ordine lessicografico, le stringhe di lunghezza $n+1$ di vertici di V che iniziano e finiscono con _1_ (il nodo)
-- Confronto la stringa generata sul nastro 2 col contenuto del nastro 4: se sono uguali, RIFIUTO
-- Scorro la sequenza sul nastro 2 e $forall j$:
-  - controllo che $i_j$ non compaia tra gli elementi $i_k$, con $k < j$
-  - controllo che $(i_(j-1), i_j) in E$
-- Se entrambi i controlli sono passati, scrivo $i_j$ sul nastro 3, ALTRIMENTI produco la prossima sequenza al passo 1 (si torna al passo 1)
+Algoritmo della MdT:
++ Scrivo sul nastro 4 la sequenza massima da generare (ad esempio $1, n, n, dots, n, 1$).
++ Sul nastro 2 genero (una dopo l'altra in ordine lessicografico) le stringhe di lunghezza $n+1$ composte da vertici di $V$, che iniziano e finiscono con 1.
++ Confronto la stringa generata sul nastro 2 col contenuto del nastro 4: se sono uguali e i controlli non sono passati, *RIFIUTO* (ho esaurito le possibilità).
++ Svuoto il nastro 3, poi scorro la sequenza sul nastro 2 e $forall j$ da 2 a $n+1$:
+  - controllo che l'arco $(i_(j-1), i_j) in E$ (cercandolo sul nastro 1);
+  - controllo che $i_j$ non compaia tra gli elementi già scritti sul nastro 3 (verificando l'assenza di vertici ripetuti, eccezion fatta per l'ultimo nodo che deve essere 1).
+  - Se entrambi i controlli sono passati, scrivo $i_j$ sul nastro 3. *ALTRIMENTI*, la sequenza attuale non è un circuito hamiltoniano: interrompo il ciclo e torno al passo 2 per generare la prossima.
++ Se il ciclo al passo 4 termina con successo per tutti i nodi della sequenza, allora ho trovato un circuito hamiltoniano valido: *ACCETTO*.
 
 //TODO: mancano osservazioni su complessità O(logn....)
 
-
-HAM $in$ P? No, non possiamo dirlo, bisognerebbe dimostrare che *nessuna* macchina risolva il problema in tempo polinomiale.
+HAM $in.not$ P? No, non possiamo dirlo, bisognerebbe dimostrare che *nessuna* macchina risolva il problema in tempo polinomiale.
 
 //09.04.2026
 #index[Riduzione polinomiale]
@@ -410,18 +408,18 @@ HAM $in$ P? No, non possiamo dirlo, bisognerebbe dimostrare che *nessuna* macchi
   - $L_1$ è riducibile a $L_2$, cioè $exists f: Sigma_1^* -> Sigma_2^*$ tale che:
     - $forall w in Sigma_1^*, space w in L_1 <=> f(w) in L_2$
     - $f$ è computabile
-  - $f$ è computabile in tempo polinomiale (usando una MDT)
+  - $f$ è computabile in tempo polinomiale (usando una MdT)
 ]
 #proposition()[
   Sia $f$ una riduzione polinomiale da $L_1$ a $L_2$ e $L_2 in P => L_1 in P$.
 ]
 #proof()[
-  Dobbiamo costruire una MDT deterministica, che chiameremo $N$, che decida il linguaggio $L_1$ in tempo polinomiale su un input $w in Sigma_1^*$.
+  Dobbiamo costruire una MdT deterministica, che chiameremo $N$, che decida il linguaggio $L_1$ in tempo polinomiale su un input $w in Sigma_1^*$.
 
   Dalle ipotesi del teorema sappiamo che:
   - Esiste una riduzione polinomiale $f: Sigma_1^* -> Sigma_2^*$ da $L_1$ a $L_2$.
-  - Sia $F$ la MDT che calcola $f$ in tempo $T_F (n) in O(n^r)$, dove $n = |w|$.
-  - Poiché $L_2 in P$, sia $M$ la MDT deterministica che decide $L_2$ in tempo $T_M (k) in O(k^s)$, dove $k$ è la lunghezza del suo input.
+  - Sia $F$ la MdT che calcola $f$ in tempo $T_F (n) in O(n^r)$, dove $n = |w|$.
+  - Poiché $L_2 in P$, sia $M$ la MdT deterministica che decide $L_2$ in tempo $T_M (k) in O(k^s)$, dove $k$ è la lunghezza del suo input.
 
   Costruiamo la macchina $N$ applicando la seguente strategia sull'input $w$:
   1. Calcoliamo $f(w)$ usando la macchina $F$.
@@ -437,18 +435,18 @@ HAM $in$ P? No, non possiamo dirlo, bisognerebbe dimostrare che *nessuna* macchi
               & = O(n^r) + O(n^(r s)) = O(n^(r s))
   $
 
-  Poiché $r$ ed $s$ sono costanti, $r s$ è a sua volta una costante. Il tempo di esecuzione di $N$ è limitato da un polinomio, dimostrando quindi che $L_1 in P$. La composizione di due polinomi è ancora un polinomio (la proprietà di composizione è chiusa rispetto alla classe dei polinomi).
+  Poiché $r$ ed $s$ sono costanti, $r s$ è a sua volta una costante. Il tempo di esecuzione di $N$ è limitato da un polinomio, dimostrando quindi che $L_1 in P$. La composizione di due polinomi è ancora un polinomio.
 ]
 
 #index[NP-difficile]
 #definition()[
-  Un linguaggio $L$ si dice *NP-DIFFICILE* quando $forall Q in "NP"$, $exists f$ riduzione polinomiale da $Q$ a $L$.
+  Un linguaggio $L$ si dice *NP-DIFFICILE* quando $forall Q in "NP"$, $exists f$ riduzione polinomiale da $Q$ a $L$ (_L is no harder than Q_).
 ]
 
 #index[NP-completo]
 #definition()[
   Un linguaggio $L$ si dice *NP-COMPLETO* quando:
-  - $L$ è *NP-DIFFICILE*
+  - $L$ è NP-DIFFICILE
   - $L in "NP"$
 ]
 
@@ -459,6 +457,8 @@ HAM $in$ P? No, non possiamo dirlo, bisognerebbe dimostrare che *nessuna* macchi
   $"NPC" subset.eq "NP"$
 ]
 
+
+//TODO: questa dimostrazione non la trovo sugli appunti, me la sono inventata?
 #proposition()[
   Se esiste un linguaggio $L$ tale che $L in "NPC"$ e $L in "P"$, allora $"P" = "NP"$.
 ]
@@ -467,9 +467,9 @@ HAM $in$ P? No, non possiamo dirlo, bisognerebbe dimostrare che *nessuna* macchi
 
   Sia $Q in "NP"$ un linguaggio arbitrario.
   Poiché $L in "NPC"$, per definizione $L$ è *"NP-difficile"*. Di conseguenza, esiste una riduzione polinomiale $f$ da $Q$ a $L$ ($Q <=_p L$).
-  Inoltre, per ipotesi $L in "P"$, quindi esiste una Macchina di Turing Deterministica (MDT) $M$ che decide $L$ in tempo polinomiale.
+  Inoltre, per ipotesi $L in "P"$, quindi esiste una Macchina di Turing Deterministica (MdT) $M$ che decide $L$ in tempo polinomiale.
 
-  Costruiamo una MDT deterministica, che chiameremo $M'$, per decidere $Q$ su un generico input $w in Sigma^*$:
+  Costruiamo una MdT deterministica, che chiameremo $M'$, per decidere $Q$ su un generico input $w in Sigma^*$:
   1. Calcoliamo $f(w)$. Poiché $f$ è una riduzione polinomiale, questo passo richiede un tempo polinomiale rispetto a $|w|$.
   2. Eseguiamo la macchina $M$ sull'input $f(w)$ per decidere se $f(w) in L$. Poiché $M$ opera in tempo polinomiale e la dimensione di $f(w)$ è limitata da un polinomio, anche questo passo richiede tempo polinomiale.
   3. $M'$ accetta l'input se e solo se $M$ accetta $f(w)$.
@@ -490,13 +490,13 @@ $
 #index[Trasformazione polinomiale]
 #definition()[
   $"rep"_1$ è *polinomialmente trasformabile* in $"rep"_2$ quando $exists t : Sigma_1^* --> Sigma_2^*$ tale che:
-  + $forall i, t("rep"_1 (p_i)) = "rep"_2 (p_i)$
+  + $forall i, space t("rep"_1 (p_i)) = "rep"_2 (p_i)$
   + $forall w in Sigma_1^*$ tale che $w in.not "Im"("rep"_1)$, vale $t(w) in.not "Im"("rep"_2)$ (con "Im" ci si riferisce all'immagine);
   + $t$ è computabile in tempo polinomiale (quindi efficiente)
 ]
 
 Se $"rep"_1$ è polinomialmente trasformabile in $"rep"_2$, allora la lunghezza di $"rep"_2 (p_i) (= t("rep"_1 (p_i)))$ è al più polinomiale nella lunghezza di $"rep"_1 (p_i)$. Pertanto se un problema sta nella classe P usando $"rep"_2$, allora il problema sta in P anche usando $"rep"_1$.
-//DA RIVEDERE con GEMINI
+
 #observation()[
   Attenzione al caso delle rappresentazioni binaria e unaria di un numero naturale (la rappresentazione binaria di $n$ ha lunghezza $approx log_2 (n)$, per cui la conversione in unario richiede un numero di transizioni esponenziale nella lunghezza dell'input). La trasformazione da binario a unario non è polinomiale! Può accadere che un problema stia in P con la rappresentazione unaria ma non stia in P con la rappresentazione binaria.
 ]
@@ -575,9 +575,10 @@ Quindi l'alfabeto per il problema SAT è $Sigma_"SAT" = {0, 1, \#, and , or}$.
   Il problema SAT appartiene a NP.
 ]
 #proof()[
-  Costruiamo una MdT non deterministica che risolve SAT in tempo polinomiale. L'idea alla base è quella di generare non deterministicamente un assegnamento e controllare se esso soddisfa il polinomio in esame.
+  Costruiamo una MdT non deterministica a 2 nastri che risolve SAT in tempo polinomiale. L'idea alla base è quella di generare non deterministicamente un assegnamento e controllare se esso soddisfa il polinomio in esame.
 
-  // DIAGRAMMA MDT A 2 NASTRI: generazione e input
+  // DIAGRAMMA MdT A 2 NASTRI: generazione e input
+  #figure(image("images/2026-08-10-17-26-35.png", width: 60%))
 
   - Per prima cosa bisogna controllare che la stringa di input sia sintatticamente corretta (se non lo è, si rifiuta e si termina subito).
   - Altrimenti si usa il nastro di lavoro 2. Infatti, si genera su di esso (non deterministicamente) un assegnamento alle variabili nella forma seguente:
@@ -607,7 +608,7 @@ $
 Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di conseguenza, la MdT costruita opera effettivamente in tempo polinomiale.
 
 #observation()[
-  per una MdT deterministica il numero di assegnamenti da generare e verificare sarebbe invece esponenziale, poiché si dovrebbero generare e testare tutte le possibili combinazioni.
+  Per una MdT deterministica il numero di assegnamenti da generare e verificare sarebbe invece esponenziale, poiché si dovrebbero generare e testare tutte le possibili combinazioni.
 ]
 
 
@@ -620,14 +621,14 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
   Vista la complessità della dimostrazione, all'orale viene spesso chiesto solo qualche passaggio.
 ]
 #proof()[
-  Vogliamo dimostrare che $forall L in "NP"$, esiste una riduzione polinomiale da $L$ a $S A T$. Dire che $L in "NP"$ equivale a considerare una $M d T$ $M$ non deterministica polinomiale che accetta $L$. Sia $p(n) = t_(C M)(n)$ (cioè $p(n)$ è la complessità della macchina di Turing $M$). Per semplicità, supponiamo che $forall$ stringa $w$ di lunghezza $n$, il numero di transizioni di $M$ su $w$ sia esattamente $p(n)$ e che $M$ sia una $M d T$ standard limitata a sinistra con le celle numerate.
+  Vogliamo dimostrare che $forall L in "NP"$, esiste una riduzione polinomiale da $L$ a $S A T$. Dire che $L in "NP"$ equivale a considerare una MdT $M$ non deterministica polinomiale che accetta $L$. Sia $p(n) = t_(C M)(n)$ (cioè $p(n)$ è la complessità della macchina di Turing $M$). Per semplicità, supponiamo che $forall$ stringa $w$ di lunghezza $n$, il numero di transizioni di $M$ su $w$ sia esattamente $p(n)$ e che $M$ sia una MdT standard limitata a sinistra con le celle numerate.
 
   Voglio trovare una funzione $Phi$ che associa ad una stringa $w$ un polinomio booleano $Phi(w)$ tale che, data una stringa $w$, $M$ accetta $w$ se e solo se $Phi(w)$ è un polinomio booleano in forma $C N F$ soddisfacibile.
   Gli stati di $M$ sono ${q_1, dots, q_s}$, quelli finali sono indicati con $F$, mentre l'alfabeto di $M$ è ${a_1, dots, a_r}$.
 
   Le variabili di $Phi(w)$ (con $w$ lungo $n$) sono di tre tipi:
-  - $S(u, t) arrow$ assegnare valore 1 significa che all'istante $t$ la $M d T$ si trova nello stato $q_u$;
-  - $C(i, j, t) arrow$ assegnare valore 1 significa che all'istante $t$, nella cella $i$ della $M d T$ c'è il simbolo $a_j$;
+  - $S(u, t) arrow$ assegnare valore 1 significa che all'istante $t$ la MdT si trova nello stato $q_u$;
+  - $C(i, j, t) arrow$ assegnare valore 1 significa che all'istante $t$, nella cella $i$ della MdT c'è il simbolo $a_j$;
   - $L(i, t) arrow$ assegnare valore 1 significa che all'istante $t$ la testina si trova nella cella $i$;
 
   Con $t in {0, 1, 2, dots, p(n)}$, $u in {1, dots, s}$, $i in {0, 1, dots, p(n) + 1}$ e $j in {1, dots, r}$.
@@ -685,7 +686,7 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
   Il polinomio totale è composto dalla congiunzione di tutti questi polinomi. Osserviamo che tutti i polinomi sopra sono in CNF, tranne quello relativo alla proprietà 7, che però può essere trasformato in CNF in tempo polinomiale.
 ]
 
-#align(center, cetz.canvas(length: 0.8cm, {
+#align(center, cetz.canvas(length: 0.6cm, {
   import cetz.draw: *
 
   // ==========================================
@@ -705,7 +706,7 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
     bezier((-1.81, -1.5), (1.81, -1.5), (0, -0.5))
 
     // Etichette interne
-    content((0, 2.3), text(weight: "bold", size: 1.5em)[NP-C])
+    content((0, 2.3), text(weight: "bold", size: 1.5em)[NPC])
     content((0, 0), text(weight: "bold", size: 1.5em)[NP-I])
     content((0, -2.3), text(weight: "bold", size: 1.5em)[P])
   })
@@ -727,7 +728,7 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
     bezier((-1.4, 2.5), (1.4, 2.5), (0, 3.2))
 
     // Etichetta interna
-    content((0, 0), text(weight: "bold", size: 1.5em)[NP-C])
+    content((0, 0), text(weight: "bold", size: 1.5em)[NPC])
   })
 }))
 
@@ -735,9 +736,7 @@ I due diagrammi illustrano in modo visivo le due possibili soluzioni al più gra
 
 
 #proposition()[
-  Supponiamo che $"P" = "NP"$.\
-  Sia $L in "NP"$, con $L eq.not emptyset, overline(L) eq.not emptyset$, allora $L in "NP-C"$
-
+  Supponiamo che $"P" = "NP"$. Sia $L in "NP"$, con $L eq.not emptyset, overline(L) eq.not emptyset$, allora $L in "NP-C"$. \
   Per ipotesi: $exists alpha in L$ e $exists beta in.not L$.
 ]
 #proof()[
@@ -754,7 +753,7 @@ I due diagrammi illustrano in modo visivo le due possibili soluzioni al più gra
 ]
 
 #proposition()[
-  Se L è NP-difficile e $f$ è una riduzione polinomiale da L a Q $=>$ Q è NP-difficile.
+  Se $L$ è NP-difficile e $f$ è una riduzione polinomiale da $L$ a $Q$ $=>$ $Q$ è NP-difficile.
 ]
 #proof()[
   Dato $R in "NP"$, descriviamo una riduzione polinomiale da R a Q
@@ -785,35 +784,37 @@ I due diagrammi illustrano in modo visivo le due possibili soluzioni al più gra
 
 Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzione polinomiale da SAT a 3-SAT.
 
-Dato $p$ polinomio booleano in CNF ($p = u_1 and u_2 and dots and u_m$ ($u_i$ clausole)) vogliamo costruire un polinomio $tilde(p)$ in 3-CNF.
+#proof()[
+  Dato $p$ polinomio booleano in CNF ($p = u_1 and u_2 and dots and u_m$ ($u_i$ clausole)) vogliamo costruire un polinomio $tilde(p)$ in 3-CNF.
 
-Le clausole di $p$ possono essere:
-- $u = v$ (_v_ letterale; $x,y$ variabili nuove)\
-  $tilde(u)= (v or x or y) and (v or x' or y) and (v or x or y') and (v or x' or y')$
-  $
-    u "soddisfacibile" <=> tilde(u) "soddisfacibile"
-  $
-- $u = v_1 or v_2 quad quad (x "variabile nuova")$\
-  $tilde(u)=(v_1 or v_2 or x) and (v_1 or v_2 or x')$
-  $
-    u "soddisfacibile" <=> tilde(u) "soddisfacibile"
-  $
-- $u = v_1 or v_2 or v_3 -> tilde(u) = u$
-- $u = v_1 or v_2 or dots or v_n quad quad (n >= 4; y_1, dots, y_(n-3) "variabili nuove")$\
-  $tilde(u) = (v_1 or v_2 or y_1) and (v_3 or y_1^' or y_2) and dots and (v_j or y_(j-2)^' or y_(j-1)) and dots and (v_(n-2) or y_(n-4)^' or y_(n-3)) and (v_(n-1) or v_n or y_(n-3)^')$
+  Le clausole di $p$ possono essere:
+  - $u = v$ (_v_ letterale; $x,y$ variabili nuove)\
+    $tilde(u)= (v or x or y) and (v or x' or y) and (v or x or y') and (v or x' or y')$
+    $
+      u "soddisfacibile" <=> tilde(u) "soddisfacibile"
+    $
+  - $u = v_1 or v_2 quad quad (x "variabile nuova")$\
+    $tilde(u)=(v_1 or v_2 or x) and (v_1 or v_2 or x')$
+    $
+      u "soddisfacibile" <=> tilde(u) "soddisfacibile"
+    $
+  - $u = v_1 or v_2 or v_3 -> tilde(u) = u$
+  - $u = v_1 or v_2 or dots or v_n quad quad (n >= 4; y_1, dots, y_(n-3) "variabili nuove")$\
+    $tilde(u) = (v_1 or v_2 or y_1) and (v_3 or y_1^' or y_2) and dots and (v_j or y_(j-2)^' or y_(j-1)) and dots and (v_(n-2) or y_(n-4)^' or y_(n-3)) and (v_(n-1) or v_n or y_(n-3)^')$
 
-+ u soddisfacibile $=> tilde(u)$ soddisfacibile
-  V variabili di $p$\
-  sia $t: V --> {0, 1} quad t.c. quad t(u) = 1$\
-  sia $v_j$ il primo letterale di u t.c. $t(v_j) = 1$\
-  sia $accent(t, tilde): V union {y_1, dots, y_(n-3)} --> {0, 1}$ come segue:
-  $
-    accent(t, tilde)(x) = cases(t(x) quad quad&"se" x in V, 1 &"se" x = y_1\, dots\, y_(j-2), 0 &"se" x=y_(j-1)\, dots\, y_(n-3))
-  $
-+ $tilde(u) "soddisfacibile" => u "soddisfacibile"$\
-  sia $accent(t, tilde): V union {y_1, dots, y_(n-3)} -->{0, 1} quad quad t.c. quad accent(t, tilde) (tilde(u))=1$\
-  sia $t = accent(t, tilde)_(|V)$\
-  Si dimostra che $t(u) = 1$
+  + Se $u$ soddisfacibile $=> tilde(u)$ soddisfacibile
+    V variabili di $p$\
+    sia $t: V --> {0, 1} quad t.c. quad t(u) = 1$\
+    sia $v_j$ il primo letterale di u t.c. $t(v_j) = 1$\
+    sia $accent(t, tilde): V union {y_1, dots, y_(n-3)} --> {0, 1}$ come segue:
+    $
+      accent(t, tilde)(x) = cases(t(x) quad quad&"se" x in V, 1 &"se" x = y_1\, dots\, y_(j-2), 0 &"se" x=y_(j-1)\, dots\, y_(n-3))
+    $
+  + $tilde(u) "soddisfacibile" => u "soddisfacibile"$\
+    sia $accent(t, tilde): V union {y_1, dots, y_(n-3)} -->{0, 1} quad quad t.c. quad accent(t, tilde) (tilde(u))=1$\
+    sia $t = accent(t, tilde)_(|V)$\
+    Si dimostra che $t(u) = 1$
+]
 
 == Problema del Vertex Cover (VC)
 
