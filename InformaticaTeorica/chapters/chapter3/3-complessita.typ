@@ -802,10 +802,10 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
   - $u = v_1 or v_2 or dots or v_n quad quad (n >= 4; y_1, dots, y_(n-3) "variabili nuove")$\
     $tilde(u) = (v_1 or v_2 or y_1) and (v_3 or y_1^' or y_2) and dots and (v_j or y_(j-2)^' or y_(j-1)) and dots and (v_(n-2) or y_(n-4)^' or y_(n-3)) and (v_(n-1) or v_n or y_(n-3)^')$
 
-  + Se $u$ soddisfacibile $=> tilde(u)$ soddisfacibile
-    V variabili di $p$\
+  + Se $u$ soddisfacibile $=> tilde(u)$ soddisfacibile\
+    Sia $V$ l'insieme delle variabili di $p$:\
     sia $t: V --> {0, 1} quad t.c. quad t(u) = 1$\
-    sia $v_j$ il primo letterale di u t.c. $t(v_j) = 1$\
+    sia $v_j$ il primo letterale di $u$ t.c. $t(v_j) = 1$\
     sia $accent(t, tilde): V union {y_1, dots, y_(n-3)} --> {0, 1}$ come segue:
     $
       accent(t, tilde)(x) = cases(t(x) quad quad&"se" x in V, 1 &"se" x = y_1\, dots\, y_(j-2), 0 &"se" x=y_(j-1)\, dots\, y_(n-3))
@@ -820,11 +820,13 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
 
 #index[Vertex cover]
 #definition()[
-  Dato $G=(V, E)$ grafo non orientato, un *vertex cover* di G è un sottoinsieme $C subset.eq V$ t.c. $forall{x,y} in E, x in C "oppure" y in C$
+  Dato $G=(V, E)$ grafo non orientato, un *vertex cover* di $G$ è un sottoinsieme $C subset.eq V$ t.c. $forall{x,y} in E, space x in C "oppure" y in C$
 ]
+#figure(image("images/2026-08-11-11-08-48.png", width: 60%), caption: "Vertex cover con C={1,6,4,7,2,3}")
+
 #index[Problema del Vertex Cover]
 #problem()[
-  Dato G grafo non orientato e $k in NN$, esiste un VC $C "di" G$ con $abs(C) = k?$
+  Dato $G$ grafo non orientato e $k in NN$, esiste un *VC* $C "di" G$ con $abs(C) = k?$
 ]
 
 #proposition()[
@@ -1065,7 +1067,7 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
   ]
   Allora l'insieme di vertici così definito (di cardinalità $n+2m$) è un vertex cover di $G(p)$.
 
-  $<==)$ $G(p)$ ha un V C di cardinalità $n+ 2m$, allora voglio definire $t: {x_1, dots, x_n} -> {0,1}$ che soddisfi $p$:
+  $<==)$ $G(p)$ ha un VC di cardinalità $n+ 2m$, allora voglio definire $t: {x_1, dots, x_n} -> {0,1}$ che soddisfi $p$:
   $
     t(x_i) = cases(
       1 & "se" x_i "sta nel" V C,
@@ -1279,7 +1281,7 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
 
 #index[Problema HAM]
 #proposition()[
-  Il problema del circuito hamiltoniano è NP-difficile ($("HAM") in "NP"$)
+  Il problema del circuito hamiltoniano è NP-difficile ($"HAM" in "NP"$).
 ]
 
 #proof()[
@@ -1622,8 +1624,8 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
     // Generazione delle righe (t e f)
     for k in range(rows + 1) {
       let y = cy-e - 1.5 - k * 1.5
-      content((cx - dx, y), text(size: 1.3em, $t_{#id,#k}$), name: "t" + id + "_" + str(k))
-      content((cx + dx, y), text(size: 1.3em, $f_{#id,#k}$), name: "f" + id + "_" + str(k))
+      content((cx - dx, y), text(size: 1.3em, $t_(#id,#k)$), name: "t" + id + "_" + str(k))
+      content((cx + dx, y), text(size: 1.3em, $f_(#id,#k)$), name: "f" + id + "_" + str(k))
     }
 
     // Nodo finale o_i
@@ -1635,7 +1637,7 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
     line(name-e, "t" + id + "_0", mark: (end: ">"))
     line(name-e, "f" + id + "_0", mark: (end: ">"))
 
-    let m = 0.6 // Margine per le doppie frecce orizzontali
+    let m = 0.8 // Margine per le doppie frecce orizzontali
     for k in range(rows + 1) {
       let y = cy-e - 1.5 - k * 1.5
       // Frecce orizzontali
@@ -1670,13 +1672,13 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
   let y-in = 8.5
   let y-out = 6.5
 
-  content((5.5, y-in), text(size: 1.4em, weight: "bold", $"in"_{j,1}$), name: "in_1")
-  content((8.0, y-in), text(size: 1.4em, weight: "bold", $"in"_{j,2}$), name: "in_2")
-  content((10.5, y-in), text(size: 1.4em, weight: "bold", $"in"_{j,3}$), name: "in_3")
+  content((5.5, y-in), text(size: 1.4em, weight: "bold", $"in"_(j,1)$), name: "in_1")
+  content((8.0, y-in), text(size: 1.4em, weight: "bold", $"in"_(j,2)$), name: "in_2")
+  content((10.5, y-in), text(size: 1.4em, weight: "bold", $"in"_(j,3)$), name: "in_3")
 
-  content((5.5, y-out), text(size: 1.4em, weight: "bold", $"out"_{j,1}$), name: "out_1")
-  content((8.0, y-out), text(size: 1.4em, weight: "bold", $"out"_{j,2}$), name: "out_2")
-  content((10.5, y-out), text(size: 1.4em, weight: "bold", $"out"_{j,3}$), name: "out_3")
+  content((5.5, y-out), text(size: 1.4em, weight: "bold", $"out"_(j,1)$), name: "out_1")
+  content((8.0, y-out), text(size: 1.4em, weight: "bold", $"out"_(j,2)$), name: "out_2")
+  content((10.5, y-out), text(size: 1.4em, weight: "bold", $"out"_(j,3)$), name: "out_3")
 
   // // Frecce verticali Clausola
   line("in_1", "out_1", mark: (end: ">"))
@@ -1693,8 +1695,8 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
 
   // // Frecce Curve Clausola
   let cut = 0.5
-  bezier("in_3", "in_1", (8.0, y-in - 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
-  bezier("out_1", "out_3", (8.0, y-out + 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
+  bezier("in_3", "in_1", (8.0, y-in + 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
+  bezier("out_1", "out_3", (8.0, y-out - 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
 
   // // ==========================================
   // // 4. Collegamenti Main Spine (Lo scheletro)
@@ -1750,7 +1752,9 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
   Il problema 2-SAT $in$ P.
 ]
 Vediamo come costruire il grafo associato a $p$. Sia $p = u_1 and u_2 and dots and u_s " con " u_i = u_(i, 1) or u_(i, 2)$ un polinomio booleano in 2-CNF. Costruiamo un grafo orientato $G(p)$ nel seguente modo:
+
 - Vertici: $forall x$ variabile che compare in _p_, si scrivono i nodi $x "e" x'$ (2 vertici)
+
 - Archi: $forall "clausola" u_i$, 2 archi: $cases(u_(i, 1)^' --> u_(i, 2), u_(i, 2)^' --> u_(i, 1))$
 
 #example()[
@@ -1844,8 +1848,8 @@ Se $"P" eq.not "NP":$
 ]
 P è chiuso rispetto alla complementazione.
 #problem("Aperto")[
-  NP è chiusa per complementazione?
-  $ "co-NP = NP?" $
+  NP è chiuso per complementazione?
+  $ "co-NP" =^? "NP" $
 ]
 #index[Classe co-NP]
 #definition()[
@@ -2020,11 +2024,11 @@ e ne trovo uno per cui non vale.
 #index[Classe Exp]
 Si definiscono come:
 $
-  "Exp" = {L | exists M "MdT deterministica che accetta" L "t.c." t_C_M (n) = Omicron(2^n^k) "per qualche" k >= 1}
+  "Exp" = {L | exists M "MdT deterministica che accetta" L "t.c." t c_M (n) = Omicron(2^n^k) "per qualche" k >= 1}
 $
 
 #observation(multiple: true)[
-  - $L in "Exp" <==> exists M$ MdT deterministica che accetta $L$ t.c. $t_(C_M)(n) = Omicron(c^(p(n)))$, per opportuni $c > 1$ e $p(n)$ polinomio di grado $>= 1$ (sennò sarebbe costante).
+  - $L in "Exp" <==> exists M$ MdT deterministica che accetta $L$ t.c. $t c_M)(n) = Omicron(c^(p(n)))$, per opportuni $c > 1$ e $p(n)$ polinomio di grado $>= 1$ (sennò sarebbe costante).
   - $"P" subset.eq "Exp"$
 ]
 
@@ -2032,7 +2036,7 @@ $
   $"NP" subset.eq "Exp"$
 ]
 #proof()[
-  $L in "NP"$, $M$ MdT non deterministica che accetta $L$ t.c. $t_(C_M)(n) = O(n^k)$ (è polinomiale). Sia $delta$ il grado di non determinismo di $M$ (ovvero il massimo numero di transizioni associate a una coppia stato-simbolo letto). Posso costruire una MdT $N$ deterministica che accetta $L$ eseguendo tutte le possibili computazioni di $M$ su una stringa $w$.
+  $L in "NP"$, $M$ MdT non deterministica che accetta $L$ t.c. $t c_M)(n) = O(n^k)$ (è polinomiale). Sia $delta$ il grado di non determinismo di $M$ (ovvero il massimo numero di transizioni associate a una coppia stato-simbolo letto). Posso costruire una MdT $N$ deterministica che accetta $L$ eseguendo tutte le possibili computazioni di $M$ su una stringa $w$.
 
   Codifica delle computazioni di $M$ su $w$ di lunghezza $n$:
   $
@@ -2093,10 +2097,10 @@ $
     Complessità in tempo di D:
     $
       |R(M)| = n\
-      t_C_D (n) = t_C_N (2n) = 2^n
+      t c_D (n) = t c_N (2n) = 2^n
     $
     Eseguiamo D su R(D):
-    + D su R(D) termina in uno stato finale $==>$ per definizione di D, N su R(D)R(D) termina in uno stat non finale $==>$ dato che N è una MdT che accetta L e R(D)R(D) non appartiene al linguaggio, D su R(D) non termina in unno stato finale entro $2^(2|R(D)|)$ transizioni $==>$ dato che $t_C_D (n) = 2^(2n)$, D su R(D) non termina in uno stato finale $==>$ *ASSURDO*\
+    + D su R(D) termina in uno stato finale $==>$ per definizione di D, N su R(D)R(D) termina in uno stat non finale $==>$ dato che N è una MdT che accetta L e R(D)R(D) non appartiene al linguaggio, D su R(D) non termina in unno stato finale entro $2^(2|R(D)|)$ transizioni $==>$ dato che $t c_D (n) = 2^(2n)$, D su R(D) non termina in uno stato finale $==>$ *ASSURDO*\
 
     + D su R(D) termina in uno stato non finale $==>$ per definizione di D, N su R(D)R(D) termina in uno stato finale $==>$ dato che N è una MdT che accetta L, D su R(D) termina in uno stato finale entro $2^(2|R(D)|)$ transizioni $==>$ *ASSURDO*
 ]
@@ -2104,7 +2108,7 @@ $
 #index[Classe NExp]
 Definisco un'altra classe di linguaggi esponenziali:
 $
-  "NExp" = { L "linguaggio" | exists"M MdT non deterministica che accetta "L "t.c." t_C_M (n) = Omicron(2^n^k), exists k >= 1}
+  "NExp" = { L "linguaggio" | exists"M MdT non deterministica che accetta "L "t.c." t c_M (n) = Omicron(2^n^k), exists k >= 1}
 $
 
 #observation()[
@@ -2123,7 +2127,7 @@ $
   Facciamo vedere che $"P" = "NP" ==> "Exp" = "NExp"$.\
   Faremo vedere che NExp $subset.eq$ Exp\
 
-  Sia $L in "Nexp"$ e M MdT non deterministica che accetta $L$ t.c. $t_C_M (n) = Omicron(2^n^k)$
+  Sia $L in "Nexp"$ e M MdT non deterministica che accetta $L$ t.c. $t c_M (n) = Omicron(2^n^k)$
   $
     accent(L, tilde) = {x & 1^2^(|x|^k) | x in L} quad quad quad (1 in.not "alfabeto di" L) \
                           & arrow.t \
@@ -2151,15 +2155,15 @@ $
 
   La *complessità in spazio di M* è una funzione:
   $
-    s_C_M: NN --> NN
+    s c_M: NN --> NN
   $
-  in cui, $s_C_M (n)$, è il numero di celle sui nastri di lavoro a cui le testine hanno accesso durante una computazione di M su una stringa di lunghezza $n$, nel caso peggiore.
+  in cui, $s c_M (n)$, è il numero di celle sui nastri di lavoro a cui le testine hanno accesso durante una computazione di M su una stringa di lunghezza $n$, nel caso peggiore.
 ]
 
 #observation(multiple: true)[
   + La definizione vale sia nel caso deterministico che in quello non deterministico;
   + Non è necessario che M termini su ogni input;
-  + È possibile che $s_C_M (n) < n$ (a lezione: $s_C_M (n) > 0$)
+  + È possibile che $s c_M (n) < n$ (a lezione: $s c_M (n) > 0$)
 ]
 
 #example()[
@@ -2184,24 +2188,24 @@ $
   La complessità in spazio di M nel caso peggiore (accettazione) è:\
   Se scrivo i numeri naturali in binario devo scrivere $n+1$ sui nastri 2 e 3, quindi
   $
-    s_C_M (n) = 2 dot (ceil(log(n+1))+2)
+    s c_M (n) = 2 dot (ceil(log(n+1))+2)
   $
 ]
 
 #proposition()[
   Se M MdT a 2 nastri, allora:
   $
-    t_C_M (n) = f(n) ==> s_C_M (n) <= f(n) + 1
+    t c_M (n) = f(n) ==> s c_M (n) <= f(n) + 1
   $
 ]
 #proof()[
-  Nel caso peggiore, M legge una nuova cella sul nastro di lavoro ad ogni transizione, aggiungendo la cella iniziale: $s_C_M (n) <= f(n) + 1$
+  Nel caso peggiore, M legge una nuova cella sul nastro di lavoro ad ogni transizione, aggiungendo la cella iniziale: $s c_M (n) <= f(n) + 1$
 ]
 
 #proposition()[
   Se M MdT a 2 nastri, $|Q| = m, |Sigma| = t$ (cardinalità di insieme degli stati e alfabeto):
   $
-    s_C_M (n) = f(n) ==> t_C_M (n) <= m(n+2)f(n)t^f(n)
+    s c_M (n) = f(n) ==> t c_M (n) <= m(n+2)f(n)t^f(n)
   $
 ]
 #proof()[
@@ -2217,7 +2221,7 @@ $
 
   Si conclude che:
   $
-    t_C_M <= m(n+2)f(n)t^f(n)
+    t c_M <= m(n+2)f(n)t^f(n)
   $
 ]
 
@@ -2226,16 +2230,14 @@ $
 #index[Classe PSpace]
 #definition()[
   $
-    "PSpace" = {L "linguaggio" | & exists M "MdT deterministica che accetta" L "t.c." \
-                                 & s_C_M (n) = Omicron(n^k), exists k >= 1}
+    "PSpace" = {L "linguaggio" | exists M "MdT det. che accetta" L "t.c." s c_M (n) = Omicron(n^k), exists k >= 1}
   $
 ]
 
 #index[Classe NPSpace]
 #definition()[
   $
-    "NPSpace" = {L "linguaggio" | & exists M "MdT non deterministica che accetta" L "t.c." \
-                                  & s_C_M (n) = Omicron(n^k), exists k >= 1}
+    "NPSpace" = {L "linguaggio" | exists M "MdT non det. che accetta" L "t.c." s c_M (n) = Omicron(n^k), exists k >= 1}
   $
 ]
 
@@ -2259,7 +2261,7 @@ $
 #proof()[
   $"PSpace" subset.eq "NPSpace"$ (ovvio)\
   Vogliamo mostrare che $"NPSpace" subset.eq "PSpace"$:
-  $L in "NPSpace"$, M MdT non deterministica, tale che $s_C_M (n) = s(n)$, che accetta _L_ in spazio polinomiale.
+  $L in "NPSpace"$, M MdT non deterministica, tale che $s c_M (n) = s(n)$, che accetta _L_ in spazio polinomiale.
 
   Numero di possibili configurazioni di M in una sua computazione su input di lunghezza _m_:
   $
@@ -2314,13 +2316,13 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
 #definition()[
   Si chiama $cal(F)P$ la classe delle funzioni $f: Sigma^* -> NN$ per cui esiste una MdT deterministica che calcola _f_ in tempo polinomiale:
   $
-    cal(F)P = {f: Sigma^* -> NN | exists M "MdT che calcola" f "t.c." t_C_M (n) = Omicron(n^k), exists k >= 1}
+    cal(F)P = {f: Sigma^* -> NN | exists M "MdT che calcola" f "t.c." t c_M (n) = Omicron(n^k), exists k >= 1}
   $
 ]
 
 #index[Classe \#P]
 #definition()[
-  Si chiama *\#_P_* (sharp P) la classe delle funzioni $f: Sigma^* -> NN$ per cui esiste una MdT non deterministica polinomiale tale che, per ogni stringa $w in Sigma^*$, le computazioni accet  tanti di M su _w_ sono $f(w)$:
+  Si chiama *\#_P_* (sharp P) la classe delle funzioni $f: Sigma^* -> NN$ per cui esiste una MdT non deterministica polinomiale tale che, per ogni stringa $w in Sigma^*$, le computazioni accettanti di M su _w_ sono $f(w)$:
   $
     \#P = {
     f: Sigma^* --> NN | & exists M "MdT non deterministica polinomiale t.c.", forall w in Sigma^* \
@@ -2332,7 +2334,6 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
 #proposition()[
   $cal(F)P subset.eq \#P$
 ]
-// Diversa da quella del PDF, TOP
 #proof()[
   $f in \#P$, sia M MdT deterministica polinomiale che calcola _f_.\
   Considero la seguente MdT non deterministica polinomiale:
@@ -2395,7 +2396,9 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
   $
   MdT per calcolare _f_, su input _w_:
   - Determino se  $w in L_(1/2 2^(q(n)))$ usando N e confrontando il numero di computazioni accettanti _k_ con $1/2 2^q(n)$.
+
     - Se $k < 1/2 2^q(n)$, rifaccio con $L_(1/4 2^(q(n)))$;
+  
     - Se $k >= 1/2 2^q(n)$, rifaccio con $L_(3/4 2^(q(n)))$.
 
   Complessità in tempo:
