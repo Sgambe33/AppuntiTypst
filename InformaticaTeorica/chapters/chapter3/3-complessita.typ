@@ -229,7 +229,7 @@ Adesso definiamo le notazioni asintotiche:
   Data una MdT _M_ non deterministica, la *complessità in tempo* di _M_ è determinata dalla funzione:
   $
     t c_M (n) = & \# "transizioni eseguite da una computazione di" M "su una stringa di lunghezza "n \
-            & "nel caso peggiore".
+                & "nel caso peggiore".
   $
 ]
 
@@ -237,32 +237,32 @@ Adesso definiamo le notazioni asintotiche:
   Sia _M_ MdT non deterministica che accetta il linguaggio _L_ e tale che $t c_M (n) = f(n)$. Allora $exists M' "MdT deterministica che accetta "L space "t.c." space t c_M'(n)=Omicron(f(n) dot delta^(f(n)))$, con $delta$ grado di non determinismo di $M$.
 ]
 
-#proof()[  
-Costruiamo una MdT deterministica $M'$ a tre nastri che simula
-sistematicamente tutte le possibili computazioni di $M$.
-La macchina $M'$ usa i tre nastri nel modo seguente:
+#proof()[
+  Costruiamo una MdT deterministica $M'$ a tre nastri che simula
+  sistematicamente tutte le possibili computazioni di $M$.
+  La macchina $M'$ usa i tre nastri nel modo seguente:
 
-- sul nastro 1 mantiene l'input;
-- sul nastro 2 simula una computazione di $M$;
-- sul nastro 3 mantiene la sequenza $(m_1, dots, m_(f(n)))$ che determina le scelte non deterministiche della computazione da simulare.
-Poiché $M$ ha grado di non determinismo $delta$, a ogni passo della
-computazione può scegliere tra al più $delta$ transizioni. Una possibile
-computazione di lunghezza al più $f(n)$ può quindi essere descritta da
-una sequenza
-$
-(m_1, m_2, dots, m_(f(n))), quad 1 <= m_i <= delta,
-$
-dove $m_i$ indica quale delle possibili transizioni di $M$ viene scelta
-all'$i$-esimo passo. Il numero di possibili sequenze, e quindi di possibili computazioni da simulare, è al più $delta^(f(n))$: infatti, per ciascuno degli al più $f(n)$ passi vi sono al più $delta$
-possibili scelte.\
-Per ciascuna di queste computazioni, $M'$ deve simulare al più $f(n)$
-transizioni di $M$, poiché $t c_M(n)=f(n)$ (dove $n$ è la lunghezza dell'input). Pertanto, nel caso peggiore, $M'$ simula al più $delta^(f(n))$ computazioni, ciascuna di costo al più $f(n)$. Ne segue
-$
-t c_(M')(n)
-  = O(f(n) dot delta^(f(n))).
-$
-Se almeno una delle computazioni simulate accetta, $M'$ accetta;
-se nessuna accetta, $M'$ rifiuta. Quindi $M'$ è equivalente a $M$.
+  - sul nastro 1 mantiene l'input;
+  - sul nastro 2 simula una computazione di $M$;
+  - sul nastro 3 mantiene la sequenza $(m_1, dots, m_(f(n)))$ che determina le scelte non deterministiche della computazione da simulare.
+  Poiché $M$ ha grado di non determinismo $delta$, a ogni passo della
+  computazione può scegliere tra al più $delta$ transizioni. Una possibile
+  computazione di lunghezza al più $f(n)$ può quindi essere descritta da
+  una sequenza
+  $
+    (m_1, m_2, dots, m_(f(n))), quad 1 <= m_i <= delta,
+  $
+  dove $m_i$ indica quale delle possibili transizioni di $M$ viene scelta
+  all'$i$-esimo passo. Il numero di possibili sequenze, e quindi di possibili computazioni da simulare, è al più $delta^(f(n))$: infatti, per ciascuno degli al più $f(n)$ passi vi sono al più $delta$
+  possibili scelte.\
+  Per ciascuna di queste computazioni, $M'$ deve simulare al più $f(n)$
+  transizioni di $M$, poiché $t c_M(n)=f(n)$ (dove $n$ è la lunghezza dell'input). Pertanto, nel caso peggiore, $M'$ simula al più $delta^(f(n))$ computazioni, ciascuna di costo al più $f(n)$. Ne segue
+  $
+    t c_(M')(n)
+    = O(f(n) dot delta^(f(n))).
+  $
+  Se almeno una delle computazioni simulate accetta, $M'$ accetta;
+  se nessuna accetta, $M'$ rifiuta. Quindi $M'$ è equivalente a $M$.
 ]
 #example()[
   #image("images/2026-04-01-11-50-50.png")
@@ -626,61 +626,66 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
   Vista la complessità della dimostrazione, all'orale viene spesso chiesto solo qualche passaggio.
 ]
 #proof()[
-  Vogliamo dimostrare che $forall L in "NP"$, esiste una riduzione polinomiale da $L$ a $S A T$. Dire che $L in "NP"$ equivale a considerare una MdT $M$ non deterministica polinomiale che accetta $L$. Sia $p(n) = t_(C M)(n)$ (cioè $p(n)$ è la complessità della macchina di Turing $M$). Per semplicità, supponiamo che $forall$ stringa $w$ di lunghezza $n$, il numero di transizioni di $M$ su $w$ sia esattamente $p(n)$ e che $M$ sia una MdT standard limitata a sinistra con le celle numerate.
+  Vogliamo dimostrare che $forall L in "NP"$, esiste una riduzione polinomiale da $L$ a $S A T$. Dire che $L in "NP"$ equivale a considerare una MdT $M$ non deterministica polinomiale che accetta $L$. Sia $p(n) = t c_M (n)$ (cioè $p(n)$ è la complessità della macchina di Turing $M$). Per semplicità, supponiamo che $forall$ stringa $w$ di lunghezza $n$, il numero di transizioni di $M$ su $w$ sia esattamente $p(n)$ e che $M$ sia una MdT standard limitata a sinistra con le celle numerate.
 
-  Voglio trovare una funzione $Phi$ che associa ad una stringa $w$ un polinomio booleano $Phi(w)$ tale che, data una stringa $w$, $M$ accetta $w$ se e solo se $Phi(w)$ è un polinomio booleano in forma $C N F$ soddisfacibile.
-  Gli stati di $M$ sono ${q_1, dots, q_s}$, quelli finali sono indicati con $F$, mentre l'alfabeto di $M$ è ${a_1, dots, a_r}$.
+  Voglio trovare una funzione $Phi$ che associa ad una stringa $w$ un polinomio booleano $Phi(w)$ tale che, data una stringa $w$, $M$ accetta $w$ se e solo se $Phi(w)$ è un polinomio booleano in forma CNF soddisfacibile.
+  Gli stati di $M$ sono $Q={q_1, dots, q_s}$, quelli finali sono indicati con $F$, mentre l'alfabeto di $M$ è $Sigma={a_1, dots, a_r}$.
 
-  Le variabili di $Phi(w)$ (con $w$ lungo $n$) sono di tre tipi:
-  - $S(u, t) arrow$ assegnare valore 1 significa che all'istante $t$ la MdT si trova nello stato $q_u$;
-  - $C(i, j, t) arrow$ assegnare valore 1 significa che all'istante $t$, nella cella $i$ della MdT c'è il simbolo $a_j$;
-  - $L(i, t) arrow$ assegnare valore 1 significa che all'istante $t$ la testina si trova nella cella $i$;
+  Le variabili di $Phi(w)$ (polinomio) (con $w$ lunga $n$) sono di tre tipi:
+  - Se $S(u, t)=1$ significa che all'istante $t$ la MdT si trova nello stato $q_u$;
+  - Se $C(i, j, t)=1$ significa che all'istante $t$, nella cella $i$ della MdT c'è il simbolo $a_j$;
+  - Se $L(i, t)=1$ significa che all'istante $t$ la testina si trova nella cella $i$;
 
   Con $t in {0, 1, 2, dots, p(n)}$, $u in {1, dots, s}$, $i in {0, 1, dots, p(n) + 1}$ e $j in {1, dots, r}$.
 
   Descriviamo ora le proprietà che caratterizzano una computazione accettante di $M$ su $w$:
 
-  1. $forall t, exists! u$ t. c. $S(u, t) = 1$
-  In un certo istante $t$, $M$ si troverà in esattamente uno solo stato.
+  1. $forall t, exists! u$ t.c. $S(u, t) = 1$\
+    In un certo istante $t$, $M$ si troverà in esattamente uno solo stato.
 
-  2. $forall t, forall i, exists! j$ t. c. $C(i, j, t) = 1$
-  In un certo istante $t$, in ogni cella è presente esattamente un solo simbolo.
+  2. $forall t, forall i, exists! j$ t.c. $C(i, j, t) = 1$\
+    In un certo istante $t$, in ogni cella è presente esattamente un solo simbolo.
 
-  3. $forall t, exists! i$ t. c. $L(i, t) = 1$
-  In un certo istante $t$, la testina indicherà una sola cella $i$.
+  3. $forall t, exists! i$ t.c. $L(i, t) = 1$\
+    In un certo istante $t$, la testina indicherà una sola cella $i$.
 
-  4. $t= 0 arrow$ configurazione iniziale
-  All'inizio della computazione, la testina è posizionata sulla prima cella del nastro; tale cella è vuota e quelle a seguire contengono la stringa $w$ in input; $M$ si trova nello stato iniziale.
+  4. $t= 0 arrow$ configurazione iniziale\
+    All'inizio della computazione, la testina è posizionata sulla prima cella del nastro; tale cella è vuota e quelle a seguire contengono la stringa $w$ in input; $M$ si trova nello stato iniziale.
 
-  5. $exists S(u, p(n))$ t. c. $q_u in F$ e $S(u, p(n)) = 1$
-  Nell'istante $t= p(n)$ , cioè a fine computazione (poiché le transizioni sono esattamente $p(n)$), $M$ si troverà in uno stato finale, quindi alla variabile $S$ si assegna il valore 1.
+  5. $exists S(u, p(n))$ t.c. $q_u in F$ e $S(u, p(n)) = 1$\
+    Nell'istante $t= p(n)$ , cioè a fine computazione (poiché le transizioni sono esattamente $p(n)$), $M$ si troverà in uno stato finale, quindi alla variabile $S$ si assegna il valore 1.
 
-  6. $forall t, forall i, L(i, t) = 0 => C(i, j, t) = C(i, j, t+ 1), forall j$
-  Se la testina non è posizionata sulla cella $i$ all'istante $t$, allora nell'istante successivo $t+ 1$ il simbolo $a_j$ contenuto in tale cella $i$ non varia.
+  6. $forall t, forall i, L(i, t) = 0 => C(i, j, t) = C(i, j, t+ 1), forall j$\
+    Se la testina non è posizionata sulla cella $i$ all'istante $t$, allora nell'istante successivo $t+ 1$ il simbolo $a_j$ contenuto in tale cella $i$ non varia.
 
-  7. $forall t, forall i, L(i, t) = 1 => S(u, t+ 1), C(i, j, t+ 1), L(i, t+ 1)$ devono assumere opportuni valori.
-  Se la testina è posizionata sulla cella $i$ all'istante $t$, allora nell'istante successivo $t+ 1$ occorre assegnare valori opportuni alle variabili per descrivere il comportamento di $M$ in base alla transizione da eseguire.
+  7. $forall t, forall i, L(i, t) = 1 => S(u, t+ 1), C(i, j, t+ 1), L(i, t+ 1)$ devono assumere opportuni valori.\
+    Se la testina è posizionata sulla cella $i$ all'istante $t$, allora nell'istante successivo $t+ 1$ occorre assegnare valori opportuni alle variabili per descrivere il comportamento di $M$ in base alla transizione da eseguire.
 
-  Adesso bisogna scrivere un polinomio booleano per ogni proprietà elencata e alla fine si metteranno tutti insieme (nel senso che se ne considererà la congiunzione) a formare un unico polinomio in forma $C N F$.
+  Adesso bisogna scrivere un polinomio booleano per ogni proprietà elencata e alla fine si metteranno tutti insieme (nel senso che se ne considererà la congiunzione) a formare un unico polinomio in forma CNF.
 
   Definiamo un polinomio booleano con variabili ${y_1, dots, y_k}$ nel modo seguente:
   $ U(y_1, dots, y_k) = (y_1 or dots or y_k) and.big_(i < j) (y'_i or y'_j) $
+
+  #example([$k$=3])[
+    $U(y_1,y_2,y_3)=(y_1 or y_2 or y_3) and (y'_1 or y'_2) and (y'_2 or y'_3) and (y'_1 or y'_3)$
+  ]
   E vale: $U(y_1, dots, y_k) = 1 <=> exists! i : y_i = 1$
   ovvero $U$ è un polinomio che vale 1 se esattamente una variabile ha valore 1 (se ha più variabili con valore 1 il polinomio non è soddisfatto).
 
-  Scriviamo i polinomi booleani per le 7 proprietà:
-  1) $and.big_(t=0)^(p(n)) U(S(1, t), S(2, t), dots, S(s, t))$
+  Scriviamo i polinomi booleani per le 7 proprietà:\
+  
+  1) $and.big_(t=0)^(p(n)) U(S(1, t), S(2, t), dots, S(s, t))=A$ (*CNF*)
 
-  2) $and.big_(t,i) U(C(i, 1, t), C(i, 2, t), dots, C(i, r, t))$
+  2) $and.big_(t,i) U(C(i, 1, t), C(i, 2, t), dots, C(i, r, t))=B$ (*CNF*)
 
-  3) $and.big_t U(L(0, t), L(1, t), dots, L(p(n) + 1, t))$
+  3) $and.big_(t=0)^(p(n)) U(L(0, t), L(1, t), dots, L(p(n) + 1, t))=C$ (*CNF*)
 
-  4) $S(1,0) and L(0,0) and C(0,*,0) and (and.big_(i=1)^(n) C(i, w_i, 0)) and (and.big_(i=n+1)^(p(n)+1) C(i,*, 0))$
+  4) $S(1,0) and L(0,0) and C(0,*,0) and (and.big_(i=1)^(n) C(i, w_i, 0)) and (and.big_(i=n+1)^(p(n)+1) C(i,*, 0))=D$ (*CNF*)\
   (la testina parte dalla cella 0, che è vuota; l'input occupa le celle da 1 a $n$ e le restanti sono vuote)
 
-  5) $or.big_(q_u in F) S(u, p(n))$
+  5) $or.big_(q_u in F) S(u, p(n))=E$ (*CNF*)
 
-  6) $A_(i,t) = L(i, t) or (and.big_j P(C(i, j, t), C(i, j, t+ 1)))$
+  6) $ and.big_(i,t) = L(i, t) or (and.big_j P(C(i, j, t), C(i, j, t+ 1)))$
   con
   $ P(x, y) = (x' or y) and (x or y'), quad P(x, y) = 1 <=> cases(x= y= 1 "oppure", x= y= 0) $
   Il polinomio finale della proprietà 6 è $and.big A_(i,t)$.
@@ -729,9 +734,6 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
     // Ovale principale
     circle((0, 0), radius: (2, 3.5), name: "oval2")
 
-    // Curva per isolare la piccola porzione superiore dei linguaggi banali
-    bezier((-1.4, 2.5), (1.4, 2.5), (0, 3.2))
-
     // Etichetta interna
     content((0, 0), text(weight: "bold", size: 1.5em)[NPC])
   })
@@ -761,8 +763,8 @@ I due diagrammi illustrano in modo visivo le due possibili soluzioni al più gra
   Se $L$ è NP-difficile e $f$ è una riduzione polinomiale da $L$ a $Q$ $=>$ $Q$ è NP-difficile.
 ]
 #proof()[
-  Dato $R in "NP"$, descriviamo una riduzione polinomiale da R a Q
-  - Poiché L è NP-difficile e R $in$ NP, $exists g$ riduzione polinomiale da R a L:
+  Dato $R in "NP"$, descriviamo una riduzione polinomiale da $R$ a $Q$
+  - Poiché $L$ è NP-difficile e $R$ $in$ NP, $exists g$ riduzione polinomiale da $R$ a $L$:
   $
     g: Sigma^*_R arrow.long Sigma^*_L quad quad w in R <=> g(w) in L
   $
@@ -775,7 +777,7 @@ I due diagrammi illustrano in modo visivo le due possibili soluzioni al più gra
   $
     f compose g: Sigma^*_R arrow.long Sigma^*_Q quad quad w in R <=> f(g(w)) in Q
   $
-  Inoltre è calcolabile in tempo polinomiale
+  Inoltre è calcolabile in tempo polinomiale.
 ]
 
 == Problema 3-SAT
@@ -2403,7 +2405,7 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
   - Determino se  $w in L_(1/2 2^(q(n)))$ usando N e confrontando il numero di computazioni accettanti _k_ con $1/2 2^q(n)$.
 
     - Se $k < 1/2 2^q(n)$, rifaccio con $L_(1/4 2^(q(n)))$;
-  
+
     - Se $k >= 1/2 2^q(n)$, rifaccio con $L_(3/4 2^(q(n)))$.
 
   Complessità in tempo:
