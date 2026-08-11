@@ -335,7 +335,7 @@ se nessuna accetta, $M'$ rifiuta. Quindi $M'$ è equivalente a $M$.
     })
   ]
 
-  Il caso peggiore si ha quando la MdT rifiuta la stringa, più precisamente la computazione in cui copio tutta la stringa sul secondo nastro $t c_M (n)= 1 + 2n$.
+  La prima transizione (dall'alto) che va da $q_1$ a $q_2$ gestisce il caso di stringhe di lunghezza dispari (si salta il simbolo centrale nel nastro 1 e poi si parte col confronto), l'altra quelle di lunghezza pari (la testina sul nastro 1 è già in posizione corretta, bisogna solo spostare quella del nastro 2). Il caso peggiore si ha quando la MdT rifiuta la stringa, più precisamente la computazione in cui copio tutta la stringa sul secondo nastro: la macchina sceglie nondeterministicamente se continuare a copiare o meno, quindi può darsi che scelga una computazione in cui tutta la stringa viene copiata e quindi $t c_M (n)= 1 + 2n$ (costo 1 per la transzione $q_0 -> q_1$, poi fa 2 operazioni (copia e spostamento) per $n$ simboli in $q_1$ e si arresta).
 ]
 == Classi P e NP
 Sebbene le complessità di alcuni algoritmi ($n^3, n^4, ...$) siano considerate elevate, noi saremo più permissivi e considereremo efficienti tutte le complessità polinomiali. Alla luce delle considerazioni fatte sulle varie tipologie di MdT, definiamo le seguenti classi di linguaggi (o "problemi", più in generale):
