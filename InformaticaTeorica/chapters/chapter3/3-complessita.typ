@@ -352,140 +352,153 @@ Sebbene le complessità di alcuni algoritmi ($n^3, n^4, ...$) siano considerate 
   P $subset.eq "NP"$, perché le MdT deterministiche sono un caso particolare di MdT non deterministiche. Vale anche l'inclusione nel verso opposto? Non si sa, è un problema aperto.
 ]
 
-#problem()[
+#problem("P vs NP")[
   Il problema aperto attualmente più importante in informatica teorica è:
   $
     P limits(=)^? N P
   $
 ]
 
-=== Problema del circuito hamiltoniano
+== Problema del circuito hamiltoniano (HAM)
 
-Dato un grafo orientato $G=(V, E)$, con:
+Sia $G=(V, E)$ un grafo orientato, con:
 - _V_ insieme dei vertici,
-- _E_ insieme degli archi
+- _E_ insieme degli archi (detti anche "lati")
 - $|V|=n$ cardinalità dell'insieme dei vertici
 
 
 #index[Circuito hamiltoniano]#index[Cammino hamiltoniano]
 #definition()[
-  Dato un grafo orientato $G=(V, E)$, un *circuito hamiltoniano* in _G_ è una sequenza $(x_1,x_2, dots, x_(n-1), x_n, x_1)$ di vertici t.c.
+  Dato un grafo orientato $G=(V, E)$, con $V = {x_1, dots, x_n}$, un *circuito hamiltoniano* in _G_ è una sequenza $(x_1,x_2, dots, x_(n-1), x_n, x_1)$ di vertici t.c.
   $
-    forall i, space (x_i, x_(i+1)) in E quad quad ((x_n, x_1) in E) "e" V={x_1, dots, x_n}
+    forall i, space (x_i, x_(i+1)) in E, " con" (x_n, x_1) in E
   $
-
   In parole povere, un *circuito hamiltoniano* è un percorso che passa una e una sola volta da tutti i vertici di un grafo.
 ]
-Affinché una MdT possa lavorare con i grafi è necessario codificare quest'ultimi. Codifica di $G=(V,E), V={1, 2, dots, n}$:
+#problem("HAM")[
+Dato un grafo orientato $G=(V,E)$, decidere se $G$ contiene un circuito hamiltoniano.
+]
+Affinché una MdT possa lavorare con i grafi è necessario codificare questi ultimi. Una codifica di $G=(V,E), V={1, 2, dots, n}$ può essere la seguente:
 
 - Codifica dei vertici: uso la codifica binaria;
 - Codifica degli archi: $(x_i, x_j) arrow.squiggly x_i\#x_j$;
-- Codifica del grafo: codifica della lista degli archi $+ n$. Per separare gli archi nella codifica si usa \#\# e per separare *$n$* si usa \#\#\#.
+- Codifica del grafo: codifica della lista degli archi $ + space n$ numero dei vertici. Per separare gli archi nella codifica si usa \#\# e per separare $n$ si usa \#\#\#.
 
 $
   dots space x_i\#x_j\#\#x_(i+1)\#x_(j+1)\#\# space dots space \#\#\#n
 $
+=== MdT deterministica che risolve HAM
+Un algoritmo _naive_ (perché prova tutti i cammini possibili) che risolve questa problema è dato da una MdT che fa uso di 4 nastri:
 
-Un'implementazione _naive_ di una MdT che tenta di risolvere questo problema fa uso di 4 nastri:
 - Nastro 1: contiene la rappresentazione del grafo in input;
 - Nastro 2: contiene la sequenza dei nodi attualmente in analisi (lunga $n+1$, inizia e termina con il nodo 1);
 - Nastro 3: è quello di lavoro, cioè quello che si usa per vedere se la sequenza è hamiltoniana: ci si scrive tutti i nodi che passano il controllo;
 - Nastro 4: serve per indicare quando fermare la generazione, contiene l'ultima sequenza possibile da controllare;
+#figure(image("images/naiveHamNastri.png", width: 50%))
+La MdT opera in questo modo:
 
-Algoritmo della MdT:
-+ Scrivo sul nastro 4 la sequenza massima da generare (ad esempio $1, n, n, dots, n, 1$).
++ Scrivo sul nastro 4 la sequenza massima generabile ($1, n, n, dots, n, 1$).
 + Sul nastro 2 genero (una dopo l'altra in ordine lessicografico) le stringhe di lunghezza $n+1$ composte da vertici di $V$, che iniziano e finiscono con 1.
 + Confronto la stringa generata sul nastro 2 col contenuto del nastro 4: se sono uguali e i controlli non sono passati, *RIFIUTO* (ho esaurito le possibilità).
 + Svuoto il nastro 3, poi scorro la sequenza sul nastro 2 e $forall j$ da 2 a $n+1$:
+  - controllo che $i_j$ non compaia tra gli elementi già scritti sul nastro 3 (verifico l'assenza di vertici ripetuti, eccezion fatta per l'ultimo nodo che deve essere 1).
   - controllo che l'arco $(i_(j-1), i_j) in E$ (cercandolo sul nastro 1);
-  - controllo che $i_j$ non compaia tra gli elementi già scritti sul nastro 3 (verificando l'assenza di vertici ripetuti, eccezion fatta per l'ultimo nodo che deve essere 1).
   - Se entrambi i controlli sono passati, scrivo $i_j$ sul nastro 3. *ALTRIMENTI*, la sequenza attuale non è un circuito hamiltoniano: interrompo il ciclo e torno al passo 2 per generare la prossima.
 + Se il ciclo al passo 4 termina con successo per tutti i nodi della sequenza, allora ho trovato un circuito hamiltoniano valido: *ACCETTO*.
+Analizzando la complessità, il caso peggiore è quello della non accettazione, cioè il caso in cui $G$ non contenga alcun circuito hamiltoniano: in tal caso vengono generate tutte le sequenze possibili, della forma $(1, i_1, dots, i_(n-1), 1)$: il primo e l'ultimo vertice sono fissati, ma ci sono $n-1$ posizioni libere e ciascuna può assumere $n$ valori, quindi le sequenze sono in numero $n^(n-1)$, e di conseguenza questo algoritmo ha complessità esponenziale.\
+Attenzione: nonostante ciò non possiamo dire che HAM $in.not$ P. Per poterlo dire, dovremmo dimostrare che *nessuna* macchina deterministica può risolvere il problema in tempo polinomiale (che equivarrebbe a dimostrare $P!=N P$).
+=== MdT non deterministica che risolve HAM
+Vediamo un'altra MdT, stavolta non deterministica, che risolve il problema HAM. Sia dato un grafo $G = (V, E)$, con $|V| = n$ e $|E| = k$. La codifica del grafo è quella già vista. La MdT non deterministica fa uso di 3 nastri, che sono gli stessi del caso deterministico escluso il nastro 4. Il comportamento è il seguente:
 
-//TODO: mancano osservazioni su complessità O(logn....)
+  1. verifico se $k < n$: in tal caso non può esserci circuito e quindi si termina rifiutando;
+  2. genero nondeterministicamente sul nastro 2 una sequenza di vertici "candidata" circuito hamiltoniano;
+  3. controllo col nastro 3 se la sequenza generato è un circuito hamiltoniano: scrivo i vertici via via su tale nastro e verifico se esiste un arco che collega il vertice attuale al successivo, senza duplicazioni. Se i controlli falliscono, termino rifiutando.
 
-HAM $in.not$ P? No, non possiamo dirlo, bisognerebbe dimostrare che *nessuna* macchina risolva il problema in tempo polinomiale.
+Dal punto di vista della complessità in tempo, che rappresentiamo in funzione di $k$ numero di archi, il caso peggiore è quello dell'accettazione. In tal caso si ha $k >= n$. I costi dei vari passi sono:
 
-//09.04.2026
+-  Controllo che il grafo abbia almeno $n$ archi: scorro la lista del nastro 1 e mantengo un contatore. Ogni volta che trovo \#\#  incremento di 1 e infine faccio un confronto con $n$. Poichè ogni vertice $v_i$, $i = 1, dots, n$, è codificato in binario, occupa al più $O(log n)$ celle. Dunque se la codifica di un arco è $v_i \# v_j$, anche un arco occupa $O(log n)$ celle. Essendoci $k$ archi, il costo di questo passo è $O(k log n)$.
+- Generazione della sequenza sul nastro 2: scrivo al più $n$ vertici, ciascuno che occupa al più $O(log n)$ celle, quindi il costo del passo è $O(n log n)$.
+- Controllo della sequenza: per ogni iterazione del ciclo:
+  - controllo che il nuovo vertice non sia già comparso: $O(n log n)$;
+  - verifico che ci sia un arco dal vertice precedente al nuovo vertice: $O(k log n)$;
+  - riposiziono  la testina del nastro 3: $O(n log n)$;
+  - ci sono al più $n$ iterazioni, dunque la complessità è $O(k log n)$ per iterazione, ossia $O(n k log n)$ in totale.
+Complessivamente si ha:
+$
+  O(k log n) + O(n log n) + O(n k log n) overbracket(<=, k >= n) \ <= O(k log k) + O(k log k) + O(k^2 log k) approx O(k^2 log k) <= O(k^3)
+$
+da questo deduciamo anche che HAM $in N P$ (in realtà andrebbe considerata la lunghezza dell'input per la funzione $t c_M$, ma con la codifica scelta la lunghezza dell'input è polinomialmente legata a $n$ e $k$, quindi il risultato resta polinomiale).
+== Riducibilità polinomiale fra linguaggi
 #index[Riduzione polinomiale]
 #definition()[
-  Dati 2 linguaggi $L_1$, $L_2$ con $L_1 subset.eq Sigma_1^*$ e $L_2 subset.eq Sigma_2^*$. Si dice che $L_1$ è *polinomialmente riducibile* a $L_2$ quando:
+  Dati $L_1$, $L_2$ linguaggi, $L_1 subset.eq Sigma_1^*$ e $L_2 subset.eq Sigma_2^*$, si dice che $L_1$ è *polinomialmente riducibile* a $L_2$ quando:
   - $L_1$ è riducibile a $L_2$, cioè $exists f: Sigma_1^* -> Sigma_2^*$ tale che:
     - $forall w in Sigma_1^*, space w in L_1 <=> f(w) in L_2$
     - $f$ è computabile
-  - $f$ è computabile in tempo polinomiale (usando una MdT)
+  - $f$ è computabile in tempo polinomiale
+  In questo caso $f$ si dice *riduzione polinomiale* da $L_1$ a $L_2$ e se $F$ è la MdT che la calcola si ha che $t c_F (n) in O(n^r)$, $r in NN$
 ]
 #proposition()[
-  Sia $f$ una riduzione polinomiale da $L_1$ a $L_2$ e $L_2 in P => L_1 in P$.
+  Sia $f$ una riduzione polinomiale da $L_1 subset.eq Sigma_1^*$ a $L_2 subset.eq Sigma_2^*$ e $L_2 in P$. Allora $L_1 in P$.
 ]
 #proof()[
   Dobbiamo costruire una MdT deterministica, che chiameremo $N$, che decida il linguaggio $L_1$ in tempo polinomiale su un input $w in Sigma_1^*$.
 
   Dalle ipotesi del teorema sappiamo che:
   - Esiste una riduzione polinomiale $f: Sigma_1^* -> Sigma_2^*$ da $L_1$ a $L_2$.
-  - Sia $F$ la MdT che calcola $f$ in tempo $T_F (n) in O(n^r)$, dove $n = |w|$.
-  - Poiché $L_2 in P$, sia $M$ la MdT deterministica che decide $L_2$ in tempo $T_M (k) in O(k^s)$, dove $k$ è la lunghezza del suo input.
+  - Sia $F$ la MdT che calcola $f$ in tempo $t c_F (n) in O(n^r)$, dove $n = |w|$.
+  - Poiché $L_2 in P$, sia $M$ la MdT deterministica che decide $L_2$ in tempo $t c_M (k) in O(k^s)$, dove $k$ è la lunghezza del suo input.
 
   Costruiamo la macchina $N$ applicando la seguente strategia sull'input $w$:
   1. Calcoliamo $f(w)$ usando la macchina $F$.
   2. Eseguiamo la macchina $M$ sull'input $f(w)$ per decidere se $f(w) in L_2$.
   3. $N$ accetta $w$ se e solo se $M$ accetta $f(w)$.
 
-  Analisi della complessità temporale di $N$: la lunghezza della stringa output $f(w)$ non può superare il numero di passi compiuti da $F$ per generarla. Pertanto, la lunghezza dell'input che passiamo a $M$ è limitata da $|f(w)| <= T_F (n) in O(n^r)$.
+  Analisi della complessità temporale di $N$: la lunghezza della stringa output $f(w)$ non può superare il numero di passi compiuti da $F$ per generarla. Pertanto, la lunghezza dell'input che passiamo a $M$ è limitata da $|f(w)| <= t c_F (n) in O(n^r)$.
 
   Il tempo totale impiegato da $N$ è la somma del tempo di $F$ e del tempo di $M$:
   $
-    t c_N (n) & = t c_F (n) + t c_M (|f(w)|) \
-              & = O(n^r) + O((n^r)^s) \
+    t c_N (n) & = t c_F (n) + t c_M (n^r) = \
+              & = O(n^r) + O((n^r)^s) = \
               & = O(n^r) + O(n^(r s)) = O(n^(r s))
   $
-
-  Poiché $r$ ed $s$ sono costanti, $r s$ è a sua volta una costante. Il tempo di esecuzione di $N$ è limitato da un polinomio, dimostrando quindi che $L_1 in P$. La composizione di due polinomi è ancora un polinomio.
+  Il tempo di esecuzione di $N$ è limitato da un polinomio, dimostrando quindi che $L_1 in P$.
 ]
-
+=== Problemi NP-difficili e NP-completi
 #index[NP-difficile]
 #definition()[
-  Un linguaggio $L$ si dice *NP-DIFFICILE* quando $forall Q in "NP"$, $exists f$ riduzione polinomiale da $Q$ a $L$ (_L is no harder than Q_).
+  Un linguaggio $L$ si dice *NP-difficile* quando $forall Q in "NP"$, $Q$ è polinomialmente riducibile a $L$ ("$L$ è difficile al più quanto $Q$").
 ]
 
 #index[NP-completo]
 #definition()[
-  Un linguaggio $L$ si dice *NP-COMPLETO* quando:
-  - $L$ è NP-DIFFICILE
+  Un linguaggio $L$ si dice *NP-completo* quando:
+  - $L$ è NP-difficile
   - $L in "NP"$
 ]
 
 #observation()[
-  La classe dei linguaggi *"NP-completi"* (indicata con $"NPC"$) è l'insieme dei linguaggi che appartengono a $"NP"$ e che sono contemporaneamente *"NP-difficili"*. Essa costituisce quindi una sottoclasse di $"NP"$. $"NPC" = { L | L in "NP" " e " L " è NP-difficile" }$
-
-  Di conseguenza, vale banalmente la relazione:
-  $"NPC" subset.eq "NP"$
+  La classe dei linguaggi NP-completi (indicata con NPC) è una sottoclasse di $"NP"$. $"NPC" = { L | L in "NP" " e " L " è NP-difficile" }$. Di conseguenza, vale  $"NPC" subset.eq "NP"$.
 ]
 
-
-//TODO: questa dimostrazione non la trovo sugli appunti, me la sono inventata?
 #proposition()[
   Se esiste un linguaggio $L$ tale che $L in "NPC"$ e $L in "P"$, allora $"P" = "NP"$.
 ]
 #proof()[
-  Per definizione, sappiamo già che $"P" subset.eq "NP"$. Per dimostrare l'uguaglianza $"P" = "NP"$, è quindi sufficiente dimostrare l'inclusione opposta: $"NP" subset.eq "P"$.
+  Per definizione, sappiamo che $"P" subset.eq "NP"$. Quindi è sufficiente dimostrare che $"NP" subset.eq "P"$.
 
   Sia $Q in "NP"$ un linguaggio arbitrario.
-  Poiché $L in "NPC"$, per definizione $L$ è *"NP-difficile"*. Di conseguenza, esiste una riduzione polinomiale $f$ da $Q$ a $L$ ($Q <=_p L$).
-  Inoltre, per ipotesi $L in "P"$, quindi esiste una Macchina di Turing Deterministica (MdT) $M$ che decide $L$ in tempo polinomiale.
+  Poiché $L in "NPC"$, allora $exists$ una riduzione polinomiale $f$ da $Q$ a $L$. Inoltre, $L in "P"$, quindi esiste una MdT $M$ che accetta $L$ in tempo polinomiale.
 
-  Costruiamo una MdT deterministica, che chiameremo $M'$, per decidere $Q$ su un generico input $w in Sigma^*$:
-  1. Calcoliamo $f(w)$. Poiché $f$ è una riduzione polinomiale, questo passo richiede un tempo polinomiale rispetto a $|w|$.
-  2. Eseguiamo la macchina $M$ sull'input $f(w)$ per decidere se $f(w) in L$. Poiché $M$ opera in tempo polinomiale e la dimensione di $f(w)$ è limitata da un polinomio, anche questo passo richiede tempo polinomiale.
-  3. $M'$ accetta l'input se e solo se $M$ accetta $f(w)$.
+  Costruiamo una MdT deterministica $M'$ per decidere $Q$ su input $w$:
+  1. Calcoliamo $f(w)$. Poiché $f$ è una riduzione polinomiale, questo passo richiede un tempo polinomiale.
+  2. Usiamo la macchina $M$ sull'input $f(w)$ per decidere se $f(w) in L$. Poiché $M$ opera in tempo polinomiale e la dimensione di $f(w)$ è limitata da un polinomio, anche questo passo richiede tempo polinomiale.
 
-  La macchina $M'$ è deterministica e decide $Q$ terminando in un tempo totale polinomiale. Ne consegue che $Q in "P"$.
-  Data l'arbitrarietà di $Q$, abbiamo dimostrato che ogni problema in $"NP"$ è anche in $"P"$, ovvero $"NP" subset.eq "P"$. Dunque, $"P" = "NP"$.
+  La macchina $M'$ è deterministica e decide $Q$ terminando in un tempo totale polinomiale. Ne consegue che $Q in "P"$. Data l'arbitrarietà di $Q$, abbiamo dimostrato che ogni problema in $"NP"$ è anche in $"P"$, ovvero $"NP" subset.eq "P"$. Dunque, $"P" = "NP"$.
 ]
 
 //15.04.2026
 == Istanze di un problema
-
 $
   "rep"_1 : {p_1, p_2, dots, p_i} --> Sigma_1^* quad quad "(codifica 1)"
 $
