@@ -581,26 +581,24 @@ I due diagrammi illustrano in modo visivo le due possibili soluzioni al più gra
   Inoltre è calcolabile in tempo polinomiale.
 ]
 
-//15.04.2026
-== Istanze di un problema
+== Rappresentazioni di problemi
+La scelta di una certa codifica per un determinato problema può avere un impatto sulla sua complessità. Quello che facciamo quando cerchiamo una *rappresentazione* (o *codifica*), è cercare una funzione
 $
-  "rep"_1 : {p_1, p_2, dots, p_i} --> Sigma_1^* quad quad "(codifica 1)"
+  "rep" : overbracket({p_1, p_2, dots, p_i}, "istanze di un problema") --> Sigma^* quad quad
 $
-$
-  "rep"_2 : {p_1, p_2, dots, p_i} --> Sigma_2^* quad quad "(codifica 2)"
-$
+cioè una funzione che traduca ciascuna istanza di un problema (ad esempio un grafo nel caso del problema HAM) in una parola su un opportuno alfabeto $Sigma$, in modo da poterla fornire in input ad una MdT.
 #index[Trasformazione polinomiale]
 #definition()[
-  $"rep"_1$ è *polinomialmente trasformabile* in $"rep"_2$ quando $exists t : Sigma_1^* --> Sigma_2^*$ tale che:
+  Date $"rep"_1 : {p_1, p_2, dots, p_i} --> Sigma_1^*$ e $"rep"_2 : {p_1, p_2, dots, p_i} --> Sigma_2^*$, \ $"rep"_1$ è *polinomialmente trasformabile* in $"rep"_2$ quando $exists space t : Sigma_1^* --> Sigma_2^*$ tale che:
+
   + $forall i, space t("rep"_1 (p_i)) = "rep"_2 (p_i)$
-  + $forall w in Sigma_1^*$ tale che $w in.not "Im"("rep"_1)$, vale $t(w) in.not "Im"("rep"_2)$ (con "Im" ci si riferisce all'immagine);
-  + $t$ è computabile in tempo polinomiale (quindi efficiente)
+  + $forall w in Sigma_1^*$ tale che $w in.not "Im"("rep"_1)$, vale $t(w) in.not "Im"("rep"_2)$ ("Im" è l'immagine);
+  + $t$ è computabile in tempo polinomiale.
 ]
 
-Se $"rep"_1$ è polinomialmente trasformabile in $"rep"_2$, allora la lunghezza di $"rep"_2 (p_i) (= t("rep"_1 (p_i)))$ è al più polinomiale nella lunghezza di $"rep"_1 (p_i)$. Pertanto se un problema sta nella classe P usando $"rep"_2$, allora il problema sta in P anche usando $"rep"_1$.
-
+Se $"rep"_1$ è polinomialmente trasformabile in $"rep"_2$, allora la lunghezza di $"rep"_2 (p_i)$ ($= t("rep"_1 (p_i))$) è al più polinomiale nella lunghezza di $"rep"_1 (p_i)$. Pertanto se un problema sta nella classe P usando $"rep"_2$, allora il problema sta in P anche usando $"rep"_1$.
 #observation()[
-  Attenzione al caso delle rappresentazioni binaria e unaria di un numero naturale (la rappresentazione binaria di $n$ ha lunghezza $approx log_2 (n)$, per cui la conversione in unario richiede un numero di transizioni esponenziale nella lunghezza dell'input). La trasformazione da binario a unario non è polinomiale! Può accadere che un problema stia in P con la rappresentazione unaria ma non stia in P con la rappresentazione binaria.
+  Attenzione al caso delle rappresentazioni binaria e unaria di un numero naturale (la rappresentazione binaria di $n$ ha lunghezza $approx log_2 (n)$, per cui la conversione in unario richiede un numero di transizioni esponenziale nella lunghezza dell'input). La trasformazione da binario a unario non è polinomiale! Può accadere che un problema stia in P con la rappresentazione unaria ma non stia in P con la rappresentazione binaria (un problema prende in input una stringa unaria di lunghezza $n$ e compie $n$ transizioni, lo stesso problema con input stringa binaria di lunghezza $m = log_2 (n)$ in input ne compie $2^m$: il numero di transizioni svolte è lo stesso, ma nel primo caso la complessità è lineare rispetto alla lunghezza dell'input, nel secondo caso è esponenziale).
 ]
 
 #index[Polinomio booleano]
@@ -843,7 +841,7 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
 #figure(image("images/2026-08-11-11-08-48.png", width: 60%), caption: "Vertex cover con C={1,6,4,7,2,3}")
 
 #index[Problema del Vertex Cover]
-#problem()[
+#problem("Vertex Cover")[
   Dato $G$ grafo non orientato e $k in NN$, esiste un *VC* $C "di" G$ con $abs(C) = k?$
 ]
 
