@@ -564,7 +564,8 @@ I due diagrammi illustrano in modo visivo le due possibili soluzioni al più gra
   Se $L$ è NP-difficile e $f$ è una riduzione polinomiale da $L$ a $Q$ $=>$ $Q$ è NP-difficile.
 ]
 #proof()[
-  Dato $R in "NP"$, descriviamo una riduzione polinomiale da $R$ a $Q$
+  Dato $R in "NP"$, descriviamo una riduzione polinomiale da $R$ a $Q$.
+
   - Poiché $L$ è NP-difficile e $R$ $in$ NP, $exists g$ riduzione polinomiale da $R$ a $L$:
   $
     g: Sigma^*_R arrow.long Sigma^*_L quad quad w in R <=> g(w) in L
@@ -600,7 +601,7 @@ Se $"rep"_1$ è polinomialmente trasformabile in $"rep"_2$, allora la lunghezza 
 #observation()[
   Attenzione al caso delle rappresentazioni binaria e unaria di un numero naturale (la rappresentazione binaria di $n$ ha lunghezza $approx log_2 (n)$, per cui la conversione in unario richiede un numero di transizioni esponenziale nella lunghezza dell'input). La trasformazione da binario a unario non è polinomiale! Può accadere che un problema stia in P con la rappresentazione unaria ma non stia in P con la rappresentazione binaria (un problema prende in input una stringa unaria di lunghezza $n$ e compie $n$ transizioni, lo stesso problema con input stringa binaria di lunghezza $m = log_2 (n)$ in input ne compie $2^m$: il numero di transizioni svolte è lo stesso, ma nel primo caso la complessità è lineare rispetto alla lunghezza dell'input, nel secondo caso è esponenziale).
 ]
-
+== Polinomi booleani
 #index[Polinomio booleano]
 #definition()[
   $x_1, x_2, dots, x_n$ indeterminate. Un *polinomio booleano* in $x_1, x_2, dots, x_n$ è elemento dell'insieme PB$(x_1,dots,x_n)$ dei polinomi booleani in $x_1,dots,x_n$ e si ha che:
@@ -609,52 +610,51 @@ Se $"rep"_1$ è polinomialmente trasformabile in $"rep"_2$, allora la lunghezza 
 
   - $forall i <= n, space x_i in "PB"(x_1,dots,x_n)$
 
-  - $p,q in "PB"(x_1,dots,x_n) => p or q, p and q, p' in "PB"(x_1,dots,x_n)$
+  - $p,q in "PB"(x_1,dots,x_n) => p or q, space p and q, space p' in "PB"(x_1,dots,x_n)$
 
   - Nient'altro è un polinomio booleano.
 ]
 
 #example()[
-  $0, y, x or y, (x and z)' or (x or y)' in "PB"(x,y,z)$
+  $0, space y, space x or y, space (x and z)' or (x or y)' in "PB"(x,y,z)$
 ]
 
 #observation()[
-  $x or y != y or x$ come polinomi, poi però se gli assegno dei valori, il risultato è lo stesso!
+  $x or y != y or x$ come polinomi, poi però se gli assegno dei valori, il risultato è lo stesso.
 ]
 
 #index[Polinomi booleani equivalenti]
 #definition()[
-  $p, q$ polinomi booleani si dicono *equivalenti* ($p equiv q$) quando $forall t$ assegnamento di valore booleano alle variabili, $t(p)=t(q)$.
+  $p, q$ polinomi booleani si dicono *equivalenti* ($p equiv q$) quando $forall t$ assegnamento di valori booleani alle variabili, $t(p)=t(q)$.
 ]
 
 #index[Letterale]#index[Clausola]#index[Forma Normale Congiuntiva (CNF)]
 #definition()[
   $"PB"(x_1,dots,x_n)$:
-  - *Letterale* è una variabile o la negazione di una variabile ($x_i, x_i '$).
+
+  - *Letterale* è una variabile o la negazione di una variabile ($x_i "o" x_i '$).
   - *Clausola* è una disgiunzione di letterali ($x_2 or x_4 ' or x_7 or x_8$).
   - Polinomio booleano in *Forma Normale Congiuntiva (CNF)* è un polinomio scritto come congiunzione di clausole, ad esempio $(x_1 or x_3 ') and (x_2 or x_3 or x_3 ') and x_1 '$.
 ]
 
 #index[Polinomio soddisfacibile]
 #definition()[
-  $p$ polinomio booleano si dice *soddisfacibile* quando $exists t$ assegnamento tale che $t(p)=1$ (cioè che lo soddisfa).
+  $p$ polinomio booleano si dice *soddisfacibile* quando $exists space t$ assegnamento tale che $t(p)=1$ (cioè l'assegnamento soddisfa il polinomio).
   $
-    {x_1, dots, x_n} "assegnamento" t:{x_1, dots, x_n}->{0,1} quad t(x_i)=0 or 1
+    {x_1, dots, x_n}, "assegnamento" t:{x_1, dots, x_n}->{0,1}, quad t(x_i)=0 or 1
   $
 ]
 
-== Problema SAT
+=== Problema SAT
 #index[Problema SAT]
 #problem()[
   Dato un polinomio booleano $p$ in CNF, determinare se $p$ è soddisfacibile (esiste un assegnamento che lo soddisfa).
 ]
-Vogliamo scrivere una MdT non deterministica per risolvere questo problema.
-
-Sia ${x_1, dots, x_n}$ un insieme di variabili. Ciascuna variabile è codificata utilizzando il suo indice scritto in binario.
-
-- Variabili $x_i arrow.r.squiggly uu(i)$ (codifica binaria di i)
-
-- Letterali:
+Vogliamo scrivere una MdT non deterministica per risolvere questo problema. Iniziamo prima dalla codifica dell'istanza, ossia la codifica di un polinomio booleano in CNF nelle variabili ${x_1, dots, x_n}$. \
+Ciascuna variabile è codificata utilizzando il suo indice scritto in binario:
+- variabili $x_i arrow.r.squiggly uu(i)$ (codifica binaria di i)
+I letterali in maniera simile:
+- letterali:
   - $x_i arrow.r.squiggly uu(i) \# 1$ (non negato)
   - $x'_i arrow.r.squiggly uu(i) \# 0$ (negato)
 
@@ -665,54 +665,43 @@ Sia ${x_1, dots, x_n}$ un insieme di variabili. Ciascuna variabile è codificata
   $
 ]
 
-Nella MdT questa codifica andrà un po' arricchita. La codifica finale è composta dalla codifica del polinomio preceduta da una lista di interi da $1$ a $n$ in binario che indicano le variabili presenti nel polinomio:
+Nella MdT questa codifica andrà un po' arricchita. La codifica finale è composta dalla codifica del polinomio preceduta (con separatore \#\#) da una lista di interi da $1$ a $n$ in binario che indicano le variabili presenti nel polinomio:
 $
-  underbrace(1\#10\#11, "cod. variabili")\#\# underbrace(1\#1 or 10\#0 and 1\#0 or 11\#1, "polinomio")
+  underbrace(1\#10\#11, "lista variabili")\#\# underbrace(1\#1 or 10\#0 and 1\#0 or 11\#1, "codifica polinomio")
 $
-Quindi l'alfabeto per il problema SAT è $Sigma_"SAT" = {0, 1, \#, and , or}$.
+In questo polinomio abbiamo quindi 3 variabili ($x_1, x_2, x_3$) e 4 letterali ($x_1, x_1 ', x_2 ', x_3$). L'alfabeto per il problema SAT è $Sigma_"SAT" = {0, 1, \#, and , or}$.
 
 #proposition()[
   Il problema SAT appartiene a NP.
 ]
 #proof()[
   Costruiamo una MdT non deterministica a 2 nastri che risolve SAT in tempo polinomiale. L'idea alla base è quella di generare non deterministicamente un assegnamento e controllare se esso soddisfa il polinomio in esame.
-
-  // DIAGRAMMA MdT A 2 NASTRI: generazione e input
   #figure(image("images/2026-08-10-17-26-35.png", width: 60%))
-
   - Per prima cosa bisogna controllare che la stringa di input sia sintatticamente corretta (se non lo è, si rifiuta e si termina subito).
   - Altrimenti si usa il nastro di lavoro 2. Infatti, si genera su di esso (non deterministicamente) un assegnamento alle variabili nella forma seguente:
     $
       x_1 \# t(x_1) \#\# x_2 \# t(x_2) \#\# dots \#\# x_n \# t(x_n)
     $
     Dove $x_i$ è la rappresentazione binaria dell'indice della variabile $x_i$ e $t(x_i)$ indica l'assegnamento del valore della variabile $x_i$, che può essere 0 o 1.
-  - Esamino il polinomio di input da sinistra verso destra, fino a incontrare un letterale $v$, quindi confronto $v \# t(v)$ sul nastro 1 con $x_i \# t(x_i)$ sul nastro 2:
-    - *Se sono uguali*: il letterale $v$ è soddisfatto e quindi la clausola in cui compare è soddisfatta (poiché è fatta da operatori OR ($or$), basta che un solo letterale sia soddisfatto affinché tutta la clausola lo sia); posso quindi passare a esaminare la clausola successiva. Se la clausola appena esaminata era l'ultima, accetto e termino.
+  - Esamino il polinomio di input da sinistra verso destra, fino a incontrare un letterale $v$, quindi confronto il valore binario che segue quel letterale (ovvero $t(v)$ in $v \# t(v))$ sul nastro 1 con quello che segue il letterale sul nastro 2 (ovvero, per esempio, $t(x_1)$ in $x_1\#t(x_1)$):
+    - *Se sono uguali*: il letterale $v$ è soddisfatto e quindi la clausola in cui compare è soddisfatta (poiché è fatta da soli operatori $or$); posso quindi passare a esaminare la clausola successiva. Se la clausola appena esaminata era l'ultima, accetto e termino.
     - *Se non sono uguali*: il letterale $v$ non è soddisfatto, quindi passo a esaminare il letterale successivo. Se il letterale appena esaminato era l'ultimo della clausola, allora termino e rifiuto il polinomio, poiché la clausola in cui compariva tale letterale non è soddisfatta (il polinomio è una congiunzione di clausole, per cui devono essere tutte vere perché il polinomio sia soddisfatto). Si dice in questo caso che il polinomio non è soddisfacibile.
 ]
 
-*Caso peggiore* \
-Nel caso peggiore dell'accettazione (quando tutte le clausole sono soddisfatte), considerando:
-- $n$ variabili
-- $k$ letterali
-
-Possiamo stimare la lunghezza dell'input in questo modo:
+Analizziamo la complessità nel caso peggiore, ovvero il caso dell'accettazione (quando tutte le clausole sono soddisfatte), considerando $n$ variabili e $k$ letterali. Possiamo stimare la lunghezza dell'input in questo modo:
 $
-  overbrace(n log n, "bit per codificare le variabili") + k log n = (n+k) log n quad ("stima lunghezza input")
+  overbrace(n log n, "n numeri binari per \n codificare la lista \n delle variabili") + overbrace(k log n, "k numeri binari per \n codificare i letterali \n (codifica polinomio)") = (n+k) log n quad
 $
-
-Stima del numero di transizioni:
+(il contributo di simboli come \#, $and$, $or$ e così via sarebbe costante quindi l'O-grande è comunque ciò che è scritto sopra). A questo punto stimiamo il numero di transizioni:
 $
-  n log n + k n log n <= n^2 + k n^2 <= ((n+k)log n)^2 + ((n+k)log n)^3
+   overbrace(n log n, "genero assegnamento") + overbrace(k n log n, "percorro nastro") <= n^2 + k n^2 <= ((n+k)log n)^2 + ((n+k)log n)^3
 $
 Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di conseguenza, la MdT costruita opera effettivamente in tempo polinomiale.
 
 #observation()[
-  Per una MdT deterministica il numero di assegnamenti da generare e verificare sarebbe invece esponenziale, poiché si dovrebbero generare e testare tutte le possibili combinazioni.
+  Per una MdT deterministica il numero di assegnamenti da generare e verificare sarebbe invece esponenziale, poiché si dovrebbero generare e verificare tutte le possibili combinazioni.
 ]
 
-
-//16.04.2026
 #index[Teorema di Cook]
 #theorem("Teorema di Cook")[
   SAT è NP-difficile.
@@ -721,42 +710,41 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
   Vista la complessità della dimostrazione, all'orale viene spesso chiesto solo qualche passaggio.
 ]
 #proof()[
-  Vogliamo dimostrare che $forall L in "NP"$, esiste una riduzione polinomiale da $L$ a $S A T$. Dire che $L in "NP"$ equivale a considerare una MdT $M$ non deterministica polinomiale che accetta $L$. Sia $p(n) = t c_M (n)$ (cioè $p(n)$ è la complessità della macchina di Turing $M$). Per semplicità, supponiamo che $forall$ stringa $w$ di lunghezza $n$, il numero di transizioni di $M$ su $w$ sia esattamente $p(n)$ e che $M$ sia una MdT standard limitata a sinistra con le celle numerate.
+  Sia $L in$ NP. Vogliamo costruire una riduzione polinomiale da $L$ a SAT (o meglio, da $L$ al linguaggio di SAT). Sia $M$ MdT non deterministica polimomiale che accetta $L$ e sia $p(n) = t c_M (n)$. Per semplicità, supponiamo che $forall$ stringa $w$ di lunghezza $n$, il numero di transizioni di $M$ su $w$ sia esattamente $p(n)$ (non è restrittivo, basta allungare le computazioni "corte") e che $M$ sia una MdT standard limitata a sinistra con le celle numerate.
 
-  Voglio trovare una funzione $Phi$ che associa ad una stringa $w$ un polinomio booleano $Phi(w)$ tale che, data una stringa $w$, $M$ accetta $w$ se e solo se $Phi(w)$ è un polinomio booleano in forma CNF soddisfacibile.
-  Gli stati di $M$ sono $Q={q_1, dots, q_s}$, quelli finali sono indicati con $F$, mentre l'alfabeto di $M$ è $Sigma={a_1, dots, a_r}$.
+  Formalmente vogliamo quindi trovare una funzione $Phi : Sigma_L ^ * -> Sigma_("SAT")^*$ computabile in tempo polinomiale e t.c. $forall w in Sigma_L ^*$, $w in L "("<==> M "accetta" w")" <==> Phi(w)$ è un polinomio booleano in forma CNF soddisfacibile.\
+  Gli stati di $M$ sono $Q={q_1, dots, q_s}$, con $|Q| = s$, mentre l'alfabeto di $M$ è $Sigma={a_1, dots, a_r}$, con $|Sigma| = r$. $F subset.eq Q$ insieme degli stati finali.
 
-  Le variabili di $Phi(w)$ (polinomio) (con $w$ lunga $n$) sono di tre tipi:
-  - Se $S(u, t)=1$ significa che all'istante $t$ la MdT si trova nello stato $q_u$;
-  - Se $C(i, j, t)=1$ significa che all'istante $t$, nella cella $i$ della MdT c'è il simbolo $a_j$;
-  - Se $L(i, t)=1$ significa che all'istante $t$ la testina si trova nella cella $i$;
+  Le variabili del polinomio $Phi(w)$ (con $w$ lunga $n$) sono di tre tipi:
+  - se $S(u, t)=1$ significa che all'istante $t$ la MdT $M$ si trova nello stato $q_u$;
+  - se $C(i, j, t)=1$ significa che all'istante $t$, nella cella $i$ della MdT $M$ c'è il simbolo $a_j$;
+  - se $L(i, t)=1$ significa che all'istante $t$ la testina si trova sulla cella $i$;
 
-  Con $t in {0, 1, 2, dots, p(n)}$, $u in {1, dots, s}$, $i in {0, 1, dots, p(n) + 1}$ e $j in {1, dots, r}$.
+  con $t in {0, 1, 2, dots, p(n)}$, $u in {1, dots, s}$, $i in {1, dots, p(n) + 1}$ e $j in {1, dots, r}$.
 
-  Descriviamo ora le proprietà che caratterizzano una computazione accettante di $M$ su $w$:
+  Descriviamo ora le condizioni che caratterizzano una computazione accettante di $M$ su $w$:
 
-  1. $forall t, exists! u$ t.c. $S(u, t) = 1$\
-    In un certo istante $t$, $M$ si troverà in esattamente uno solo stato.
+  1. $forall t, exists! space u$ t.c. $S(u, t) = 1$\
+    In un certo istante $t$, $M$ si troverà in esattamente uno stato.
 
-  2. $forall t, forall i, exists! j$ t.c. $C(i, j, t) = 1$\
+  2. $forall t, forall i, exists! space j$ t.c. $C(i, j, t) = 1$\
     In un certo istante $t$, in ogni cella è presente esattamente un solo simbolo.
 
-  3. $forall t, exists! i$ t.c. $L(i, t) = 1$\
+  3. $forall t, exists! space i$ t.c. $L(i, t) = 1$\
     In un certo istante $t$, la testina indicherà una sola cella $i$.
 
-  4. $t= 0 arrow$ configurazione iniziale\
-    All'inizio della computazione, la testina è posizionata sulla prima cella del nastro; tale cella è vuota e quelle a seguire contengono la stringa $w$ in input; $M$ si trova nello stato iniziale.
+  4. $t= 0 arrow$ Configurazione iniziale: all'inizio della computazione, la testina è posizionata sulla cella 1 nastro; tale cella è vuota (contiene "\*") e quelle a seguire contengono la stringa $w$ in input; $M$ si trova nello stato iniziale.
 
-  5. $exists S(u, p(n))$ t.c. $q_u in F$ e $S(u, p(n)) = 1$\
-    Nell'istante $t= p(n)$ , cioè a fine computazione (poiché le transizioni sono esattamente $p(n)$), $M$ si troverà in uno stato finale, quindi alla variabile $S$ si assegna il valore 1.
+  5. $exists space u$ t.c. $q_u in F$ e $S(u, p(n)) = 1$\
+    Nell'istante $t= p(n)$ , cioè a fine computazione (le transizioni sono esattamente $p(n)$), $M$ si troverà in uno stato finale $q_u$.
 
-  6. $forall t, forall i, L(i, t) = 0 => C(i, j, t) = C(i, j, t+ 1), forall j$\
+  6. $forall t, forall i, L(i, t) = 0 => C(i, j, t) = C(i, j, t+ 1)$\
     Se la testina non è posizionata sulla cella $i$ all'istante $t$, allora nell'istante successivo $t+ 1$ il simbolo $a_j$ contenuto in tale cella $i$ non varia.
 
   7. $forall t, forall i, L(i, t) = 1 => S(u, t+ 1), C(i, j, t+ 1), L(i, t+ 1)$ devono assumere opportuni valori.\
     Se la testina è posizionata sulla cella $i$ all'istante $t$, allora nell'istante successivo $t+ 1$ occorre assegnare valori opportuni alle variabili per descrivere il comportamento di $M$ in base alla transizione da eseguire.
 
-  Adesso bisogna scrivere un polinomio booleano per ogni proprietà elencata e alla fine si metteranno tutti insieme (nel senso che se ne considererà la congiunzione) a formare un unico polinomio in forma CNF.
+  Adesso bisogna scrivere un polinomio booleano per ogni condizione elencata e alla fine ne considereremo la congiunzione in modo da formare un unico polinomio in forma CNF che descrive una computazione accettante di $Phi(w)$.
 
   Definiamo un polinomio booleano con variabili ${y_1, dots, y_k}$ nel modo seguente:
   $ U(y_1, dots, y_k) = (y_1 or dots or y_k) and.big_(i < j) (y'_i or y'_j) $
@@ -764,32 +752,45 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
   #example([$k$=3])[
     $U(y_1,y_2,y_3)=(y_1 or y_2 or y_3) and (y'_1 or y'_2) and (y'_2 or y'_3) and (y'_1 or y'_3)$
   ]
-  E vale: $U(y_1, dots, y_k) = 1 <=> exists! i : y_i = 1$
-  ovvero $U$ è un polinomio che vale 1 se esattamente una variabile ha valore 1 (se ha più variabili con valore 1 il polinomio non è soddisfatto).
+  E vale che $U(y_1, dots, y_k) = 1 <==> exists! space i : y_i = 1$
+  ovvero $U$ è un polinomio che vale 1 quando esattamente una variabile ha valore 1 (se ha più variabili con valore 1 il polinomio non è soddisfatto).
 
-  Scriviamo i polinomi booleani per le 7 proprietà:\
+  Scriviamo i polinomi booleani per le 7 condizioni:\
 
   1) $and.big_(t=0)^(p(n)) U(S(1, t), S(2, t), dots, S(s, t))=A$ (*CNF*)
 
-  2) $and.big_(t=0)^(p(n)) and.big_(i=0)^(p(n)+1) U(C(i, 1, t), C(i, 2, t), dots, C(i, r, t))=B$ (*CNF*)
+  2) $and.big_(t=0)^(p(n)) and.big_(i=1)^(p(n)+1) U(C(i, 1, t), C(i, 2, t), dots, C(i, r, t))=B$ (*CNF*)
 
-  3) $and.big_(t=0)^(p(n)) U(L(0, t), L(1, t), dots, L(p(n) + 1, t))=C$ (*CNF*)
+  3) $and.big_(t=0)^(p(n)) U(L(1, t), L(2, t), dots, L(p(n) + 1, t))=C$ (*CNF*)
 
-  4) $S(1,0) and L(0,0) and C(0,*,0) and (and.big_(i=1)^(n) C(i, w_i, 0)) and (and.big_(i=n+1)^(p(n)+1) C(i,*, 0))=D$ (*CNF*)\
-  (la testina parte dalla cella 0, che è vuota; l'input occupa le celle da 1 a $n$ e le restanti sono vuote)
+  4) $S(1,0) and L(1,0) and C(1, *, 0) and (and.big_(i=1)^(n) C(i+1, w_i, 0)) and (and.big_(i=n+1)^(p(n)+1) C(i,*, 0))=D$ (*CNF*)\
+  (l'input occupa le celle da 2 a $n+1$ e le restanti sono vuote)
 
   5) $or.big_(q_u in F) S(u, p(n))=E$ (*CNF*)
 
-  6) $and.big_(t=0)^(p(n)) and.big_(i=0)^(p(n)+1) L(i, t) or (and.big_(j=1)^r P(C(i, j, t), C(i, j, t+ 1)))=F$
-  con
-  $ P(x, y) = (x' or y) and (x or y'), quad P(x, y) = 1 <=> cases(x= y= 1 "oppure", x= y= 0) $
+  6) $and.big_(t=0)^(p(n)-1) and.big_(i=1)^(p(n)+1) ( L(i, t) or (and.big_(j=1)^r C(i, j, t) "XNOR" C(i, j, t+ 1)))=F$ (che è quasi *CNF*)
+  $ 
+    "con" x "XNOR" y = (x' or y) and (x or y')
+  $
+  7) $
+G_(u,t,i,j) =
+      S(u,t)' or L(i,t)' or C(i,j,t)' or \
+      or.big_((q_u', a_j', v) in delta(q_u, a_j))
+      (
+        S(u', t+1) and
+        C(i, j', t+1) and
+        L(i+v, t+1)
+      )\
+      "e poi" G = and.big_(u, t, i, j)G_(u, t, i, j)
+    $
 
-  7) $G_(t,i,u,j) = S(u, t)' or L(i, t)' or C(i, j, t)' or (S(overline(u), t+ 1) and and.big C(i, overline(j), t+ 1) and L(overline(i), t+ 1))$ *(nota: questo polinomio non è scritto in forma completamente corretta)*
+  Osserviamo che tutti i polinomi sopra sono in CNF tranne il 6, per cui basta applicare $L or (A and B) equiv (L or A) and (L or B)$, e il 7 che però può essere trasformato in CNF in tempo polinomiale.
 
-  Il polinomio totale è composto dalla congiunzione di tutti questi polinomi. Osserviamo che tutti i polinomi sopra sono in CNF, tranne quello relativo alla proprietà 7, che però può essere trasformato in CNF in tempo polinomiale.
+  Il polinomio finale è quindi la congiunzione dei polinomi $A$ - $G$. Per costruzione, $Phi(w)$ è soddisfacibile (cioè appartiene a SAT) se e solo se esiste una computazione accettante di $M$ su $w$, cioè se e solo se $w in L$.
+  Inoltre, poiché $p(n)$ è polinomiale e $M$ è fissata, $Phi(w)$ ha dimensione polinomiale in $n$ ed è costruibile in tempo polinomiale. Dunque $L$ è polinomialmente riducibile a SAT. Essendo $L in "NP"$ arbitrario, SAT è NP-difficile.
 ]
 
-== Problema 3-SAT //OK
+=== Problema 3-SAT
 #index[Problema 3-SAT]
 #problem("3-SAT")[
   Dato un polinomio booleano $p$ in 3-CNF (ogni clausola contiene esattamente 3 letterali), determinare se $p$ è soddisfacibile.
