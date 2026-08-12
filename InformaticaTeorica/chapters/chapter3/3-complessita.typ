@@ -1620,6 +1620,29 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
   ]
 ]
 
+== Problema IS //OK
+#definition()[
+  Sia $G=(V,E)$ un grafo non orientato, $I subset.eq V$ si dice *indipendente* quando $forall x,y in I$, ${x,y} in.not E$.
+]
+
+#problem("IS: Indipendent Set")[
+  Dato un grafo non orientato $G$ e un intero $k$, determinare se $G$ contiene un sottoinsieme indipendente di cardinalità $k$.
+]
+
+#proposition()[
+  Il problema IS è NP.
+]
+#proof()[
+  Cerchiamo una riduzione polinomiale dal problema CLIQUE a IS sebbene i concetti di grafo completo e insieme indipendente siano concetti opposti.\
+  $
+    underbrace((G, k), "ist. clique") arrow.long.squiggly underbrace((tilde(G), k), "ist. IS")
+  $
+  Con $tilde(G)=(tilde(V), tilde(E))$ e $tilde(V)=V=binom(V,2) \\ E$ dove $binom(V,2)={{u,v}|u,v in V, u!=v}$\
+  $G$ ha una clique di cardinalità $k$ $<==>$ $tilde(G)$ ha un indipendent set di cardinalità $k$.
+  #observation()[
+    Questo problema è solo per far vedere che si effettuano riduzioni polinomiali non solo dal problema 3-SAT.
+  ]
+]
 
 == Problema 2-SAT //OK
 #index[Problema 2-SAT]
