@@ -1630,17 +1630,31 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
 ]
 
 #proposition()[
-  Il problema IS è NP.
+  Il problema IS è NP-difficile.
 ]
 #proof()[
-  Cerchiamo una riduzione polinomiale dal problema CLIQUE a IS sebbene i concetti di grafo completo e insieme indipendente siano concetti opposti.\
+  Cerchiamo una riduzione polinomiale dal problema CLIQUE a IS, sebbene i concetti di grafo completo e insieme indipendente siano concetti opposti.
   $
     underbrace((G, k), "ist. clique") arrow.long.squiggly underbrace((tilde(G), k), "ist. IS")
   $
-  Con $tilde(G)=(tilde(V), tilde(E))$ e $tilde(V)=V=binom(V,2) \\ E$ dove $binom(V,2)={{u,v}|u,v in V, u!=v}$\
-  $G$ ha una clique di cardinalità $k$ $<==>$ $tilde(G)$ ha un indipendent set di cardinalità $k$.
+  Con $tilde(G)=(tilde(V), tilde(E))$ tale che
+  $
+    tilde(V) = V, quad tilde(E) = binom(V, 2) \\ E
+  $
+  dove $binom(V, 2)={{u,v}|u,v in V, u!=v}$, cioè $tilde(G)$ è il grafo complementare di $G$: stessi vertici, e un arco tra due vertici distinti se e solo se tale arco non era presente in $G$.
+
+  La costruzione di $tilde(G)$ a partire da $G$ richiede di esaminare tutte le $binom(|V|, 2)$ coppie di vertici, quindi è calcolabile in tempo polinomiale.
+
+  Resta da mostrare che la riduzione è corretta:
+  $
+    G "ha una clique di cardinalità" k <==> tilde(G) "ha un insieme indipendente di cardinalità" k.
+  $
+  Sia $I subset.eq V$ con $|I|=k$. Allora $I$ è una clique in $G$ $<==>$ $forall x,y in I, x!=y$, ${x,y} in E$ $<==>$ $forall x,y in I, x!=y$, ${x,y} in.not tilde(E)$ $<==>$ $I$ è un insieme indipendente in $tilde(G)$.
+
+  Quindi $G$ ha una clique di cardinalità $k$ se e solo se $tilde(G)$ ha un insieme indipendente di cardinalità $k$, il che prova la correttezza della riduzione.
+
   #observation()[
-    Questo problema è solo per far vedere che si effettuano riduzioni polinomiali non solo dal problema 3-SAT.
+    Questo esempio serve a far vedere che si effettuano riduzioni polinomiali non solo a partire dal problema 3-SAT, ma anche tra problemi NP-completi già noti.
   ]
 ]
 
@@ -1965,55 +1979,55 @@ $
 #proof()[
   Facciamo vedere che $exists L in "Exp", L in.not "P"$
   $
-    & L = {(M)x | "se M su x termina in uno stato finale ciò avviene entro" 2^(2|x|) "passi"}
+    & L = {(M)x | "se" M "su "x" termina in uno stato finale ciò avviene entro" 2^(2|x|) "passi"}
   $
-  1. L $in$ Exp\
-    N MdT su input $R(M)x$:
-    - Esegue M su x
-      - Se M termina in uno stato finale entro $2^(2|x|)$ transizioni, accetta;
+  1. $L$ $in$ Exp\
+    $N$ MdT su input $R(M)x$:
+    - Esegue $M$ su $x$
+      - Se $M$ termina in uno stato finale entro $2^(2|x|)$ transizioni, accetta;
       - Altrimenti, rifiuta
-    N accetta L
+    $N$ accetta $L$
 
     *Complessità in tempo di N*\
     $
       |underbracket(R(M), "corto")underbracket(x, "lungo")|
     $
-    Per avere il caso peggiore, considero $|R(M)|$ corta rispetto a $|x|$, in modo tale che $|R(M)x| approx |x|$
+    Per avere il caso peggiore, considero $|R(M)|$ corta rispetto a $|x|$, in modo tale che $|R(M)x| approx |x|$.
 
     $
-      T_C_N (n) = Omicron(2^(2n)) arrow.long.squiggly L in "Exp"
+      t c_N (n) = Omicron(2^(2n)) ==> L in "Exp"
     $
 
     #observation()[
       $2^(2n) = (2^n)^2 in.not Omicron(2^n)$, perché $2^(2n)\/2^n = 2^n arrow.long infinity$: la complessità è quindi genuinamente esponenziale.
     ]
 
-  + L $in.not$ P\
-    Facciamo vedere che $exists.not$N MdT deterministica che accetta L t.c. $t_C_N (n) = Omicron(2^n)$
+  + $L in.not$ P\
+    Facciamo vedere che $exists.not N$ MdT deterministica che accetta $L$ t.c. $t c_N (n) = Omicron(2^n)$
 
-    #underline("Per assurdo"): sia MdT deterministica che accetta L per stati finali t.c. $t_C_N (n) = 2^n$\
+    #underline("Per assurdo"): sia MdT deterministica che accetta $L$ per stati finali t.c. $t c_N (n) = 2^n$\
 
-    Sia D MdT definita come segue:\
-    $quad$ Su input R(M):
-    - Esegue N su R(M)R(M)
-      - Se N termina in uno stato finale, D termina in uno stato non finale;
-      - Se N termina in uno stato non finale, D termina in uno stato finale;
+    Sia $D$ MdT definita come segue:\
+    $quad$ Su input $R(M)$:
+    - Esegue N su $R(M)R(M)$
+      - Se $N$ termina in uno stato finale, $D$ termina in uno stato non finale;
+      - Se $N$ termina in uno stato non finale, $D$ termina in uno stato finale;
 
-    Complessità in tempo di D:
+    Complessità in tempo di $D$:
     $
       |R(M)| = n\
       t c_D (n) = t c_N (2n) = 2^n
     $
-    Eseguiamo D su R(D):
-    + D su R(D) termina in uno stato finale $==>$ per definizione di D, N su R(D)R(D) termina in uno stat non finale $==>$ dato che N è una MdT che accetta L e R(D)R(D) non appartiene al linguaggio, D su R(D) non termina in unno stato finale entro $2^(2|R(D)|)$ transizioni $==>$ dato che $t c_D (n) = 2^(2n)$, D su R(D) non termina in uno stato finale $==>$ *ASSURDO*\
+    Eseguiamo $D$ su $R(D)$:
+    + $D$ su $R(D)$ termina in uno stato finale $==>$ per definizione di $D$, $N$ su $R(D)R(D)$ termina in uno stato non finale $==>$ dato che $N$ è una MdT che accetta $L$ e $R(D)R(D)$ non appartiene al linguaggio, $D$ su $R(D)$ non termina in uno stato finale entro $2^(2|R(D)|)$ transizioni $==>$ dato che $t c_D (n) = 2^(2n)$, $D$ su $R(D)$ non termina in uno stato finale $==>$ *ASSURDO*\
 
-    + D su R(D) termina in uno stato non finale $==>$ per definizione di D, N su R(D)R(D) termina in uno stato finale $==>$ dato che N è una MdT che accetta L, D su R(D) termina in uno stato finale entro $2^(2|R(D)|)$ transizioni $==>$ *ASSURDO*
+    + $D$ su $R(D)$ termina in uno stato non finale $==>$ per definizione di $D$, $N$ su $R(D)R(D)$ termina in uno stato finale $==>$ dato che $N$ è una MdT che accetta $L$, $D$ su $R(D)$ termina in uno stato finale entro $2^(2|R(D)|)$ transizioni $==>$ *ASSURDO*
 ]
 
 #index[Classe NExp]
 Definisco un'altra classe di linguaggi esponenziali:
 $
-  "NExp" = { L "linguaggio" | exists"M MdT non deterministica che accetta "L "t.c." t c_M (n) = Omicron(2^n^k), exists k >= 1}
+  "NExp" = { L "linguaggio" | exists M "MdT non deterministica che accetta "L "t.c." t c_M (n) = Omicron(2^n^k), exists k >= 1}
 $
 
 #observation()[
@@ -2021,40 +2035,39 @@ $
 ]
 
 #problem("Aperto")[
-  $ "Exp" = "NExp" $
+  $ "Exp" =^? "NExp" $
 ]
 
 #proposition()[
-  Se si dimostra che Exp $eq.not$ NExp, allora P $eq.not$ NP
+  Se Exp $eq.not$ NExp $==>$ P $eq.not$ NP
 ]
 
 #proof()[
-  Facciamo vedere che $"P" = "NP" ==> "Exp" = "NExp"$.\
-  Faremo vedere che NExp $subset.eq$ Exp\
+  Facciamo vedere che $"P" = "NP" ==> "Exp" = "NExp"$.  Faremo vedere che NExp $subset.eq$ Exp.
 
-  Sia $L in "Nexp"$ e M MdT non deterministica che accetta $L$ t.c. $t c_M (n) = Omicron(2^n^k)$
+  Sia $L in "NExp"$ e $M$ MdT non deterministica che accetta $L$ t.c. $t c_M (n) = Omicron(2^n^k)$
+
   $
-    accent(L, tilde) = {x & 1^2^(|x|^k) | x in L} quad quad quad (1 in.not "alfabeto di" L) \
-                          & arrow.t \
-                          & "Tanti 1 quanti la complessità di L"
+    tilde(L) = {x space underbrace(1^2^(|x|^k), "tanti 1 quanti la complessità di" L) space | space x in L} quad quad (1 in.not "alfabeto di" L)
   $
-  Facciamo vedere che $accent(L, tilde) in "NP"$. Sia N MdT non deterministica che accetta $accent(L, tilde)$:
-  - Dato y, controllo se $exists z "t.c." y = z 1^2^(|z|^k)$, altrimenti rifiuto;
-  - Se il controllo è passato, eseguo M su z e, in più al $2^(|z|^k)$ passi, decido se  $z in L$ oppure no.
+
+  Facciamo vedere che $accent(L, tilde) in "NP"$. Sia $N$ MdT non deterministica che accetta $accent(L, tilde)$:
+  - Dato $y$, controllo se $exists z "t.c." y = z 1^2^(|z|^k)$, altrimenti rifiuto;
+  - Se il controllo è passato, eseguo $M$ su $z$ e, in più al $2^(|z|^k)$ passi, decido se  $z in L$ oppure no.
 
   La complessità in tempo di N è polinomiale in $|y|$ (lunghezza di _y_). Quindi $accent(L, tilde) in "NP"$\
   Poiché per ipotesi P $in$ NP $==> accent(L, tilde) in$ P.\
-  Dunque $exists R$ MdT deterministica polinomiale che accetta $accent(L, tilde)$. MdT deterministiica per L:
-  - Data x, costruisco la stringa $x 1^2^(|x|^k)$;
-  - Uso R per stabilire se $y in accent(L, tilde)$.
-  Complessivamente, l'algoritmo descritto sopra è esponenziale nella lunghezza di x.
+  Dunque $exists R$ MdT deterministica polinomiale che accetta $accent(L, tilde)$. MdT deterministica per $L$:
+  - Data $x$, costruisco la stringa $x 1^2^(|x|^k)$;
+  - Uso $R$ per stabilire se $y in accent(L, tilde)$.
+  Complessivamente, l'algoritmo descritto sopra è esponenziale nella lunghezza di $x$.
 ]
 
 == Complessità in spazio
 
 #index[Complessità in spazio]
 #definition()[
-  Sia M una MdT a $k+1$ nastri:
+  Sia $M$ una MdT a $k+1$ nastri:
   - nastro 1 per l'input (mai modificato);
   - $k$ nastri di lavoro.
 
@@ -2067,8 +2080,8 @@ $
 
 #observation(multiple: true)[
   + La definizione vale sia nel caso deterministico che in quello non deterministico;
-  + Non è necessario che M termini su ogni input;
-  + È possibile che $s c_M (n) < n$ (a lezione: $s c_M (n) > 0$)
+  + Non è necessario che $M$ termini su ogni input;
+  + $s c_M (n) > 0$ (la testina parte sempre dalla prima cella del nastro di lavoro).
 ]
 
 #example()[
@@ -2098,23 +2111,23 @@ $
 ]
 
 #proposition()[
-  Se M MdT a 2 nastri, allora:
+  Se $M$ MdT a 2 nastri, allora:
   $
     t c_M (n) = f(n) ==> s c_M (n) <= f(n) + 1
   $
 ]
 #proof()[
-  Nel caso peggiore, M legge una nuova cella sul nastro di lavoro ad ogni transizione, aggiungendo la cella iniziale: $s c_M (n) <= f(n) + 1$
+  Nel caso peggiore, $M$ legge una nuova cella sul nastro di lavoro ad ogni transizione, aggiungendo la cella iniziale: $s c_M (n) <= f(n) + 1$
 ]
 
 #proposition()[
-  Se M MdT a 2 nastri, $|Q| = m, |Sigma| = t$ (cardinalità di insieme degli stati e alfabeto):
+  Se $M$ MdT a 2 nastri, $|Q| = m, |Sigma| = t$ (cardinalità di insieme degli stati e alfabeto):
   $
     s c_M (n) = f(n) ==> t c_M (n) <= m(n+2)f(n)t^f(n)
   $
 ]
 #proof()[
-  Poiché M termina su ogni input, essa non può transitare 2 volte per la stessa configurazione. Valutiamo il numero totale di possibili configurazioni di M su una stringa in input di lunghezza _n_, con il numero di stati $|Q| = n, "l'alfabeto di lavoro" |Sigma| = t$:
+  Poiché $M$ termina su ogni input, essa non può transitare 2 volte per la stessa configurazione. Valutiamo il numero totale di possibili configurazioni di $M$ su una stringa in input di lunghezza _n_, con il numero di stati $|Q| = n, "l'alfabeto di lavoro" |Sigma| = t$:
   $
     m dot (n+2) dot f(n) dot t^f(n)
   $
@@ -2147,38 +2160,65 @@ $
 ]
 
 #observation(multiple: true)[
-  + $"P" subset.eq "PSpace"$\
-    $"P" limits(=)^? "PSpace"$
-  + $"PSpace" subset.eq "Exp"$
-    $"PSpace" limits(=)^? "Exp"$
-  + $"NP" subset.eq "PSpace"$
+  + $"P" subset.eq "PSpace"$ $-->$ $"P" limits(=)^? "PSpace"$ (prob. aperto)
+  + $"PSpace" subset.eq "Exp"$ $-->$ $"PSpace" limits(=)^? "Exp"$ (prob. aperto)
+  + $"NP" subset.eq "PSpace"$\
     $L in "NP" ==> exists M "MdT non deterministica polinomiale che accetta" L$ poiché si può riutilizzare lo spazio.
-  + $"PSpace" subset.eq "NPSpace"$
 ]
 
 === Teorema di Savitch
 
 #index[Teorema di Savitch]
-#theorem("Savitch - PDF è più dettagliato")[
+#theorem("Savitch")[
   $"PSpace" = "NPSpace"$
 ]
 
+#definition()[
+  $
+    "NPSpace" = {L "linguaggio" | exists M "MdT non deterministica t.c." "sc"_M (n) = O(n^k), exists k >= 1}
+  $
+]
+
 #proof()[
-  $"PSpace" subset.eq "NPSpace"$ (ovvio)\
-  Vogliamo mostrare che $"NPSpace" subset.eq "PSpace"$:
-  $L in "NPSpace"$, M MdT non deterministica, tale che $s c_M (n) = s(n)$, che accetta _L_ in spazio polinomiale.
+  $"PSpace" subset.eq "NPSpace"$ (ovvio).\
+  Vogliamo dimostrare che $"NPSpace" subset.eq "PSpace"$:\
+  sia $L in "NPSpace"$, $M$ MdT non deterministica che accetta $L$ in spazio polinomiale.
 
-  Numero di possibili configurazioni di M in una sua computazione su input di lunghezza _m_:
+  Numero di possibili configurazioni di $M$ in una sua computazione su input di lunghezza $n$:
   $
-    Omicron(2^(c dot s(n))) quad quad "per un opportuno c"
-  $
-  Sia _x_ una stringha di lunghezza _m_ e $C_x$ la configurazione di M all'inizio della computazione di _x_. Allora, _x_ è accettata da M $<==> exists$ una computazione di M che, partendo da $C_x$, raggiunge $C^\*$ in al più $2^(c dot s(n))$ transizioni.
-  $
-    "Configurazione iniziale" <-- C_x arrow.long.squiggly C^* --> & "Configurazione accettante" \
-                                                                  & "(supponiamo che sia unica)"
+    O(2^("sc"_M (n) dot c)) quad quad "per un opportuno valore" c.
   $
 
-  Sia *reachable($C, C^', k$)* con due configurazioni di M e un numero naturale. Esso è vero quando, partendo dalla prima configurazione si può raggiungere la seconda in al più $2^j$ transizioni.
+  Sia $x$ una stringa di lunghezza $n$ e $C_x arrow.squiggly.long C^*$ una computazione accettante di $M$ su $x$, dove $C_x$ è la configurazione iniziale e $C^*$ la configurazione accettante (supponiamo sia unica).
+
+  Introduciamo questo predicato:
+  $
+    "reachable"(C, C', j)
+  $
+  con $C, C'$ configurazioni di $M$ e $j in NN$. reachable$(C,C',j)$ è vero quando, partendo da $C$, si può raggiungere $C'$ in al più $2^j$ transizioni.
+
+  #observation()[
+    $x in L$ sse $x$ è accettata da $M$ sse reachable$(C_x, C^*, c dot "sc"_M (n))$ è vero.
+  ]
+
+  Scriviamo un algoritmo deterministico per valutare reachable$(C,C',j)$:
+
+  - Se $j=0$: facile.
+  - Altrimenti, per un generico $j$ (vogliamo capire se $C arrow.squiggly.long C'$ in al più $2^j$ transizioni), per ogni configurazione $tilde(C)$ verifichiamo:
+    $
+      "reachable"(C, tilde(C), j-1) quad "e" quad "reachable"(tilde(C), C', j-1)
+    $
+    Se esiste $tilde(C)$ tale che entrambi i predicati sono veri $arrow.long$ vero.\
+    Altrimenti $arrow.long$ falso.
+
+  *Complessità in spazio*
+
+  Sia $f(j)$ lo spazio richiesto per calcolare reachable quando il terzo parametro è $j$. Poiché per valutare reachable$(C,C',j)$ basta tenere in memoria una configurazione $tilde(C)$ in più rispetto al calcolo ricorsivo di reachable con parametro $j-1$ (lo spazio della ricorsione si riusa):
+  $
+    f(j) = f(j-1) + O("sc"_M (n)) = f(j-2) + 2 dot O("sc"_M (n)) = dots.c = f(j-k) + k dot O("sc"_M (n)) = dots.c = j dot O("sc"_M (n))
+  $
+
+  Ponendo $j = c dot "sc"_M (n) = O(n^k)$, si ottiene che lo spazio totale richiesto è polinomiale in $n$.
 ]
 
 // Lezione del 13-05-2026
@@ -2190,23 +2230,23 @@ $
 ]
 
 #proposition()[
-  Sia $L$ PSpace-difficile. Allora:
+  Sia $L$ PSpace-completo. Allora:
   + $L in "P" quad quad ==> "P" = "PSpace"$
   + $L in "NP" quad quad ==> "NP" = "PSpace"$
 ]
 
 #proof()[
   + $"P" subset.eq "PSpace"$ (ovvio)\
-    Sia $Q in "PSpace"$. Poiché L è PSpace-difficile, $exists f$ riduzione polinomiale in tempo da Q a L.\
-    Algoritmo per decidere Q:
+    Sia $Q in "PSpace"$. Poiché $L$ è PSpace-completo, $exists f$ riduzione polinomiale in tempo da $Q$ a $L$.\
+    Algoritmo per decidere $Q$:
     - Dato _w_, calcolo $f(w) arrow.long.squiggly$ tempo polinomiale;
     - Decido se $f(w) in L arrow.long.squiggly$ tempo polinomiale (perché $L in "P"$);
     $quad quad quad quad quad quad space &arrow.b.double\ Q &in "P"$
 
 
   + $"NP" subset.eq "PSpace"$ (ovvio)\
-    Sia $Q in "PSpace"$. Poiché L è PSpace-difficile, $exists f$ riduzione polinomiale in tempo da Q a L.\
-    Algoritmo per decidere Q:
+    Sia $Q in "PSpace"$. Poiché $L$ è PSpace-completo, $exists f$ riduzione polinomiale in tempo da $Q$ a $L$.\
+    Algoritmo per decidere $Q$:
     - Dato _w_, calcolo $f(w) arrow.long.squiggly$ tempo polinomiale;
     - Decido se $f(w) in L arrow.long.squiggly$ tempo polinomiale non deterministico (perché $L in "NP"$);
     $quad quad quad quad quad quad space &arrow.b.double\ Q &in "NP"$
@@ -2214,7 +2254,7 @@ $
 
 == Problemi di conteggio
 #index[Problemi di conteggio]
-I problemi di conteggio si occupano di stabilire quante possono essere le soluzioni di un problema (ovvero, data una MdT M e una stringa $w$, ci si chiede quante siano le configurazioni accettanti di M su $w$).
+I problemi di conteggio si occupano di stabilire quante possono essere le soluzioni di un problema (ovvero, data una MdT $M$ e una stringa $w$, ci si chiede quante siano le configurazioni accettanti di $M$ su $w$).
 // $Sigma = {0, 1}, quad f: Sigma^* --> NN$
 
 #index[Classe FP]
@@ -2227,11 +2267,11 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
 
 #index[Classe \#P]
 #definition()[
-  Si chiama *\#_P_* (sharp P) la classe delle funzioni $f: Sigma^* -> NN$ per cui esiste una MdT non deterministica polinomiale tale che, per ogni stringa $w in Sigma^*$, le computazioni accettanti di M su _w_ sono $f(w)$:
+  Si chiama *\#_P_* (sharp P) la classe delle funzioni $f: Sigma^* -> NN$ per cui esiste una MdT non deterministica polinomiale tale che, per ogni stringa $w in Sigma^*$, le computazioni accettanti di $M$ su _w_ sono $f(w)$:
   $
     \#P = {
     f: Sigma^* --> NN | & exists M "MdT non deterministica polinomiale t.c.", forall w in Sigma^* \
-                        & f(w) "è il numero di computazioni accettanti di M su" w
+                        & f(w) "è il numero di computazioni accettanti di "M" su" w
                           }
   $
 ]
@@ -2240,7 +2280,7 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
   $cal(F)P subset.eq \#P$
 ]
 #proof()[
-  $f in \#P$, sia M MdT deterministica polinomiale che calcola _f_.\
+  $f in \#P$, sia $M$ MdT deterministica polinomiale che calcola _f_.\
   Considero la seguente MdT non deterministica polinomiale:
   - Su input _w_, calcolo $f(w) = k$;
   - Genero _k_ computazioni (ciascuna delle quali stampa un intero _i_, con $1 <= i <= k$), e le considero tutte accettanti
@@ -2262,7 +2302,7 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
 #proof()[
   Sia $L in "NP" ==> exists M$ MdT non deterministica polinomiale che accetta _L_.
 
-  Sia $f: Sigma^* --> NN$ la funzione che conta le computazioni accettanti di M $==> f in \#P$, ma per ipotesi $cal(F)P = \#P$, quindi vale anche $f in cal(F)P$. Dunque $exists N "MdT"$ polinomiale deterministica che calcola _f_.
+  Sia $f: Sigma^* --> NN$ la funzione che conta le computazioni accettanti di $M$ $==> f in \#P$, ma per ipotesi $cal(F)P = \#P$, quindi vale anche $f in cal(F)P$. Dunque $exists N "MdT"$ polinomiale deterministica che calcola _f_.
 
   Algoritmo per decidere _L_, dato $w in Sigma^*$:
   - Calcolo $f(w)$;
@@ -2313,8 +2353,8 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
 
 #index[Problema \#SAT]#index[Problema \#CYCLE]
 #example(multiple: true)[
-  + \#SAT: Dato un polinomio booleano, determinare quanti sono gli assegnamenti che lo soddisfano. (\#SAT $in$ \#P)
-  + \#CYCLE: Dato un grafo orientato, determinare il numero di cicli semplici
+  + \#SAT: dato un polinomio booleano, determinare quanti sono gli assegnamenti che lo soddisfano. (\#SAT $in$ \#P)
+  + \#CYCLE: dato un grafo orientato, determinare il numero di cicli semplici
 ]
 
 #index[Problema CYCLE]
@@ -2331,23 +2371,23 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
 ]
 #proof()[
   Facciamo vedere che HAM $in$ P (dato che HAM è un problema NP, se dimostriamo che è $in$ P, allora vale che $"P" = "NP"$).
-  Sia G un grafo orientato:
-  - Costruiamo un nuovo grafo orientato G';
+  Sia $G$ un grafo orientato:
+  - Costruiamo un nuovo grafo orientato $G'$;
   - Facciamo vedere che:
-    - G ha un circuito hamiltoniano $<==>$ G' ha almeno $n^n^2$ cicli.
+    - $G$ ha un circuito hamiltoniano $<==>$ $G'$ ha almeno $n^n^2$ cicli.
 
-  Costruzioni di G', supponiamo che $(u, v)$ sia un lato di G.
-  #image("/assets/image-9.png")
-  Ogni lato $(u, v)$ di G corrisponde a $2^m$ cammini semplici da _u_ a _v_ in G'. Pertanto, ogni ciclo semplice di lunghezza _l_ di G corrisponde a $(2^m)^l$ cicli semplici in G'.
+  Costruzioni di $G'$, supponiamo che $(u, v)$ sia un lato di $G$.
+  #figure(image("/assets/image-9.png", width: 60%))
+  Ogni lato $(u, v)$ di $G$ corrisponde a $2^m$ cammini semplici da _u_ a _v_ in $G'$. Pertanto, ogni ciclo semplice di lunghezza _l_ di $G$ corrisponde a $(2^m)^l$ cicli semplici in $G'$.
 
   Scegliamo $m = n log_2(n)$ (per semplicità, supponiamo che _n_ sia una potenza di 2).
 
-  $==>)$ G ha un circuito hamiltoniano . Il numero dei cicli di G' è $>= (2^m)^n$ ($n = l$) = $(2^(n log_2(n)))^n = (n^n)^n = n^n^2$.\
-  $<==)$ G non ha un circuito hamiltoniano $==>$ il più lungo ciclo di G ha lunghezza al più $n - 1$. Il numero totale di cicli di G è al massimo $n^(n-1)$.
+  $==>)$ $G$ ha un circuito hamiltoniano . Il numero dei cicli di $G'$ è $>= (2^m)^n$ ($n = l$) = $(2^(n log_2(n)))^n = (n^n)^n = n^n^2$.\
+  $<==)$ $G$ non ha un circuito hamiltoniano $==>$ il più lungo ciclo di $G$ ha lunghezza al più $n - 1$. Il numero totale di cicli di $G$ è al massimo $n^(n-1)$.
 
-  Il numero di cicli di G' è quindi
+  Il numero di cicli di $G'$ è quindi
   $
     <= (2^m)^(n-1) dot n^(n-1) = (2^(n log_2 n))^(n-1) dot n^(n-1) = n^(n(n-1)) dot n^(n-1) = n^(n^2-n) dot n^(n-1) = n^(n^2-1) < n^(n^2)
   $
-  Dunque G ha un circuito hamiltoniano se e solo se G' ha almeno $n^(n^2)$ cicli, e contare i cicli di G' permetterebbe di decidere HAM in tempo polinomiale.
+  Dunque $G$ ha un circuito hamiltoniano se e solo se $G'$ ha almeno $n^(n^2)$ cicli, e contare i cicli di $G'$ permetterebbe di decidere HAM in tempo polinomiale.
 ]
