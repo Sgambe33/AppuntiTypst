@@ -376,13 +376,13 @@ Sia $G=(V, E)$ un grafo orientato, con:
   In parole povere, un *circuito hamiltoniano* è un percorso che passa una e una sola volta da tutti i vertici di un grafo.
 ]
 #problem("HAM")[
-Dato un grafo orientato $G=(V,E)$, decidere se $G$ contiene un circuito hamiltoniano.
+  Dato un grafo orientato $G=(V,E)$, decidere se $G$ contiene un circuito hamiltoniano.
 ]
 Affinché una MdT possa lavorare con i grafi è necessario codificare questi ultimi. Una codifica di $G=(V,E), V={1, 2, dots, n}$ può essere la seguente:
 
 - Codifica dei vertici: uso la codifica binaria;
 - Codifica degli archi: $(x_i, x_j) arrow.squiggly x_i\#x_j$;
-- Codifica del grafo: codifica della lista degli archi $ + space n$ numero dei vertici. Per separare gli archi nella codifica si usa \#\# e per separare $n$ si usa \#\#\#.
+- Codifica del grafo: codifica della lista degli archi $+ space n$ numero dei vertici. Per separare gli archi nella codifica si usa \#\# e per separare $n$ si usa \#\#\#.
 
 $
   dots space x_i\#x_j\#\#x_(i+1)\#x_(j+1)\#\# space dots space \#\#\#n
@@ -410,13 +410,13 @@ Attenzione: nonostante ciò non possiamo dire che HAM $in.not$ P. Per poterlo di
 === MdT non deterministica che risolve HAM
 Vediamo un'altra MdT, stavolta non deterministica, che risolve il problema HAM. Sia dato un grafo $G = (V, E)$, con $|V| = n$ e $|E| = k$. La codifica del grafo è quella già vista. La MdT non deterministica fa uso di 3 nastri, che sono gli stessi del caso deterministico escluso il nastro 4. Il comportamento è il seguente:
 
-  1. verifico se $k < n$: in tal caso non può esserci circuito e quindi si termina rifiutando;
-  2. genero nondeterministicamente sul nastro 2 una sequenza di vertici "candidata" circuito hamiltoniano;
-  3. controllo col nastro 3 se la sequenza generato è un circuito hamiltoniano: scrivo i vertici via via su tale nastro e verifico se esiste un arco che collega il vertice attuale al successivo, senza duplicazioni. Se i controlli falliscono, termino rifiutando.
+1. verifico se $k < n$: in tal caso non può esserci circuito e quindi si termina rifiutando;
+2. genero nondeterministicamente sul nastro 2 una sequenza di vertici "candidata" circuito hamiltoniano;
+3. controllo col nastro 3 se la sequenza generato è un circuito hamiltoniano: scrivo i vertici via via su tale nastro e verifico se esiste un arco che collega il vertice attuale al successivo, senza duplicazioni. Se i controlli falliscono, termino rifiutando.
 
 Dal punto di vista della complessità in tempo, che rappresentiamo in funzione di $k$ numero di archi, il caso peggiore è quello dell'accettazione. In tal caso si ha $k >= n$. I costi dei vari passi sono:
 
--  Controllo che il grafo abbia almeno $n$ archi: scorro la lista del nastro 1 e mantengo un contatore. Ogni volta che trovo \#\#  incremento di 1 e infine faccio un confronto con $n$. Poichè ogni vertice $v_i$, $i = 1, dots, n$, è codificato in binario, occupa al più $O(log n)$ celle. Dunque se la codifica di un arco è $v_i \# v_j$, anche un arco occupa $O(log n)$ celle. Essendoci $k$ archi, il costo di questo passo è $O(k log n)$.
+- Controllo che il grafo abbia almeno $n$ archi: scorro la lista del nastro 1 e mantengo un contatore. Ogni volta che trovo \#\#  incremento di 1 e infine faccio un confronto con $n$. Poichè ogni vertice $v_i$, $i = 1, dots, n$, è codificato in binario, occupa al più $O(log n)$ celle. Dunque se la codifica di un arco è $v_i \# v_j$, anche un arco occupa $O(log n)$ celle. Essendoci $k$ archi, il costo di questo passo è $O(k log n)$.
 - Generazione della sequenza sul nastro 2: scrivo al più $n$ vertici, ciascuno che occupa al più $O(log n)$ celle, quindi il costo del passo è $O(n log n)$.
 - Controllo della sequenza: per ogni iterazione del ciclo:
   - controllo che il nuovo vertice non sia già comparso: $O(n log n)$;
@@ -495,6 +495,90 @@ da questo deduciamo anche che HAM $in N P$ (in realtà andrebbe considerata la l
   2. Usiamo la macchina $M$ sull'input $f(w)$ per decidere se $f(w) in L$. Poiché $M$ opera in tempo polinomiale e la dimensione di $f(w)$ è limitata da un polinomio, anche questo passo richiede tempo polinomiale.
 
   La macchina $M'$ è deterministica e decide $Q$ terminando in un tempo totale polinomiale. Ne consegue che $Q in "P"$. Data l'arbitrarietà di $Q$, abbiamo dimostrato che ogni problema in $"NP"$ è anche in $"P"$, ovvero $"NP" subset.eq "P"$. Dunque, $"P" = "NP"$.
+]
+
+#align(center, cetz.canvas(length: 0.6cm, {
+  import cetz.draw: *
+
+  // ==========================================
+  // SCENARIO 1: P != NP
+  // ==========================================
+  group(name: "p-neq-np", {
+    // Titolo
+    content((0, 4.2), text(weight: "bold", size: 1.5em)[NP])
+
+    // Ovale principale
+    circle((0, 0), radius: (2, 3.5), name: "oval1")
+
+    // Curva di separazione superiore (piega verso il basso)
+    bezier((-1.81, 1.5), (1.81, 1.5), (0, 0.5))
+
+    // Curva di separazione inferiore (piega verso l'alto)
+    bezier((-1.81, -1.5), (1.81, -1.5), (0, -0.5))
+
+    // Etichette interne
+    content((0, 2.3), text(weight: "bold", size: 1.5em)[NPC])
+    content((0, 0), text(weight: "bold", size: 1.5em)[NP-I])
+    content((0, -2.3), text(weight: "bold", size: 1.5em)[P])
+  })
+
+  // ==========================================
+  // SCENARIO 2: P = NP
+  // ==========================================
+  group(name: "p-eq-np", {
+    // Sposto il secondo diagramma in basso
+    translate(x: 5)
+
+    // Titolo
+    content((0, 4.2), text(weight: "bold", size: 1.5em)[NP=P])
+
+    // Ovale principale
+    circle((0, 0), radius: (2, 3.5), name: "oval2")
+
+    // Etichetta interna
+    content((0, 0), text(weight: "bold", size: 1.5em)[NPC])
+  })
+}))
+
+I due diagrammi illustrano in modo visivo le due possibili soluzioni al più grande problema aperto dell'informatica teorica, *P vs NP*. Il diagramma di sinistra mostra lo scenario più accreditato ($"P" != "NP"$), in cui l'insieme dei problemi verificabili in tempo polinomiale (NP) è rigidamente diviso tra problemi facilmente risolvibili (P), i problemi più complessi in assoluto a cui tutti gli altri sono riconducibili (NP-Completi) e una fascia di mezzo (NP-Intermedi) che non ricade in nessuna delle due. Il diagramma a destra, al contrario, rappresenta lo scenario catastrofico: se venisse dimostrato che $"P" = "NP"$, l'intera struttura collasserebbe e, dato che ogni problema verificabile diventerebbe automaticamente anche facile da risolvere, quasi tutti i problemi in NP coinciderebbero per definizione con la classe degli NP-Completi.
+
+
+#proposition()[
+  Supponiamo che $"P" = "NP"$. Sia $L in "NP"$, con $L eq.not emptyset, overline(L) eq.not emptyset$, allora $L in "NP-C"$. \
+  Per ipotesi: $exists alpha in L$ e $exists beta in.not L$.
+]
+#proof()[
+  $L in "NP"$. Facciamo vedere che $L$ è NP-difficile. \
+  Sia $Q in "NP" (equiv "P")$. Descriviamo una riduzione polinomiale da $Q$ a $L$:
+  $
+    f: w --> cases(alpha "se" w in Q, beta "se" w in.not Q)
+  $
+]
+
+#observation()[
+  - $emptyset$ non è NP-difficile. Dato $Q in "NP"$, esiste una riduzione polinomiale da $Q$ a $emptyset$? No, in quanto non ci possono essere funzioni che mandano stringhe di $Q$ nel vuoto.
+  - $Sigma^*$ non è NP-difficile (motivo analogo). $Q arrow.squiggly.long Sigma^*$
+]
+
+#proposition()[
+  Se $L$ è NP-difficile e $f$ è una riduzione polinomiale da $L$ a $Q$ $=>$ $Q$ è NP-difficile.
+]
+#proof()[
+  Dato $R in "NP"$, descriviamo una riduzione polinomiale da $R$ a $Q$
+  - Poiché $L$ è NP-difficile e $R$ $in$ NP, $exists g$ riduzione polinomiale da $R$ a $L$:
+  $
+    g: Sigma^*_R arrow.long Sigma^*_L quad quad w in R <=> g(w) in L
+  $
+  - Sappiamo che L è polinomialmente ridotto a Q:
+  $
+    f: Sigma^*_L arrow.long Sigma^*_Q quad quad w in L <=> f(w) in Q
+  $
+
+  Osserviamo che:
+  $
+    f compose g: Sigma^*_R arrow.long Sigma^*_Q quad quad w in R <=> f(g(w)) in Q
+  $
+  Inoltre è calcolabile in tempo polinomiale.
 ]
 
 //15.04.2026
@@ -686,10 +770,10 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
   ovvero $U$ è un polinomio che vale 1 se esattamente una variabile ha valore 1 (se ha più variabili con valore 1 il polinomio non è soddisfatto).
 
   Scriviamo i polinomi booleani per le 7 proprietà:\
-  
+
   1) $and.big_(t=0)^(p(n)) U(S(1, t), S(2, t), dots, S(s, t))=A$ (*CNF*)
 
-  2) $and.big_(t,i) U(C(i, 1, t), C(i, 2, t), dots, C(i, r, t))=B$ (*CNF*)
+  2) $and.big_(t=0)^(p(n)) and.big_(i=0)^(p(n)+1) U(C(i, 1, t), C(i, 2, t), dots, C(i, r, t))=B$ (*CNF*)
 
   3) $and.big_(t=0)^(p(n)) U(L(0, t), L(1, t), dots, L(p(n) + 1, t))=C$ (*CNF*)
 
@@ -698,102 +782,16 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
 
   5) $or.big_(q_u in F) S(u, p(n))=E$ (*CNF*)
 
-  6) $ and.big_(i,t) = L(i, t) or (and.big_j P(C(i, j, t), C(i, j, t+ 1)))$
+  6) $and.big_(t=0)^(p(n)) and.big_(i=0)^(p(n)+1) L(i, t) or (and.big_(j=1)^r P(C(i, j, t), C(i, j, t+ 1)))=F$
   con
   $ P(x, y) = (x' or y) and (x or y'), quad P(x, y) = 1 <=> cases(x= y= 1 "oppure", x= y= 0) $
-  Il polinomio finale della proprietà 6 è $and.big A_(i,t)$.
 
-  7) $B_(t,i,u,j) = S(u, t)' or L(i, t)' or C(i, j, t)' or (S(overline(u), t+ 1) and and.big C(i, overline(j), t+ 1) and L(overline(i), t+ 1))$ *(nota: questo polinomio non è scritto in forma completamente corretta)*
-  Il polinomio finale della proprietà 7 è $and.big_(t,i,u,j) B_(t,i,u,j)$.
+  7) $G_(t,i,u,j) = S(u, t)' or L(i, t)' or C(i, j, t)' or (S(overline(u), t+ 1) and and.big C(i, overline(j), t+ 1) and L(overline(i), t+ 1))$ *(nota: questo polinomio non è scritto in forma completamente corretta)*
 
   Il polinomio totale è composto dalla congiunzione di tutti questi polinomi. Osserviamo che tutti i polinomi sopra sono in CNF, tranne quello relativo alla proprietà 7, che però può essere trasformato in CNF in tempo polinomiale.
 ]
 
-#align(center, cetz.canvas(length: 0.6cm, {
-  import cetz.draw: *
-
-  // ==========================================
-  // SCENARIO 1: P != NP
-  // ==========================================
-  group(name: "p-neq-np", {
-    // Titolo
-    content((0, 4.2), text(weight: "bold", size: 1.5em)[NP])
-
-    // Ovale principale
-    circle((0, 0), radius: (2, 3.5), name: "oval1")
-
-    // Curva di separazione superiore (piega verso il basso)
-    bezier((-1.81, 1.5), (1.81, 1.5), (0, 0.5))
-
-    // Curva di separazione inferiore (piega verso l'alto)
-    bezier((-1.81, -1.5), (1.81, -1.5), (0, -0.5))
-
-    // Etichette interne
-    content((0, 2.3), text(weight: "bold", size: 1.5em)[NPC])
-    content((0, 0), text(weight: "bold", size: 1.5em)[NP-I])
-    content((0, -2.3), text(weight: "bold", size: 1.5em)[P])
-  })
-
-  // ==========================================
-  // SCENARIO 2: P = NP
-  // ==========================================
-  group(name: "p-eq-np", {
-    // Sposto il secondo diagramma in basso
-    translate(x: 5)
-
-    // Titolo
-    content((0, 4.2), text(weight: "bold", size: 1.5em)[NP=P])
-
-    // Ovale principale
-    circle((0, 0), radius: (2, 3.5), name: "oval2")
-
-    // Etichetta interna
-    content((0, 0), text(weight: "bold", size: 1.5em)[NPC])
-  })
-}))
-
-I due diagrammi illustrano in modo visivo le due possibili soluzioni al più grande problema aperto dell'informatica teorica, *P vs NP*. Il diagramma di sinistra mostra lo scenario più accreditato ($"P" != "NP"$), in cui l'insieme dei problemi verificabili in tempo polinomiale (NP) è rigidamente diviso tra problemi facilmente risolvibili (P), i problemi più complessi in assoluto a cui tutti gli altri sono riconducibili (NP-Completi) e una fascia di mezzo (NP-Intermedi) che non ricade in nessuna delle due. Il diagramma a destra, al contrario, rappresenta lo scenario catastrofico: se venisse dimostrato che $"P" = "NP"$, l'intera struttura collasserebbe e, dato che ogni problema verificabile diventerebbe automaticamente anche facile da risolvere, quasi tutti i problemi in NP coinciderebbero per definizione con la classe degli NP-Completi.
-
-
-#proposition()[
-  Supponiamo che $"P" = "NP"$. Sia $L in "NP"$, con $L eq.not emptyset, overline(L) eq.not emptyset$, allora $L in "NP-C"$. \
-  Per ipotesi: $exists alpha in L$ e $exists beta in.not L$.
-]
-#proof()[
-  $L in "NP"$. Facciamo vedere che $L$ è NP-difficile. \
-  Sia $Q in "NP" (equiv "P")$. Descriviamo una riduzione polinomiale da $Q$ a $L$:
-  $
-    f: w --> cases(alpha "se" w in Q, beta "se" w in.not Q)
-  $
-]
-
-#observation()[
-  - $emptyset$ non è NP-difficile. Dato $Q in "NP"$, esiste una riduzione polinomiale da $Q$ a $emptyset$? No, in quanto non ci possono essere funzioni che mandano stringhe di $Q$ nel vuoto.
-  - $Sigma^*$ non è NP-difficile (motivo analogo). $Q arrow.squiggly.long Sigma^*$
-]
-
-#proposition()[
-  Se $L$ è NP-difficile e $f$ è una riduzione polinomiale da $L$ a $Q$ $=>$ $Q$ è NP-difficile.
-]
-#proof()[
-  Dato $R in "NP"$, descriviamo una riduzione polinomiale da $R$ a $Q$
-  - Poiché $L$ è NP-difficile e $R$ $in$ NP, $exists g$ riduzione polinomiale da $R$ a $L$:
-  $
-    g: Sigma^*_R arrow.long Sigma^*_L quad quad w in R <=> g(w) in L
-  $
-  - Sappiamo che L è polinomialmente ridotto a Q:
-  $
-    f: Sigma^*_L arrow.long Sigma^*_Q quad quad w in L <=> f(w) in Q
-  $
-
-  Osserviamo che:
-  $
-    f compose g: Sigma^*_R arrow.long Sigma^*_Q quad quad w in R <=> f(g(w)) in Q
-  $
-  Inoltre è calcolabile in tempo polinomiale.
-]
-
-== Problema 3-SAT
+== Problema 3-SAT //OK
 #index[Problema 3-SAT]
 #problem("3-SAT")[
   Dato un polinomio booleano $p$ in 3-CNF (ogni clausola contiene esattamente 3 letterali), determinare se $p$ è soddisfacibile.
@@ -836,7 +834,7 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
     Si dimostra che $t(u) = 1$
 ]
 
-== Problema del Vertex Cover (VC)
+== Problema del Vertex Cover (VC) //OK
 
 #index[Vertex cover]
 #definition()[
@@ -860,7 +858,7 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
 
   $
     & p=(u_(1,1) or u_(1,2) or u_(1,3)) and (u_(2,1) or u_(2,2) or u_(2,3)) and dots and (u_(m,1) or u_(m,2) or u_(m,3)) \
-    & p=(x_1 or x'_2 or x_3) and (x'_1 or x_2 or x'_4)
+    & p=(x_1 or x'_2 or x_3) and (x'_1 or x_2 or x'_4) quad (*)
   $
 
   $V = {x_1, dots, x_n}$ insieme delle variabili di $p$, $|V| = n$ e $m =$ numero di clausole di $p$.
@@ -977,7 +975,7 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
   - Per ogni clausola, individuiamo un letterale che soddisfa la clausola e scegliamo i rimanenti 2 (quindi in tutto scelgo 2 nodi su 3 per ogni clausola $=> 2m$).
 
   #example()[
-    Riprendiamo l'esempio di prima e diamo i seguenti valori alle variabili: $x_1 -> 1, x_2 -> 0, x_3 -> 1, x_4 -> 0$. Allora:
+    Considerando $(*)$, diamo i seguenti valori alle variabili: $x_1 -> 1, x_2 -> 0, x_3 -> 1, x_4 -> 0$. Allora:
     #align(center, cetz.canvas(length: 24pt, {
       import cetz.draw: *
 
@@ -1099,7 +1097,7 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
 
 
 
-== Problema di Clique
+== Problema di Clique //OK
 
 #index[Problema Clique]
 #problem("Clique")[
@@ -1297,7 +1295,7 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
   }))
 ]
 
-== Problema HAM
+== Problema HAM //OK
 
 #index[Problema HAM]
 #proposition()[
@@ -1309,7 +1307,7 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
   $
     p = u_1 and u_2 and dots and u_m, quad u_i = (u_(i,1) or u_(i,2) or u_(i,3))
   $
-  Con $V = {x_1, dots, x_n}$ variabili di $p$, $x_i$ variabile di $p$. Si introducono quattro categorie di nodi: _t_ (true), _f_ (false), $e_i$ (entrata), $o_i$ (output). Per ogni variabile $x_i$ si crea un grafo formato nel seguente modo:
+  Con $V = {x_1, dots, x_n}$ variabili di $p$, $x_i$ variabile di $p$. Si introducono quattro categorie di nodi: _t_ (true), _f_ (false), $e_i$ (entrata), $o_i$ (output). Per ogni variabile $x_i$ si crea un grafo ("gadget") formato nel seguente modo:
   #grid(
     columns: (0.5fr, 0.5fr),
     rows: (4em, 1em, 2em, 4em),
@@ -1618,154 +1616,17 @@ Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzion
     $
       p = (x_1 or x_2 or x_3^') and (x_1^' or x_2 or x_4^') and (x_1 or x_2^' or x_4) and (x_1^' or x_3 or x_4)
     $
-    Devo sapere quanti nodi vanno scritti, sapere quindi quanto vale $r_i$ (massimo delle occorrenze di $x_i "e" x_i^' "in" p$). Esempio per $x_1$: $x_1$ appare 2 volte, $x_1^'$ appare 2 volte $==> r_i = 2 ==>$ sono 3 nodi $0, 1, 2$.
+    Devo sapere quanti nodi vanno scritti, sapere quindi quanto vale $r_i$ (massimo delle occorrenze di $x_i "e" x_i^' "in" p$). \
+    Esempio per $x_1$: $x_1$ appare 2 volte, $x_1^'$ appare 2 volte $==> r_i = 2 ==>$ sono 3 nodi $0, 1, 2$.
     #figure(image("/assets/image-17.png", width: 75%))
   ]
 ]
 
-#align(center, cetz.canvas(length: 20pt, {
-  import cetz.draw: *
 
-  // Stile globale
-  set-style(content: (padding: 0.2)) // Allontana le frecce dai testi
-  set-style(mark: (fill: black, scale: .4))
-
-  // ==========================================
-  // 1. Macro per disegnare i gadget "Diamante"
-  // ==========================================
-
-  let draw-diamond(cx, cy-e, id, rows) = {
-    let dx = 2.5 // Larghezza del diamante
-
-    // Nodo iniziale e_i
-    let name-e = "e" + id
-    content((cx, cy-e), text(size: 1.4em, weight: "bold", $e_#id$), name: name-e)
-
-    // Generazione delle righe (t e f)
-    for k in range(rows + 1) {
-      let y = cy-e - 1.5 - k * 1.5
-      content((cx - dx, y), text(size: 1.3em, $t_(#id,#k)$), name: "t" + id + "_" + str(k))
-      content((cx + dx, y), text(size: 1.3em, $f_(#id,#k)$), name: "f" + id + "_" + str(k))
-    }
-
-    // Nodo finale o_i
-    let name-o = "o" + id
-    let y-end = cy-e - 1.5 - (rows + 1) * 1.5
-    content((cx, y-end), text(size: 1.4em, weight: "bold", $o_#id$), name: name-o)
-
-    // --- Disegno degli spigoli ---
-    line(name-e, "t" + id + "_0", mark: (end: ">"))
-    line(name-e, "f" + id + "_0", mark: (end: ">"))
-
-    let m = 0.8 // Margine per le doppie frecce orizzontali
-    for k in range(rows + 1) {
-      let y = cy-e - 1.5 - k * 1.5
-      // Frecce orizzontali
-      line((cx - dx + m, y + 0.1), (cx + dx - m, y + 0.1), mark: (end: ">"))
-      line((cx + dx - m, y - 0.1), (cx - dx + m, y - 0.1), mark: (end: ">"))
-
-      // Frecce incrociate
-      if k < rows {
-        line("t" + id + "_" + str(k), "f" + id + "_" + str(k + 1), mark: (end: ">"))
-        line("f" + id + "_" + str(k), "t" + id + "_" + str(k + 1), mark: (end: ">"))
-      }
-    }
-
-    line("t" + id + "_" + str(rows), name-o, mark: (end: ">"))
-    line("f" + id + "_" + str(rows), name-o, mark: (end: ">"))
-  }
-
-  // ==========================================
-  // 2. Posizionamento dei 4 Gadget Variabile
-  // ==========================================
-
-  // (Centro X, Altezza nodo e, ID, numero di righe)
-  draw-diamond(0, 15, "1", 2) // x1 (Top-Left)
-  draw-diamond(0, 6, "2", 2) // x2 (Bottom-Left)
-  draw-diamond(16, 15, "3", 1) // x3 (Top-Right)
-  draw-diamond(16, 6, "4", 2) // x4 (Bottom-Right)
-
-  // // ==========================================
-  // // 3. Disegno del Gadget Clausola (J=1)
-  // // ==========================================
-
-  let y-in = 8.5
-  let y-out = 6.5
-
-  content((5.5, y-in), text(size: 1.4em, weight: "bold", $"in"_(j,1)$), name: "in_1")
-  content((8.0, y-in), text(size: 1.4em, weight: "bold", $"in"_(j,2)$), name: "in_2")
-  content((10.5, y-in), text(size: 1.4em, weight: "bold", $"in"_(j,3)$), name: "in_3")
-
-  content((5.5, y-out), text(size: 1.4em, weight: "bold", $"out"_(j,1)$), name: "out_1")
-  content((8.0, y-out), text(size: 1.4em, weight: "bold", $"out"_(j,2)$), name: "out_2")
-  content((10.5, y-out), text(size: 1.4em, weight: "bold", $"out"_(j,3)$), name: "out_3")
-
-  // // Frecce verticali Clausola
-  line("in_1", "out_1", mark: (end: ">"))
-  line("in_2", "out_2", mark: (end: ">"))
-  line("in_3", "out_3", mark: (end: ">"))
-
-  // // Frecce orizzontali Clausola (con margine per non toccare il testo)
-  let mc = 0.8
-  line((5.5 + mc, y-in), (8.0 - mc, y-in), mark: (end: ">"))
-  line((8.0 + mc, y-in), (10.5 - mc, y-in), mark: (end: ">"))
-
-  line((10.5 - mc, y-out), (8.0 + mc, y-out), mark: (end: ">"))
-  line((8.0 - mc, y-out), (5.5 + mc, y-out), mark: (end: ">"))
-
-  // // Frecce Curve Clausola
-  let cut = 0.5
-  bezier("in_3", "in_1", (8.0, y-in + 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
-  bezier("out_1", "out_3", (8.0, y-out - 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
-
-  // // ==========================================
-  // // 4. Collegamenti Main Spine (Lo scheletro)
-  // // ==========================================
-
-  line("o1", "e2", mark: (end: ">"))
-  line("o3", "e4", mark: (end: ">"))
-
-  // o2 -> e3 (passa in mezzo, x = 3.8)
-  line("o2", (0, -1.5), (3.8, -1.5), (3.8, 16.0), (16, 16.0), "e3", mark: (end: ">"))
-
-  // o4 -> e1 (back edge grande a sinistra, x = -7.0)
-  line("o4", (16, -4.0), (-7.0, -4.0), (-7.0, 17.0), (0, 17.0), "e1", mark: (end: ">"))
-
-  // // ==========================================
-  // // 5. Routing Variabili <-> Clausola
-  // // ==========================================
-
-  // x1 <-> Clausola
-  line("f1_0", (3.2, 13.5), (3.2, 9.5), (5.5, 9.5), "in_1", mark: (end: ">"))
-  line("out_1", (5.5, 5.5), (4.8, 5.5), (4.8, 12.0), "f1_1", mark: (end: ">"))
-
-  // // x2 <-> Clausola
-  // line("t2_1", (-4.5, 3.0), (-4.5, 10.0), ("in_2.x", 10.0), "in_2", mark: (end: ">"))
-  // line("out_2", ("out_2.x", 5.0), (-5.5, 5.0), (-5.5, 1.5), "t2_2", mark: (end: ">"))
-
-  // // x3 <-> Clausola
-  // line("f3_0", (20.0, 13.5), (20.0, 10.5), ("in_3.x", 10.5), "in_3", mark: (end: ">"))
-  // line("out_3", ("out_3.x", 5.5), (12.0, 5.5), (12.0, 12.0), "f3_1", mark: (end: ">"))
-
-  // // ==========================================
-  // // 6. Testi e Annotazioni a mano
-  // // ==========================================
-
-  // content((-1.5, 16), text(size: 1.2em, style: "italic")[Scegli un percorso in\nbase ai valori di $x_i$])
-
-  // content((-2.5, 15), text(size: 1.5em, weight: "bold")[$x_1: 0$])
-  // content((-2.5, 6), text(size: 1.5em, weight: "bold")[$x_2: 0$])
-  // content((13.5, 15), text(size: 1.5em, weight: "bold")[$x_3: 1$])
-  // content((13.5, 6), text(size: 1.5em, weight: "bold")[$x_4:$])
-
-  // content((11.5, 7.5), text(size: 1.4em, weight: "bold")[$J=1$])
-  // content((17.5, 0), text(size: 1.4em, weight: "bold")[$=m$])
-}))
-
-== Problema 2-SAT
+== Problema 2-SAT //OK
 #index[Problema 2-SAT]
 #problem()[
-  Dato un polinomio booleano $p$ in CNF in cui ogni clausola contiene esattamente 2 letterali, esiste un assegnamento di valori delle variabili che soddisfa $p$?
+  Dato un polinomio booleano $p$ in 2-CNF in cui ogni clausola contiene esattamente 2 letterali, esiste un assegnamento di valori delle variabili che soddisfa $p$?
 ]
 
 #proposition()[
@@ -1832,18 +1693,21 @@ Vediamo come costruire il grafo associato a $p$. Sia $p = u_1 and u_2 and dots a
 
     $&x --> gamma_1 --> gamma_2 --> dots &&dots dots &&alpha --> &&beta space dots --> gamma_(n-1) --> gamma_n --> &&x'\
     &t(x)=1 &&t(alpha)&&=1 &&t(beta) = 0 &&t(x') = 0$\
-    In _p_ c'è la clausola $alpha' or beta$ che non è soddisfatta da _t_
+    In _p_ c'è la clausola $alpha' or beta$ che non è soddisfatta da _t_.
 
   $<==)$ Senza perdita di generalità, supponiamo che $exists alpha$ letterale t.c. in _p_ compaiono sia $alpha$ che $alpha'$ (altrimenti _p_ sarebbe banalmente soddisfacibile).
-  Se, per assurdo, $forall alpha$ letterale t.c. $alpha, alpha'$ compaiono in _p_, $alpha arrow.long.squiggly alpha'$, allora, se $beta$ è uno di questi letterali, $cases(beta arrow.long.squiggly beta', beta' arrow.long.squiggly beta)$. Questo è assurdo perché contro l'HP.
+  Se, per assurdo, $forall alpha$ letterale t.c. $alpha, alpha'$ compaiono in _p_, $alpha arrow.long.squiggly alpha'$, allora, se $beta$ è uno di questi letterali, $cases(beta arrow.long.squiggly beta', beta' arrow.long.squiggly beta)$. Questo è assurdo perché contraddice l'ipotesi.
 
   Pertanto $exists alpha$ letterale di _p_ t.c. $alpha'$ è anch'esso letterale di _p_ e $alpha cancel(arrow.long.squiggly) alpha'$
 
   Dato un letterale $alpha$, cominciamo a definire l'assegnamento _t_ ponendo:
   - $t(alpha) = 1$
   - $forall beta " t.c. " alpha arrow.long.squiggly beta, t(beta) = 1$
-  Osserviamo che fin qui _t_ è ben definito, perché non può accadere che $t(beta') = 1$, in quanto $alpha cancel(arrow.long.squiggly) beta'$: infatti, se per assurdo fosse $alpha arrow.long.squiggly beta'$, allora si avrebbe $beta arrow.long.squiggly alpha'$ e quindi $alpha arrow.long.squiggly alpha'$, contro quanto appena stabilito
+  #observation()[
+    Osserviamo che fin qui _t_ è ben definito, perché non può accadere che $t(beta') = 1$, in quanto $alpha cancel(arrow.long.squiggly) beta'$: infatti, se per assurdo fosse $alpha arrow.long.squiggly beta'$, allora si avrebbe $beta arrow.long.squiggly alpha'$ e quindi $alpha arrow.long.squiggly alpha'$, contro quanto appena stabilito
+  ]
 ]
+
 
 === Algoritmo per il problema 2-SAT
 + Costruisco il grafo $G(p)$
