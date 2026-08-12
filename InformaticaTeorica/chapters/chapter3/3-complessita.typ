@@ -341,11 +341,15 @@ Adesso definiamo le notazioni asintotiche:
 Sebbene le complessità di alcuni algoritmi ($n^3, n^4, ...$) siano considerate elevate, noi saremo più permissivi e considereremo efficienti tutte le complessità polinomiali. Alla luce delle considerazioni fatte sulle varie tipologie di MdT, definiamo le seguenti classi di linguaggi (o "problemi", più in generale):
 #index[Classe P]
 #definition()[
-  $bold(P)={L "linguaggio" | exists M "MdT det. che accetta "L "t.c." t c_M (n)=Omicron(n^r), exists r in NN}$
+  P $={L "linguaggio" | exists M "MdT deterministica che accetta "L "t.c." t c_M (n)=Omicron(n^r), exists r in NN}$
+
+  I problemi in questa classe si considerano risolvibili in maniera efficiente (trattabili).
 ]
 #index[Classe NP]
 #definition()[
-  $bold(N P)={L "linguaggio" | exists M "MdT non det. che accetta "L "t.c." t c_M (n)=Omicron(n^r), exists r in NN}$
+  NP = ${L "linguaggio" | exists M "MdT non determ. che accetta "L "t.c." t c_M (n)=Omicron(n^r), exists r in NN}$.\
+
+  Un problema che è classificato NP è _verificabile_ in tempo polinomiale da una MdT deterministica (che equivale a dire, come da definizione, che esiste una MdT non deterministica che lo _risolve_ in tempo polinomiale). In altre parole, se ci viene fornita una possibile soluzione, possiamo controllare efficientemente che sia effettivamente una soluzione; ciò non implica però che siamo in grado di trovare deterministicamente, partendo dall'input del problema, tale soluzione in tempo polinomiale.
 ]
 
 #observation()[
@@ -796,54 +800,83 @@ G_(u,t,i,j) =
   Dato un polinomio booleano $p$ in 3-CNF (ogni clausola contiene esattamente 3 letterali), determinare se $p$ è soddisfacibile.
 ]
 #observation()[
-  3-SAT $in$ NP.
+  3-SAT $in$ NP (si verifica con lo stesso procedimento visto per SAT).
 ]
-
-Facciamo vedere che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzione polinomiale da SAT a 3-SAT.
-
+Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzione polinomiale da SAT, che sappiamo essere NP-difficile, a 3-SAT.
+#proposition()[
+  3-SAT è NP-difficile
+]
 #proof()[
-  Dato $p$ polinomio booleano in CNF ($p = u_1 and u_2 and dots and u_m$ ($u_i$ clausole)) vogliamo costruire un polinomio $tilde(p)$ in 3-CNF.
+  Dato $p$ polinomio booleano in CNF $p = u_1 and u_2 and dots and u_m$, $u_i$ clausole, vogliamo costruire un polinomio $tilde(p)$ in 3-CNF, dunque ogni $u_i$ dovrà diventare una clausola (o un insieme di clausole) $tilde(u)_i$ con esattamente 3 letterali. Le clausole di $p$ possono essere, a seconda dei casi:
 
-  Le clausole di $p$ possono essere:
-  - $u = v$ (_v_ letterale; $x,y$ variabili nuove)\
-    $tilde(u)= (v or x or y) and (v or x' or y) and (v or x or y') and (v or x' or y')$
-    $
-      u "soddisfacibile" <=> tilde(u) "soddisfacibile"
-    $
-  - $u = v_1 or v_2 quad quad (x "variabile nuova")$\
-    $tilde(u)=(v_1 or v_2 or x) and (v_1 or v_2 or x')$
-    $
-      u "soddisfacibile" <=> tilde(u) "soddisfacibile"
-    $
-  - $u = v_1 or v_2 or v_3 -> tilde(u) = u$
-  - $u = v_1 or v_2 or dots or v_n quad quad (n >= 4; y_1, dots, y_(n-3) "variabili nuove")$\
-    $tilde(u) = (v_1 or v_2 or y_1) and (v_3 or y_1^' or y_2) and dots and (v_j or y_(j-2)^' or y_(j-1)) and dots and (v_(n-2) or y_(n-4)^' or y_(n-3)) and (v_(n-1) or v_n or y_(n-3)^')$
+  1. $u = v$, clausola che contiene un solo letterale: introduciamo due nuove variabili $x, y$ e poniamo
+  $
+    tilde(u) =
+    (v or x or y)
+    and (v or x' or y)
+    and (v or x or y')
+    and (v or x' or y').
+  $
+  Se $v=1$, tutte le clausole sono soddisfatte. Se invece $v=0$, per ogni assegnamento di $x$ e $y$ una delle quattro clausole risulta falsa. Quindi $u " soddisfacibile" <==> tilde(u) " soddisfacibile".$
 
-  + Se $u$ soddisfacibile $=> tilde(u)$ soddisfacibile\
-    Sia $V$ l'insieme delle variabili di $p$:\
-    sia $t: V --> {0, 1} quad t.c. quad t(u) = 1$\
-    sia $v_j$ il primo letterale di $u$ t.c. $t(v_j) = 1$\
-    sia $accent(t, tilde): V union {y_1, dots, y_(n-3)} --> {0, 1}$ come segue:
-    $
-      accent(t, tilde)(x) = cases(t(x) quad quad&"se" x in V, 1 &"se" x = y_1\, dots\, y_(j-2), 0 &"se" x=y_(j-1)\, dots\, y_(n-3))
-    $
-  + $tilde(u) "soddisfacibile" => u "soddisfacibile"$\
-    sia $accent(t, tilde): V union {y_1, dots, y_(n-3)} -->{0, 1} quad quad t.c. quad accent(t, tilde) (tilde(u))=1$\
-    sia $t = accent(t, tilde)_(|V)$\
-    Si dimostra che $t(u) = 1$
+  2. $u = v_1 or v_2$, clausola che contiene due letterali: introduciamo una nuova variabile $x$ e poniamo
+  $
+    tilde(u) =
+    (v_1 or v_2 or x)
+    and
+    (v_1 or v_2 or x').
+  $
+  Se $v_1 or v_2=1$, entrambe le clausole sono soddisfatte indipendentemente dal valore di $x$; se invece $v_1=v_2=0$, le due clausole richiederebbero contemporaneamente $x=1$ e $x=0$. Dunque anche in questo caso $u " soddisfacibile" <==> tilde(u) " soddisfacibile".$
+  
+  3. $u = v_1 or v_2 or v_3$, che contiene già tre letterali, non occorre modificarla. Quindi $tilde(u)=u.$
+  
+  4. $u = v_1 or v_2 or dots or v_k$, clausola che contiene $k>3$ letterali: introduciamo $k-3$ nuove variabili $y_1, dots, y_(k-3)$ e poniamo
+  $
+    tilde(u) =
+    (v_1 or v_2 or y_1)
+    and
+    (y_1 ' or v_3 or y_2)
+    and
+    (y_2 ' or v_4 or y_3)
+    and dots \ dots and
+    (y_(k-4) ' or v_(k-2) or y_(k-3))
+    and
+    (y_(k-3) ' or v_(k-1) or v_k).
+  $
+  
+  Mostriamo che anche in questo caso $u$ è soddisfacibile $<==>$ $tilde(u)$ è soddisfacibile:
+  
+- $==>$) Supponiamo che $u$ sia soddisfacibile. Sia $V$ l'insieme delle variabili che compaiono in $p$ e sia $t : V -> {0,1}$ un assegnamento t.c. $t(u)=1$. Poiché $u$ è soddisfatta da $t$, esiste almeno un letterale di $u$ soddisfatto: sia $v_j$ il primo letterale t.c. $t(v_j)=1$. Estendiamo $t$ alle nuove variabili $y_1, dots, y_(k-3)$ definendo $tilde(t) : V union {y_1, dots, y_(k-3)} -> {0,1}$ come segue:
+  $
+    tilde(t)(x) =
+    cases(
+      t(x) & "se " x in V,
+      1 & "se " x = y_1","dots","y_(j-2),
+      0 & "se " x = y_(j-1)","dots","y_(n-3).
+    )
+  $
+  
+  Con questo assegnamento, le clausole che precedono quella contenente $v_j$ sono soddisfatte dalle variabili $y_1, dots, y_(j-2)$; le clausole successive sono soddisfatte dai letterali $y_(j-1) ', dots, y_(k-3) '$; la clausola contenente $v_j$ è soddisfatta proprio da $v_j$. Quindi $tilde(t)(tilde(u))=1$, e dunque $tilde(u)$ è soddisfacibile.
+  
+  - $<==$) Viceversa, supponiamo che $tilde(u)$ sia soddisfacibile e che, per assurdo, tutti i letterali $v_1, dots, v_k$ siano falsi. La prima clausola impone allora $y_1=1$. La seconda impone $y_2=1$ e, procedendo allo stesso modo lungo la catena, si ottiene $y_1 = y_2 = dots = y_(k-3) = 1$. L'ultima clausola diventa però $y_(k-3) ' or v_(k-1) or v_k = 0$, assurdo. Quindi almeno uno dei letterali $v_j$ deve essere vero e pertanto $u$ è soddisfatta.
+  
+  Infine si ottiene $tilde(p) = tilde(u)_1 and tilde(u)_2 and dots and tilde(u)_m$ e, per costruzione, $p " è soddisfacibile" <==> tilde(p) " è soddisfacibile"$.\
+  Inoltre, una clausola di $k$ letterali viene sostituita da un numero $O(k)$ di clausole e variabili ausiliarie; la dimensione di $tilde(p)$ è quindi lineare, e in particolare polinomiale, nella dimensione di $p$. Anche la trasformazione può essere eseguita in tempo polinomiale. Abbiamo dunque costruito una riduzione polinomiale da SAT a 3-SAT, e poiché SAT è NP-difficile, segue che 3-SAT è NP-difficile.
 ]
-
+#observation()[
+  3-SAT è NP $and$ 3-SAT è NP-difficile $==>$ 3-SAT è NP-completo
+]
 == Problema del Vertex Cover (VC) //OK
 
 #index[Vertex cover]
 #definition()[
-  Dato $G=(V, E)$ grafo non orientato, un *vertex cover* di $G$ è un sottoinsieme $C subset.eq V$ t.c. $forall{x,y} in E, space x in C "oppure" y in C$
+  Dato $G=(V, E)$ grafo non orientato, un *vertex cover* (VC) di $G$ è un sottoinsieme $C subset.eq V$ t.c. $forall{x,y} in E, space x in C "oppure" y in C$
 ]
 #figure(image("images/2026-08-11-11-08-48.png", width: 60%), caption: "Vertex cover con C={1,6,4,7,2,3}")
 
 #index[Problema del Vertex Cover]
 #problem("Vertex Cover")[
-  Dato $G$ grafo non orientato e $k in NN$, esiste un *VC* $C "di" G$ con $abs(C) = k?$
+  Dato $G=(V,E)$ grafo non orientato e $k in NN$, determinare se $G$ possiede un VC di cardinalità $k$.
 ]
 
 #proposition()[
@@ -2028,7 +2061,7 @@ $
 #index[Classe NExp]
 Definisco un'altra classe di linguaggi esponenziali:
 $
-  "NExp" = { L "linguaggio" | exists M "MdT non deterministica che accetta "L "t.c." t c_M (n) = Omicron(2^n^k), exists k >= 1}
+  "NExp" = { L "linguaggio" | exists M "MdT non deterministica che accetta "L \ "t.c." t c_M (n) = Omicron(2^n^k), exists k >= 1}
 $
 
 #observation()[
