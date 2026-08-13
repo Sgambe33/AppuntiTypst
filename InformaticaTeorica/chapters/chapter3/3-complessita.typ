@@ -591,7 +591,7 @@ La scelta di una certa codifica per un determinato problema può avere un impatt
 $
   "rep" : overbracket({p_1, p_2, dots, p_i}, "istanze di un problema") --> Sigma^* quad quad
 $
-cioè una funzione che traduca ciascuna istanza di un problema (ad esempio un grafo nel caso del problema HAM) in una parola su un opportuno alfabeto $Sigma$, in modo da poterla fornire in input ad una MdT.
+cioè una funzione che traduca ciascuna istanza di un problema (che sarebbero gli input, ad esempio un grafo $G$ nel caso del problema HAM) in una parola su un opportuno alfabeto $Sigma$, in modo da poterla fornire in input ad una MdT.
 #index[Trasformazione polinomiale]
 #definition()[
   Date $"rep"_1 : {p_1, p_2, dots, p_i} --> Sigma_1^*$ e $"rep"_2 : {p_1, p_2, dots, p_i} --> Sigma_2^*$, \ $"rep"_1$ è *polinomialmente trasformabile* in $"rep"_2$ quando $exists space t : Sigma_1^* --> Sigma_2^*$ tale che:
@@ -793,7 +793,9 @@ G_(u,t,i,j) =
   Il polinomio finale è quindi la congiunzione dei polinomi $A$ - $G$. Per costruzione, $Phi(w)$ è soddisfacibile (cioè appartiene a SAT) se e solo se esiste una computazione accettante di $M$ su $w$, cioè se e solo se $w in L$.
   Inoltre, poiché $p(n)$ è polinomiale e $M$ è fissata, $Phi(w)$ ha dimensione polinomiale in $n$ ed è costruibile in tempo polinomiale. Dunque $L$ è polinomialmente riducibile a SAT. Essendo $L in "NP"$ arbitrario, SAT è NP-difficile.
 ]
-
+#observation()[
+  SAT è NP $and$ SAT è NP-difficile $==>$ SAT è NP-completo
+]
 === Problema 3-SAT
 #index[Problema 3-SAT]
 #problem("3-SAT")[
@@ -866,13 +868,16 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
 #observation()[
   3-SAT è NP $and$ 3-SAT è NP-difficile $==>$ 3-SAT è NP-completo
 ]
-== Problema del Vertex Cover (VC) //OK
+#pagebreak()
+== Altri problemi NP-completi
+Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione da 3-SAT per dimostrare la NP-completezza.
 
+=== Problema del Vertex Cover (VC)
 #index[Vertex cover]
 #definition()[
   Dato $G=(V, E)$ grafo non orientato, un *vertex cover* (VC) di $G$ è un sottoinsieme $C subset.eq V$ t.c. $forall{x,y} in E, space x in C "oppure" y in C$
 ]
-#figure(image("images/2026-08-11-11-08-48.png", width: 60%), caption: "Vertex cover con C={1,6,4,7,2,3}")
+#figure(image("images/2026-08-11-11-08-48.png", width: 60%), caption: "Vertex cover con C = {1,6,4,7,2,3}")
 
 #index[Problema del Vertex Cover]
 #problem("Vertex Cover")[
@@ -889,22 +894,22 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
   Costruiamo una riduzione polinomiale da 3-SAT a VC. Sia $p$ polinomio booleano in 3-CNF:
 
   $
-    & p=(u_(1,1) or u_(1,2) or u_(1,3)) and (u_(2,1) or u_(2,2) or u_(2,3)) and dots and (u_(m,1) or u_(m,2) or u_(m,3)) \
-    & p=(x_1 or x'_2 or x_3) and (x'_1 or x_2 or x'_4) quad (*)
+    & p=(u_(1,1) or u_(1,2) or u_(1,3)) and (u_(2,1) or u_(2,2) or u_(2,3)) and dots and (u_(m,1) or u_(m,2) or u_(m,3))
   $
 
   $V = {x_1, dots, x_n}$ insieme delle variabili di $p$, $|V| = n$ e $m =$ numero di clausole di $p$.
 
   Costruiamo un grafo non orientato $G(p)$ nel seguente modo:
-  - Scriviamo un nodo per ogni variabile del polinomio e un nodo per ogni negazione di variabile;
-  - Colleghiamo ogni coppia variabile-variabile negata con un lato;
-  - Scriviamo un nodo per ogni letterale di ogni clausola;
-  - Colleghiamo con 3 lati i 3 letterali di ogni clausola;
-  - Aggiungiamo lati tra i due insiemi di nodi, collegando le variabili o variabili negate ai letterali delle clausole corrispondenti.
+  
+  - scriviamo un nodo per ogni variabile del polinomio e un nodo per ogni negazione di variabile;
+  - colleghiamo ogni coppia variabile-variabile negata con un lato;
+  - scriviamo un nodo per ogni letterale di ogni clausola;
+  - colleghiamo con 3 lati i 3 letterali di ogni clausola;
+  - aggiungiamo lati tra i due insiemi di nodi, collegando le variabili o variabili negate ai letterali delle clausole corrispondenti.
 
   #example()[
     $
-      p = (x_1 or x'_2 or x_3) and (x'_1 or x_2 or x'_4)
+      p = (x_1 or x'_2 or x_3) and (x'_1 or x_2 or x'_4) quad (*)
     $
     con $V = {x_1, x_2, x_3, x_4}$, $|V|=4$ e $m=2$.
     #align(center, cetz.canvas(length: 24pt, {
@@ -997,17 +1002,22 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
     }))
   ]
 
-  In un vertex cover di $G(p)$ ci devono essere almeno $n+2m$ vertici: infatti occorre almeno un vertice per ciascuno degli $n$ lati che collegano $x_i$ a $x'_i$, e almeno 2 dei 3 vertici di ciascuno degli $m$ triangoli delle clausole.
-  Facciamo vedere che $p$ è soddisfacibile $<=> G(p)$ ha un vertex cover di cardinalità $n+2m = k(p)$.
+  In un VC di $G(p)$ ci devono essere almeno $n+2m$ vertici: infatti basta scegliere uno solo dei due estremi per ciascuno degli $n$ lati che collegano $x_i$ a $x'_i$, mentre per coprire i tre archi di ciascuno degli $m$ triangoli associati alle clausole occorrono almeno due dei tre vertici.\
+  Facciamo vedere che $p$ è soddisfacibile $<==> G(p)$ ha un vertex cover di cardinalità $n+2m = k(p)$.
 
   $==>)$ Sia $t$ assegnamento t.c. $t(p) = 1$
 
-  - $forall i = 1, dots, n$ scegliamo $cases(x_i &"se" t(x_i) = 1, x'_i &"se" t(x'_i) = 0)$
-
+  - $forall i = 1, dots, n$ scegliamo
+  $
+    cases(
+        x_i &"se" t(x_i) = 1,
+        x'_i &"se" t(x_i) = 0
+    )
+  $
   - Per ogni clausola, individuiamo un letterale che soddisfa la clausola e scegliamo i rimanenti 2 (quindi in tutto scelgo 2 nodi su 3 per ogni clausola $=> 2m$).
 
   #example()[
-    Considerando $(*)$, diamo i seguenti valori alle variabili: $x_1 -> 1, x_2 -> 0, x_3 -> 1, x_4 -> 0$. Allora:
+    Considerando $(*)$, diamo i seguenti valori alle variabili: $x_1 -> 1, x_2 -> 0, x_3 -> 1, x_4 -> 0$. Allora (i vertici "scelti" sono dentro i quadrati):
     #align(center, cetz.canvas(length: 24pt, {
       import cetz.draw: *
 
@@ -1115,27 +1125,24 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
       draw-node(u23, $u_(2,3)$)
     }))
   ]
-  Allora l'insieme di vertici così definito (di cardinalità $n+2m$) è un vertex cover di $G(p)$.
+  Allora l'insieme di vertici così definito ha cardinalità $n + 2m$ ed è un VC di $G(p)$.
 
-  $<==)$ $G(p)$ ha un VC di cardinalità $n+ 2m$, allora voglio definire $t: {x_1, dots, x_n} -> {0,1}$ che soddisfi $p$:
+  $<==)$ $G(p)$ ha un VC di cardinalità $n+ 2m$, allora definisco $t: {x_1, dots, x_n} -> {0,1}$ che soddisfa $p$ in questo modo:
   $
     t(x_i) = cases(
-      1 & "se" x_i "sta nel" V C,
-      0 & "se" x'_i "sta nel" V C
+      1 & "se" x_i in V C,
+      0 & "se" x'_i in.not V C
     )
   $
-  Con questo assegnamento, ogni clausola è soddisfatta dal letterale corrispondente al nodo $in.not V C$ di ogni "triangolo" (insieme di tre letterali $u_(i,0), u_(i,1), u_(i,2)$).
+  Con questo assegnamento, ogni clausola è soddisfatta dal letterale corrispondente al nodo non appartenente al VC di ogni "triangolo" $u_(i,0), u_(i,1), u_(i,2)$.\ Dunque abbiamo ottenuto che $p in $ 3-SAT $<==> G(p) "ha un VC con cardinalità" k(p)$, e poiché la funzione che costruisce il grafo dal polinomio è computabile in tempo polinomiale 3-SAT è polinomialmente riducibile a VC: essendo 3-SAT NP-difficile, anche VC è NP-difficile.
 ]
 
-
-
-== Problema di Clique //OK
-
+=== Problema Clique
 #index[Problema Clique]
 #problem("Clique")[
   Dato un grafo non orientato $G$ e un intero $k$, determinare se esiste un sottografo completo di $G$ avente $k$ vertici.
 ]
-
+#figure(image("images/esempioClique.png", width: 50%))
 #proposition()[
   Il problema Clique $in$ NP.
 ]
@@ -1147,14 +1154,15 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
 #proof()[
   Troviamo una riduzione polinomiale da 3-SAT a Clique. Sia $p$ un polinomio booleano in 3-CNF con $k$ clausole:
   $
-    & p = u_1 and u_2 and dots and u_k quad quad quad quad quad quad && | (x_1 or x_2^' or x_3) and (x_1^' or x_2 or x_4^') \
-    & u_i = (u_(i, 2) or u_(i, 2) or u_(i, 3))                       && |
+    & p = u_1 and u_2 and dots and u_k \
+    & u_i = (u_(i, 1) or u_(i, 2) or u_(i, 3))
   $
+  Costruiamo un grafo $G(p) = (V, E)$  in cui: 
 
-  Costruiamo un grafo $G(p) = (V, E)$  in cui c'è un vertice per ogni letterale di $p$ e tale che:
-  - Non ci siano lati tra letterali della stessa clausola;
-  - Non ci sia un lato tra due letterali opposti ($x_i$ e $x'_i$);
-  - C'è un lato fra ogni altra coppia di vertici.
+  - c'è un vertice per ciascun letterale di ogni clausola;
+  - non ci sono lati tra letterali della stessa clausola;
+  - non ci sono lati tra due letterali opposti ($x_i$ e $x'_i$);
+  - c'è un lato fra ogni altra coppia di vertici.
 
   #example()[
     $
@@ -1206,13 +1214,12 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
   ]
 
 
-  $p$ è soddisfacibile $<=> G(p)$ ha un sottografo completo di cardinalità $k$.
+  Mostriamo che $p$ è soddisfacibile $<==> G(p)$ ha un sottografo completo di cardinalità $k$.
 
-  $==>$) Sia $t$ un assegnamento di valori alle variabili che soddisfa $p$.
-  Quindi, $forall i <= k$ (cioè per ogni clausola), $t(u_i) = 1$.
+  $==>$) Sia $t$ un assegnamento di valori alle variabili che soddisfa $p$, ossia t.c. $t(p)=1$. Quindi $forall i <= k$ si ha $t(u_i) = 1$.
   Dunque $forall i <= k, exists j in {1, 2, 3} : t(u_(i,j)) = 1$.
 
-  Nel grafo $G(p)$, $forall i <= k$ scelgo $u_(i,j)$ letterale soddisfatto (cioè in tutto scelgo $k$ vertici su $k$ clausole, ovvero uno in ogni clausola). $forall$ coppia di vertici scelti $x$ e $y$, c'è il lato ${x, y}$ perché $t(x) = t(y) = 1$, dunque $x eq.not y'$ (e, naturalmente, i due vertici $x$ e $y$ rappresentano letterali appartenenti a due clausole diverse).
+  Nel grafo $G(p)$, $forall i <= k$ scelgo $u_(i,j)$ letterale soddisfatto (cioè in tutto scelgo $k$ vertici su $k$ clausole, ovvero uno in ogni clausola). Per ogni coppia di vertici scelti $x$ e $y$, c'è il lato ${x, y}$ perché $t(x) = t(y) = 1$, dunque $x eq.not y'$ (e, naturalmente, i due vertici $x$ e $y$ rappresentano letterali appartenenti a due clausole diverse).
   #align(center, cetz.canvas(length: 20pt, {
     import cetz.draw: *
 
@@ -1265,13 +1272,10 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
       }
     }
   }))
-
   $<==)$ Sia ${v_1, dots, v_k}$ un sottografo completo di $G(p)$. Si noti che si sceglie esattamente 1 vertice per ogni clausola, poiché due vertici appartenenti alla stessa clausola non sono collegati.
-
-  $forall i = 1, dots, k$ sia $u^((i))$ il letterale associato a $v_i$; definiamo l'assegnamento $t$ ponendo $t(u^((i))) = 1$.
+  Per ogni $i = 1, dots, k$ sia $u^((i))$ il letterale associato a $v_i$ e definiamo l'assegnamento $t$ t.c. $t(u^((i))) = 1$.
   - $t$ è ben definito: poiché i vertici selezionati determinano un sottografo completo, non compaiono coppie del tipo $x, x'$;
   - $t$ soddisfa $p$: in ogni clausola c'è un letterale posto a 1.
-
   #align(center, cetz.canvas(length: 20pt, {
     import cetz.draw: *
 
@@ -1324,14 +1328,14 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
       circle((x, 0), radius: 0.08, fill: white, stroke: 1.5pt)
       circle((x, -1.2), radius: 0.08, fill: white, stroke: 1.5pt)
     }
-  }))
+  })) 
+Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardinalità" k$, con $k$ numero di clausole di $p$. Inoltre, $G(p)$ è costruibile in tempo polinomiale nella dimensione di $p$: contiene $3k$ vertici e gli archi si ottengono considerando le coppie di letterali appartenenti a clausole diverse e non opposti. Quindi 3-SAT è polinomialmente riducibile a Clique e poiché 3-SAT è NP-difficile, anche Clique è NP-difficile.
 ]
 
-== Problema HAM //OK
-
+=== Problema HAM
 #index[Problema HAM]
 #proposition()[
-  Il problema del circuito hamiltoniano è NP-difficile ($"HAM" in "NP"$).
+  Il problema del circuito hamiltoniano HAM è NP-difficile.
 ]
 
 #proof()[
@@ -1654,7 +1658,7 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
   ]
 ]
 
-== Problema IS //OK
+=== Problema IS //OK
 #definition()[
   Sia $G=(V,E)$ un grafo non orientato, $I subset.eq V$ si dice *indipendente* quando $forall x,y in I$, ${x,y} in.not E$.
 ]
@@ -1667,7 +1671,7 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
   Il problema IS è NP-difficile.
 ]
 #proof()[
-  Cerchiamo una riduzione polinomiale dal problema CLIQUE a IS, sebbene i concetti di grafo completo e insieme indipendente siano concetti opposti.
+  Cerchiamo una riduzione polinomiale dal problema Clique a IS, sebbene i concetti di grafo completo e insieme indipendente siano concetti opposti.
   $
     underbrace((G, k), "ist. clique") arrow.long.squiggly underbrace((tilde(G), k), "ist. IS")
   $
@@ -1691,7 +1695,7 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
     Questo esempio serve a far vedere che si effettuano riduzioni polinomiali non solo a partire dal problema 3-SAT, ma anche tra problemi NP-completi già noti.
   ]
 ]
-
+#pagebreak()
 == Problema 2-SAT //OK
 #index[Problema 2-SAT]
 #problem()[
@@ -1705,7 +1709,10 @@ Vediamo come costruire il grafo associato a $p$. Sia $p = u_1 and u_2 and dots a
 
 - Vertici: $forall x$ variabile che compare in _p_, si scrivono i nodi $x "e" x'$ (2 vertici)
 
-- Archi: $forall "clausola" u_i$, 2 archi: $cases(u_(i, 1)^' --> u_(i, 2), u_(i, 2)^' --> u_(i, 1))$
+- Archi: $forall "clausola" u_i$, 2 archi: 
+$
+  cases(u_(i, 1)^' --> u_(i, 2), u_(i, 2)^' --> u_(i, 1))
+$
 
 #example()[
   $
