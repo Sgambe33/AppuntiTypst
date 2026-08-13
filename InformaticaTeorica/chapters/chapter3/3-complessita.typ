@@ -1413,15 +1413,15 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
       line("tr", "o", mark: (end: ">"))
       line("fr", "o", mark: (end: ">"))
     })),
-    grid.cell(rowspan: 2, [
-      - Esiste un arco tra un vertice $t_(i,j)$ e un vertice $f_(i, j+1)$ e un arco tra un vertice $f_(i,j)$ e un vertice $t_(i,j+1)$;
+    grid.cell(rowspan: 2, [ \ \
+      - esiste un arco tra un vertice $t_(i,j)$ e un vertice $f_(i, j+1)$ e un arco tra un vertice $f_(i,j)$ e un vertice $t_(i,j+1)$;
     ]),
-    grid.cell(rowspan: 2, [- Esiste un arco da $t_(i,j)$ a $f_(i,j)$ e viceversa;]),
-    grid.cell(rowspan: 2, [- con $r_i$ = massimo fra le occorrenze di $x_i "e" x_i^'$ in _p_.]),
+    grid.cell(rowspan: 1, [\ \
+    - esiste un arco da $t_(i,j)$ a $f_(i,j)$ e viceversa;]),
+    grid.cell(rowspan: 2, [\ \
+    con $r_i$ = massimo fra le occorrenze di $x_i "e" x_i^'$ in _p_.]),
   )
-
-  I pezzi di grafo così costruiti si connettono aggiungendo un lato da $o_i "a" c_(i+1)$, per ogni $i$, infine si aggiunge un lato da $o_n "a" e_1$.
-  Essendo che ogni variabile ha 2 camini hamiltoniani da $e_j "a" o_j$:
+  I pezzi di grafo così costruiti si connettono aggiungendo un lato da $o_i "a" e_(i+1)$, per ogni $i$, infine si aggiunge un lato da $o_n "a" e_1$. Nel grafo sopra, ogni variabile ha 2 camini hamiltoniani da $e_j "a" o_j$:
   #grid(
     columns: (0.5fr, 0.5fr),
     align: center,
@@ -1554,7 +1554,7 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
     })],
   )
 
-  Per cui si hanno in totale $2^n$ circuiti hamiltoniani nel grafo rappresentato sotto.
+  Per cui si hanno in totale $2^n$ circuiti hamiltoniani nel grafo rappresentato qui sotto:
 
   #align(center, cetz.canvas(length: 20pt, {
     import cetz.draw: *
@@ -1588,20 +1588,19 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
     line("on", (17.5, 0), (17.5, -2.5), (-2, -2.5), "e1", mark: (end: ">"))
   }))
 
-  Si ha quindi $u_j=(u_(j, 1) or u_(j, 2) or u_(j, 3))$, si inseriscono i nodi $i n_(i, j)$ e $o u t_(i, j)$
+  Dato quindi $u_j=(u_(j, 1) or u_(j, 2) or u_(j, 3))$, si inseriscono i nodi $i n_(i, j)$ e $o u t_(i, j)$: ne serve uno per ogni clausola $u_j$.
 
-  #grid(
-    columns: (0.5fr, 0.5fr),
-    align: (center, center + horizon),
-
-    [#align(center, cetz.canvas(length: 25pt, {
+  #align(center)[
+    #cetz.canvas(length: 25pt, {
       import cetz.draw: *
+
       set-style(mark: (fill: black, scale: 1))
       set-style(content: (padding: 0.2))
       set-style(line: (padding: 0.2))
-      let dx = 3 // Distanza orizzontale tra i nodi
-      let y-in = 2.5 // Altezza della riga "in"
-      let y-out = 0 // Altezza della riga "out"
+
+      let dx = 3
+      let y-in = 2.5
+      let y-out = 0
 
       // Riga superiore (in)
       content((0, y-in), text(size: 1.4em, $"in"_(j,1)$), name: "in1")
@@ -1613,40 +1612,51 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
       content((dx, y-out), text(size: 1.4em, $"out"_(j,2)$), name: "out2")
       content((2 * dx, y-out), text(size: 1.4em, $"out"_(j,3)$), name: "out3")
 
-      // Frecce verticali in ingresso dall'alto
-      line((0, y-in + 1.5), "in1", mark: (end: ">"))
-      line((dx, y-in + 1.5), "in2", mark: (end: ">"))
-      line((2 * dx, y-in + 1.5), "in3", mark: (end: ">"))
 
-      // Frecce verticali in uscita verso il basso
-      line("out1", (0, y-out - 1.5), mark: (end: ">"))
-      line("out2", (dx, y-out - 1.5), mark: (end: ">"))
-      line("out3", (2 * dx, y-out - 1.5), mark: (end: ">"))
+      // Frecce verticali in ingresso
+      line((0, y-in + 1.5), "in1.north", mark: (end: ">"))
+      line((dx, y-in + 1.5), "in2.north", mark: (end: ">"))
+      line((2 * dx, y-in + 1.5), "in3.north", mark: (end: ">"))
 
-      // Frecce verticali interne (da "in" a "out")
-      line("in1", "out1", mark: (end: ">"))
-      line("in2", "out2", mark: (end: ">"))
-      line("in3", "out3", mark: (end: ">"))
+      // Frecce verticali in uscita
+      line("out1.south", (0, y-out - 1.5), mark: (end: ">"))
+      line("out2.south", (dx, y-out - 1.5), mark: (end: ">"))
+      line("out3.south", (2 * dx, y-out - 1.5), mark: (end: ">"))
 
-      // Frecce orizzontali sulla riga superiore (verso destra)
-      line("in1", "in2", mark: (end: ">"))
-      line("in2", "in3", mark: (end: ">"))
+      // Frecce verticali interne
+      line("in1.south", "out1.north", mark: (end: ">"))
+      line("in2.south", "out2.north", mark: (end: ">"))
+      line("in3.south", "out3.north", mark: (end: ">"))
 
-      // Frecce orizzontali sulla riga inferiore (verso sinistra)
-      line("out3", "out2", mark: (end: ">"))
-      line("out2", "out1", mark: (end: ">"))
+      // Frecce orizzontali superiori
+      line("in1.east", "in2.west", mark: (end: ">"))
+      line("in2.east", "in3.west", mark: (end: ">"))
 
-      let cut = 1
+      // Frecce orizzontali inferiori
+      line("out3.west", "out2.east", mark: (end: ">"))
+      line("out2.west", "out1.east", mark: (end: ">"))
 
-      // Freccia curva superiore (da in3 a in1, passa "sotto" i nodi)
-      bezier("in3", "in1", (dx, y-in - 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
 
-      // Freccia curva inferiore (da out1 a out3, passa "sopra" i nodi)
-      bezier("out1", "out3", (dx, y-out + 1.2), mark: (end: ">"), shorten-start: cut, shorten-end: cut)
-    }))],
-    //TODO: aggiustare sta merda
-    [Ne serve uno per ogni clausola $u_j$],
-  )
+      // Curva superiore: in3 -> in1, passando sotto
+      bezier(
+        "in3.south",
+        "in1.south",
+        (dx, y-in - 1.3),
+        mark: (end: ">"),
+        shorten-start: 0.15,
+        shorten-end: 0.15,
+      )
+
+      // Curva inferiore: out1 -> out3, passando sopra
+      bezier(
+        "out1.north",
+        "out3.north",
+        (dx, y-out + 1.5),
+        mark: (end: ">"),
+        shorten-start: 0.15,
+        shorten-end: 0.15,
+      )
+  })]
   #example()[
     Consideriamo:
     $
@@ -1656,22 +1666,36 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
     Esempio per $x_1$: $x_1$ appare 2 volte, $x_1^'$ appare 2 volte $==> r_i = 2 ==>$ sono 3 nodi $0, 1, 2$.
     #figure(image("/assets/image-17.png", width: 75%))
   ]
+#observation()[
+  A lezione il prof si è fermato all'esempio qui sopra, non terminando la dimostrazione.
+  L'idea della conclusione comunque è mostrare la correttezza della riduzione, provando che
+  il polinomio $p$ è soddisfacibile $<==>$ il grafo costruito $G(p)$ possiede un circuito hamiltoniano.
+  
+  $==>$) Se $p$ è soddisfacibile, per ogni variabile scegliamo il cammino nel gadget
+  ("lato true", o "lato false") coerente con l'assegnamento. Poiché ogni clausola è soddisfatta
+  da almeno un letterale, il circuito può effettuare una "deviazione" dal cammino della variabile
+  corrispondente per visitare i nodi della clausola e tornare subito nel gadget, riuscendo così
+  a toccare tutti i nodi.
+  
+  $<==$) Se esiste un circuito hamiltoniano, la struttura a "catena" dei gadget impone che per ogni variabile venga scelto uno dei due possibili cammini, definendo così un assegnamento di verità. Il fatto che il circuito riesca a visitare anche i nodi delle clausole garantisce che ogni clausola abbia almeno un letterale vero.
+  
+  Poiché la costruzione del grafo richiede tempo polinomiale rispetto alla dimensione del
+  polinomio, si ha che 3-SAT è polinomialmente riducibile a HAM ed essendo 3-SAT NP-completo, e quindi NP-difficile, ne consegue che HAM è NP-difficile.
 ]
-
-=== Problema IS //OK
+]
+=== Problema Independent Set (IS)
 #definition()[
   Sia $G=(V,E)$ un grafo non orientato, $I subset.eq V$ si dice *indipendente* quando $forall x,y in I$, ${x,y} in.not E$.
 ]
-
-#problem("IS: Indipendent Set")[
+#figure(image("images/esempioIS.png",  width: 35%), caption: "I nove vertici blu formano un insieme indipendente massimo per questo grafo")
+#problem("IS")[
   Dato un grafo non orientato $G$ e un intero $k$, determinare se $G$ contiene un sottoinsieme indipendente di cardinalità $k$.
 ]
-
 #proposition()[
   Il problema IS è NP-difficile.
 ]
 #proof()[
-  Cerchiamo una riduzione polinomiale dal problema Clique a IS, sebbene i concetti di grafo completo e insieme indipendente siano concetti opposti.
+  Cerchiamo una riduzione polinomiale dal problema Clique a IS (sebbene i concetti di grafo completo e insieme indipendente siano opposti).
   $
     underbrace((G, k), "ist. clique") arrow.long.squiggly underbrace((tilde(G), k), "ist. IS")
   $
@@ -1679,44 +1703,40 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
   $
     tilde(V) = V, quad tilde(E) = binom(V, 2) \\ E
   $
-  dove $binom(V, 2)={{u,v}|u,v in V, u!=v}$, cioè $tilde(G)$ è il grafo complementare di $G$: stessi vertici, e un arco tra due vertici distinti se e solo se tale arco non era presente in $G$.
+  dove $binom(V, 2) = { {u,v} | u,v in V, u!=v}$, cioè $tilde(G)$ è il grafo complementare di $G$: stessi vertici, e un arco tra due vertici distinti se e solo se tale arco non era presente in $G$ (figura d'esempio a fine dimostrazione).
 
-  La costruzione di $tilde(G)$ a partire da $G$ richiede di esaminare tutte le $binom(|V|, 2)$ coppie di vertici, quindi è calcolabile in tempo polinomiale.
-
-  Resta da mostrare che la riduzione è corretta:
+  La costruzione di $tilde(G)$ a partire da $G$ richiede di esaminare tutte le $binom(|V|, 2)$ coppie di vertici, quindi è calcolabile in tempo polinomiale. Resta da mostrare che la riduzione è corretta:
   $
     G "ha una clique di cardinalità" k <==> tilde(G) "ha un insieme indipendente di cardinalità" k.
   $
   Sia $I subset.eq V$ con $|I|=k$. Allora $I$ è una clique in $G$ $<==>$ $forall x,y in I, x!=y$, ${x,y} in E$ $<==>$ $forall x,y in I, x!=y$, ${x,y} in.not tilde(E)$ $<==>$ $I$ è un insieme indipendente in $tilde(G)$.
 
   Quindi $G$ ha una clique di cardinalità $k$ se e solo se $tilde(G)$ ha un insieme indipendente di cardinalità $k$, il che prova la correttezza della riduzione.
-
-  #observation()[
-    Questo esempio serve a far vedere che si effettuano riduzioni polinomiali non solo a partire dal problema 3-SAT, ma anche tra problemi NP-completi già noti.
-  ]
+  #figure(image("images/esempioGrafoComplementare.png", width: 50%))
 ]
-#pagebreak()
-== Problema 2-SAT //OK
+#observation()[
+  Da questo problema si può osservare che si effettuano riduzioni polinomiali non solo a partire dal problema 3-SAT, ma anche da altri problemi NP-completi noti.
+]
+== Problema 2-SAT
 #index[Problema 2-SAT]
 #problem()[
-  Dato un polinomio booleano $p$ in 2-CNF in cui ogni clausola contiene esattamente 2 letterali, esiste un assegnamento di valori delle variabili che soddisfa $p$?
+  Dato un polinomio booleano $p$ in 2-CNF (ogni clausola contiene esattamente 2 letterali), esiste un assegnamento di valori delle variabili che soddisfa $p$?
 ]
 
 #proposition()[
   Il problema 2-SAT $in$ P.
 ]
-Vediamo come costruire il grafo associato a $p$. Sia $p = u_1 and u_2 and dots and u_s " con " u_i = u_(i, 1) or u_(i, 2)$ un polinomio booleano in 2-CNF. Costruiamo un grafo orientato $G(p)$ nel seguente modo:
+Vediamo innanzitutto come costruire il grafo associato a $p$. Sia $p = u_1 and u_2 and dots and u_s " con " u_i = u_(i, 1) or u_(i, 2)$ un polinomio booleano in 2-CNF. Costruiamo un grafo orientato $G(p)$ nel seguente modo:
 
-- Vertici: $forall x$ variabile che compare in _p_, si scrivono i nodi $x "e" x'$ (2 vertici)
-
-- Archi: $forall "clausola" u_i$, 2 archi: 
+- vertici: $forall x$ variabile che compare in _p_, si scrivono i vertici $x "e" x'$;
+- archi: $forall "clausola" u_i$, 2 archi: 
 $
   cases(u_(i, 1)^' --> u_(i, 2), u_(i, 2)^' --> u_(i, 1))
 $
 
 #example()[
   $
-    p = (x'_1 or x_2) or (x_1 or x_3) and (x_2 or x'_3) "in" {x_1,x_2,x_3}
+    p = (x'_1 or x_2) and (x_1 or x_3) and (x_2 or x'_3) "in" {x_1,x_2,x_3}
   $
   #align(center, cetz.canvas({
     import cetz.draw: *
@@ -1757,41 +1777,46 @@ $
 
 #observation()[
   Siano $alpha$ e $beta$ vertici di $G(p)$. Allora, $alpha arrow.squiggly.long beta$ significa che c'è un cammino diretto da $alpha$ a $beta$.
+
+  Inoltre, vale che se $alpha arrow.squiggly.long beta$ allora $beta' arrow.squiggly.long alpha'$.
 ]
 
-#lemma()[
-  _p_ è soddisfacibile $<==> exists.not x "variabile di" p "tale che in" G(p) space x arrow.squiggly.long x' " e " x' arrow.squiggly.long x$
+#proposition()[
+  _p_ è soddisfacibile $<==> exists.not x "variabile di" p "tale che in" G(p) space x arrow.squiggly.long x' "e" x' arrow.squiggly.long x$
 ]
 
 #proof()[\
-  $==>)$ Usiamo la contronominale. Sia _x_ t.c. $x arrow.squiggly.long x' " e " x' arrow.squiggly.long x$; facciamo vedere che _p_ non è soddisfacibile. Sia _t_ assegnamento:
-  - $t(x) = 1$, quindi
+  $==>)$ Usiamo la contronominale. Supponiamo che esista una variabile $x$ t.c. $x arrow.squiggly.long x'$ e $x' arrow.squiggly.long x$; mostriamo che $p$ non è soddisfacibile. Sia $t$ un qualunque assegnamento.
+  - Se $t(x)=1$, considerando il cammino $x arrow.squiggly.long x'$, poiché $t(x')=0$ deve esistere lungo il cammino un arco $alpha --> beta$ in cui si passa per la prima volta dal valore $1$ al valore $0$: $ &x --> gamma_1 --> dots --> alpha --> beta --> dots --> gamma_n --> x' \ &t(x)=1 space space space space space space space space space space t(alpha)=1, space t(beta)=0 space space space space space space space space space t(x')=0 $ Ma l'arco $alpha --> beta$ deriva dalla clausola $alpha' or beta$ di $p$, che sotto $t$ vale $ t(alpha')=0, quad t(beta)=0, $ e quindi non è soddisfatta.
 
-    $&x --> gamma_1 --> gamma_2 --> dots &&dots dots &&alpha --> &&beta space dots --> gamma_(n-1) --> gamma_n --> &&x'\
-    &t(x)=1 &&t(alpha)&&=1 &&t(beta) = 0 &&t(x') = 0$\
-    In _p_ c'è la clausola $alpha' or beta$ che non è soddisfatta da _t_.
-
+  - Se $t(x)=0$, allora $t(x')=1$ e si applica lo stesso ragionamento al cammino $x' arrow.squiggly.long x$, ottenendo nuovamente una clausola non soddisfatta.
+  
+  In entrambi i casi $t$ non soddisfa $p$; essendo $t$ arbitrario, $p$ non è soddisfacibile.
+  
   $<==)$ Senza perdita di generalità, supponiamo che $exists alpha$ letterale t.c. in _p_ compaiono sia $alpha$ che $alpha'$ (altrimenti _p_ sarebbe banalmente soddisfacibile).
-  Se, per assurdo, $forall alpha$ letterale t.c. $alpha, alpha'$ compaiono in _p_, $alpha arrow.long.squiggly alpha'$, allora, se $beta$ è uno di questi letterali, $cases(beta arrow.long.squiggly beta', beta' arrow.long.squiggly beta)$. Questo è assurdo perché contraddice l'ipotesi.
-
-  Pertanto $exists alpha$ letterale di _p_ t.c. $alpha'$ è anch'esso letterale di _p_ e $alpha cancel(arrow.long.squiggly) alpha'$
-
-  Dato un letterale $alpha$, cominciamo a definire l'assegnamento _t_ ponendo:
+  Se, per assurdo, $forall alpha$ letterale t.c. $alpha, alpha'$ compaiono in _p_, $alpha arrow.long.squiggly alpha'$, allora, se $beta$ è uno di questi letterali si ha  $beta arrow.long.squiggly beta'$ e $beta' arrow.long.squiggly beta$ (per l'osservazione sopra). Questo è assurdo perché contraddice l'ipotesi.\
+  Pertanto $exists alpha$ letterale di _p_ t.c. $alpha'$ è anch'esso letterale di _p_ e $alpha cancel(arrow.long.squiggly) alpha'$.
+  Sia $alpha$ uno di tali letterali, definiamo l'assegnamento _t_ ponendo:
   - $t(alpha) = 1$
-  - $forall beta " t.c. " alpha arrow.long.squiggly beta, t(beta) = 1$
+  - $forall beta "t.c." alpha arrow.long.squiggly beta, space t(beta) = 1$
   #observation()[
-    Osserviamo che fin qui _t_ è ben definito, perché non può accadere che $t(beta') = 1$, in quanto $alpha cancel(arrow.long.squiggly) beta'$: infatti, se per assurdo fosse $alpha arrow.long.squiggly beta'$, allora si avrebbe $beta arrow.long.squiggly alpha'$ e quindi $alpha arrow.long.squiggly alpha'$, contro quanto appena stabilito
+    Fin qui _t_ è ben definito, perché non può accadere che $t(beta') = 1$, in quanto $alpha cancel(arrow.long.squiggly) beta'$: infatti, se per assurdo fosse $alpha arrow.long.squiggly beta'$, allora si avrebbe $beta arrow.long.squiggly alpha'$ (per l'osservaizone di prima) e quindi $alpha arrow.long.squiggly alpha'$, in contraddizione a quanto appena stabilito
   ]
+  Eliminiamo ora da $p$ tutte le clausole soddisfatte da $t$. Le clausole rimanenti contengono soltanto letterali non ancora assegnati: infatti, se una clausola $beta' or gamma$ contenesse $beta'$ con $t(beta)=1$, avremmo l'arco $beta --> gamma$ e poiché $alpha arrow.long.squiggly beta$ avremmo anche $alpha arrow.long.squiggly gamma$, da cui $t(gamma)=1$; la clausola sarebbe dunque già stata eliminata. Ripetiamo il procedimento sul polinomio rimanente. A ogni passo viene eliminata almeno una clausola, quindi dopo un numero finito di passi otteniamo un assegnamento che soddisfa tutte le clausole di $p$. Pertanto $p$ è soddisfacibile.
 ]
 
+=== Algoritmo per 2-SAT
+Grazie alla propsizione precedente possiamo costruire questo algoritmo per 2-SAT:
 
-=== Algoritmo per il problema 2-SAT
 + Costruisco il grafo $G(p)$
-+ $forall x$ variabile di _p_, controllo se c'è $x arrow.long.squiggly x' " e " x' arrow.long.squiggly x$:
++ $forall x$ variabile di _p_, controllo se c'è $x arrow.long.squiggly x' "e" x' arrow.long.squiggly x$:
   - Se sì, allora _p_ non è soddisfacibile;
   - Altrimenti _p_ è soddisfacibile
 
-Tale algoritmo ha complessità in tempo polinomiale, in quanto consiste essenzialmente nell'esecuzione di un algoritmo di ricerca in ampiezza (opportunamente modificato).
+Tale algoritmo è deterministico polinomiale, in quanto consiste essenzialmente nell'esecuzione di un algoritmo di ricerca in ampiezza (opportunamente modificato). Dunque:
+#observation()[
+  2-SAT $in$ P
+]
 
 == Linguaggi NP-intermedi
 
