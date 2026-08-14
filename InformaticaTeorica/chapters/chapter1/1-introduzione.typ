@@ -47,7 +47,7 @@ Diamo ora alcune definizioni:
 Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un linguaggio.
 - Se $Sigma$ è un alfabeto finito, composto da $Sigma = {a_1, a_2, dots, a_n}$, possiamo scrivere tutte le stringhe di lunghezza $k$ in ordine lessicografico, $forall k in NN$.
 
-- Se $Sigma$ è un alfabeto infinito, composto da $Sigma = {a_1, a_2, dots, a_n, dots}$, dobbiamo usare un metodo particolare chiamato diagonalizzazione o procedimento diagonale di Cantor. Questo metodo consiste nel disporre gli elementi dell'alfabeto in verticale e in orizzontale a formare una tabella e poi a visitarla in maniera diagonale. Questa procedura vale per tutte le stringhe di lunghezza $k$ (segue un esempio di stringhe di lunghezza 2).
+- Se $Sigma$ è un alfabeto infinito, composto da $Sigma = {a_1, a_2, dots, a_n, dots}$, dobbiamo usare un metodo particolare chiamato *diagonalizzazione* o *procedimento diagonale di Cantor*. Questo metodo consiste nel disporre gli elementi dell'alfabeto in verticale e in orizzontale a formare una tabella e poi a visitarla in maniera diagonale. Questa procedura vale per tutte le stringhe di lunghezza $k$ (segue un esempio di stringhe di lunghezza 2).
 
 #figure(image("images/2026-03-03-17-57-48.png", width: 50%))
 
@@ -99,7 +99,7 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 
 #index[Funzione caratteristica]
 #definition()[
-  Sia $L$ un linguaggio. La funzione caratteristica di $L$ è definita come:
+  Sia $L$ un linguaggio. La *funzione caratteristica* di $L$ è definita come:
   $
     chi_L: Sigma^* -> {0,1}\
     chi_L (w) = cases(
@@ -277,7 +277,7 @@ Vediamo ora i due "costruttori" di funzioni, a partire dalle iniziali: la compos
   + Ogni prefisso di una drp è una drp.
   + Come conseguenza della precedente, ogni funzione che compare in una drp è *_rp_*.
 
-  Si noti la convenzione: *_rp_* minuscolo è riferito alla classe di funzioni, mentre RP maiuscolo si riferisce al fatto che una funzione è derivata per ricorsione primitiva.
+  Si noti la convenzione: *_rp_* minuscolo è riferito alla classe di funzioni, mentre RP maiuscolo si riferisce al fatto che una funzione è definita per ricorsione primitiva.
 ]
 
 #proposition()[
@@ -662,15 +662,16 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
       f(arrow(x), y+1) = phi(arrow(x), y, f(arrow(x), y))
     )
   $
-  Il caso base è immediato: $f(arrow(x), 0) = 0 = C_0^((k))(arrow(x))$, che è *_rp_*. Per il passo:
+  *Caso base*: è immediato, $f(arrow(x), 0) = 0 = C_0^((k))(arrow(x))$, che è *_rp_*.\
+  *Passo induttivo*: per il passo induttivo, supponiamo noto $t=f(arrow(x),y)$. Passando dal limite $y$ al limite $y+1$ si ha che
   $
     f(arrow(x), y+1) = cases(
-      f(arrow(x), y)\, & "se" exists 0 <= z <= y "t.c." (arrow(x), z) in R,
-      y + 1\, & "se non siamo nel caso sopra e" (arrow(x), y+1) in R,
-      0\, & "altrimenti"
+      f(arrow(x), y)\, & " se " exists space 0 <= z <= y "t.c." (arrow(x), z) in R,
+      y + 1\, & " se non siamo nel caso sopra e" (arrow(x), y+1) in R,
+      0\, & " altrimenti"
     )
   $
-  cioè $phi$ è la funzione definita per casi
+  che possiamo scrivere come funzione definita per casi
   $
     phi(arrow(x), y, t) = cases(
       t\, & "se" (arrow(x), y, t) in R_1,
@@ -680,17 +681,19 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
   $
   dove
   $
-    R_1 & = {(arrow(x), y, t) | exists z, 0 <= z <= y: (arrow(x), z) in R} \
-    R_2 & = {(arrow(x), y, t) | (arrow(x), y, t) in.not R_1 "e" (arrow(x), y+1) in R}
+    R_1 & = {(arrow(x), y, t) | exists space z, 0 <= z <= y: (arrow(x), z) in R}, \
+    R_2 & = {(arrow(x), y, t) | (arrow(x), y, t) in.not R_1 "e" (arrow(x), y+1) in R}.
   $
-  Per costruzione $f(arrow(x), y+1) = phi(arrow(x), y, f(arrow(x), y))$; resta da mostrare che $phi$ è *_rp_*.
+  Per costruzione $f(arrow(x), y+1) = phi(arrow(x), y, f(arrow(x), y))$. Resta da mostrare che $phi$ è *_rp_*.
 
-  Le tre funzioni che la definiscono lo sono: $t = epsilon_(k+2)^((k+2))$, $y + 1 = S compose epsilon_(k+1)^((k+2))$ e $0 = C_0^((k+2))$. Restano le relazioni; ricordando che per ipotesi $R$ è *_rp_*, e dunque $chi_R$ è *_rp_*:
+  Le tre funzioni associate ai tre casi lo sono: $t = epsilon_(k+2)^((k+2))$, $y + 1 = S compose epsilon_(k+1)^((k+2))$ e $0 = C_0^((k+2))$. Mostriamo adesso che sono _*rp*_ anche le relazioni $R_1$, $R_2$. Ricordando che per ipotesi $R$ è *_rp_*, e dunque $chi_R$ è *_rp_*:
+
   - $R_1$ è *_rp_* perché
     $
       chi_(R_1)(arrow(x), y, t) = "sg" (underbrace(sum_(z=0)^y chi_R (arrow(x), z), "somma limitata di" chi_R))
     $
-    ed è quindi ottenuta per composizione a partire dall'operatore di somma limitata applicato a $chi_R$, che è *_rp_* (a meno della composizione con le proiezioni necessaria per portare l'arità a $k+2$);
+    ed è quindi ottenuta per composizione a partire dall'operatore di somma limitata applicato a $chi_R$, che è *_rp_* (a meno della composizione con le proiezioni necessaria per portare l'arietà a $k+2$);
+
   - poniamo $T = {(arrow(x), y, t) in NN^(k+2) | (arrow(x), y+1) in R}$, che soddisfa la seconda condizione di $R_2$. Vale
     $
       chi_T (arrow(x), y, t) = chi_R (arrow(x), y+1) = (chi_R compose (epsilon_1^((k+2)), dots, epsilon_k^((k+2)), S compose epsilon_(k+1)^((k+2))))(arrow(x), y, t)
@@ -698,7 +701,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
     dunque $chi_T$ è *_rp_* e quindi lo è $T$. Ne segue che
     $ R_2 = underbrace(R_1^c, italic("rp")) inter underbrace(T, italic("rp")) $
     è *_rp_*.
-  Quindi $phi$ è *_rp_* e, di conseguenza, lo è anche $f$.
+  Quindi $phi$ è *_rp_* e, di conseguenza, lo è anche $f$ (vedi Proposizione 1.6.4).
 ]
 
 == Enumerabilità delle funzioni ricorsive primitive
