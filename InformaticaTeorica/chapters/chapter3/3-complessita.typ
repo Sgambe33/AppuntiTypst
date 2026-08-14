@@ -544,28 +544,54 @@ da questo deduciamo anche che HAM $in N P$ (in realtà andrebbe considerata la l
   })
 }))
 
-I due diagrammi illustrano in modo visivo le due possibili soluzioni al più grande problema aperto dell'informatica teorica, *P vs NP*. Il diagramma di sinistra mostra lo scenario più accreditato ($"P" != "NP"$), in cui l'insieme dei problemi verificabili in tempo polinomiale (NP) è rigidamente diviso tra problemi facilmente risolvibili (P), i problemi più complessi in assoluto a cui tutti gli altri sono riconducibili (NP-Completi) e una fascia di mezzo (NP-Intermedi) che non ricade in nessuna delle due. Il diagramma a destra, al contrario, rappresenta lo scenario catastrofico: se venisse dimostrato che $"P" = "NP"$, l'intera struttura collasserebbe e, dato che ogni problema verificabile diventerebbe automaticamente anche facile da risolvere, quasi tutti i problemi in NP coinciderebbero per definizione con la classe degli NP-Completi.
+I diagrammi sopra illustrano le due possibili soluzioni al più grande problema aperto dell'informatica teorica, *P vs NP*. Il diagramma di sinistra mostra lo scenario più accreditato $"P" != "NP"$, in cui l'insieme dei problemi verificabili in tempo polinomiale (NP) è rigidamente diviso tra problemi facilmente risolvibili (P), i problemi più complessi in assoluto a cui tutti gli altri sono riconducibili (NP-Completi) e una fascia di mezzo (NP-Intermedi) che non ricade in nessuna delle due. Il diagramma a destra, al contrario, rappresenta lo scenario che avrebbe enormi conseguenze per l'informatica. Infatti, se venisse dimostrato che $"P" = "NP"$, l'intera struttura collasserebbe: NP-I sarebbe vuota e ogni linguaggio non banale di NP sarebbe NP-completo; in particolare, tutti i problemi NP-completi diventerebbero risolvibili in tempo polinomiale.
 
 
 #proposition()[
-  Supponiamo che $"P" = "NP"$. Sia $L in "NP"$, con $L eq.not emptyset, overline(L) eq.not emptyset$, allora $L in "NP-C"$. \
-  Per ipotesi: $exists alpha in L$ e $exists beta in.not L$.
+  Supponiamo che $"P" = "NP"$. Sia $L in "NP"$, con $L eq.not emptyset$ e $overline(L) eq.not Sigma^*$. Allora $L in "NPC"$. \
 ]
 #proof()[
-  $L in "NP"$. Facciamo vedere che $L$ è NP-difficile. \
-  Sia $Q in "NP" (equiv "P")$. Descriviamo una riduzione polinomiale da $Q$ a $L$:
-  $
-    f: w --> cases(alpha "se" w in Q, beta "se" w in.not Q)
-  $
+Poiché $L in$ NP, per dimostrare che $L$ è NP-completo è sufficiente
+mostrare che $L$ è NP-difficile.
+
+Dalle ipotesi $L != emptyset$ e $L != Sigma^*$ esistono due stringhe fissate
+$alpha$ e $beta$ tali che $alpha in L$ e $beta in.not L$. Sia ora $Q in$ NP un linguaggio arbitrario. Poiché per ipotesi P = NP,
+si ha anche $Q in P$; esiste quindi un algoritmo deterministico che decide
+in tempo polinomiale, per ogni stringa $w$, se $w in Q$.
+
+Definiamo la funzione
+$
+  f(w) := cases(
+    alpha & "se " w in Q,
+    beta & "se " w in.not Q.
+  )
+$
+
+Verifichiamo che $f$ è una riduzione polinomiale da $Q$ a $L$. Per costruzione:
+- se $w in Q$, allora $f(w) = alpha in L$;
+- se $w in.not Q$, allora $f(w) = beta in.not L$.
+
+Pertanto $w in Q <==> f(w) in L.$ Resta da verificare che $f$ sia calcolabile in tempo polinomiale.
+Su input $w$, l'algoritmo che calcola $f$ procede nel modo seguente:
+
+1. decide se $w in Q$ usando l'algoritmo polinomiale per $Q$ (che esiste in quanto $Q in$ P);
+2. se $w in Q$ restituisce $alpha$, altrimenti restituisce $beta$.
+
+Il primo passo richiede tempo polinomiale in $|w|$ (lunghezza di $w$); il secondo richiede
+tempo costante, poiché $alpha$ e $beta$ sono due stringhe fissate,
+indipendenti da $w$. Dunque $f$ è calcolabile in tempo polinomiale.
+
+Abbiamo quindi costruito, per un arbitrario $Q in$ NP, una riduzione
+polinomiale da $Q$ a $L$. Ne segue che $L$ è NP-difficile, ed essendo anche in NP, $L$ è NP-completo.\
 ]
 
 #observation()[
   - $emptyset$ non è NP-difficile. Dato $Q in "NP"$, esiste una riduzione polinomiale da $Q$ a $emptyset$? No, in quanto non ci possono essere funzioni che mandano stringhe di $Q$ nel vuoto.
-  - $Sigma^*$ non è NP-difficile (motivo analogo). $Q arrow.squiggly.long Sigma^*$
+  - $Sigma^*$ non è NP-difficile (motivo analogo, riduzione da $Q$ a $Sigma^*$).
 ]
 
 #proposition()[
-  Se $L$ è NP-difficile e $f$ è una riduzione polinomiale da $L$ a $Q$ $=>$ $Q$ è NP-difficile.
+  Se $L$ è NP-difficile e $f$ è una riduzione polinomiale da $L$ a $Q$, allora $Q$ è NP-difficile.
 ]
 #proof()[
   Dato $R in "NP"$, descriviamo una riduzione polinomiale da $R$ a $Q$.
@@ -574,7 +600,7 @@ I due diagrammi illustrano in modo visivo le due possibili soluzioni al più gra
   $
     g: Sigma^*_R arrow.long Sigma^*_L quad quad w in R <=> g(w) in L
   $
-  - Sappiamo che L è polinomialmente ridotto a Q:
+  - Sappiamo che L è polinomialmente riducibile a Q:
   $
     f: Sigma^*_L arrow.long Sigma^*_Q quad quad w in L <=> f(w) in Q
   $
@@ -583,7 +609,7 @@ I due diagrammi illustrano in modo visivo le due possibili soluzioni al più gra
   $
     f compose g: Sigma^*_R arrow.long Sigma^*_Q quad quad w in R <=> f(g(w)) in Q
   $
-  Inoltre è calcolabile in tempo polinomiale.
+  Inoltre è calcolabile in tempo polinomiale.\
 ]
 
 == Rappresentazioni di problemi
@@ -1818,12 +1844,13 @@ Tale algoritmo è deterministico polinomiale, in quanto consiste essenzialmente 
   2-SAT $in$ P
 ]
 
-== Linguaggi NP-intermedi
+== Classi NP-I e co-NP
 
-Se $"P" eq.not "NP":$
+=== NP-intermedi
+Abbiamo visto (Sottosezione 3.4.1) che se $"P" eq.not "NP"$, ci sono dei linguaggi in NP che non stanno né in P né in NPC:
 #index[Linguaggi NP-intermedi]
 #definition()[
-  I linguaggi NP-intermedi (o NP-I) sono linguaggi di NP che non stanno né in P né in NP-completi (o NP-C).
+  I linguaggi *NP-intermedi* (o NP-I) sono linguaggi di NP che non stanno né in P né in NP-completi (o NP-C).
 
   $"NP-I" = "NP" \\ ("P" union "NP-C")$
 ]
@@ -1831,27 +1858,22 @@ Se $"P" eq.not "NP":$
 #theorem("Ladner")[
   Se $"P" eq.not "NP"$, allora $"NP-I" eq.not emptyset$
 ]
-P è chiuso rispetto alla complementazione.
+=== co-NP
+La classe P è chiusa rispetto alla complementazione (P = co-P): se un linguaggio $L$ è in P, esiste per definizione una MdT deterministica $M$ che lo decide in tempo polinomiale. Poiché M termina sempre, per decidere il complementare $L^'$ (in questa sezione indichiamo con $'$ il complementare)  è sufficiente utilizzare la stessa macchina $M$ e scambiare gli stati finali di accettazione e rifiuto. Questa operazione non aggiunge transizioni, preservando la complessità polinomiale del calcolo. Ci chiediamo se questo vale anche per NP.
+#index[Classe co-NP]
+#definition()[
+  co-NP $= {L "linguaggio" | L^' in "NP"}$
+]
+#example()[
+  Il problema UNSAT, che dato se un polinomio booleano $p$ determina se *non* è soddisfaccibile, appartiene a co-NP.
+]
 #problem("Aperto")[
   NP è chiuso per complementazione?
   $ "co-NP" =^? "NP" $
 ]
-#index[Classe co-NP]
-#definition()[
-  co-NP $= {L "linguaggio" | overline(L) in "NP"}$
-]
-
-
-#example()[
-  #underline("UNSAT"): Dato un polinomio booleano _p_, determinare se _p_ *non*
-  è soddisfacibile:
-  $
-    L_("UNSAT") in "co-NP"
-  $
-]
 
 #proposition()[
-  Se fosse dimostrato NP $eq.not$ co-NP $==>$ P $eq.not$ NP
+  Se fosse dimostrato NP $eq.not$ co-NP, allora P $eq.not$ NP
 ]
 #proof()[
   Ragioniamo per contronominale: supponiamo $"P" = "NP"$. Poiché $"P"$ è chiusa per complementazione vale $"co-P" = "P"$, e dunque
@@ -1862,25 +1884,40 @@ P è chiuso rispetto alla complementazione.
 ]
 
 #proposition()[
-  Supponiamo che esista un linguaggio $L$ tale che $L in$ NP-C e $L in$ co-NP $==>$ NP $=$ co-NP.
+  Supponiamo che esista un linguaggio $L$ tale che $L in$ NPC e $L in$ co-NP. Allora NP $=$ co-NP.
 ]
 #proof()[
   #rect($"co-NP" subset.eq "NP"$)
-  $Q in "co-NP" ==> Q' in "NP"$
+  $Q in "co-NP" ==> Q' in "NP"$. Poiché $L in "NPC", exists f$ riduzione polinomiale da $Q' "a" L$, e osserviamo che _f_ è anche riduzione polinomiale da $Q "a" L' in "NP"$ (la stessa funzione di riduzione riduce anche i complementari).
 
-  Poiché $L in "NPC", exists f$ riduzione polinomiale da $Q' "a" L$, osserviamo che _f_ è anche riduzione polinomiale da $Q "a" L' in "NP"$
+  Determiniamo un algoritmo polinomiale non deterministico per decidere $Q$ data $w$ in input:
 
-  Algoritmo polinomiale non deterministico per decidere $Q$: data $w$,
-  - Calcolo $f(w)$
-  - Decido se $f(w) in L'$
-  Pertanto $Q in "NP"$
+  - Calcolo $f(w)$;
+  - Decido se $f(w) in L'$.
+  Pertanto $Q in "NP"$.
 
 
   #rect($"NP" subset.eq "co-NP"$)
-  $Q in "NP" ==> Q' in "co-NP" ==> Q' in "NP" ==> Q in "co-NP"$
+  $Q in "NP" ==> Q' in "co-NP" overbrace(==>, "dim. sopra") Q' in "NP" ==> Q in "co-NP"$
 ]
+#observation()[
+  Se mostrassimo che UNSAT $in$ NP, allora co-NP = NP
+]
+#example(multiple: true, "esercizi d'esame")[
 
+  1. Chiusura di co-NP rispetto all'intersezione: siano $L_1, L_2 in "co-NP"$. Vogliamo mostrare che $L_1 inter L_2 in "co-NP"$.\
+
+    Per definizione di co-NP, $L'_1 in "NP e" L'_2 in "NP"$.
+    Per le leggi di De Morgan, $L_1 inter L_2 = (L'_1 union L'_2)'$.
+    Poiché NP è chiusa rispetto all'unione, $L'_1 union L'_2 in "NP"$,
+    e quindi, per definizione, $L_1 inter L_2 in "co-NP".$
+
+  2. Differenza tra un linguaggio in NP e un suo sottolinguaggio in co-NP: siano $L in "NP"$, $L_1 subset.eq L$ e $L_1 in "co-NP"$. Vogliamo mostrare che $L without L_1 in "NP"$.\
+  
+   Poiché $L_1 in "co-NP"$, per definizione $L'_1 in "NP"$. Inoltre, $L without L_1 = L inter L'_1$. Siccome $L in "NP"$ e $L'_1 in "NP"$ e NP è chiusa rispetto all'intersezione, segue che $L inter L'_1 in "NP"$. Pertanto $L without L_1 in "NP"$.
+]
 == Test di primalità
+Vogliamo trovare un algoritmo che dato un numero $n in NN$ in input determina se è primo.
 #index[Test di primalità]
 #proposition()[
   _n_ composto $==> exists d | n, " con " d in [2, sqrt(n)]$
@@ -1891,39 +1928,37 @@ P è chiuso rispetto alla complementazione.
   Se per assurdo $m_1, m_2 > sqrt(n)$ allora $n = m_1 dot m_2 > n$ ma $m_1 dot m_2 = n$ (assurdo)
 ]
 
-=== Algoritmo deterministico
+=== Algoritmo deterministico non polinomiale
 
 Dato $n in NN$, per ogni $d in [2, sqrt(n)]$ controllo se $d | n$:
+
 - se sì: $n$ composto;
 - altrimenti, $n$ primo
 
-La complessità dell'algoritmo rispetto alla lunghezza _l_ è almeno la seguente:
+Analizziamone la complessità:
+$
+    & log n =    && l-->"Lunghezza della codifica binaria di "n \
+    & " "arrow.t && arrow.t \
+  n & = 2^l      && "Lo usiamo come parametro per la complessità"
+$
+La complessità dell'algoritmo sopra rispetto alla lunghezza _l_ è la seguente:
 $
   Omega(sqrt(n)) = Omega(2^(l/2))
 $
-
-=== Codifica binaria di $n$
-$
-    & log n =    && l-->"parametro per la complessità" \
-    & " "arrow.t && arrow.t \
-  n & = 2^l      && "Lunghezza della codifica binaria di "n
-$
-
+esponenziale... è troppo, vediamo se si può fare di meglio.
 === Piccolo teorema di Fermat
 #index[Piccolo teorema di Fermat]
 + $ a^p equiv a quad (p) <== cases(delim: "[", p "primo", a in NN) $
 + $ a^(p-1) equiv 1 quad (p) <== cases(delim: "[", p "primo", a in NN, (a, p) = 1) $
 
-=== Algoritmo non deterministico #underline("non corretto") polinomiale
+=== Algoritmo non deterministico polinomiale
 
 Dato $n in NN$:
 - genero non deterministicamente $a in NN "t.c. "(a, n) = 1$
 - se $a^(n-1) equiv 1 quad (n)$, allora $n$ primo
 - altrimenti, $n$ composto
 
-Questo algoritmo applica il teorema di Fermat al contrario (ovviamente non vale) e pertanto non è corretto.
-
-Esiste un algoritmo per calcolare le potenze modulari $a^n$ con complessità:
+Questo algoritmo *è sbagliato*: applica il punto 2 del teorema di Fermat nel verso opposto (ovviamente non vale) e pertanto non è corretto. Però è polinomiale, quindi vogliamo "aggiustarlo" per farlo funzionare: infatti da questo deriva un algoritmo per calcolare le potenze modulari $a^n$ con complessità:
 $ Omicron(log n^2) = Omicron(l^2) $
 
 #index[Teorema di Pratt]
@@ -1945,9 +1980,9 @@ $ Omicron(log n^2) = Omicron(l^2) $
   $
     n = p_1 dot p_2 dot dots dot p_r > 2^r
   $
-  Il numero dion congruenze da controllare è quindi inferiore.
+  Il numero di congruenze da controllare è quindi inferiore.
 ]
-Testare la condizione del piccolo teorema di Fermat per un certo numero di $a$. ?
+L'algoritmo visto sopra rimane tuttavia non deterministico. Si può arrivare ad una procedura deterministica? Forse testando la condizione del piccolo teorema di Fermat per un certo numero di $a$? Non funziona, perché esistono i seguenti numeri:
 
 #index[Numeri di Carmichael]
 #definition()[
@@ -1961,11 +1996,11 @@ Testare la condizione del piccolo teorema di Fermat per un certo numero di $a$. 
 #theorem("Alford, Granville, Pomerance")[
   Esistono infiniti numeri di Carmichael.
 ]
-
-#underline("Idea"): modifichiamo il piccolo teorema di Fermat.
+=== Verso un algoritmo deterministico polinomiale
+#underline("Altra idea"): modifichiamo il piccolo teorema di Fermat.
 #index[Teorema di Agrawal (AKS)]
 #theorem("Agrawal")[
-  Sia $n in NN, a in NN$ con $n>=2$ e $(a, n) = 1$:
+  Sia $n in NN, a in NN$ e $(a, n) = 1$:
   $
     n "primo" <==> (x + a)^n equiv x^n + a quad (n)
   $
@@ -1974,16 +2009,16 @@ Testare la condizione del piccolo teorema di Fermat per un certo numero di $a$. 
 #proof()[\
   $==> )$ $n$ primo (congruenze tutte modulo $n$):
   $
-    (x + a)^n = sum_(k=0)^n binom(n, k)a^(n - k)x^k equiv x^n + a^n equiv x^n + a quad (n)\
-    binom(n, k) = (n!)/(k!(n - k)!) = (n dot (n - 1) dot dots dot (n - k + 1))/(k!) quad quad 0 < k < n --> n bar binom(n, k)
+    (x + a)^n = sum_(k=0)^n binom(n, k)a^(n - k)x^k equiv x^n + a^n overbrace(equiv, "Fermat") x^n + a quad (n)\
+    binom(n, k) = (n!)/(k!(n - k)!) = (n dot (n - 1) dot dots dot (n - k + 1))/(k!), quad quad 0 < k < n ==> n bar binom(n, k) "(poiché" n "primo)"
   $
   $<== )$ $n$ composto. Facciamo vedere che $exists k "con" 0 < k <= n$,
   $
     n cancel(inverted: #true, bar) binom(n, k)
   $
-  Sia $p | n, p "primo"$:
+  Sia $p | n$, $p$ primo:
   $
-    &p^alpha | n, "ma" p^(alpha + 1) cancel(inverted: #true, bar) quad quad quad quad binom(n, p) = (n dot (n - 1) dot dots dot (n - p + 1))/(p dot (p - 1) dot dots dot 2 dot 1)\
+    &p^alpha | n, "ma" p^(alpha + 1) cancel(inverted: #true, bar) n". Ricordo che "binom(n, p) = (n dot (n - 1) dot dots dot (n - p + 1))/(p dot (p - 1) dot dots dot 2 dot 1)\
     &p^alpha "divide il numeratore", quad p^(alpha + 1) "non divide il numeratore"\
   $
   $
@@ -1991,169 +2026,170 @@ Testare la condizione del piccolo teorema di Fermat per un certo numero di $a$. 
   $
 ]
 
-Le congruenze da testare sono circa $n = 2^l$.\
-#underline("IDEA"): dividere i polinomi per $x^r - 1$, per opportuno $r$. #underline("Agrawal, Kayac, Saxena (2002)") hanno dimostrato che:
-- Se _n_ è composto e si sceglie un _r_ "giusto", allora è sufficiente testare la seguente congruenza per "pochi" _a_:
+Le congruenze da testare sono circa $n = 2^l$. #underline("Idea"): dividere i polinomi per $x^r - 1$, per un opportuno $r$. Agrawal, Kayac, Saxena (2002) hanno dimostrato che: se _n_ è composto e si sceglie un _r_ "giusto", allora è sufficiente testare la seguente congruenza per "pochi" _a_:
 $
   (x+a)^n equiv x^n + a quad (n, x^r - 1)
 $
-e ne trovo uno per cui non vale.
+e ne trovo uno per cui non vale. Il "giusto" $r$ e i "pochi" $a$ si dimostra che sono polinomiali in "l". Quindi è una algoritmo deterministico per determinare se un numero è primo con complessità polinomiale.
 
-// SONO ESERCIZI SVOLTI A LEZIONE
-// Volendo vedi appunti sgambe
-
-== Classi di complessità
-
-=== Linguaggi esponenziali
-
-#index[Classe Exp]
-Si definiscono come:
+== Classi di linguaggi esponenziali (EXP e NEXP)
+=== EXP
+#index[Classe EXP]
+Definiamo:
 $
-  "Exp" = {L | exists M "MdT deterministica che accetta" L "t.c." t c_M (n) = Omicron(2^n^k) "per qualche" k >= 1}
+  "EXP" = {L | exists M "MdT deterministica che accetta" L "t.c." t c_M (n) = Omicron(2^n^k)"," exists k >= 1}
 $
 
 #observation(multiple: true)[
-  - $L in "Exp" <==> exists M$ MdT deterministica che accetta $L$ t.c. $t c_M)(n) = Omicron(c^(p(n)))$, per opportuni $c > 1$ e $p(n)$ polinomio di grado $>= 1$ (sennò sarebbe costante).
-  - $"P" subset.eq "Exp"$
+  - $L in "EXP" <==> exists M$ MdT deterministica che accetta $L$ t.c. $t c_M (n) = Omicron(c^(p(n)))$, per opportuni $c > 1$ e $p(n)$ polinomio di grado $>= 1$ (sennò sarebbe costante).
+  - $"P" subset.eq "EXP"$
 ]
 
 #proposition()[
-  $"NP" subset.eq "Exp"$
+  $"NP" subset.eq "EXP"$
 ]
 #proof()[
-  $L in "NP"$, $M$ MdT non deterministica che accetta $L$ t.c. $t c_M)(n) = O(n^k)$ (è polinomiale). Sia $delta$ il grado di non determinismo di $M$ (ovvero il massimo numero di transizioni associate a una coppia stato-simbolo letto). Posso costruire una MdT $N$ deterministica che accetta $L$ eseguendo tutte le possibili computazioni di $M$ su una stringa $w$.
+  Si basa sulla costruzione di una MdT deterministica equivalente a una non deterministica.\
+  $L in "NP"$, $M$ MdT non deterministica che accetta $L$ t.c. $t c_M (n) = O(n^k)$. Sia $delta$ il grado di non determinismo di $M$ (ovvero il massimo numero di transizioni associate a una coppia stato-simbolo letto). Posso costruire una MdT $N$ deterministica che accetta $L$ eseguendo tutte le possibili computazioni di $M$ su una stringa $w$.
 
   Codifica delle computazioni di $M$ su $w$ di lunghezza $n$:
   $
     (m_1, m_2, dots, m_(n^k)) quad "dove" quad m_i in {1, dots, delta}
   $
 
-  Il numero di transizioni di una singola computazione è $O(n^k)$, mentre il numero delle possibili computazioni è $delta^(n^k) => t_(C_N)(n) = O(n^k dot delta^(n^k))$ per cui $L in "Exp"$.
+Il numero di transizioni di una singola computazione è $O(n^k)$, mentre,
+poiché a ogni passo vi sono al più $delta$ possibili scelte, il numero delle
+possibili computazioni è al più $delta^(n^k)$. Pertanto
+$
+  t c_N (n) = O(n^k dot delta^(n^k))
+$
+per cui $L in "EXP"$.
 ]
 
 #problem("Aperto")[
   Ancora non si sa se le inclusioni sono strette o no:
   $
-    "P" limits(subset.eq)^? "NP" limits(subset.eq)^? "Exp"
+    "P" limits(subset.eq)^? "NP" limits(subset.eq)^? "EXP"
   $
 ]
 
 #proposition()[
-  $"P" subset "Exp"$
+  $"P" subset "EXP"$
 ]
 
 #proof()[
-  Facciamo vedere che $exists L in "Exp", L in.not "P"$
+  Facciamo vedere che $exists L in "EXP", L in.not "P"$
   $
-    & L = {(M)x | "se" M "su "x" termina in uno stato finale ciò avviene entro" 2^(2|x|) "passi"}
+    & L = { R(M)x | M "su "x" termina in uno stato finale entro" 2^(2|x|) "transizioni"}
   $
-  1. $L$ $in$ Exp\
+  1. *$L$ $in$ EXP*\
+
     $N$ MdT su input $R(M)x$:
     - Esegue $M$ su $x$
       - Se $M$ termina in uno stato finale entro $2^(2|x|)$ transizioni, accetta;
       - Altrimenti, rifiuta
-    $N$ accetta $L$
+    $N$ accetta $L$.
 
-    *Complessità in tempo di N*\
+    Analizziamo la complessità in tempo di $N$: data la lunghezza dell'input $n = |R(M) x|$, considero che la lunghezza di $R(M)$ sia trascurabile ("corta") rispetto a quella di $x$ (vale a dire, suppongo di fissare $|R(M)|$ e far crescere solo $|x|$). Allora la complessità in tempo di $N$ è
     $
-      |underbracket(R(M), "corto")underbracket(x, "lungo")|
+      t c_N (n) = Omicron(2^(2n)) ==> L in "EXP".
     $
-    Per avere il caso peggiore, considero $|R(M)|$ corta rispetto a $|x|$, in modo tale che $|R(M)x| approx |x|$.
-
-    $
-      t c_N (n) = Omicron(2^(2n)) ==> L in "Exp"
-    $
-
     #observation()[
-      $2^(2n) = (2^n)^2 in.not Omicron(2^n)$, perché $2^(2n)\/2^n = 2^n arrow.long infinity$: la complessità è quindi genuinamente esponenziale.
+      $2^(2n) in.not Omicron(2^n)$, perché $2^(2n)\/2^n = 2^n arrow.long infinity$
     ]
 
-  + $L in.not$ P\
+  + *$L in.not$ P*\
     Facciamo vedere che $exists.not N$ MdT deterministica che accetta $L$ t.c. $t c_N (n) = Omicron(2^n)$
 
-    #underline("Per assurdo"): sia MdT deterministica che accetta $L$ per stati finali t.c. $t c_N (n) = 2^n$\
+    #underline("Per assurdo"): sia $N$ MdT deterministica che accetta $L$ per stati finali t.c. $t c_N (n) = 2^n$.\
 
-    Sia $D$ MdT definita come segue:\
-    $quad$ Su input $R(M)$:
+    Sia $D$ MdT definita come segue su input $R(M)$ (l'input è una MdT):
+
     - Esegue N su $R(M)R(M)$
       - Se $N$ termina in uno stato finale, $D$ termina in uno stato non finale;
-      - Se $N$ termina in uno stato non finale, $D$ termina in uno stato finale;
+      - Se $N$ termina in uno stato non finale, $D$ termina in uno stato finale.
 
-    Complessità in tempo di $D$:
+    Analizziamo la complessità in tempo di $D$, con $n = |R(M)|$:
     $
-      |R(M)| = n\
-      t c_D (n) = t c_N (2n) = 2^n
+      t c_D (n) = t c_N (2n) = 2^(2n)
     $
-    Eseguiamo $D$ su $R(D)$:
-    + $D$ su $R(D)$ termina in uno stato finale $==>$ per definizione di $D$, $N$ su $R(D)R(D)$ termina in uno stato non finale $==>$ dato che $N$ è una MdT che accetta $L$ e $R(D)R(D)$ non appartiene al linguaggio, $D$ su $R(D)$ non termina in uno stato finale entro $2^(2|R(D)|)$ transizioni $==>$ dato che $t c_D (n) = 2^(2n)$, $D$ su $R(D)$ non termina in uno stato finale $==>$ *ASSURDO*\
+    Eseguiamo $D$ su $R(D)$ (cioè eseguiamo la $D$ sulla propria codifica, ossia sulla macchina $D$ stessa):
+    + *$D$ su $R(D)$ termina in uno stato finale* $==>$ per definizione di $D$, $N$ su $R(D)R(D)$ termina in uno stato non finale $==>$ dato che $N$ è una MdT che accetta $L$ e $R(D)R(D)$ non appartiene al linguaggio, $D$ su $R(D)$ non termina in uno stato finale entro $2^(2|R(D)|)$ transizioni $==>$ dato che $t c_D (n) = 2^(2n)$, *$D$ su $R(D)$ non termina in uno stato finale*: assurdo.
 
-    + $D$ su $R(D)$ termina in uno stato non finale $==>$ per definizione di $D$, $N$ su $R(D)R(D)$ termina in uno stato finale $==>$ dato che $N$ è una MdT che accetta $L$, $D$ su $R(D)$ termina in uno stato finale entro $2^(2|R(D)|)$ transizioni $==>$ *ASSURDO*
+    + *$D$ su $R(D)$ termina in uno stato non finale* $==>$ per definizione di $D$, $N$ su $R(D)R(D)$ termina in uno stato finale $==>$ dato che $N$ è una MdT che accetta $L$, *$D$ su $R(D)$ termina in uno stato finale* entro $2^(2|R(D)|)$ transizioni: assurdo.
+
+  Abbiamo quindi costruito un linguaggio $L in "EXP"$ tale che $L in.not "P"$. Poiché $"P" subset.eq "EXP"$, segue che $"P" subset "EXP".$
 ]
 
-#index[Classe NExp]
-Definisco un'altra classe di linguaggi esponenziali:
+=== NEXP
+#index[Classe NEXP]
+Definiamo un'altra classe di linguaggi esponenziali:
 $
-  "NExp" = { L "linguaggio" | exists M "MdT non deterministica che accetta "L \ "t.c." t c_M (n) = Omicron(2^n^k), exists k >= 1}
+  "NEXP" = { L "linguaggio" | exists M "MdT non deterministica che accetta "L \ "t.c." t c_M (n) = Omicron(2^n^k), exists k >= 1}
 $
 
 #observation()[
-  $ "Exp" subset.eq "NExp" $
+  $ "EXP" subset.eq "NEXP" $
 ]
 
 #problem("Aperto")[
-  $ "Exp" =^? "NExp" $
+  $ "EXP" =^? "NEXP" $
 ]
 
 #proposition()[
-  Se Exp $eq.not$ NExp $==>$ P $eq.not$ NP
+  Se fosse dimostrato EXP $eq.not$ NEXP, allora P $eq.not$ NP
 ]
 
 #proof()[
-  Facciamo vedere che $"P" = "NP" ==> "Exp" = "NExp"$.  Faremo vedere che NExp $subset.eq$ Exp.
+  Usando la contronominale, facciamo vedere che $"P" = "NP" ==> "EXP" = "NEXP"$.  Faremo vedere che NEXP $subset.eq$ EXP (l'altra inclusione è banalmente vera).
 
-  Sia $L in "NExp"$ e $M$ MdT non deterministica che accetta $L$ t.c. $t c_M (n) = Omicron(2^n^k)$
+  Sia $L in "NEXP"$ e $M$ MdT non deterministica che accetta $L$ t.c. $t c_M (n) = O(2^n^k)$. Definiamo il linguaggio:
 
   $
-    tilde(L) = {x space underbrace(1^2^(|x|^k), "tanti 1 quanti la complessità di" L) space | space x in L} quad quad (1 in.not "alfabeto di" L)
+    tilde(L) = {x 1^2^(|x|^k) space | space x in L} quad quad (1 in.not "alfabeto di" L).
   $
 
-  Facciamo vedere che $accent(L, tilde) in "NP"$. Sia $N$ MdT non deterministica che accetta $accent(L, tilde)$:
-  - Dato $y$, controllo se $exists z "t.c." y = z 1^2^(|z|^k)$, altrimenti rifiuto;
-  - Se il controllo è passato, eseguo $M$ su $z$ e, in più al $2^(|z|^k)$ passi, decido se  $z in L$ oppure no.
+  Notare che dopo $x$ si aggiunge un numero di "1" proporzionale al tempo esponenziale necessario a $M$.\
+  
+  *1*. Facciamo vedere che $accent(L, tilde) in "NP"$. 
+  Sia $N$ MdT non deterministica che accetta $accent(L, tilde)$ su input $y$:
 
-  La complessità in tempo di N è polinomiale in $|y|$ (lunghezza di _y_). Quindi $accent(L, tilde) in "NP"$\
-  Poiché per ipotesi P $in$ NP $==> accent(L, tilde) in$ P.\
-  Dunque $exists R$ MdT deterministica polinomiale che accetta $accent(L, tilde)$. MdT deterministica per $L$:
-  - Data $x$, costruisco la stringa $x 1^2^(|x|^k)$;
-  - Uso $R$ per stabilire se $y in accent(L, tilde)$.
-  Complessivamente, l'algoritmo descritto sopra è esponenziale nella lunghezza di $x$.
+  - controllo se $exists z "t.c." y = z 1^2^(|z|^k)$, altrimenti rifiuto;
+  - se il controllo è passato, eseguo $M$ su $z$ e, in al più $2^(|z|^k)$ passi, decido se  $z in L$.
+
+  La complessità in tempo di $N$ è polinomiale in $|y|$ (lunghezza di _y_). Infatti se $y = z 1^2^(|z|^k)$, allora $|y| = |z| + 2^(|z|^k)$ e quindi $2^(|z|^k) = O(|y|).$ Quindi $accent(L, tilde) in "NP"$, e visto che per ipotesi P = NP allora $accent(L, tilde) in$ P. Dunque $exists R$ MdT deterministica polinomiale che accetta $accent(L, tilde)$.\
+
+  *2*. Facciamo vedere che $L in$ EXP con la seguente MdT deterministica per $L$:
+
+  - data $x$, costruisco la stringa $y = x 1^2^(|x|^k)$;
+  - uso $R$ per stabilire se $y in accent(L, tilde)$.
+
+  Complessivamente, l'algoritmo descritto sopra è esponenziale in $|x|$: poiché $|y| = O(2^(|x|^k))$, l'esecuzione di $R$ che ha complessita $O(n^h)$ richiede un tempo $O(|y|^h) = O(2^(h |x|^k))$ (ma anche costruire $y$ richiede tempo esponenziale).
+
+  Dunque, se P = NP, il linguaggio arbitario $L$ appartiene non solo a NEXP ma anche ad EXP, ovvero NEXP $subset.eq$ EXP da cui EXP = NEXP. Per contronominale, questo equivale a $"EXP" eq.not "NEXP" ==> "P" eq.not "NP"$.
 ]
 
 == Complessità in spazio
 
 #index[Complessità in spazio]
 #definition()[
-  Sia $M$ una MdT a $k+1$ nastri:
-  - nastro 1 per l'input (mai modificato);
-  - $k$ nastri di lavoro.
-
-  La *complessità in spazio di M* è una funzione:
+  Sia $M$ una MdT a $k >= 2$ nastri, con nastro di input di sola lettura. La *complessità in spazio di $M$* è indicata dalla funzione _space complexity_
   $
     s c_M: NN --> NN
   $
-  in cui, $s c_M (n)$, è il numero di celle sui nastri di lavoro a cui le testine hanno accesso durante una computazione di M su una stringa di lunghezza $n$, nel caso peggiore.
+  dove $s c_M (n)$, è il numero di celle sui nastri di lavoro a cui le testine hanno accesso durante una computazione di $M$ su una stringa di lunghezza $n$, nel caso peggiore.
 ]
 
 #observation(multiple: true)[
   + La definizione vale sia nel caso deterministico che in quello non deterministico;
-  + Non è necessario che $M$ termini su ogni input;
+  + non è necessario che $M$ termini su ogni input;
   + $s c_M (n) > 0$ (la testina parte sempre dalla prima cella del nastro di lavoro).
 ]
 
 #example()[
-  Sial $L$ linguaggio delle palindrome binarie su ${a,b}$. Descriviamo il comportamento di una MdT M che accetta tale linguaggio.
+  Sia $L$ il linguaggio delle stringhe palindrome binarie su ${a,b}$. Descriviamo il comportamento di una MdT $M$ a 3 nastri che accetta tale linguaggio.
 
-  All'inizio scrivo 1 sul nastro 3, il nastro 2 è vuoto, sul nastro 2 c'è l'input le testine sono a inizio nastro.
+  All'inizio scrivo 1 sul nastro 3 (questo nastro tiene un contatore, in binario), il nastro 2 è vuoto, sul nastro 1 c'è l'input e le testine sono a inizio nastro.
 
   Quando sul nastro 3 c'è _*i*_:
   - Copio _*i*_ sul nastro 2;
@@ -2167,15 +2203,14 @@ $
   - Finché non arrivo a 0 sul nastro 2:
     - Sposto la testina a sinistra sul nastro 1;
     - Decremento il contatore sul nastro 2.
-  - Confronto *$w_i$* con *$w_(n-i)$*, se sono diversi, rifiuto; Altrimenti aggiorno il nastro 3 scrivendo $i+1$ e ricomincio.
+  - Confronto *$w_i$* con *$w_(n+1-i)$*, se sono diversi, rifiuto; altrimenti aggiorno il nastro 3 scrivendo $i+1$ e ricomincio.
 
-  La complessità in spazio di M nel caso peggiore (accettazione) è:\
-  Se scrivo i numeri naturali in binario devo scrivere $n+1$ sui nastri 2 e 3, quindi
+  La complessità in spazio di $M$ nel caso peggiore si ha in caso di accettazione. Se scrivo i numeri naturali in binario, il numero di celle che mi serve per scrivere $n + 1$ per 2 volte (sui nastri 2 e 3 scrivo il contatore $i$) è
   $
     s c_M (n) = 2 dot (ceil(log(n+1))+2)
   $
 ]
-
+Vediamo adesso che relazioni ci sono tra complessità spaziale e temporale: 
 #proposition()[
   Se $M$ MdT a 2 nastri, allora:
   $
@@ -2187,19 +2222,19 @@ $
 ]
 
 #proposition()[
-  Se $M$ MdT a 2 nastri, $|Q| = m, |Sigma| = t$ (cardinalità di insieme degli stati e alfabeto):
+  Se $M$ MdT a 2 nastri, $|Q| = m, |Sigma| = t$ (cardinalità di insieme degli stati e alfabeto), allora:
   $
-    s c_M (n) = f(n) ==> t c_M (n) <= m(n+2)f(n)t^f(n)
+    s c_M (n) = f(n) ==> t c_M (n) <= m dot (n+2) dot f(n) dot t^f(n)
   $
 ]
 #proof()[
-  Poiché $M$ termina su ogni input, essa non può transitare 2 volte per la stessa configurazione. Valutiamo il numero totale di possibili configurazioni di $M$ su una stringa in input di lunghezza _n_, con il numero di stati $|Q| = n, "l'alfabeto di lavoro" |Sigma| = t$:
+  Poiché $M$ termina su ogni input, essa non può transitare 2 volte per la stessa configurazione. Valutiamo il numero totale di possibili configurazioni di $M$ su una stringa in input di lunghezza _n_, con il numero di stati $|Q| = m$, e cardinalità dell'alfabeto di lavoro $|Sigma| = t$:
   $
     m dot (n+2) dot f(n) dot t^f(n)
   $
   Dove:
-  - m è il numero di possibili stati;
-  - $n+2$ è il numero di possibili posizione della testina sul nastro 1, su un simbolo della stringa, sulla prima cella vuota o sull'ultima;
+  - $m$ è il numero di possibili stati;
+  - $n+2$ è il numero di possibili posizioni della testina sul nastro 1, o su un simbolo della stringa, o sulla prima cella vuota o sull'ultima;
   - $f(n)$ è il numero di possibili posizioni della testina sul nastro 2;
   - $t^f(n)$ è il numero di possibili simboli da scrivere nelle $f(n)$ celle lette sul nastro 2;
 
@@ -2209,48 +2244,39 @@ $
   $
 ]
 
-=== Classi di linguaggi con complessità spaziale
+=== Classi PSACE e NPSPACE
 
-#index[Classe PSpace]
+#index[Classe PSPACE]
 #definition()[
   $
-    "PSpace" = {L "linguaggio" | exists M "MdT det. che accetta" L "t.c." s c_M (n) = Omicron(n^k), exists k >= 1}
+    "PSPACE" = {L "linguaggio" | exists M "MdT det. che accetta" L "t.c." s c_M (n) = Omicron(n^k), exists k >= 1}
   $
 ]
 
-#index[Classe NPSpace]
+#index[Classe NPSPACE]
 #definition()[
   $
-    "NPSpace" = {L "linguaggio" | exists M "MdT non det. che accetta" L "t.c." s c_M (n) = Omicron(n^k), exists k >= 1}
+    "NPSPACE" = {L "linguaggio" | exists M "MdT non det. che accetta" L \ "t.c." s c_M (n) = Omicron(n^k), exists k >= 1}
   $
 ]
 
 #observation(multiple: true)[
-  + $"P" subset.eq "PSpace"$ $-->$ $"P" limits(=)^? "PSpace"$ (prob. aperto)
-  + $"PSpace" subset.eq "Exp"$ $-->$ $"PSpace" limits(=)^? "Exp"$ (prob. aperto)
-  + $"NP" subset.eq "PSpace"$\
-    $L in "NP" ==> exists M "MdT non deterministica polinomiale che accetta" L$ poiché si può riutilizzare lo spazio.
+  + $"P" subset.eq "PSPACE"$ $-->$ $"P" limits(=)^? "PSPACE"$ (prob. aperto)
+  + $"PSPACE" subset.eq "EXP"$ $-->$ $"PSPACE" limits(=)^? "EXP"$ (prob. aperto)
+  + $"NP" subset.eq "PSPACE"$\
+    $L in "NP" ==> exists M "MdT non deterministica polinomiale in tempo che accetta" L$ poiché si può riutilizzare lo spazio.
 ]
 
 === Teorema di Savitch
 
 #index[Teorema di Savitch]
 #theorem("Savitch")[
-  $"PSpace" = "NPSpace"$
+  $"PSPACE" = "NPSPACE"$
 ]
-
-#definition()[
-  $
-    "NPSpace" = {L "linguaggio" | exists M "MdT non deterministica t.c." "sc"_M (n) = O(n^k), exists k >= 1}
-  $
-]
-
 #proof()[
-  $"PSpace" subset.eq "NPSpace"$ (ovvio).\
-  Vogliamo dimostrare che $"NPSpace" subset.eq "PSpace"$:\
-  sia $L in "NPSpace"$, $M$ MdT non deterministica che accetta $L$ in spazio polinomiale.
+  $"PSPACE" subset.eq "NPSPACE"$ è ovvio. Vogliamo dimostrare che $"NPSPACE" subset.eq "PSPACE"$.
 
-  Numero di possibili configurazioni di $M$ in una sua computazione su input di lunghezza $n$:
+  Sia $L in "NPSPACE"$, $M$ MdT non deterministica che accetta $L$ in spazio polinomiale. Numero di possibili configurazioni di $M$ in una sua computazione su input di lunghezza $n$:
   $
     O(2^("sc"_M (n) dot c)) quad quad "per un opportuno valore" c.
   $
@@ -2261,133 +2287,125 @@ $
   $
     "reachable"(C, C', j)
   $
-  con $C, C'$ configurazioni di $M$ e $j in NN$. reachable$(C,C',j)$ è vero quando, partendo da $C$, si può raggiungere $C'$ in al più $2^j$ transizioni.
+  con $C, C'$ configurazioni di $M$ e $j in NN$, reachable$(C,C',j)$ è vero quando, partendo da $C$, si può raggiungere $C'$ in al più $2^j$ transizioni.
 
   #observation()[
-    $x in L$ sse $x$ è accettata da $M$ sse reachable$(C_x, C^*, c dot "sc"_M (n))$ è vero.
+    $x in L <==> x$ è accettata da $M <==>$ reachable$(C_x, C^*, c dot "sc"_M (n))$ è vero.
   ]
 
   Scriviamo un algoritmo deterministico per valutare reachable$(C,C',j)$:
 
-  - Se $j=0$: facile.
-  - Altrimenti, per un generico $j$ (vogliamo capire se $C arrow.squiggly.long C'$ in al più $2^j$ transizioni), per ogni configurazione $tilde(C)$ verifichiamo:
+  - se $j=0$, facile (il predicato è vero se $C = C'$ o se si raggiunge $C'$ da $C$ con una sola transizione).
+  - Altrimenti, per un generico $j > 0$, per ogni possibile configurazione $tilde(C)$ verifichiamo:
     $
-      "reachable"(C, tilde(C), j-1) quad "e" quad "reachable"(tilde(C), C', j-1)
+      "reachable"(C, tilde(C), j-1) quad "e" quad "reachable"(tilde(C), C^', j-1).
     $
-    Se esiste $tilde(C)$ tale che entrambi i predicati sono veri $arrow.long$ vero.\
-    Altrimenti $arrow.long$ falso.
+    Se esiste $tilde(C)$ tale che entrambi i predicati sono veri allora reachable$(C,C',j)$ è vero; altrimenti è falso.\
 
-  *Complessità in spazio*
-
-  Sia $f(j)$ lo spazio richiesto per calcolare reachable quando il terzo parametro è $j$. Poiché per valutare reachable$(C,C',j)$ basta tenere in memoria una configurazione $tilde(C)$ in più rispetto al calcolo ricorsivo di reachable con parametro $j-1$ (lo spazio della ricorsione si riusa):
+  Valutiamo la complessità in spazio per il calcolo di reachable: sia $f(j)$ lo spazio richiesto per calcolare reachable quando il terzo parametro è $j$. Poiché per valutare reachable$(C,C',j)$ basta tenere in memoria una configurazione $tilde(C)$ in più rispetto al calcolo ricorsivo di reachable con parametro $j-1$ (lo spazio della ricorsione si riusa: calcolo la prima chiamata ricorsiva, riuso quello spazio per la seconda e poi passo al successivo $tilde(C)$), si ha
   $
-    f(j) = f(j-1) + O("sc"_M (n)) = f(j-2) + 2 dot O("sc"_M (n)) = dots.c = f(j-k) + k dot O("sc"_M (n)) = dots.c = j dot O("sc"_M (n))
+    f(j) = f(j-1) + O("sc"_M (n)) = f(j-2) + 2 dot O("sc"_M (n)) = \ = dots.c = f(j-k) + k dot O("sc"_M (n)) = dots.c = j dot O("sc"_M (n)).
   $
 
-  Ponendo $j = c dot "sc"_M (n) = O(n^k)$, si ottiene che lo spazio totale richiesto è polinomiale in $n$.
+  Ponendo $j = c dot "sc"_M (n) = O(n^k)$ (perché $M$ è nondet. polinomiale), si ottiene che lo spazio totale richiesto è polinomiale in $n$. Dunque $L$ appartiene non solo a NPSPACE ma anche a PSPACE, e poiché $L$ è arbitrario vale NPSACE $subset.eq$ PSPACE che insieme all'inclusione opposta porta a PSPACE = NPSACE.
 ]
 
 // Lezione del 13-05-2026
-#index[PSpace-difficile]
+#index[PSPACE-difficile]
 #definition()[
-  L linguaggio si dice *PSpace-difficile* quando $forall Q in "PSpace", exists f$ riduzione polinomiale in tempo da _Q_ a _L_.
+  L linguaggio si dice *PSPACE-difficile* quando $forall Q in "PSPACE", exists f$ riduzione polinomiale in tempo da _Q_ a _L_.
 
-  L si dice *PSpace-completo* quando L è PSpace-difficile e $L in "PSpace"$
+  L si dice *PSPACE-completo* quando L è PSPACE-difficile e $L in "PSPACE"$
 ]
 
 #proposition()[
-  Sia $L$ PSpace-completo. Allora:
-  + $L in "P" quad quad ==> "P" = "PSpace"$
-  + $L in "NP" quad quad ==> "NP" = "PSpace"$
+  Sia $L$ PSPACE-completo. Allora:
+
+  + $L in "P" ==> "P" = "PSPACE"$
+  + $L in "NP" ==> "NP" = "PSPACE"$
 ]
 
 #proof()[
-  + $"P" subset.eq "PSpace"$ (ovvio)\
-    Sia $Q in "PSpace"$. Poiché $L$ è PSpace-completo, $exists f$ riduzione polinomiale in tempo da $Q$ a $L$.\
+  + $"P" subset.eq "PSPACE"$ è ovvio. Sia $Q in "PSPACE"$. Poiché $L$ è PSPACE-completo, $exists f$ riduzione polinomiale in tempo da $Q$ a $L$.
+  
     Algoritmo per decidere $Q$:
-    - Dato _w_, calcolo $f(w) arrow.long.squiggly$ tempo polinomiale;
-    - Decido se $f(w) in L arrow.long.squiggly$ tempo polinomiale (perché $L in "P"$);
-    $quad quad quad quad quad quad space &arrow.b.double\ Q &in "P"$
+    - Dato _w_, calcolo $f(w) -->$ tempo polinomiale;
+    - Decido se $f(w) in L -->$ tempo polinomiale (perché $L in "P"$),
+    Dunque $Q in$ P e poiché $Q$ è arbitrario vale PSPACE $subset.eq$ P e quindi P = PSPACE.
 
+  + $"NP" subset.eq "PSPACE"$ è ovvio. Sia $Q in "PSPACE"$. Poiché $L$ è PSPACE-completo, $exists f$ riduzione polinomiale in tempo da $Q$ a $L$.
 
-  + $"NP" subset.eq "PSpace"$ (ovvio)\
-    Sia $Q in "PSpace"$. Poiché $L$ è PSpace-completo, $exists f$ riduzione polinomiale in tempo da $Q$ a $L$.\
-    Algoritmo per decidere $Q$:
-    - Dato _w_, calcolo $f(w) arrow.long.squiggly$ tempo polinomiale;
-    - Decido se $f(w) in L arrow.long.squiggly$ tempo polinomiale non deterministico (perché $L in "NP"$);
-    $quad quad quad quad quad quad space &arrow.b.double\ Q &in "NP"$
+    Algoritmo nondeterministico per decidere $Q$:
+    - Dato _w_, calcolo $f(w) -->$ tempo polinomiale;
+    - Decido se $f(w) in L -->$ tempo polinomiale non deterministico (perché $L in$ NP).
+    
+    Dunque $Q in$ NP e poiché $Q$ è arbitrario vale PSPACE $subset.eq$ NP e quindi NP = PSPACE.
 ]
 
 == Problemi di conteggio
 #index[Problemi di conteggio]
-I problemi di conteggio si occupano di stabilire quante possono essere le soluzioni di un problema (ovvero, data una MdT $M$ e una stringa $w$, ci si chiede quante siano le configurazioni accettanti di $M$ su $w$).
-// $Sigma = {0, 1}, quad f: Sigma^* --> NN$
+I problemi di conteggio si occupano di stabilire quante possono essere le soluzioni di un problema (ovvero, data una MdT $M$ e una stringa $w$, ci si chiede quante siano le configurazioni accettanti di $M$ su $w$). Di seguito considereremo $Sigma = {0, 1}$.
 
 #index[Classe FP]
 #definition()[
-  Si chiama $cal(F)P$ la classe delle funzioni $f: Sigma^* -> NN$ per cui esiste una MdT deterministica che calcola _f_ in tempo polinomiale:
+  Si chiama *FP* la classe delle funzioni $f: Sigma^* -> NN$ per cui esiste una MdT deterministica che calcola _f_ in tempo polinomiale:
   $
-    cal(F)P = {f: Sigma^* -> NN | exists M "MdT che calcola" f "t.c." t c_M (n) = Omicron(n^k), exists k >= 1}
+    "FP" = {f: Sigma^* -> NN | exists M "MdT che calcola" f "t.c." t c_M (n) = Omicron(n^k), exists k >= 1}
   $
 ]
 
 #index[Classe \#P]
 #definition()[
-  Si chiama *\#_P_* (sharp P) la classe delle funzioni $f: Sigma^* -> NN$ per cui esiste una MdT non deterministica polinomiale tale che, per ogni stringa $w in Sigma^*$, le computazioni accettanti di $M$ su _w_ sono $f(w)$:
+  Si chiama *\#P* ("sharp P") la classe delle funzioni $f: Sigma^* -> NN$ per cui esiste una MdT non deterministica polinomiale tale che, per ogni stringa $w in Sigma^*$, le computazioni accettanti di $M$ su _w_ sono $f(w)$:
   $
-    \#P = {
-    f: Sigma^* --> NN | & exists M "MdT non deterministica polinomiale t.c.", forall w in Sigma^* \
-                        & f(w) "è il numero di computazioni accettanti di "M" su" w
-                          }
+    "#P" = {
+      f: Sigma^* --> NN | exists M "MdT non deterministica polinomiale t.c.", forall w in Sigma^* \
+      f(w) "è il numero di computazioni accettanti di "M" su" w
+    }
   $
 ]
-
 #proposition()[
-  $cal(F)P subset.eq \#P$
+  FP $subset.eq$ \#P
 ]
 #proof()[
-  $f in \#P$, sia $M$ MdT deterministica polinomiale che calcola _f_.\
-  Considero la seguente MdT non deterministica polinomiale:
-  - Su input _w_, calcolo $f(w) = k$;
-  - Genero _k_ computazioni (ciascuna delle quali stampa un intero _i_, con $1 <= i <= k$), e le considero tutte accettanti
-  $
-    arrow.b.double\
-    f in \#P
-  $
+  Data $f in$ FP, sia $M$ MdT deterministica polinomiale che calcola _f_. Considero la seguente MdT non deterministica polinomiale su input $w$:
+
+  - calcolo $f(w) = k$;
+  - genero _k_ computazioni (ciascuna delle quali stampa un intero _i_, con $1 <= i <= k$), e le considero tutte accettanti.
+  Segue che $f in$ \#P, da cui la tesi.
 ]
 
 #problem("aperto")[
   $
-    cal(F)P limits(=)^? \#P
+    "FP" limits(=)^? "#P"
   $
 ]
 
 #proposition()[
-  Se $cal(F)P = \#P ==> "P" = "NP"$
+  Se valesse FP = \#P, allora P = NP
 ]
 #proof()[
-  Sia $L in "NP" ==> exists M$ MdT non deterministica polinomiale che accetta _L_.
+  Sia $L in "NP", " allora" exists M$ MdT non deterministica polinomiale che accetta _L_. Sia $f: Sigma^* --> NN$ la funzione che conta le computazioni accettanti di $M$, allora  $f in$ \#P, ma per ipotesi FP = \#P, quindi vale anche $f in$ FP. Dunque $exists N "MdT"$ deterministica polinomiale che calcola _f_.
 
-  Sia $f: Sigma^* --> NN$ la funzione che conta le computazioni accettanti di $M$ $==> f in \#P$, ma per ipotesi $cal(F)P = \#P$, quindi vale anche $f in cal(F)P$. Dunque $exists N "MdT"$ polinomiale deterministica che calcola _f_.
+  Algoritmo per decidere _L_ su input $w$:
 
-  Algoritmo per decidere _L_, dato $w in Sigma^*$:
   - Calcolo $f(w)$;
-  - Se $f(w) = 0$, rifiuta (poiché $f(w)$ è anche il numero di computazioni accettanti);
-  - Se $f(w) > 0$, accetta (almeno una computazione accettante).
+  - Se $f(w) = 0$, rifiuto $w$ (poiché $f(w)$ è anche il numero di computazioni accettanti);
+  - Se $f(w) > 0$, accetto $w$ (almeno una computazione accettante).
 
-  Dato che questo è un algoritmo polinomiale per _L_: $L in "P"$
+  Dato che questo è un algoritmo polinomiale per _L_ vale $L in "P"$, da cui la tesi.
 ]
 #problem("aperto")[
   $
-    "P" = "NP" limits(=)^? cal(F)P = \#P
+    "P" = "NP" limits(==>)^? "FP" = "#P"
   $
 ]
 
 #proposition()[
-  Se fosse vero che PSpace $=$ P $==> cal(F)P = \#P$
+  Se fosse vero che PSPACE = P, allora FP = \#P
 ]
 #proof()[
-  Rimane da dimostrare: $\#P subset.eq cal(F)P$
+  Avendo già dimostrato FP $subset.eq$ \#P, rimane da dimostrare \#P $subset.eq$ FP.
 
   #grid(
     columns: 2,
@@ -2403,57 +2421,57 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
 
   Sia _N_ la MdT deterministica equivalente a _M_, a cui aggiungiamo un nastro per contare le computazioni accettanti.
   $
-    L_k = {w | "ci sono almeno" k "computazioni di M che accettano" w}
+    L_k = {w | "ci sono almeno" k "computazioni di" M "che accettano" w}
   $
-  MdT per calcolare _f_, su input _w_:
-  - Determino se  $w in L_(1/2 2^(q(n)))$ usando N e confrontando il numero di computazioni accettanti _k_ con $1/2 2^q(n)$.
+  MdT per calcolare _f_, su input _w_ (una sorta di ricerca binaria):
+
+  - Determino se  $w in L_(1/2 2^(q(n)))$ usando $N$ e confrontando il numero di computazioni accettanti con $k = 1/2 2^q(n)$.
 
     - Se $k < 1/2 2^q(n)$, rifaccio con $L_(1/4 2^(q(n)))$;
 
     - Se $k >= 1/2 2^q(n)$, rifaccio con $L_(3/4 2^(q(n)))$.
 
   Complessità in tempo:
-  - $forall k, L_k in "PSpace" ==> L_k in "P"$;
+
+  - $forall k$, $L_k in "PSPACE" ==> L_k in "P"$;
   - Il numero di linguaggi da controllare non è $2^q(n)$, ma $Omicron(log(2^(q(n)))) = Omicron(q(n))$ (ricerca binaria)
-] // Dimostrazione? BOH
 
-#index[Problema \#SAT]#index[Problema \#CYCLE]
-#example(multiple: true)[
-  + \#SAT: dato un polinomio booleano, determinare quanti sono gli assegnamenti che lo soddisfano. (\#SAT $in$ \#P)
-  + \#CYCLE: dato un grafo orientato, determinare il numero di cicli semplici
+  Dunque la complessità è polinomiale, perciò $f in$ FP ed essendo $f in$ \#P arbitraria vale la tesi.\ 
 ]
-
+=== Esempi di problemi di conteggio
+#index[Problema \#SAT]
 #index[Problema CYCLE]
-#problem("CYCLE")[
-  Dato un grafo orientato (diretto), esiste un ciclo semplice?
+#index[Problema \#CYCLE]
+#example(multiple: true)[
+  + *\#SAT*: dato un polinomio booleano, determinare quanti sono gli assegnamenti che lo soddisfano. (\#SAT $in$ \#P).
+  + Il problema CYCLE ($in$ P) vuole determinare se, dato un grafo orientato, questo contiene almeno un ciclo semplice. Invece, *\#CYCLE*, dato un grafo orientato, vuole determinare il numero di cicli semplici che contiene (\#CYCLE $in$ \#P)
 ]
 
 #observation()[
-  Se fosse vero che \#SAT $in cal(F)P, "allora" ==> "#SAT" in "P" ==> "P" = "NP"$
+  Se fosse vero che \#SAT $in "FP", " allora SAT" in "P" ==> "P" = "NP"$
 ]
 
 #proposition()[
-  Se fosse vero che \#CYCLE $in cal(F)P$, allora $"P" = "NP"$
+  Se fosse vero che \#CYCLE $in$ FP, allora $"P" = "NP"$
 ]
 #proof()[
-  Facciamo vedere che HAM $in$ P (dato che HAM è un problema NP, se dimostriamo che è $in$ P, allora vale che $"P" = "NP"$).
-  Sia $G$ un grafo orientato:
-  - Costruiamo un nuovo grafo orientato $G'$;
-  - Facciamo vedere che:
+  Facciamo vedere che con questa ipotesi si ottiene che HAM $in$ P (dato che HAM è un problema NP, se dimostriamo che è $in$ P, allora vale che $"P" = "NP"$).
+
+  Sia $G$ un grafo orientato con $n$ vertici. La strategia è:
+
+  - costruiamo un nuovo grafo orientato $G'$ in tempo polinomiale;
+  - facciamo vedere che:
     - $G$ ha un circuito hamiltoniano $<==>$ $G'$ ha almeno $n^n^2$ cicli.
 
-  Costruzioni di $G'$, supponiamo che $(u, v)$ sia un lato di $G$.
-  #figure(image("/assets/image-9.png", width: 60%))
-  Ogni lato $(u, v)$ di $G$ corrisponde a $2^m$ cammini semplici da _u_ a _v_ in $G'$. Pertanto, ogni ciclo semplice di lunghezza _l_ di $G$ corrisponde a $(2^m)^l$ cicli semplici in $G'$.
+  Costruzione di $G'$: al posto di ogni lato $(u, v)$ di G mettiamo questo gadget:
+  #figure(image("/assets/image-9.png", width: 60%), caption: "Anche sopra ci sono m nuovi vertici")
+  Ogni lato $(u, v)$ di $G$ corrisponde a $2^m$ cammini semplici da _u_ a _v_ in $G'$ (per ogni nodo intermedio aggiunto ho 2 strade per arrivare a $v$). Pertanto, ogni ciclo semplice di lunghezza _l_ di $G$ corrisponde a $(2^m)^l$ cicli semplici in $G'$.\
+  Scegliamo $m = n log_2(n)$ (per semplicità, supponiamo che _n_ sia una potenza di 2). Mostriamo che $G$ ha un circuito hamiltoniano $<==>$ $G'$ ha almeno $n^n^2$ cicli:
 
-  Scegliamo $m = n log_2(n)$ (per semplicità, supponiamo che _n_ sia una potenza di 2).
-
-  $==>)$ $G$ ha un circuito hamiltoniano . Il numero dei cicli di $G'$ è $>= (2^m)^n$ ($n = l$) = $(2^(n log_2(n)))^n = (n^n)^n = n^n^2$.\
-  $<==)$ $G$ non ha un circuito hamiltoniano $==>$ il più lungo ciclo di $G$ ha lunghezza al più $n - 1$. Il numero totale di cicli di $G$ è al massimo $n^(n-1)$.
-
-  Il numero di cicli di $G'$ è quindi
+  $==>)$ $G$ ha un circuito hamiltoniano. Il numero dei cicli di $G'$ è $>= (2^m)^n = (2^(n log_2(n)))^n = (n^n)^n = n^n^2$.\
+  $<==)$ $G$ non ha un circuito hamiltoniano. Allora il più lungo ciclo di $G$ ha lunghezza al più $n - 1$, quindi il numero di cicli di $G$ è al massimo $n^(n-1)$. Il numero di cicli di $G'$ è quindi:
   $
     <= (2^m)^(n-1) dot n^(n-1) = (2^(n log_2 n))^(n-1) dot n^(n-1) = n^(n(n-1)) dot n^(n-1) = n^(n^2-n) dot n^(n-1) = n^(n^2-1) < n^(n^2)
   $
-  Dunque $G$ ha un circuito hamiltoniano se e solo se $G'$ ha almeno $n^(n^2)$ cicli, e contare i cicli di $G'$ permetterebbe di decidere HAM in tempo polinomiale.
+  Dunque $G$ ha un circuito hamiltoniano se e solo se $G'$ ha almeno $n^(n^2)$ cicli. Sotto l'ipotesi \#CYCLE $in$ FP possiamo contare in tempo polionmiale il numero di cicli di $G'$ e confrontarlo con $n^(n^2)$, che in binario ha lunghezza $log_2(n^(n^2)) = n^2log_2(n)$. Questo permetterebbe di decidere HAM in tempo polinomiale e quindi si avrebbe P = NP.\
 ]
