@@ -5,8 +5,7 @@
 
 = Macchine di Turing
 
-// TODO: metere caption con i credits per l'immagine: https://aturingmachine.com/
-#figure(image("images/turing-machine.png", width: 80%))
+#figure(image("images/turing-machine.png", width: 80%), caption: "presa da https://aturingmachine.com/")
 
 Introducendo le funzioni $mu$-ricorsive abbiamo visto una proposta di definizione di algoritmo, che restituisce formalmente l'idea intuitiva di funzione computabile. In questo capitolo vediamo una proposta equivalente del concetto di algoritmo: la *Macchina di Turing* (MdT). Una MdT ha le seguenti caratteristiche:
 
@@ -624,7 +623,7 @@ Lavoriamo su $NN$ in codifica unaria.
   - Se $f(accent(x, arrow))arrow.t$, $M$ non termina su $accent(x, arrow)$.
 ]
 
-=== Tesi di Church per funzioni parziali $tau$-ricorsive
+=== Tesi di Church generalizzata (per funzioni parziali $tau$-ricorsive)
 #index[Tesi di Church]
 #proposition[La classe delle funzioni parziali computabili coincide con la classe delle funzioni parziali $tau$-ricorsive.]
 Questa è la *forma generalizzata* della tesi di Church, che inizialmente avevamo presentato solo per funzioni totali. Si evidenzia che il modello della MdT è in grado di descrivere il comportamento di qualunque algoritmo, inclusa la sua capacità (o incapacità) di terminare.
