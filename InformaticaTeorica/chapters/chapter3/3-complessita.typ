@@ -7,7 +7,7 @@
 //30.03.2026
 = Complessità computazionale
 
-Conclusa l'analisi sulla calcolabilità, ci concentriamo ora sulla classe dei problemi decidibili, ovvero quei problemi per i quali è garantita l'esistenza di un algoritmo risolutivo che termini in tempo finito per ogni input. Quello che ci chiediamo è: qual è la complessità computazionale di questi problemi? Ovvero, quante risorse in termini di tempo e spazio richiede la sua risoluzione?
+Conclusa l'analisi sulla calcolabilità, ci concentriamo ora sulla classe dei problemi decidibili, ovvero quei problemi per i quali è garantita l'esistenza di un algoritmo risolutivo che termini in tempo finito per ogni input. Quello che ci chiediamo è: qual è la complessità computazionale di questi problemi? Ovvero, quante risorse in termini di tempo e spazio richiede la loro risoluzione?
 
 == Complessità temporale
 #index[Complessità in tempo]
@@ -34,7 +34,7 @@ Adesso definiamo le notazioni asintotiche:
   $
     exists D > 0, exists n_0 in NN, forall n gt.eq n_0 : frac(f(n), g(n)) gt.eq D "oppure" f(n) gt.eq D dot g(n)
   $
-  ovvero quando quando il rapporto tra queste due funzioni sta sempre sopra ad un certo valore costante.
+  ovvero quando il rapporto tra queste due funzioni sta sempre sopra ad un certo valore costante.
 ]
 
 #index[Notazione Theta]
@@ -101,7 +101,7 @@ Adesso definiamo le notazioni asintotiche:
 #proof()[
   Consideriamo una MdT $M$ a $k$ nastri e prendiamo la MdT $M'$ a $2k+1$ tracce che è equivalente a $M$ già descritta nella prima parte del corso (Proposizione 2.5.1), ma ricordiamo com'è fatta per $k=2$:
   #figure(image("images/MdTmultitracciaPerSimulareMdTmultinastro.png", width: 60%))
-  Sia $w$ una stringa di lunghezza $n$ su cui eseguiamo $M$ e supponiamo che $M$ su $w$ esegua $f(n)$ transizioni. Vediamo prima quante transizioni di $M'$ sono necessarie per simulare la $t$-esima transizione di $M$ su $w$: dapprima si ha il momento della raccolta delle informazioni, in cui la testina di $M'$ si   sposta sulle tracce in corrispondenza della posizione delle testine dei nastri per leggere i simboli e salvarli nello stato. La posizione di ciascuna testina simulata può trovarsi a distanza al massimo $t$ dalla posizione iniziale, perché alla $t$-esima transizione una testina può essersi spostata di al massimo di $t$ celle. Giunti alla cella, si legge il simbolo e si torna indietro: per cui vengono fatti al massimo $t$ passi avanti e $t$ passi indietro per tutti i $k$ nastri di $M$, dunque il costo di questa fase è $2t k$ (vedere la Proposizione 2.5.1 per i passaggi in dettaglio). Per simulare correttamente la transizione poi si deve eseguirla effettivamente, quindi tornare sulla posizione $k$ per effettuare scritture/spostamenti delle testine simulate, e anche in questo caso il costo è $2t k$. Quindi la stima del numero massimo di transizioni che $M'$ deve effettuare per simulare la $t$-esima transizione di $M$ è $2t k + 2t k = 4t k$.\ A questo punto possiamo stimare il limite superiore del numero di transizioni eseguite da $M'$ su input di lunghezza $n$ nel caso peggiore:
+  Sia $w$ una stringa di lunghezza $n$ su cui eseguiamo $M$ e supponiamo che $M$ su $w$ esegua $f(n)$ transizioni. Vediamo prima quante transizioni di $M'$ sono necessarie per simulare la $t$-esima transizione di $M$ su $w$: dapprima si ha il momento della raccolta delle informazioni, in cui la testina di $M'$ si   sposta sulle tracce in corrispondenza della posizione delle testine dei nastri per leggere i simboli e salvarli nello stato. La posizione di ciascuna testina simulata può trovarsi a distanza al massimo $t$ dalla posizione iniziale, perché alla $t$-esima transizione una testina può essersi spostata di al massimo $t$ celle. Giunti alla cella, si legge il simbolo e si torna indietro: per cui vengono fatti al massimo $t$ passi avanti e $t$ passi indietro per tutti i $k$ nastri di $M$, dunque il costo di questa fase è $2t k$ (vedere la Proposizione 2.5.1 per i passaggi in dettaglio). Per simulare correttamente la transizione poi la si deve eseguire effettivamente, quindi si deve tornare sulla posizione $k$ per effettuare scritture/spostamenti delle testine simulate, e anche in questo caso il costo è $2t k$. Quindi la stima del numero massimo di transizioni che $M'$ deve effettuare per simulare la $t$-esima transizione di $M$ è $2t k + 2t k = 4t k$.\ A questo punto possiamo stimare il limite superiore del numero di transizioni eseguite da $M'$ su input di lunghezza $n$ nel caso peggiore:
   $
     sum_(t=1)^(f(n)) 4 t k =
     4k dot sum_(t=1)^(f(n)) t = 4k dot frac(f(n) dot (f(n)+1), 2) = Omicron(f(n)^2)
@@ -255,8 +255,7 @@ Adesso definiamo le notazioni asintotiche:
   dove $m_i$ indica quale delle possibili transizioni di $M$ viene scelta
   all'$i$-esimo passo. Il numero di possibili sequenze, e quindi di possibili computazioni da simulare, è al più $delta^(f(n))$: infatti, per ciascuno degli al più $f(n)$ passi vi sono al più $delta$
   possibili scelte.\
-  Per ciascuna di queste computazioni, $M'$ deve simulare al più $f(n)$
-  transizioni di $M$, poiché $t c_M(n)=f(n)$ (dove $n$ è la lunghezza dell'input). Pertanto, nel caso peggiore, $M'$ simula al più $delta^(f(n))$ computazioni, ciascuna di costo al più $f(n)$. Ne segue
+  Per ciascuna di queste computazioni, $M'$ deve simulare al più $f(n)$ transizioni di $M$, poiché $t c_M(n)=f(n)$ (dove $n$ è la lunghezza dell'input). Pertanto, nel caso peggiore, $M'$ simula al più $delta^(f(n))$ computazioni, ciascuna di costo al più $f(n)$. Ne segue
   $
     t c_(M')(n)
     = O(f(n) dot delta^(f(n))).
@@ -392,7 +391,7 @@ $
   dots space x_i\#x_j\#\#x_(i+1)\#x_(j+1)\#\# space dots space \#\#\#n
 $
 === MdT deterministica che risolve HAM
-Un algoritmo _naive_ (perché prova tutti i cammini possibili) che risolve questa problema è dato da una MdT che fa uso di 4 nastri:
+Un algoritmo _naive_ (perché prova tutti i cammini possibili) che risolve questo problema è dato da una MdT che fa uso di 4 nastri:
 
 - Nastro 1: contiene la rappresentazione del grafo in input;
 - Nastro 2: contiene la sequenza dei nodi attualmente in analisi (lunga $n+1$, inizia e termina con il nodo 1);
@@ -415,12 +414,12 @@ Attenzione: nonostante ciò non possiamo dire che HAM $in.not$ P. Per poterlo di
 Vediamo un'altra MdT, stavolta non deterministica, che risolve il problema HAM. Sia dato un grafo $G = (V, E)$, con $|V| = n$ e $|E| = k$. La codifica del grafo è quella già vista. La MdT non deterministica fa uso di 3 nastri, che sono gli stessi del caso deterministico escluso il nastro 4. Il comportamento è il seguente:
 
 1. verifico se $k < n$: in tal caso non può esserci circuito e quindi si termina rifiutando;
-2. genero nondeterministicamente sul nastro 2 una sequenza di vertici "candidata" circuito hamiltoniano;
-3. controllo col nastro 3 se la sequenza generato è un circuito hamiltoniano: scrivo i vertici via via su tale nastro e verifico se esiste un arco che collega il vertice attuale al successivo, senza duplicazioni. Se i controlli falliscono, termino rifiutando.
+2. genero nondeterministicamente sul nastro 2 una sequenza di vertici candidata a essere un circuito hamiltoniano;
+3. controllo col nastro 3 se la sequenza generata è un circuito hamiltoniano: scrivo i vertici via via su tale nastro e verifico se esiste un arco che collega il vertice attuale al successivo, senza duplicazioni. Se i controlli falliscono, termino rifiutando.
 
 Dal punto di vista della complessità in tempo, che rappresentiamo in funzione di $k$ numero di archi, il caso peggiore è quello dell'accettazione. In tal caso si ha $k >= n$. I costi dei vari passi sono:
 
-- Controllo che il grafo abbia almeno $n$ archi: scorro la lista del nastro 1 e mantengo un contatore. Ogni volta che trovo \#\#  incremento di 1 e infine faccio un confronto con $n$. Poichè ogni vertice $v_i$, $i = 1, dots, n$, è codificato in binario, occupa al più $O(log n)$ celle. Dunque se la codifica di un arco è $v_i \# v_j$, anche un arco occupa $O(log n)$ celle. Essendoci $k$ archi, il costo di questo passo è $O(k log n)$.
+- Controllo che il grafo abbia almeno $n$ archi: scorro la lista del nastro 1 e mantengo un contatore. Ogni volta che trovo \#\#  incremento di 1 e infine faccio un confronto con $n$. Poiché ogni vertice $v_i$, $i = 1, dots, n$, è codificato in binario, occupa al più $O(log n)$ celle. Dunque se la codifica di un arco è $v_i \# v_j$, anche un arco occupa $O(log n)$ celle. Essendoci $k$ archi, il costo di questo passo è $O(k log n)$.
 - Generazione della sequenza sul nastro 2: scrivo al più $n$ vertici, ciascuno che occupa al più $O(log n)$ celle, quindi il costo del passo è $O(n log n)$.
 - Controllo della sequenza: per ogni iterazione del ciclo:
   - controllo che il nuovo vertice non sia già comparso: $O(n log n)$;
@@ -615,7 +614,7 @@ polinomiale da $Q$ a $L$. Ne segue che $L$ è NP-difficile, ed essendo anche in 
 ]
 
 == Rappresentazioni di problemi
-La scelta di una certa codifica per un determinato problema può avere un impatto sulla sua complessità. Quello che facciamo quando cerchiamo una *rappresentazione* (o *codifica*), è cercare una funzione
+La scelta di una certa codifica per un determinato problema può avere un impatto sulla sua complessità. Quello che facciamo quando cerchiamo una *rappresentazione* (o *codifica*) è cercare una funzione
 $
   "rep" : overbracket({p_1, p_2, dots, p_i}, "istanze di un problema") --> Sigma^* quad quad
 $
@@ -631,20 +630,20 @@ cioè una funzione che traduca ciascuna istanza di un problema (che sarebbero gl
 
 Se $"rep"_1$ è polinomialmente trasformabile in $"rep"_2$, allora la lunghezza di $"rep"_2 (p_i)$ ($= t("rep"_1 (p_i))$) è al più polinomiale nella lunghezza di $"rep"_1 (p_i)$. Pertanto se un problema sta nella classe P usando $"rep"_2$, allora il problema sta in P anche usando $"rep"_1$.
 #observation()[
-  Attenzione al caso delle rappresentazioni binaria e unaria di un numero naturale (la rappresentazione binaria di $n$ ha lunghezza $approx log_2 (n)$, per cui la conversione in unario richiede un numero di transizioni esponenziale nella lunghezza dell'input). La trasformazione da binario a unario non è polinomiale! Può accadere che un problema stia in P con la rappresentazione unaria ma non stia in P con la rappresentazione binaria (un problema prende in input una stringa unaria di lunghezza $n$ e compie $n$ transizioni, lo stesso problema con input stringa binaria di lunghezza $m = log_2 (n)$ in input ne compie $2^m$: il numero di transizioni svolte è lo stesso, ma nel primo caso la complessità è lineare rispetto alla lunghezza dell'input, nel secondo caso è esponenziale).
+  Attenzione al caso delle rappresentazioni binaria e unaria di un numero naturale (la rappresentazione binaria di $n$ ha lunghezza $approx log_2 (n)$, per cui la conversione in unario richiede un numero di transizioni esponenziale nella lunghezza dell'input). La trasformazione da binario a unario non è polinomiale! Può accadere che un problema stia in P con la rappresentazione unaria ma non stia in P con la rappresentazione binaria (un problema prende in input una stringa unaria di lunghezza $n$ e compie $n$ transizioni, lo stesso problema con input una stringa binaria di lunghezza $m = log_2 (n)$ ne compie $2^m$: il numero di transizioni svolte è lo stesso, ma nel primo caso la complessità è lineare rispetto alla lunghezza dell'input, nel secondo caso è esponenziale).
 ]
 == Polinomi booleani
 #index[Polinomio booleano]
 #definition()[
-  $x_1, x_2, dots, x_n$ indeterminate. Un *polinomio booleano* in $x_1, x_2, dots, x_n$ è elemento dell'insieme PB$(x_1,dots,x_n)$ dei polinomi booleani in $x_1,dots,x_n$ e si ha che:
+  $x_1, x_2, dots, x_n$ indeterminate. Un *polinomio booleano* in $x_1, x_2, dots, x_n$ è un elemento dell'insieme PB$(x_1,dots,x_n)$ dei polinomi booleani in $x_1,dots,x_n$ e si ha che:
 
-  - $0,1 in "PB"(x_1,dots,x_n)$
+  - $0,1 in "PB"(x_1,dots,x_n)$;
 
-  - $forall i <= n, space x_i in "PB"(x_1,dots,x_n)$
+  - $forall i <= n, space x_i in "PB"(x_1,dots,x_n)$;
 
-  - $p,q in "PB"(x_1,dots,x_n) => p or q, space p and q, space p' in "PB"(x_1,dots,x_n)$
+  - $p,q in "PB"(x_1,dots,x_n) => p or q, space p and q, space p' in "PB"(x_1,dots,x_n)$;
 
-  - Nient'altro è un polinomio booleano.
+  - nient'altro è un polinomio booleano.
 ]
 
 #example()[
@@ -685,7 +684,7 @@ Se $"rep"_1$ è polinomialmente trasformabile in $"rep"_2$, allora la lunghezza 
 Vogliamo scrivere una MdT non deterministica per risolvere questo problema. Iniziamo prima dalla codifica dell'istanza, ossia la codifica di un polinomio booleano in CNF nelle variabili ${x_1, dots, x_n}$. \
 Ciascuna variabile è codificata utilizzando il suo indice scritto in binario:
 - variabili $x_i arrow.r.squiggly uu(i)$ (codifica binaria di i)
-I letterali in maniera simile:
+I letterali sono codificati in maniera simile:
 - letterali:
   - $x_i arrow.r.squiggly uu(i) \# 1$ (non negato)
   - $x'_i arrow.r.squiggly uu(i) \# 0$ (negato)
@@ -741,10 +740,10 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
   Vista la complessità della dimostrazione, all'orale viene spesso chiesto solo qualche passaggio.
 ]
 #proof()[
-  Sia $L in$ NP. Vogliamo costruire una riduzione polinomiale da $L$ a SAT (o meglio, da $L$ al linguaggio di SAT). Sia $M$ MdT non deterministica polimomiale che accetta $L$ e sia $p(n) = t c_M (n)$. Per semplicità, supponiamo che $forall$ stringa $w$ di lunghezza $n$, il numero di transizioni di $M$ su $w$ sia esattamente $p(n)$ (non è restrittivo, basta allungare le computazioni "corte") e che $M$ sia una MdT standard limitata a sinistra con le celle numerate.
+  Sia $L in$ NP. Vogliamo costruire una riduzione polinomiale da $L$ a SAT (o meglio, da $L$ al linguaggio di SAT). Sia $M$ MdT non deterministica polinomiale che accetta $L$ e sia $p(n) = t c_M (n)$. Per semplicità, supponiamo che $forall$ stringa $w$ di lunghezza $n$, il numero di transizioni di $M$ su $w$ sia esattamente $p(n)$ (non è restrittivo, basta allungare le computazioni "corte") e che $M$ sia una MdT standard limitata a sinistra con le celle numerate.
 
   Formalmente vogliamo quindi trovare una funzione $Phi : Sigma_L ^ * -> Sigma_("SAT")^*$ computabile in tempo polinomiale e t.c. $forall w in Sigma_L ^*$, $w in L "("<==> M "accetta" w")" <==> Phi(w)$ è un polinomio booleano in forma CNF soddisfacibile.\
-  Gli stati di $M$ sono $Q={q_1, dots, q_s}$, con $|Q| = s$, mentre l'alfabeto di $M$ è $Sigma={a_1, dots, a_r}$, con $|Sigma| = r$. $F subset.eq Q$ insieme degli stati finali.
+  Gli stati di $M$ sono $Q={q_1, dots, q_s}$, con $|Q| = s$, mentre l'alfabeto di $M$ è $Sigma={a_1, dots, a_r}$, con $|Sigma| = r$. $F subset.eq Q$ è l'insieme degli stati finali.
 
   Le variabili del polinomio $Phi(w)$ (con $w$ lunga $n$) sono di tre tipi:
   - se $S(u, t)=1$ significa che all'istante $t$ la MdT $M$ si trova nello stato $q_u$;
@@ -764,7 +763,7 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
   3. $forall t, exists! space i$ t.c. $L(i, t) = 1$\
     In un certo istante $t$, la testina indicherà una sola cella $i$.
 
-  4. $t= 0 arrow$ Configurazione iniziale: all'inizio della computazione, la testina è posizionata sulla cella 1 nastro; tale cella è vuota (contiene "\*") e quelle a seguire contengono la stringa $w$ in input; $M$ si trova nello stato iniziale.
+  4. $t= 0 arrow$ Configurazione iniziale: all'inizio della computazione, la testina è posizionata sulla cella 1 del nastro; tale cella è vuota (contiene "\*") e quelle a seguire contengono la stringa $w$ in input; $M$ si trova nello stato iniziale.
 
   5. $exists space u$ t.c. $q_u in F$ e $S(u, p(n)) = 1$\
     Nell'istante $t= p(n)$ , cioè a fine computazione (le transizioni sono esattamente $p(n)$), $M$ si troverà in uno stato finale $q_u$.
@@ -836,7 +835,7 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
   3-SAT è NP-difficile
 ]
 #proof()[
-  Dato $p$ polinomio booleano in CNF $p = u_1 and u_2 and dots and u_m$, $u_i$ clausole, vogliamo costruire un polinomio $tilde(p)$ in 3-CNF, dunque ogni $u_i$ dovrà diventare una clausola (o un insieme di clausole) $tilde(u)_i$ con esattamente 3 letterali. Le clausole di $p$ possono essere, a seconda dei casi:
+  Dato un polinomio booleano $p$ in CNF $p = u_1 and u_2 and dots and u_m$, dove le $u_i$ sono clausole, vogliamo costruire un polinomio $tilde(p)$ in 3-CNF, dunque ogni $u_i$ dovrà diventare una clausola (o un insieme di clausole) $tilde(u)_i$ con esattamente 3 letterali. Le clausole di $p$ possono essere, a seconda dei casi:
 
   1. $u = v$, clausola che contiene un solo letterale: introduciamo due nuove variabili $x, y$ e poniamo
   $
@@ -911,7 +910,7 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
 ]
 
 #proposition()[
-  Il problema del vertex cover $in$ NP.
+  Il problema del vertex cover appartiene a NP.
 ]
 #proposition()[
   Il problema del vertex cover è NP-difficile.
@@ -1031,7 +1030,7 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
   In un VC di $G(p)$ ci devono essere almeno $n+2m$ vertici: infatti basta scegliere uno solo dei due estremi per ciascuno degli $n$ lati che collegano $x_i$ a $x'_i$, mentre per coprire i tre archi di ciascuno degli $m$ triangoli associati alle clausole occorrono almeno due dei tre vertici.\
   Facciamo vedere che $p$ è soddisfacibile $<==> G(p)$ ha un vertex cover di cardinalità $n+2m = k(p)$.
 
-  $==>)$ Sia $t$ assegnamento t.c. $t(p) = 1$
+  $==>)$ Sia $t$ un assegnamento t.c. $t(p) = 1$
 
   - $forall i = 1, dots, n$ scegliamo
   $
@@ -1160,7 +1159,7 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
       0 & "se" x'_i in.not V C
     )
   $
-  Con questo assegnamento, ogni clausola è soddisfatta dal letterale corrispondente al nodo non appartenente al VC di ogni "triangolo" $u_(i,0), u_(i,1), u_(i,2)$.\ Dunque abbiamo ottenuto che $p in $ 3-SAT $<==> G(p) "ha un VC con cardinalità" k(p)$, e poiché la funzione che costruisce il grafo dal polinomio è computabile in tempo polinomiale 3-SAT è polinomialmente riducibile a VC: essendo 3-SAT NP-difficile, anche VC è NP-difficile.
+  Con questo assegnamento, ogni clausola è soddisfatta dal letterale corrispondente al nodo non appartenente al VC di ogni "triangolo" $u_(i,0), u_(i,1), u_(i,2)$.\ Dunque abbiamo ottenuto che $p in $ 3-SAT $<==> G(p) "ha un VC con cardinalità" k(p)$. Poiché la funzione che costruisce il grafo dal polinomio è computabile in tempo polinomiale, 3-SAT è polinomialmente riducibile a VC: essendo 3-SAT NP-difficile, anche VC è NP-difficile.
 ]
 
 === Problema Clique
@@ -1447,7 +1446,7 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
     grid.cell(rowspan: 2, [\ \
     con $r_i$ = massimo fra le occorrenze di $x_i "e" x_i^'$ in _p_.]),
   )
-  I pezzi di grafo così costruiti si connettono aggiungendo un lato da $o_i "a" e_(i+1)$, per ogni $i$, infine si aggiunge un lato da $o_n "a" e_1$. Nel grafo sopra, ogni variabile ha 2 camini hamiltoniani da $e_j "a" o_j$:
+  I pezzi di grafo così costruiti si connettono aggiungendo un lato da $o_i "a" e_(i+1)$, per ogni $i$, infine si aggiunge un lato da $o_n "a" e_1$. Nel grafo sopra, ogni variabile ha 2 cammini hamiltoniani da $e_j "a" o_j$:
   #grid(
     columns: (0.5fr, 0.5fr),
     align: center,
@@ -1693,7 +1692,7 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
     #figure(image("/assets/image-17.png", width: 75%))
   ]
 #observation()[
-  A lezione il prof si è fermato all'esempio qui sopra, non terminando la dimostrazione.
+  A lezione il professore si è fermato all'esempio qui sopra, non terminando la dimostrazione.
   L'idea della conclusione comunque è mostrare la correttezza della riduzione, provando che
   il polinomio $p$ è soddisfacibile $<==>$ il grafo costruito $G(p)$ possiede un circuito hamiltoniano.
   
@@ -1826,13 +1825,13 @@ $
   - $t(alpha) = 1$
   - $forall beta "t.c." alpha arrow.long.squiggly beta, space t(beta) = 1$
   #observation()[
-    Fin qui _t_ è ben definito, perché non può accadere che $t(beta') = 1$, in quanto $alpha cancel(arrow.long.squiggly) beta'$: infatti, se per assurdo fosse $alpha arrow.long.squiggly beta'$, allora si avrebbe $beta arrow.long.squiggly alpha'$ (per l'osservaizone di prima) e quindi $alpha arrow.long.squiggly alpha'$, in contraddizione a quanto appena stabilito.
+    Fin qui _t_ è ben definito, perché non può accadere che $t(beta') = 1$, in quanto $alpha cancel(arrow.long.squiggly) beta'$: infatti, se per assurdo fosse $alpha arrow.long.squiggly beta'$, allora si avrebbe $beta arrow.long.squiggly alpha'$ (per l'osservazione di prima) e quindi $alpha arrow.long.squiggly alpha'$, in contraddizione a quanto appena stabilito.
   ]
   Eliminiamo ora da $p$ tutte le clausole soddisfatte da $t$. Le clausole rimanenti contengono soltanto letterali non ancora assegnati: infatti, se una clausola $beta' or gamma$ contenesse $beta'$ con $t(beta)=1$, avremmo l'arco $beta --> gamma$ e poiché $alpha arrow.long.squiggly beta$ avremmo anche $alpha arrow.long.squiggly gamma$, da cui $t(gamma)=1$; la clausola sarebbe dunque già stata eliminata. Ripetiamo il procedimento sul polinomio rimanente. A ogni passo viene eliminata almeno una clausola, quindi dopo un numero finito di passi otteniamo un assegnamento che soddisfa tutte le clausole di $p$. Pertanto $p$ è soddisfacibile.
 ]
 
 === Algoritmo per 2-SAT
-Grazie alla propsizione precedente possiamo costruire questo algoritmo per 2-SAT:
+Grazie alla proposizione precedente possiamo costruire questo algoritmo per 2-SAT:
 
 + Costruisco il grafo $G(p)$
 + $forall x$ variabile di _p_, controllo se c'è $x arrow.long.squiggly x' "e" x' arrow.long.squiggly x$:
@@ -1859,14 +1858,14 @@ Abbiamo visto (Sottosezione 3.4.1) che se $"P" eq.not "NP"$, ci sono dei linguag
   Se $"P" eq.not "NP"$, allora $"NP-I" eq.not emptyset$
 ]
 === co-NP
-La classi P ed NP sono chiuse rispetto ad unione e intersezione. Infatti, dati $L_1$, $L_2 in$ P, si ha che $L_1 union L_2 in$ P e $L_1 inter L_2 in$ P: basta eseguire i due algoritmi deterministici polinomiali e per l'unione si accetta se almeno uno accetta, per l'intersezione si accetta solo se entrambi accettano. Un ragionamento analogo si può fare per NP.\
+Le classi P ed NP sono chiuse rispetto ad unione e intersezione. Infatti, dati $L_1$, $L_2 in$ P, si ha che $L_1 union L_2 in$ P e $L_1 inter L_2 in$ P: basta eseguire i due algoritmi deterministici polinomiali e per l'unione si accetta se almeno uno accetta, per l'intersezione si accetta solo se entrambi accettano. Un ragionamento analogo si può fare per NP.\
 P è anche chiusa rispetto alla complementazione (P = co-P): se un linguaggio $L$ è in P, esiste per definizione una MdT deterministica $M$ che lo decide in tempo polinomiale. Poiché $M$ termina sempre, per decidere il complementare $L^'$ (in questa sezione indichiamo con $'$ il complementare)  è sufficiente utilizzare la stessa macchina $M$ e scambiare gli stati finali di accettazione e rifiuto. Questa operazione non aggiunge transizioni, preservando la complessità polinomiale del calcolo. Ci chiediamo se anche NP è chiusa per complementazione.
 #index[Classe co-NP]
 #definition()[
   co-NP $= {L "linguaggio" | L^' in "NP"}$
 ]
 #example()[
-  Il problema UNSAT, che dato un polinomio booleano $p$ determina se *non* è soddisfaccibile, appartiene a co-NP.
+  Il problema UNSAT, che dato un polinomio booleano $p$ determina se *non* è soddisfacibile, appartiene a co-NP.
 ]
 #problem("Aperto")[
   NP è chiusa per complementazione?
@@ -1889,7 +1888,7 @@ P è anche chiusa rispetto alla complementazione (P = co-P): se un linguaggio $L
 ]
 #proof()[
   #rect($"co-NP" subset.eq "NP"$)
-  $Q in "co-NP" ==> Q' in "NP"$. Poiché $L in "NPC", exists f$ riduzione polinomiale da $Q' "a" L$, e osserviamo che _f_ è anche riduzione polinomiale da $Q "a" L' in "NP"$ (la stessa funzione di riduzione riduce anche i complementari).
+  $Q in "co-NP" ==> Q' in "NP"$. Poiché $L in "NPC", exists f$ riduzione polinomiale da $Q' "a" L$, e osserviamo che _f_ è anche una riduzione polinomiale da $Q "a" L' in "NP"$ (la stessa funzione di riduzione riduce anche i complementari).
 
   Determiniamo un algoritmo polinomiale non deterministico per decidere $Q$ data $w$ in input:
 
@@ -1918,7 +1917,7 @@ P è anche chiusa rispetto alla complementazione (P = co-P): se un linguaggio $L
    Poiché $L_1 in "co-NP"$, per definizione $L'_1 in "NP"$. Inoltre, $L without L_1 = L inter L'_1$. Siccome $L in "NP"$ e $L'_1 in "NP"$ e NP è chiusa rispetto all'intersezione, segue che $L inter L'_1 in "NP"$. Pertanto $L without L_1 in "NP"$.
 ]
 == Test di primalità
-Vogliamo trovare un algoritmo che dato un numero $n in NN$ in input determina se tale numero è primo.
+Vogliamo trovare un algoritmo che, dato un numero $n in NN$ in input, determini se tale numero è primo.
 #index[Test di primalità]
 #proposition()[
   _n_ composto $==> exists d | n, " con " d in [2, sqrt(n)]$
@@ -2026,7 +2025,7 @@ Altra idea: modifichiamo il piccolo teorema di Fermat.
   $
 ]
 
-Le congruenze da testare sono circa $n = 2^l$. #underline("Idea"): dividere i polinomi per $x^r - 1$, per un opportuno $r$. Agrawal, Kayac, Saxena (2002) hanno dimostrato che se _n_ è composto e si sceglie un _r_ "giusto", allora è sufficiente testare la seguente congruenza per "pochi" _a_:
+Le congruenze da testare sono circa $n = 2^l$. #underline("Idea"): dividere i polinomi per $x^r - 1$, per un opportuno $r$. Agrawal, Kayal, Saxena (2002) hanno dimostrato che se _n_ è composto e si sceglie un _r_ "giusto", allora è sufficiente testare la seguente congruenza per "pochi" _a_:
 $
   (x+a)^n equiv x^n + a quad (n, x^r - 1)
 $
@@ -2164,9 +2163,9 @@ $
   - data $x$, costruisco la stringa $y = x 1^2^(|x|^k)$;
   - uso $R$ per stabilire se $y in accent(L, tilde)$.
 
-  Complessivamente, l'algoritmo descritto sopra è esponenziale in $|x|$: poiché $|y| = O(2^(|x|^k))$, l'esecuzione di $R$ che ha complessita $O(n^h)$ richiede un tempo $O(|y|^h) = O(2^(h |x|^k))$ (ma anche costruire $y$ richiede tempo esponenziale).
+  Complessivamente, l'algoritmo descritto sopra è esponenziale in $|x|$: poiché $|y| = O(2^(|x|^k))$, l'esecuzione di $R$ che ha complessità $O(n^h)$ richiede un tempo $O(|y|^h) = O(2^(h |x|^k))$ (ma anche costruire $y$ richiede tempo esponenziale).
 
-  Dunque, se P = NP, il linguaggio arbitario $L$ appartiene non solo a NEXP ma anche ad EXP, ovvero NEXP $subset.eq$ EXP da cui EXP = NEXP. Per contronominale, questo equivale a $"EXP" eq.not "NEXP" ==> "P" eq.not "NP"$.
+  Dunque, se P = NP, il linguaggio arbitrario $L$ appartiene non solo a NEXP ma anche ad EXP, ovvero NEXP $subset.eq$ EXP da cui EXP = NEXP. Per contronominale, questo equivale a $"EXP" eq.not "NEXP" ==> "P" eq.not "NP"$.
 ]
 
 == Complessità in spazio
@@ -2177,7 +2176,7 @@ $
   $
     s c_M: NN --> NN
   $
-  dove $s c_M (n)$, è il numero di celle sui nastri di lavoro a cui le testine hanno accesso durante una computazione di $M$ su una stringa di lunghezza $n$, nel caso peggiore.
+  dove $s c_M (n)$ è il numero di celle sui nastri di lavoro (non considero il nastro di input) a cui le testine hanno accesso durante una computazione di $M$ su una stringa di lunghezza $n$, nel caso peggiore.
 ]
 
 #observation(multiple: true)[
@@ -2222,7 +2221,7 @@ Vediamo adesso che relazioni ci sono tra complessità spaziale e temporale:
 ]
 
 #proposition()[
-  Se $M$ MdT a 2 nastri, $|Q| = m, |Sigma| = t$ (cardinalità di insieme degli stati e alfabeto), allora:
+  Se $M$ MdT a 2 nastri, $|Q| = m, |Sigma| = t$ (cardinalità rispettivamente dell'insieme degli stati e dell'alfabeto), allora:
   $
     s c_M (n) = f(n) ==> t c_M (n) <= m dot (n+2) dot f(n) dot t^f(n)
   $
@@ -2244,7 +2243,7 @@ Vediamo adesso che relazioni ci sono tra complessità spaziale e temporale:
   $
 ]
 
-=== Classi PSACE e NPSPACE
+=== Classi PSPACE e NPSPACE
 
 #index[Classe PSPACE]
 #definition()[
@@ -2307,13 +2306,13 @@ Vediamo adesso che relazioni ci sono tra complessità spaziale e temporale:
     f(j) = f(j-1) + O("sc"_M (n)) = f(j-2) + 2 dot O("sc"_M (n)) = \ = dots.c = f(j-k) + k dot O("sc"_M (n)) = dots.c = j dot O("sc"_M (n)).
   $
 
-  Ponendo $j = c dot "sc"_M (n) = O(n^k)$ (perché $M$ è nondet. polinomiale), si ottiene che lo spazio totale richiesto è polinomiale in $n$. Dunque $L$ appartiene non solo a NPSPACE ma anche a PSPACE, e poiché $L$ è arbitrario vale NPSACE $subset.eq$ PSPACE che insieme all'inclusione opposta porta a PSPACE = NPSACE.
+  Ponendo $j = c dot "sc"_M (n) = O(n^k)$ (perché $M$ è nondet. polinomiale), si ottiene che lo spazio totale richiesto è polinomiale in $n$. Dunque $L$ appartiene non solo a NPSPACE ma anche a PSPACE, e poiché $L$ è arbitrario vale NPSPACE $subset.eq$ PSPACE che insieme all'inclusione opposta porta a PSPACE = NPSPACE.
 ]
 
 // Lezione del 13-05-2026
 #index[PSPACE-difficile]
 #definition()[
-  L linguaggio si dice *PSPACE-difficile* quando $forall Q in "PSPACE", exists f$ riduzione polinomiale in tempo da _Q_ a _L_.
+  Un linguaggio $L$ si dice *PSPACE-difficile* quando $forall Q in "PSPACE", exists f$ riduzione polinomiale in tempo da _Q_ a _L_.
 
   L si dice *PSPACE-completo* quando L è PSPACE-difficile e $L in "PSPACE"$
 ]
@@ -2436,7 +2435,7 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
   - $forall k$, $L_k in "PSPACE" ==> L_k in "P"$;
   - Il numero di linguaggi da controllare non è $2^q(n)$, ma $Omicron(log(2^(q(n)))) = Omicron(q(n))$ (ricerca binaria)
 
-  Dunque la complessità è polinomiale, perciò $f in$ FP ed essendo $f in$ \#P arbitraria vale la tesi.\ 
+  Dunque la complessità è polinomiale, perciò $f in$ FP e, essendo $f in$ \#P arbitraria, vale la tesi.\ 
 ]
 === Esempi di problemi di conteggio
 #index[Problema \#SAT]
@@ -2473,5 +2472,5 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
   $
     <= (2^m)^(n-1) dot n^(n-1) = (2^(n log_2 n))^(n-1) dot n^(n-1) = n^(n(n-1)) dot n^(n-1) = n^(n^2-n) dot n^(n-1) = n^(n^2-1) < n^(n^2)
   $
-  Dunque $G$ ha un circuito hamiltoniano se e solo se $G'$ ha almeno $n^(n^2)$ cicli. Sotto l'ipotesi \#CYCLE $in$ FP possiamo contare in tempo polionmiale il numero di cicli di $G'$ e confrontarlo con $n^(n^2)$, che in binario ha lunghezza $log_2(n^(n^2)) = n^2log_2(n)$. Questo permetterebbe di decidere HAM in tempo polinomiale e quindi si avrebbe P = NP.\
+  Dunque $G$ ha un circuito hamiltoniano se e solo se $G'$ ha almeno $n^(n^2)$ cicli. Sotto l'ipotesi \#CYCLE $in$ FP possiamo contare in tempo polinomiale il numero di cicli di $G'$ e confrontarlo con $n^(n^2)$, che in binario ha lunghezza $log_2(n^(n^2)) = n^2log_2(n)$. Questo permetterebbe di decidere HAM in tempo polinomiale e quindi si avrebbe P = NP.\
 ]
