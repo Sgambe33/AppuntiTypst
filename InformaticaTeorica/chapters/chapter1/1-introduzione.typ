@@ -134,11 +134,15 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 
 #index[Linguaggio semidecidibile]
 #definition()[
-  Un linguaggio $L$ è *semidecidibile* quando esiste un algoritmo $M$ che, data una stringa $w in Sigma^*$, $M$ termina su $w$ se $w in L$, altrimenti $M$ non termina.
+  Un linguaggio $L subset.eq Sigma^*$ si dice *semidecidibile* quando esiste
+  un algoritmo $M$ tale che, per ogni $w in Sigma^*$, se $w in L$, $M$ termina e accetta $w$.
 ]
 
 #observation()[
-  $L$ è semidecidibile $<==>$ esiste un algoritmo $M$ che, $forall w in Sigma^*$, se $w in L$ allora $M$ termina su $w$. Non specifico niente per il caso in cui $w in.not L$: $M$ può terminare oppure non terminare.
+  Ne segue che se $w in.not L$, $M$ non può terminare accettando $w$. La differenza rispetto alla decidibilità è che un algoritmo di decisione
+  termina su ogni input: accetta se $w in L$ e rifiuta se $w in.not L$. Un
+  algoritmo di semidecisione, invece, termina solo sugli input appartenenti
+  a $L$; sugli input $w in.not L$ non termina (o comunque non accetta mai).
 ]
 
 #proposition()[
@@ -816,7 +820,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
 #proposition()[
   $forall g: NN^k -> NN$ funzione *_rp_*, $exists c in NN$ tale che $forall arrow(x) in NN^k$, $g(arrow(x)) < A(c, sum_(i=1)^k x_i)$
 
-  Ovvero, per qualunque funzione *_rp_* del tipo $g: NN^k -> NN$, esiste una costante (un numero naturale) per cui, data una qualsiasi k-upla, la funzione calcolata su tale k-upla è strettamente minore della funzione di Ackermann con primo argomento la costante e secondo argomento la sommatoria della k-upla.
+  Ovvero, per qualunque funzione *_rp_* del tipo $g: NN^k -> NN$, esiste una costante (un numero naturale) per cui, data una qualsiasi $k$-upla, la funzione calcolata su tale $k$-upla è strettamente minore della funzione di Ackermann con primo argomento la costante e secondo argomento la sommatoria della $k$-upla.
 ]
 #proof()[
   Si dimostra per induzione strutturale, sulla costruzione dell'insieme delle funzioni *_rp_*:
@@ -849,7 +853,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
 #proof()[
   Supponiamo per assurdo che $A$ sia *_rp_*.
 
-  Allora, anche la funzione $B(x) = A(x, x)$ è *_rp_* ($B = A compose (epsilon_1^((1)), epsilon_1^((1)))$). Posso applicare il lemma precedente, quindi $exists c in NN$ tale che $forall x in NN, B(x) < A(c, x)$.
+  Allora, anche la funzione $B(x) = A(x, x)$ è *_rp_* ($B = A compose (epsilon_1^((1)), epsilon_1^((1)))$). Posso applicare la proposizione precedente, quindi $exists c in NN$ tale che $forall x in NN, B(x) < A(c, x)$.
 
   Ma allora se scelgo $x = c$ ottengo $B(c) < A(c, c) = B(c)$ per definizione, cioè $B(c)$ strettamente minore di $B(c)$, il che è assurdo. Per cui, $A$ non è *_rp_*.
 ]
@@ -874,7 +878,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
   - $f_i$ è ottenuta per RP da 2 funzioni precedenti, oppure
   - $f_i$ è ottenuta da $f_j$ regolare per minimalizzazione (con $j < i$)
   \
-  Una funzione si dice *$mu$-ricorsiva* quando compare in coda ad una derivazione $mu$-ricorsiva.
+  Una *funzione* si dice *$mu$-ricorsiva* quando compare in coda ad una derivazione $mu$-ricorsiva.
 ]
 
 #proposition()[

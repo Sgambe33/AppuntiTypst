@@ -377,7 +377,7 @@ Sia $G=(V, E)$ un grafo orientato, con:
   $
     forall i, space (x_i, x_(i+1)) in E, " con" (x_n, x_1) in E
   $
-  In parole povere, un *circuito hamiltoniano* è un percorso che passa una e una sola volta da tutti i vertici di un grafo.
+  In parole povere, un circuito hamiltoniano è un ciclo che passa una e una sola volta da tutti i vertici di un grafo per poi ritornare al vertice di partenza.
 ]
 #problem("HAM")[
   Dato un grafo orientato $G=(V,E)$, decidere se $G$ contiene un circuito hamiltoniano.
@@ -410,7 +410,7 @@ La MdT opera in questo modo:
   - Se entrambi i controlli sono passati, scrivo $i_j$ sul nastro 3. *ALTRIMENTI*, la sequenza attuale non è un circuito hamiltoniano: interrompo il ciclo e torno al passo 2 per generare la prossima.
 + Se il ciclo al passo 4 termina con successo per tutti i nodi della sequenza, allora ho trovato un circuito hamiltoniano valido: *ACCETTO*.
 Analizzando la complessità, il caso peggiore è quello della non accettazione, cioè il caso in cui $G$ non contenga alcun circuito hamiltoniano: in tal caso vengono generate tutte le sequenze possibili, della forma $(1, i_1, dots, i_(n-1), 1)$: il primo e l'ultimo vertice sono fissati, ma ci sono $n-1$ posizioni libere e ciascuna può assumere $n$ valori, quindi le sequenze sono in numero $n^(n-1)$, e di conseguenza questo algoritmo ha complessità esponenziale.\
-Attenzione: nonostante ciò non possiamo dire che HAM $in.not$ P. Per poterlo dire, dovremmo dimostrare che *nessuna* macchina deterministica può risolvere il problema in tempo polinomiale (che equivarrebbe a dimostrare $P!=N P$).
+Attenzione: nonostante ciò non possiamo dire che HAM $in.not$ P. Per poterlo dire, dovremmo dimostrare che *nessuna* macchina deterministica può risolvere il problema in tempo polinomiale (che equivarrebbe a dimostrare P $!=$ NP).
 === MdT non deterministica che risolve HAM
 Vediamo un'altra MdT, stavolta non deterministica, che risolve il problema HAM. Sia dato un grafo $G = (V, E)$, con $|V| = n$ e $|E| = k$. La codifica del grafo è quella già vista. La MdT non deterministica fa uso di 3 nastri, che sono gli stessi del caso deterministico escluso il nastro 4. Il comportamento è il seguente:
 
@@ -431,7 +431,7 @@ Complessivamente si ha:
 $
   O(k log n) + O(n log n) + O(n k log n) overbracket(<=, k >= n) \ <= O(k log k) + O(k log k) + O(k^2 log k) approx O(k^2 log k) <= O(k^3)
 $
-da questo deduciamo anche che HAM $in N P$ (in realtà andrebbe considerata la lunghezza dell'input per la funzione $t c_M$, ma con la codifica scelta la lunghezza dell'input è polinomialmente legata a $n$ e $k$, quindi il risultato resta polinomiale).
+da questo deduciamo anche che HAM $in$ NP (in realtà andrebbe considerata la lunghezza dell'input per la funzione $t c_M$, ma con la codifica scelta la lunghezza dell'input è polinomialmente legata a $n$ e $k$, quindi il risultato resta polinomiale).
 == Riducibilità polinomiale fra linguaggi
 #index[Riduzione polinomiale]
 #definition()[
@@ -471,7 +471,9 @@ da questo deduciamo anche che HAM $in N P$ (in realtà andrebbe considerata la l
 === Problemi NP-difficili e NP-completi
 #index[NP-difficile]
 #definition()[
-  Un linguaggio $L$ si dice *NP-difficile* quando $forall Q in "NP"$, $Q$ è polinomialmente riducibile a $L$ ("$L$ è difficile al più quanto $Q$").
+  Un linguaggio $L$ si dice *NP-difficile* quando $forall Q in "NP"$, $Q$ è polinomialmente riducibile a $L$. \
+  
+  In altri termini: "$Q$ è difficile *al più* quanto $L$" o equivalentemente "$L$ è difficile *almeno* quanto $Q$". Quindi risolvere $L$ è sufficiente per risolvere $Q$.
 ]
 
 #index[NP-completo]
@@ -544,7 +546,7 @@ da questo deduciamo anche che HAM $in N P$ (in realtà andrebbe considerata la l
   })
 }))
 
-I diagrammi sopra illustrano le due possibili soluzioni al più grande problema aperto dell'informatica teorica, *P vs NP*. Il diagramma di sinistra mostra lo scenario più accreditato $"P" != "NP"$, in cui l'insieme dei problemi verificabili in tempo polinomiale (NP) è rigidamente diviso tra problemi facilmente risolvibili (P), i problemi più complessi in assoluto a cui tutti gli altri sono riconducibili (NP-Completi) e una fascia di mezzo (NP-Intermedi) che non ricade in nessuna delle due. Il diagramma a destra, al contrario, rappresenta lo scenario che avrebbe enormi conseguenze per l'informatica. Infatti, se venisse dimostrato che $"P" = "NP"$, l'intera struttura collasserebbe: NP-I sarebbe vuota e ogni linguaggio non banale di NP sarebbe NP-completo; in particolare, tutti i problemi NP-completi diventerebbero risolvibili in tempo polinomiale.
+I diagrammi sopra illustrano le due possibili soluzioni al più grande problema aperto dell'informatica teorica, *P vs NP*. Il diagramma di sinistra mostra lo scenario più accreditato, $"P" != "NP"$, in cui l'insieme dei problemi verificabili in tempo polinomiale (NP) è rigidamente diviso tra problemi facilmente risolvibili (P), i problemi più complessi in assoluto a cui tutti gli altri sono riconducibili (NP-Completi) e una fascia di mezzo (NP-Intermedi) che non ricade in nessuna delle due. Il diagramma a destra, al contrario, rappresenta lo scenario che avrebbe enormi conseguenze per l'informatica. Infatti, se venisse dimostrato che $"P" = "NP"$, l'intera struttura collasserebbe: NP-I sarebbe vuota e ogni linguaggio non banale di NP sarebbe NP-completo; in particolare, tutti i problemi NP-completi diventerebbero risolvibili in tempo polinomiale.
 
 
 #proposition()[
@@ -716,7 +718,6 @@ In questo polinomio abbiamo quindi 3 variabili ($x_1, x_2, x_3$) e 4 letterali (
   - Esamino il polinomio di input da sinistra verso destra, fino a incontrare un letterale $v$, quindi confronto il valore binario che segue quel letterale (ovvero $t(v)$ in $v \# t(v))$ sul nastro 1 con quello che segue il letterale sul nastro 2 (ovvero, per esempio, $t(x_1)$ in $x_1\#t(x_1)$):
     - *Se sono uguali*: il letterale $v$ è soddisfatto e quindi la clausola in cui compare è soddisfatta (poiché è fatta da soli operatori $or$); posso quindi passare a esaminare la clausola successiva. Se la clausola appena esaminata era l'ultima, accetto e termino.
     - *Se non sono uguali*: il letterale $v$ non è soddisfatto, quindi passo a esaminare il letterale successivo. Se il letterale appena esaminato era l'ultimo della clausola, allora termino e rifiuto il polinomio, poiché la clausola in cui compariva tale letterale non è soddisfatta (il polinomio è una congiunzione di clausole, per cui devono essere tutte vere perché il polinomio sia soddisfatto). Si dice in questo caso che il polinomio non è soddisfacibile.
-]
 
 Analizziamo la complessità nel caso peggiore, ovvero il caso dell'accettazione (quando tutte le clausole sono soddisfatte), considerando $n$ variabili e $k$ letterali. Possiamo stimare la lunghezza dell'input in questo modo:
 $
@@ -727,7 +728,7 @@ $
    overbrace(n log n, "genero assegnamento") + overbrace(k n log n, "percorro nastro") <= n^2 + k n^2 <= ((n+k)log n)^2 + ((n+k)log n)^3
 $
 Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di conseguenza, la MdT costruita opera effettivamente in tempo polinomiale.
-
+]
 #observation()[
   Per una MdT deterministica il numero di assegnamenti da generare e verificare sarebbe invece esponenziale, poiché si dovrebbero generare e verificare tutte le possibili combinazioni.
 ]
@@ -894,7 +895,6 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
 #observation()[
   3-SAT è NP $and$ 3-SAT è NP-difficile $==>$ 3-SAT è NP-completo
 ]
-#pagebreak()
 == Altri problemi NP-completi
 Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione da 3-SAT per dimostrare la NP-completezza.
 
@@ -1826,7 +1826,7 @@ $
   - $t(alpha) = 1$
   - $forall beta "t.c." alpha arrow.long.squiggly beta, space t(beta) = 1$
   #observation()[
-    Fin qui _t_ è ben definito, perché non può accadere che $t(beta') = 1$, in quanto $alpha cancel(arrow.long.squiggly) beta'$: infatti, se per assurdo fosse $alpha arrow.long.squiggly beta'$, allora si avrebbe $beta arrow.long.squiggly alpha'$ (per l'osservaizone di prima) e quindi $alpha arrow.long.squiggly alpha'$, in contraddizione a quanto appena stabilito
+    Fin qui _t_ è ben definito, perché non può accadere che $t(beta') = 1$, in quanto $alpha cancel(arrow.long.squiggly) beta'$: infatti, se per assurdo fosse $alpha arrow.long.squiggly beta'$, allora si avrebbe $beta arrow.long.squiggly alpha'$ (per l'osservaizone di prima) e quindi $alpha arrow.long.squiggly alpha'$, in contraddizione a quanto appena stabilito.
   ]
   Eliminiamo ora da $p$ tutte le clausole soddisfatte da $t$. Le clausole rimanenti contengono soltanto letterali non ancora assegnati: infatti, se una clausola $beta' or gamma$ contenesse $beta'$ con $t(beta)=1$, avremmo l'arco $beta --> gamma$ e poiché $alpha arrow.long.squiggly beta$ avremmo anche $alpha arrow.long.squiggly gamma$, da cui $t(gamma)=1$; la clausola sarebbe dunque già stata eliminata. Ripetiamo il procedimento sul polinomio rimanente. A ogni passo viene eliminata almeno una clausola, quindi dopo un numero finito di passi otteniamo un assegnamento che soddisfa tutte le clausole di $p$. Pertanto $p$ è soddisfacibile.
 ]
@@ -1859,16 +1859,17 @@ Abbiamo visto (Sottosezione 3.4.1) che se $"P" eq.not "NP"$, ci sono dei linguag
   Se $"P" eq.not "NP"$, allora $"NP-I" eq.not emptyset$
 ]
 === co-NP
-La classe P è chiusa rispetto alla complementazione (P = co-P): se un linguaggio $L$ è in P, esiste per definizione una MdT deterministica $M$ che lo decide in tempo polinomiale. Poiché M termina sempre, per decidere il complementare $L^'$ (in questa sezione indichiamo con $'$ il complementare)  è sufficiente utilizzare la stessa macchina $M$ e scambiare gli stati finali di accettazione e rifiuto. Questa operazione non aggiunge transizioni, preservando la complessità polinomiale del calcolo. Ci chiediamo se questo vale anche per NP.
+La classi P ed NP sono chiuse rispetto ad unione e intersezione. Infatti, dati $L_1$, $L_2 in$ P, si ha che $L_1 union L_2 in$ P e $L_1 inter L_2 in$ P: basta eseguire i due algoritmi deterministici polinomiali e per l'unione si accetta se almeno uno accetta, per l'intersezione si accetta solo se entrambi accettano. Un ragionamento analogo si può fare per NP.\
+P è anche chiusa rispetto alla complementazione (P = co-P): se un linguaggio $L$ è in P, esiste per definizione una MdT deterministica $M$ che lo decide in tempo polinomiale. Poiché $M$ termina sempre, per decidere il complementare $L^'$ (in questa sezione indichiamo con $'$ il complementare)  è sufficiente utilizzare la stessa macchina $M$ e scambiare gli stati finali di accettazione e rifiuto. Questa operazione non aggiunge transizioni, preservando la complessità polinomiale del calcolo. Ci chiediamo se anche NP è chiusa per complementazione.
 #index[Classe co-NP]
 #definition()[
   co-NP $= {L "linguaggio" | L^' in "NP"}$
 ]
 #example()[
-  Il problema UNSAT, che dato se un polinomio booleano $p$ determina se *non* è soddisfaccibile, appartiene a co-NP.
+  Il problema UNSAT, che dato un polinomio booleano $p$ determina se *non* è soddisfaccibile, appartiene a co-NP.
 ]
 #problem("Aperto")[
-  NP è chiuso per complementazione?
+  NP è chiusa per complementazione?
   $ "co-NP" =^? "NP" $
 ]
 
@@ -1892,8 +1893,8 @@ La classe P è chiusa rispetto alla complementazione (P = co-P): se un linguaggi
 
   Determiniamo un algoritmo polinomiale non deterministico per decidere $Q$ data $w$ in input:
 
-  - Calcolo $f(w)$;
-  - Decido se $f(w) in L'$.
+  - calcolo $f(w)$;
+  - decido se $f(w) in L'$.
   Pertanto $Q in "NP"$.
 
 
@@ -1917,7 +1918,7 @@ La classe P è chiusa rispetto alla complementazione (P = co-P): se un linguaggi
    Poiché $L_1 in "co-NP"$, per definizione $L'_1 in "NP"$. Inoltre, $L without L_1 = L inter L'_1$. Siccome $L in "NP"$ e $L'_1 in "NP"$ e NP è chiusa rispetto all'intersezione, segue che $L inter L'_1 in "NP"$. Pertanto $L without L_1 in "NP"$.
 ]
 == Test di primalità
-Vogliamo trovare un algoritmo che dato un numero $n in NN$ in input determina se è primo.
+Vogliamo trovare un algoritmo che dato un numero $n in NN$ in input determina se tale numero è primo.
 #index[Test di primalità]
 #proposition()[
   _n_ composto $==> exists d | n, " con " d in [2, sqrt(n)]$
@@ -1958,15 +1959,14 @@ Dato $n in NN$:
 - se $a^(n-1) equiv 1 quad (n)$, allora $n$ primo
 - altrimenti, $n$ composto
 
-Questo algoritmo *è sbagliato*: applica il punto 2 del teorema di Fermat nel verso opposto (ovviamente non vale) e pertanto non è corretto. Però è polinomiale, quindi vogliamo "aggiustarlo" per farlo funzionare: infatti da questo deriva un algoritmo per calcolare le potenze modulari $a^n$ con complessità:
-$ Omicron(log n^2) = Omicron(l^2) $
-
+Questo algoritmo è *sbagliato*: applica il punto 2 del teorema di Fermat nel verso opposto e pertanto non è corretto. Però è polinomiale, quindi vale la pena "aggiustarlo" per farlo funzionare: infatti da questo deriva un algoritmo per calcolare le potenze modulari $a^n$ con complessità $Omicron(log n^2) = Omicron(l^2)$:
 #index[Teorema di Pratt]
 #theorem("Pratt, 1975")[
   $n in NN$.\
   Se $exists a in NN$ tale che:
   - $(a, n) = 1$
   - $a^(n - 1) equiv 1 quad (n)$
+
   - $forall q | n - 1, space q "primo", a^((n-1)/q) equiv.not 1 quad (n)$
   Allora $n$ è primo
 ]
@@ -1990,14 +1990,14 @@ L'algoritmo visto sopra rimane tuttavia non deterministico. Si può arrivare ad 
 ]
 
 #example()[
-  561 è un numero di carmichael. $561 = 3 dot 11 dot 17$
+  561 è un numero di Carmichael. $561 = 3 dot 11 dot 17$
 ]
 
 #theorem("Alford, Granville, Pomerance")[
   Esistono infiniti numeri di Carmichael.
 ]
 === Verso un algoritmo deterministico polinomiale
-#underline("Altra idea"): modifichiamo il piccolo teorema di Fermat.
+Altra idea: modifichiamo il piccolo teorema di Fermat.
 #index[Teorema di Agrawal (AKS)]
 #theorem("Agrawal")[
   Sia $n in NN, a in NN$ e $(a, n) = 1$:
@@ -2026,11 +2026,11 @@ L'algoritmo visto sopra rimane tuttavia non deterministico. Si può arrivare ad 
   $
 ]
 
-Le congruenze da testare sono circa $n = 2^l$. #underline("Idea"): dividere i polinomi per $x^r - 1$, per un opportuno $r$. Agrawal, Kayac, Saxena (2002) hanno dimostrato che: se _n_ è composto e si sceglie un _r_ "giusto", allora è sufficiente testare la seguente congruenza per "pochi" _a_:
+Le congruenze da testare sono circa $n = 2^l$. #underline("Idea"): dividere i polinomi per $x^r - 1$, per un opportuno $r$. Agrawal, Kayac, Saxena (2002) hanno dimostrato che se _n_ è composto e si sceglie un _r_ "giusto", allora è sufficiente testare la seguente congruenza per "pochi" _a_:
 $
   (x+a)^n equiv x^n + a quad (n, x^r - 1)
 $
-e ne trovo uno per cui non vale. Il "giusto" $r$ e i "pochi" $a$ si dimostra che sono polinomiali in "l". Quindi è una algoritmo deterministico per determinare se un numero è primo con complessità polinomiale.
+e ne trovo uno per cui non vale. Il "giusto" $r$ e i "pochi" $a$ si dimostra che sono polinomiali in $l$. Quindi siamo arrivati ad un algoritmo deterministico per determinare se un numero è primo con complessità polinomiale.
 
 == Classi di linguaggi esponenziali (EXP e NEXP)
 === EXP

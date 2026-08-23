@@ -6,7 +6,7 @@
   cover-image: image("cover.jpg", height: 100%, width: 100%),
 )[
 
-  #align(center, "Appunti basati su note prese a lezione e sugli appunti di Elena Simionato.")
+  #align(center, "Appunti basati su note prese a lezione, sul libro di Sudkamp e sugli appunti di Elena Simionato.")
   #outline(title: "Contenuti")
 
   #pagebreak()

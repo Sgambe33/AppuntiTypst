@@ -11,7 +11,7 @@ Introducendo le funzioni $mu$-ricorsive abbiamo visto una proposta di definizion
 
 - E' composta da un *nastro unidimensionale* infinito, sia da destra che da sinistra.
 - Il nastro è diviso in *celle* che possono contenere informazioni.
-- Le informazioni che si possono scrivere sul nastro sono *simboli* da un *alfabeto finito $Sigma$* definito inizialmente. Questo alfabeto contiene sempre un *simbolo privilegiato (\*)* che serve per denotare una *cella vuota* ed è normalmente implicito e non scritto tra i simboli dell'alfabeto.
+- Le informazioni che si possono scrivere sul nastro sono *simboli* da un *alfabeto finito $Sigma$* definito inizialmente. Questo alfabeto contiene sempre un *simbolo privilegiato* (*\**) che serve per denotare una *cella vuota* ed è normalmente implicito e non scritto tra i simboli dell'alfabeto.
 - C'è una *testina* che si occupa della *lettura/scrittura*, spostandosi a destra ($D$) e a sinistra ($S$), indicando una cella ad ogni spostamento. Ogni spostamento della testina è definito *passo di calcolo* o *transizione*.
 - La macchina ha un insieme di stati di memoria _Q_ = {$q_0, q_1, dots, q_n$}. Lo stato $q_0$ è chiamato stato iniziale e in seguito a una *transizione*, la macchina può cambiare stato.
 
@@ -166,7 +166,6 @@ Vale quindi la stessa tesi vista per le funzioni $mu$-ricorsive, in questo senso
 Dato un alfabeto $Sigma$ e un linguaggio $L subset.eq Sigma^*$, ci chiediamo se una stringa $w in Sigma^*$ appartiene a $L$. Per rispondere a questa domanda possiamo costruire una MdT $M$ che, data in input la stringa $w$, determina se $w in L$. In tal caso, si dice che $M$ *accetta* la stringa $w$. In generale, $M$ accetta il linguaggio $L$ se quest'ultimo è l'insieme di tutte e sole le stringhe che $M$ è in grado di accettare, ovvero $L = L(M)$ ("$L$ è il linguaggio accettato dalla MdT $M$"). Vediamo due modi in cui una MdT può accettare un linguaggio: per stati finali o per arresto.
 
 === Accettazione per stati finali
-Accettazione di una stringa per stati finali:
 - $Q$: insieme degli stati di una MdT
 - $F subset.eq Q$: insieme degli stati finali
 
@@ -596,6 +595,7 @@ Le $1,2,3$ indicano le transizioni per cui data quella coppia stato-simbolo la s
   - altrimenti viene generata sul nastro 3 la successiva sequenza di interi da 1 a $delta$ e si ripetono i passi precedenti.
 ]
 
+=== Tesi di Church generalizzata (per funzioni parziali $tau$-ricorsive)
 
 #index[Funzione parziale]
 #definition()[
@@ -623,7 +623,6 @@ Lavoriamo su $NN$ in codifica unaria.
   - Se $f(accent(x, arrow))arrow.t$, $M$ non termina su $accent(x, arrow)$.
 ]
 
-=== Tesi di Church generalizzata (per funzioni parziali $tau$-ricorsive)
 #index[Tesi di Church]
 #proposition[La classe delle funzioni parziali computabili coincide con la classe delle funzioni parziali $tau$-ricorsive.]
 Questa è la *forma generalizzata* della tesi di Church, che inizialmente avevamo presentato solo per funzioni totali. Si evidenzia che il modello della MdT è in grado di descrivere il comportamento di qualunque algoritmo, inclusa la sua capacità (o incapacità) di terminare.
@@ -749,7 +748,7 @@ Tale definizione è equivalente perché:
 - Ogni stringa su un alfabeto può essere codificata da un numero naturale. Questo secondo punto (e quindi il fatto che le due definizioni siano equivalenti) è garantito in particolare dalla *funzione di Gödelizzazione*:
 #index[Funzione di Gödelizzazione]
 #definition("Funzione di Gödelizzazione")[
-  Dato l'insieme dei numeri primi $P={2,3,5,7,dots}={p_1,p_2,p_3,dots}$ e l'alfabeto numerabile $Sigma={a_1,a_2,a_3,dots}$, definisco funzione di Gödelizzazione la funzione $accent(g, dot.double): Sigma^* -> NN$ che associa a una stringa costituita dai simboli di $Sigma$ un numero:
+  Dato l'insieme dei numeri primi $P={2,3,5,7,dots}={p_1,p_2,p_3,dots}$ e l'alfabeto numerabile $Sigma={a_1,a_2,a_3,dots}$, definisco funzione di Gödelizzazione la funzione $accent(g, dot.double): Sigma^* -> NN$ che associa un numero a una stringa costituita dai simboli di $Sigma$:
   $
     a_(i_1) a_(i_2) dots a_(i_n) --> p_1^(i_1) p_2^(i_2) dots p_n^(i_n)
   $
@@ -795,7 +794,9 @@ Vediamo quindi la formulazione alternativa del Teorema dell'arresto, dal punto d
   La MdT universale è un concetto fondamentale per la teoria della computabilità e per l'informatica tutta. Essa dimostra che esiste un'unica macchina in grado di simulare qualsiasi altra macchina, a condizione che le informazioni sulla macchina da simulare e il suo input siano fornite in un formato appropriato. In particolare introduce il concetto di "programma come dato", che troviamo in molti contesti informatici, tra cui:
 
   - *Interpreti:* se $R(M)$ è il codice sorgente, $w$ sono i dati di input passati al programma, allora la MdT universale $U$ è l'interprete che legge il codice riga per riga e ne simula il comportamento su _w_.
-  - *Sistemi Operativi:* il SO è esso stesso un programma in esecuzione e agisce come una MdT universale. Tratta i file eseguibili come codifiche $R(M)$, li carica dal disco alla RAM e ne fa simulare/eseguire il comportamento dalla CPU. In questo senso si nota anche l'impatto che questo concetto ha avuto sull'hardware con l'architettura di von Neumann, che ha permesso di avere un unico processore in grado di eseguire programmi diversi, a condizione che siano forniti in un formato appropriato.
+
+  - *Sistemi Operativi:* il SO è esso stesso un programma in esecuzione e agisce come una MdT universale. Tratta i file eseguibili come codifiche $R(M)$, li carica dal disco alla RAM e ne fa simulare/eseguire il comportamento dalla CPU.
+  
   - *Architettura di Von Neumann:* l'impatto della MdT universale riguarda anche l'hardware. Proprio come una MdT universale $U$ accetta sul suo nastro sia la codifica $R(M)$ che i dati $w$, questa architettura memorizza indistintamente *istruzioni* e *dati* nella stessa Memoria Centrale (RAM). Questo permette a un'unica CPU (hardware fisso) di comportarsi come infinite macchine diverse (simularne il comportamento) semplicemente cambiando i dati in memoria, senza dover modificare l'hardware.
 ]
 
