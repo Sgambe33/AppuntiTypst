@@ -11,6 +11,7 @@
     sul libro di Sudkamp (#emph("Languages and Machines"), Addison-Wesley, terza edizione) 
     e sugli appunti di Elena Simionato.
   ]
+  #align(center)[ Per contribuire: https://github.com/Sgambe33/AppuntiTypst]
   #outline(title: "Contenuti")
 
   #pagebreak()

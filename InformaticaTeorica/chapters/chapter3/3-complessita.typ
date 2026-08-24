@@ -1168,10 +1168,19 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
   Dato un grafo non orientato $G$ e un intero $k$, determinare se esiste un sottografo completo di $G$ avente $k$ vertici.
 ]
 #figure(image("images/esempioClique.png", width: 50%))
+#observation()[
+  Si ricorda che un *sottografo* di un grafo $G = (V, E)$ è un grafo
+  $G' = (V', E')$ tale che $V' subset.eq V$ ed $E' subset.eq E$.
+
+  Un sottografo si dice *completo* se ogni coppia di vertici distinti di
+  $V'$ è collegata da un arco, cioè se
+  $
+    forall u, v in V', u != v => {u, v} in E'.
+  $
+]
 #proposition()[
   Il problema Clique $in$ NP.
 ]
-
 #proposition()[
   Il problema Clique è NP-difficile
 ]
