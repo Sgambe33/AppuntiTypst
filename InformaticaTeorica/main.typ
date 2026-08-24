@@ -6,8 +6,11 @@
   subtitle: "a.a. 2025-2026",
   cover-image: image("cover.jpg", height: 100%, width: 100%),
 )[
-
-  #align(center, "Appunti basati su note prese a lezione, sul libro di Sudkamp e sugli appunti di Elena Simionato.")
+  #align(center)[
+    Appunti basati sulle lezioni del prof. Ferrari (UniFi), 
+    sul libro di Sudkamp (#emph("Languages and Machines"), Addison-Wesley, terza edizione) 
+    e sugli appunti di Elena Simionato.
+  ]
   #outline(title: "Contenuti")
 
   #pagebreak()
