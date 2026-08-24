@@ -3,6 +3,7 @@
 
 #dvdtyp(
   title: "Appunti Informatica Teorica",
+  subtitle: "a.a. 2025-2026",
   cover-image: image("cover.jpg", height: 100%, width: 100%),
 )[
 
