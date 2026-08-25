@@ -26,8 +26,8 @@
 
 #let dvdtyp(
   title: "",
-  subtitle: "",
-  author: "",
+  subtitle: none,
+  author: none,
   abstract: none,
   cover-image: none,
   accent: colors.at(6),
@@ -159,12 +159,6 @@
 }
 
 #let thmtext(t, color: rgb("#000000")) = {
-  let a = t.children
-  if (a.at(0) == [ ]) {
-    a.remove(0)
-  }
-  t = a.join()
-
   text(font: "New Computer Modern", fill: color)[#t]
 }
 
@@ -246,7 +240,11 @@
 
 #let problem-style = builder-thmbox(color: colors.at(16), shadow: (offset: (x: 2pt, y: 2pt), color: luma(70%)))
 
-#let problem = problem-style("problem", "Problema").with(numbering: none)
+//#let problem = problem-style("problem", "Problema").with(numbering: none)
+#let problem(identifier: "problem", multiple: false, ..args) = {
+  let name = if multiple { "Problemi" } else { "Problema" }
+  problem-style(identifier, name, ..args).with(numbering: none)(..args)
+}
 
 #let theorem-style = builder-thmbox(color: colors.at(1), shadow: (offset: (x: 3pt, y: 3pt), color: luma(70%)))
 
