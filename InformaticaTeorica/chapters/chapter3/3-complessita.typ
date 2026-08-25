@@ -902,7 +902,7 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
 #definition()[
   Dato $G=(V, E)$ grafo non orientato, un *vertex cover* (VC) di $G$ è un sottoinsieme $C subset.eq V$ t.c. $forall{x,y} in E, space x in C "oppure" y in C$
 ]
-#figure(image("images/2026-08-11-11-08-48.png", width: 60%), caption: "Vertex cover con C = {1,6,4,7,2,3,8}")
+#figure(image("images/2026-08-11-11-08-48.png", width: 60%), caption: "Un vertex cover di questo grafo è C = {1,6,4,7,2,3,8}. Un VC minimo potrebbe essere invece {1,3,4,7,8}.")
 
 #index[Problema del Vertex Cover]
 #problem("Vertex Cover")[
