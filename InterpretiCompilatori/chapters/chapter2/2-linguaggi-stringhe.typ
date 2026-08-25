@@ -4,7 +4,225 @@
 #import "@preview/pinit:0.2.2": *
 
 #pagebreak()
-= Analisi Lessicale
+= Sulle stringhe e sui linguaggi
+
+== Alfabeti e Stringhe
+
+Un *alfabeto* è un insieme finito di *simboli* non vuoto. Ogni simbolo è un'entità indivisibile. Un alfabeto si indica con $Sigma$:
+$
+  Sigma = {a,b,c} space "oppure" space Sigma = {"if", "else", "then"}
+$
+Una *stringa* di un dato alfabeto è definita come una sequenza di simboli presi da quell'alfabeto:
+$
+  w = s_1 s_2 ... s_n space "con" space s_i in Sigma, n<infinity
+$
+Una stringa vuota, che non contiene simboli, si indica con $epsilon$. Il numero dei simboli che compongono una stringa rappresenta la sua *lunghezza* e si indica con $abs(w)$, di conseguenza vale che $abs(epsilon)=0$.
+
+L'insieme di tutte le stringhe di lunghezza $k$ con $k gt.eq 0$ si indica con $Sigma^k$. $Sigma^0 = {epsilon}$.
+
+L'insieme di tutte le stringhe di qualsiasi lunghezza è $Sigma^*$ che per definizione può essere riscritto come:
+$
+  Sigma^* = Sigma^0 union Sigma^1 union Sigma^2 union ...
+$
+Si può anche indicare l'insieme delle stringhe di lunghezza almeno 1:
+$
+  Sigma^+ = Sigma^1 union Sigma^2 union ...
+$
+
+#definition()[
+  Due stringhe sono *uguali* ($u$ = $v$) se:
+  $abs(u) = abs(v)$ e $x_i = y_i$ per $i=1,2,3,...,n$.
+]
+
+#definition("Sottostringa")[
+  Una stringa $k$ è detta *sottostringa* di $u$ se:
+  $u= w k z$, dove $w$ e $z$ sono stringhe, eventualmente vuote.
+]
+
+#definition("Suffisso e Prefisso")[
+  - $k$ è *prefisso* di $u$ se $u = k z$
+  - $k$ è *suffisso* di $u$ se $u=w k$
+]
+
+
+=== Operazioni su stringhe
+
+Date due stringhe $u$ e $v$ definite come:
+$
+  u = x_1 x_2 ... x_n space space v = y_1 y_2 ... y_k
+$
+Sulle stringhe si possono effettuare alcune operazioni come:
+- Concatenazione
+- Potenza
+- Reverse
+
+==== Concatenazione
+La concatenazione di $u$ e $v$ restituisce una nuova stringa #mtext("uv") definita come:
+$
+  mtext("uv") = x_1 x_2 ... x_n y_1 y_2 ... y_k
+$
+La stringa vuota ($epsilon$) è l'elemento neutro rispetto all'operazione di concatenamento, cioè
+$
+  epsilon s = s epsilon = s
+$
+per qualsiasi stringa $s$. Gode solo della proprietà associativa. Ovviamente la concatenazione può essere applicata a più di due stringhe.
+
+==== Potenza
+
+La potenza $u^n$ con $n gt 0$ indica la concatenazione della stringa con se stessa $n$ volte.
+$
+  u^0 = epsilon space space space abs(u^n) = n times abs(u)
+$
+
+==== Reverse
+
+L'operazione di _reverse_ consiste nell'invertire l'ordine dei simboli nella stringa:
+$
+  u = x_1 x_2 dots x_n => u^R = x_n dots x_2 x_1
+$
+
+== Linguaggi
+
+Un linguaggio $L$ è un insieme numerabile di stringhe di un dato alfabeto $Sigma$:
+$
+  L subset.eq Sigma^*
+$
+
+Essendo i linguaggi degli insiemi a tutti gli effetti, è possibile applicare le classiche operazioni insiemistiche su di essi:
+- Concatenazione
+- Unione
+- Intersezione
+- Differenza
+
+=== Concatenazione
+
+Dati due linguaggi $L_x$ e $L_y$, la loro concatenazione $L_x L_y$ è definita come:
+$
+  L_x L_y = {x y bar x in L_x and y in L_y }
+$
+
+=== Unione
+
+Dati due linguaggi $L_x$ e $L_y$, la loro unione $L_x union L_y$ è definita come l'insieme delle stringhe che appartengono ad almeno uno dei due:
+$
+  L_x union L_y = {z in Sigma^* bar z in L_x or z in L_y }
+$
+
+=== Intersezione
+
+Dati due linguaggi $L_x$ e $L_y$, la loro intersezione $L_x inter L_y$ è definita come:
+$
+  L_x inter L_y = {z in Sigma^* bar z in L_x and z in L_y }
+$
+
+=== Differenza
+
+Dati due linguaggi $L_x$ e $L_y$, la loro differenza $L_x - L_y$ è definita come l'insieme delle stringhe che appartengono al primo ma non al secondo:
+$
+  L_x - L_y = {z in Sigma^* bar z in L_x and z in.not L_y }
+$
+
+=== Chiusura di un linguaggio
+==== Chiusura di Kleene ($L^*$)
+È l'insieme delle stringhe ottenute concatenando $L$ con se stesso zero o più volte. Include sempre la stringa vuota $epsilon$ (poiché $L^0 = \{epsilon\}$).
+$
+  L^* = union.big_(i gt.eq 0) L^i
+$
+
+==== Chiusura Positiva ($L^+$)
+Coincide con la chiusura di Kleene a meno del termine $L^0$. Questo significa che la stringa vuota $epsilon$ non appartiene a $L^+$, a meno che essa non appartenga già a $L$ stesso.
+$
+  L^+ = union.big_(i gt 0) L^i
+$
+
+#observation()[
+  - $L^+ = L L^* = L^* L$ (stringa vuota è elemento neutro rispetto alla concatenazione)
+  - $L^+ = L union L L^+$
+]
+
+Si definiscono inoltre:
+- $Sigma^*$ (*linguaggio universale*): l'insieme di tutte le possibili stringhe sull'alfabeto $Sigma$;
+- $Sigma^+$ (*linguaggio universale positivo*): l'insieme di tutte le stringhe di $Sigma^*$ ad eccezione della stringa vuota $epsilon$ (quindi $Sigma^+ = Sigma^* - {epsilon}$);
+- $overline(L) = Sigma^* - L$ (*linguaggio complementare*): l'insieme delle stringhe di $Sigma^*$ che non appartengono a $L$.
+
+=== Definizione ricorsiva di linguaggio
+
+I linguaggi formali possono essere definiti in modo ricorsivo tramite tre componenti essenziali:
+- #underline("Base"): fornisce un insieme finito di stringhe iniziali che appartengono sicuramente a $L$.
+- #underline("Passo ricorsivo"): regole di produzione che indicano come generare nuove stringhe partendo da stringhe già note in $L$ (es: se $v_1, dots, v_j "in" L$, allora $f(v_1, dots, v_j) "in" L$)
+- #underline("Chiusura"): una stringa $w$ appartiene a $L$ solo se può essere ottenuta dagli elementi di base con un numero finito di applicazioni del passo ricorsivo.
+
+
+#example(multiple: true)[
+  + Stringhe su {a,b} che iniziano con a e hanno lunghezza pari.
+    $
+      L= {w in {a,b}^* bar w = a u, abs(w) = 2n "con" n > 0}
+    $
+
+    - #underline("Base"): aa, ab $in L$
+    - #underline("Passo ricorsivo"): se u $in L ==> mtext("uaa, uab, uba, ubb") in L$
+
+  + Stringhe su {a,b} in cui ogni occorrenza di b è preceduta da a.
+    - $underline(text("Base")): epsilon in L$
+    - $underline(text("Passo ricorsivo")): text("se") u in L ==> u a, u a b in L$
+    - $underline(text("Passo ricorsivo")): text("se") u in L ==> a u, a b u in L$
+
+  + Espressioni con $n$, +, -, \*, ), (, /
+    - $underline(text("Base")): n in L$
+    - $underline(text("Passo ricorsivo")):$ se $u,v in L ==> (u),u+v,u-v,u*v,u\/v in L$
+
+  + Linguaggio $L={a^n b^(2n) bar n > 0}$
+    - $underline(text("Base")): a b b in L$
+    - $underline(text("Passo ricorsivo")):$ se $u in L ==> a u b b in L$
+
+  + Linguaggio $L={a^n b^n bar n>=0}$
+    - $underline(text("Base")): epsilon in L$
+    - $underline(text("Passo ricorsivo")):$ se $u in L ==> a u b in L$
+
+  + Stringhe su {a,b} che contengono lo stesso numero di $a$ e di $b$.\
+    $
+      L={w in {a,b}^* bar |w|_a = |w|_b}
+    $
+    - $underline(text("Base")): epsilon in L$
+    - $underline(text("Passo ricorsivo")):$ se $u, v in L ==> a u b v, b u a v in L$
+    Passi ricorsivi errati:
+    - $underline(text("Passo ricorsivo")):$ se $u in L ==> u a b in L$ (genera solo stringhe nella forma #mtext("ababab..."))
+    - $underline(text("Passo ricorsivo")):$ se $u in L ==> b u a, a u b in L$ (genera solo stringhe con lettere diverse agli estremi)
+
+  + Linguaggio $L={a^i b^j bar 0 < i < j}$
+    - $underline(text("Base")): a b b in L$
+    - $underline(text("Passo ricorsivo")):$ se $u in L ==> u b, a u b in L$
+    Supponiamo di voler ottenere $a^5 b^8$. Diventa: abb $=>$ aabbb $=>$ aaabbbb $=>$ aaaabbbbb $=>$ aaaaabbbbbb $=>$ aaaaabbbbbbbb
+
+  + Linguaggio $L'={a^i b^j bar i > j > 0}$
+    - $underline(text("Base")): a a b in L'$
+    - $underline(text("Passo ricorsivo")):$ se $u in L' ==> a u, a u b in L'$
+
+  + Linguaggio $L''={a^i b^j bar i != j; quad i, j > 0}$\
+    $L'' = L union L'$
+    - $underline(text("Base")): a a b, a b b in L$
+    - #underline("Passo ricorsivo"): se $u in L ==> a u b in L$ attenzione, questo genera un linguaggio incompleto!
+]
+
+=== Linguaggi regolari
+
+I linguaggi regolari su un alfabeto $Sigma$ sono definiti ricorsivamente a partire dagli elementi di base usando le operazioni di unione, concatenazione e chiusura.
+
+- #underline("Base"): i seguenti insiemi elementari sono regolari
+  - L'insieme vuoto $emptyset$
+  - L'insieme contenente solo la stringa vuota ${epsilon}$
+  - L'insieme contenente un singolo simbolo dell'alfabeto ${t}, forall t in Sigma$
+- #underline("Passo ricorsivo"): se $x$ e $y$ sono insiemi regolari, allora anche $x union y, x y, x^*, x^+$ sono regolari.
+- #underline("Chiusura"): un insieme è regolare se e solo se può essere ottenuto dagli elementi di base tramite un numero finito di applicazioni del passo ricorsivo.
+
+#example()[
+  $L$ su $Sigma = {a,b}$ in cui ogni occorrenza di b è preceduta da a.
+  + ${a}$ è regolare
+  + ${b}$ è regolare
+  + ${a}{b}$ è regolare
+  + ${a} union {a}{b}$ è regolare
+  + $({a} union {a}{b})^*$ è regolare
+]
 
 == Espressioni regolari
 #definition()[

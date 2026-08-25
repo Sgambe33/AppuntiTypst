@@ -59,7 +59,7 @@ La seguente SDD può costruire sia alberi sintattici sia DAG, a patto di modific
 Per esempio, prima di costruire un nuovo nodo `Node(op, left, right)`, la logica del compilatore deve scansionare una tabella hash per verificare se esiste già un nodo con etichetta `op` e con figli `left` e `right` (esattamente in quest'ordine). Se tale nodo esiste, la funzione `Node()` restituisce il puntatore a quel nodo; altrimenti, ne alloca uno nuovo.
 
 #example()[
-  La seguente sequenza di passi costruisce il DAG mostrato nell'esempio #link(<esempioDAG1>, [*precedente*]), a patto che le funzioni Leaf () e Node() ritornino un nodo gia esistente, secondo quanto appena discusso, quando cid é possibile.
+  La seguente sequenza di passi costruisce il DAG mostrato nell'esempio #link(<esempioDAG1>, [*precedente*]), a patto che le funzioni Leaf () e Node() ritornino un nodo gia esistente, secondo quanto appena discusso.
   #figure(image("images/2025-11-27-16-18-56.png"))
 
   Assumiamo che `entry-a` sia un puntatore all'elemento della tabella dei simboli relativo ad $a$, e così per gli altri identificatori.
@@ -77,7 +77,7 @@ In questa struttura:
 
 #figure(image("images/2025-11-27-17-58-19.png"))
 
-Nel diagramma (b) le foglie hanno un campo aggiuntivo contenente il valore lessicale (nel caso in esame un puntatore a un elemento della tabella dei simboli oppure una costante); i nodi interni hanno due campi aggiuntivi che rappresentano i figli sinistro e destro.
+Nel diagramma (b) le foglie hanno un campo aggiuntivo contenente il valore lessicale; i nodi interni hanno due campi aggiuntivi che rappresentano i figli sinistro e destro.
 
 In questo array ci si riferisce ai nodi e alle sottoespressioni semplicemente mediante l'indice del record corrispondente. Storicamente, tale indice è chiamato *valore numerico* del nodo o dell'espressione che esso rappresenta. Per esempio, nel diagramma precedente, il nodo con etichetta + ha valore numerico 3 e i suoi figli sinistro e destro hanno rispettivamente valore numerico 1 e 2. Benché in pratica si utilizzino spesso puntatori ai record o riferimenti agli oggetti, si continua a usare il termine “valore numerico” per indicare i riferimenti a un nodo. Se memorizzati in una opportuna struttura dati, i valori numerici permettono di costruire il DAG di un'espressione in modo molto efficiente attraverso un algoritmo.
 
@@ -131,6 +131,9 @@ Le istruzioni più comuni appaiono invece nelle seguenti forme:
 #example()[
   Consideriamo il seguente statement: `do i = i+1; while (a[i] < v);`. Si possono avere due possibili traduzioni: nella prima si associa un'etichetta simbolica alla prima istruzione, nella seconda si utilizzano i numeri delle posizioni delle istruzioni.
   #figure(image("images/2025-11-28-12-05-56.png"))
+  #observation()[
+    La moltiplicazione è necessaria per il calcolo dell'indirizzo di offset.
+  ]
 ]
 
 === Quadruple
@@ -144,7 +147,7 @@ Alcune eccezioni a questa regola generale sono:
 + Le istruzioni di salto condizionato e incondizionato salvano l'etichetta in `result`.
 
 #example()[
-  II codice a tre indirizzi dell'assegnamento `a = b*-c + b*-c;` è mostrato nella che segue. L'operatore speciale `minus` è utilizzato per distinguere   il meno unario, come in `-b`, dall'operatore binario di sottrazione, come in `b - c`. Si noti che le istruzioni relative al meno unario, così come l'istruzione di copia `a = t5`, utilizzano solamente due dei tre indirizzi.
+  II codice a tre indirizzi dell'assegnamento `a = b*-c + b*-c;` è mostrato nella figura che segue. L'operatore speciale `minus` è utilizzato per distinguere   il meno unario, come in `-b`, dall'operatore binario di sottrazione, come in `b - c`. Si noti che le istruzioni relative al meno unario, così come l'istruzione di copia `a = t5`, utilizzano solamente due dei tre indirizzi.
   #figure(image("images/2026-05-18-09-42-44.png"))
 ]
 
@@ -160,6 +163,8 @@ Come si nota dalla Figura 6.10(b), il campo `result` è utilizzato principalment
 
 Uno dei vantaggi delle quadruple rispetto alle triple emerge considerando i compilatori ottimizzanti, in cui spesso le istruzioni vengono riorganizzate e spostate. Usando le quadruple, infatti, se spostiamo un'istruzione che calcola una variabile temporanea `t`, le istruzioni che utilizzano `t` non richiedono alcuna modifica. Usando le triple, invece, ci si riferisce al risultato di un'operazione mediante la sua posizione nel codice, perciò spostare un istruzione richiede una modifica a tutte le triple che fanno riferimento al risultato che questa calcola. Tale problema, tuttavia, può essere risolto grazie alle triple indirette.
 
+
+=== Triple indirette
 Le *triple indirette* consistono in una lista di puntatori a triple, piuttosto che in una lista delle triple stesse. Possiamo per esempio usare un array _instruction_ per memorizzare i puntatori alle triple nell'ordine desiderato. In tal caso, le triple della Figura 6.11(b) potrebbero essere rappresentate come nella Figura 6.12.
 
 #figure(image("images/2025-11-30-21-33-49.png"))
@@ -181,11 +186,11 @@ I tipi hanno una struttura ben precisa che noi rappresenteremo mediante le *espr
 
 - Un tipo di base è un'espressione di tipo. I classici tipi di base per molti linguaggi sono boolean, char, integer, float e void;
 
-- Un nome di tipo é un'espressione di tipo.
+- Un nome di tipo è un'espressione di tipo.
 
-- Un'espressione di tipo pud essere costruita applicando il costruttore di tipo array a un intero e a un'espressione di tipo.
+- Un'espressione di tipo può essere costruita applicando il costruttore di tipo `array` a un intero e a un'espressione di tipo.
 
-- Un record è una struttura dati composta da campi aventi un nome. Una espressione di tipo può essere in questo caso ottenuta applicando il costruttore di tipo record ai nomi dei campi e ai loro tipi.
+- Un record è una struttura dati composta da campi aventi un nome. Una espressione di tipo può essere in questo caso ottenuta applicando il costruttore di tipo `record` ai nomi dei campi e ai loro tipi.
 
 - Un'espressione può essere ottenuta applicando il costruttore di tipo $->$ relativo ai tipi delle funzioni. Scriviamo $s -> t$ per indicare una funzione dal tipo $s$ (tipo degli argomenti) al tipo $t$ (tipo del valore restituito).
 
@@ -390,7 +395,7 @@ I calcoli degli indirizzi visti fino a questo punto assumono che gli array siano
 
 === Traduzione dei riferimenti ad array
 
-Il problema principale nella generazione del codice per i riferimenti agli elementi di un array consiste nel correlare i calcoli dell'indirizzo visti nel Paragrafo 6.4.3 alla grammatica corrispondente. Sia $L$ un non-terminale che genera un nome di array seguito da una sequenza di espressioni per gli indici:
+Il problema principale nella generazione del codice per i riferimenti agli elementi di un array consiste nel correlare i calcoli dell'indirizzo alla grammatica corrispondente. Sia $L$ un non-terminale che genera un nome di array seguito da una sequenza di espressioni per gli indici:
 
 $
   L -> L [ E ] | text("id") [ E ]
@@ -419,7 +424,6 @@ Le produzioni $E -> E_1 + E_2$ e $E -> text("id")$ sono le stesse già studiate.
   La Figura 6.23 mostra un albero di parsing annotato relativo all'espressione `c + a[i][j]`. Tale espressione viene tradotta nel codice a tre indirizzi riportato nella Figura 6.24, in cui abbiamo utilizzato, come di consueto, i nomi dei simboli per riferirci ai corrispondenti elementi nella tabella dei simboli.
 
   #figure(image("images/2025-12-02-17-18-18.png"))
-  #figure(image("images/2025-12-02-17-18-37.png"))
 
   #align(center, block(
     fill: luma(240),
@@ -437,14 +441,16 @@ Le produzioni $E -> E_1 + E_2$ e $E -> text("id")$ sono le stesse già studiate.
 
 //10.12.2025
 == Controllo dei tipi
+Il controllo dei tipi assegna un'espressione di tipo a ogni componente del codice per verificarne la conformità rispetto alle regole logiche del linguaggio (il _type system_), con l'obiettivo di intercettare eventuali errori.
 
-Per poter effettuare il controllo dei tipi un compilatore deve dapprima assegnare un'espressione di tipo a ogni componente del programma sorgente per poi procedere a verificare che tali espressioni siano conformi rispetto a un insieme di regole logiche comunemente detto _type system_ di un linguaggio.
-Il controllo dei tipi può portare all'individuazione di errori nel programma. In linea di principio, tutti i controlli di tipo possono essere effettuati a run-time a patto che il codice generato conservi non solo il valore di ogni elemento, ma anche il suo tipo. Un type system solido elimina la necessità di effettuare controlli dinamici di errori di tipo poiché è in grado di stabilire a livello statico (compile-time) che quegli errori non si potranno verificare durante l'esecuzione. Si dice che l'implementazione di un linguaggio è *fortemente tipizzata* se il compilatore garantisce che i programmi che accetta potranno essere eseguiti senza che si verifichino errori di tipo.
+- *Controllo dinamico (Run-time):* i controlli avvengono durante l'esecuzione. Richiede che il codice generato conservi in memoria sia il valore che il tipo di ogni elemento.
+- *Controllo statico (Compile-time):* un _type system_ solido anticipa le verifiche alla fase di compilazione, eliminando la necessità (e il costo) dei controlli a run-time.
+- *Tipizzazione forte:* l'implementazione di un linguaggio si dice *fortemente tipizzata* se il compilatore può garantire in modo assoluto che un programma accettato verrà eseguito senza generare errori di tipo.
 
 
 === Regole per il controllo dei tipi
 
-Il controllo dei tipi può assumere due forme: *sintesi* e *inferenza*. La sintesi dei tipi prevede la costruzione di un tipo di un'espressione a partire dal tipo delle sue sotto-espressioni. Tale approccio richiede che tutti i nomi siano dichiarati prima di poter essere utilizzati. Il tipo di un'espressione come $E_1 + E_2$ è definito in base al tipo di $E_1$ e a quello di $E_2$. Una tipica regola che si incontra nella sintesi dei tipi ha la forma:
+Il controllo dei tipi può assumere due forme: *sintesi* e *inferenza*. La *sintesi* dei tipi prevede la costruzione di un tipo di un'espressione a partire dal tipo delle sue sotto-espressioni. Tale approccio richiede che tutti i nomi siano dichiarati prima di poter essere utilizzati. Il tipo di un'espressione come $E_1 + E_2$ è definito in base al tipo di $E_1$ e a quello di $E_2$. Una tipica regola che si incontra nella sintesi dei tipi ha la forma:
 
 #algo()[
   *if* $f$ è di tipo $s -> t$ *and* $x$ è di tipo $s$, \
@@ -453,7 +459,7 @@ Il controllo dei tipi può assumere due forme: *sintesi* e *inferenza*. La sinte
 
 In questa regola, che si riferisce a funzioni con un solo argomento, $f$ e $x$ indicano espressioni e la scrittura $s -> t$ indica una funzione da $s$ a $t$.
 
-L'inferenza di tipo determina il tipo di un costrutto del linguaggio in base al modo in cui esso è utilizzato. Sia `null()` una funzione che verifica se una lista è vuota. In tal caso, in base a un suo utilizzo nella forma `null(x)` possiamo concludere che $x$ deve essere una lista. Il tipo degli elementi della lista, tuttavia, non è noto; al momento si può soltanto stabilire che $x$ è una lista di elementi di tipo ignoto.
+L'*inferenza* di tipo determina il tipo di un costrutto del linguaggio in base al modo in cui esso è utilizzato. Sia `null()` una funzione che verifica se una lista è vuota. In tal caso, in base a un suo utilizzo nella forma `null(x)` possiamo concludere che $x$ deve essere una lista. Il tipo degli elementi della lista, tuttavia, non è noto; al momento si può soltanto stabilire che $x$ è una lista di elementi di tipo ignoto.
 
 #observation()[
   Useremo le lettere greche $alpha, beta$ e così via, per indicare variabili di tipo nelle espressioni di tipo.
@@ -462,7 +468,7 @@ L'inferenza di tipo determina il tipo di un costrutto del linguaggio in base al 
 Una tipica regola per l'inferenza di tipo ha la forma seguente:
 
 #algo()[
-  *if* $f(x)$ è un'espressione, \
+  *if* $f(x)$ è una funzione, \
   *then* per qualche $alpha$ e $beta$, $f$ è di tipo $alpha -> beta$ *and* $x$ è di tipo $alpha$
 ]
 
@@ -493,17 +499,16 @@ Illustreremo la sintesi dei tipi estendendo lo schema di traduzione relativo all
 All'aumentare del numero dei tipi, il numero dei casi da considerare cresce molto rapidamente.
 
 #figure(image("images/2025-12-10-17-43-38.png"))
-[Image of type widening and narrowing conversions hierarchy diagram]
 
 Le regole di conversione di tipo variano da linguaggio a linguaggio. Le regole di conversione per il linguaggio Java riportate nella Figura 6.25 distinguono due casi:
 - *Conversioni con ampliamento* o promozioni (*widening*), che hanno lo scopo di preservare l'informazione intatta.
 - *Conversioni con restrizione* o demozioni (*narrowing*), che possono portare invece a una perdita di informazione.
 
-Le regole di promozione sono date dalla gerarchia della Figura 6.25(a): ogni tipo può essere promosso a un tipo più in alto nella gerarchia. Per
+Le regole di promozione sono date dalla gerarchia della Figura 6.25(a): ogni tipo può essere promosso a un tipo più in alto nella gerarchia.
 
 === Sovraccaricamento di funzioni e operatori
 Un simbolo *sovraccaricato* (*overloaded*) ha diversi significati a seconda del contesto in cui si trova. Si dice che il sovraccaricamento viene _risolto_ quando si assegna un significato univoco a ogni occorrenza di un nome.
-Una possibile regola per la sintesi del tipo di funzioni sovraccaricate é la seguente:
+Una possibile regola per la sintesi del tipo di funzioni sovraccaricate è la seguente:
 #algo()[
   *if* $f$ può essere di tipo $s_i->t_i$, per $1 lt.eq i lt.eq n$, con $s_i eq.not s_j$ per $i eq.not j$\
   *and* $x$ è di tipo $s_k$, per qualche valore di $k$ tale che $1 lt.eq k lt.eq n$ \
@@ -512,7 +517,9 @@ Una possibile regola per la sintesi del tipo di funzioni sovraccaricate é la se
 Il metodo del valore numerico può essere applicato a espressioni di tipo per risolvere efficientemente il problema del sovraccaricamento sulla base del tipo degli argomenti. L'ipotesi di poter risolvere il sovraccaricamento di una funzione sulla base del tipo dei soli argomenti equivale all'ipotesi di poter risolvere il sovraccaricamento in base alla firma delle funzioni. Non sempre, tuttavia, l'analisi del tipo dei soli argomenti è sufficiente a risolvere il sovraccaricamento di una funzione.
 
 === Inferenza del tipo e funzioni polimorfiche
-L'inferenza del tipo è utile nel caso di linguaggi come ML, che pur essendo fortemente tipizzato, non richiede di dichiarare i nomi prima dell'uso. L'inferenza di tipo assicura che i nomi siano usati in modo consistente. Il termine *polimorfico* indica in generale un qualsiasi frammento di codice che possa essere eseguito con argomenti di diversi tipi. In questo paragrafo considereremo il polimorfismo parametrico, cioe quel tipo di polimorfismo caratterizzato da parametri o da variabili di tipo. A tale scopo ci riferiremo al programma in linguaggio ML che definisce la funzione _length_():
+In linguaggi fortemente tipizzati come ML, non è sempre necessario dichiarare esplicitamente il tipo delle variabili prima del loro uso. È il compilatore stesso a occuparsi dell'*inferenza del tipo*, analizzando il codice per dedurre i tipi in gioco e assicurarsi che vengano usati in modo coerente.
+Questo meccanismo si sposa perfettamente con il concetto di *polimorfismo parametrico*, ovvero la capacità di scrivere un frammento di codice (come una funzione) in grado di operare su argomenti di tipi diversi, rappresentati astrattamente tramite "variabili di tipo" (spesso indicate con lettere greche come $alpha$).
+
 #align(center, [
   ```ML
   fun length() = if null(x) then 0 else length(tl(x)) + 1;
@@ -524,38 +531,32 @@ La funzione _length_() calcola la lunghezza di una lista $x$, cioè il numero di
 ])
 La lista di stringhe ha lunghezza pari a 3, quella di interi ha lunghezza pari a 4, quindi l'espressione assume valore 7.
 
-Ricorrendo al simbolo $forall$ (per ogni) e al costruttore di tipo _list_, possiamo scrivere il tipo della funzione _length_() come:
+Per rappresentare formalmente il tipo di una funzione polimorfica, si ricorre al quantificatore universale $forall$ (per ogni). Il tipo della funzione `length` si scrive così:
 $
-  forall alpha".list"(alpha) -> "integer"
+  forall alpha . text("list")(alpha) -> text("integer")
 $
-Il simbolo $forall$ è il quantificatore universale e la variabile alla quale è applicato si dice legata a esso. Una variabile legata può essere rinominata liberamente, a patto di rinominare tutte le sue occorrenze. Informalmente, quando in una espressione di tipo compare il simbolo $forall$, parleremo di "*tipo polimorfico*".
+Questo si legge: *"Per ogni tipo $alpha$, la funzione mappa una lista di elementi di tipo $alpha$ in un intero"*. Quando in un'espressione di tipo compare il simbolo $forall$, ci troviamo di fronte a un *tipo polimorfico*.
 
 #example()[
+  Il compilatore deduce il tipo polimorfico analizzando i nodi dell'albero sintattico astratto.
   #figure(image("images/2025-12-10-18-28-22.png"))
-  Questo albero sintattico astratto rappresenta la definizione della funzione _length()_ fornita precedentemente. La radice dell'albero con etichetta *fun* rappresenta la definizione della funzione. I rimanenti nodi interni possono essere visti come applicazioni di funzioni.  Possiamo inferire il tipo della funzione length() a partire dal suo corpo. Consideriamo i figli del nodo con etichetta *if*, presi da sinistra a destra. Dato che la funzione _null_() si aspetta di essere applicata a una lista, $x$ deve essere una lista. Indicando con la variabile $alpha$ il tipo degli elementi della lista, il tipo di $x$ è “lista di $alpha$”. Se _null_($x$) è vera allora _length_($x$) vale 0. Pertanto il tipo di _length_() deve essere “funzione da una lista di $alpha$ a un intero”. Tale valore per il tipo inferito della funzione è anche consistente con la parte di definizione.
+  Possiamo inferire il tipo della funzione analizzando il suo corpo (i figli del nodo `if`):
+  1. La funzione `null(x)` richiede che il suo argomento sia una lista. Quindi, deduciamo che $x$ deve avere tipo `list(`$alpha$`)`.
+  2. Se `null(x)` è vera, la funzione ritorna `0` (che è un intero).
+  3. Di conseguenza, l'intera funzione `length` deve prendere in ingresso una `list(`$alpha$`)` e restituire un `integer`.
 ]
 
 //11.12.2025
-Dato che nelle espressioni di tipo possono comparire variabili, è necessario prendere nuovamente in esame il concetto di equivalenza tra tipi.
+Quando le espressioni di tipo contengono variabili astratte (come $alpha$), il compilatore non può limitarsi a verificare se due tipi sono identici. Se stiamo applicando una funzione che richiede un parametro di tipo $s$ a un argomento di tipo $t$, dobbiamo cercare di *unificarli*. 
 
-Supponiamo di applicare $E_1$ di tipo $s -> s_2$ a $E_2$, di tipo $t$. Invece di determinare semplicemente l'uguaglianza tra $s$ e $t$, dobbiamo *unificarli*, cioè verificare se è possibile rendere i tipi $s$ e $t$ strutturalmente equivalenti sostituendo le variabili di tipo in $s$ e $t$ con espressioni di tipo.
+Unificare significa verificare se è possibile rendere $s$ e $t$ strutturalmente equivalenti sostituendo le loro variabili di tipo con espressioni concrete. Per capire questo processo, definiamo rigorosamente i seguenti concetti:
 
-Una *sostituzione* è un mapping tra variabili di tipo ed espressioni di tipo. La scrittura $S(t)$ indica il risultato dell'applicazione della sostituzione $S$ alle variabili dell'espressione di tipo $t$ (si veda il box “Sostituzioni, istanze e unificazione”).
-
-Due espressioni di tipo $t_1$ e $t_2$ possono essere unificate se esiste una sostituzione $S$ tale che $S(t_1) = S(t_2)$. In pratica siamo interessati all'*unificatore più generale* possibile, ovvero vogliamo individuare la sostituzione che impone il minor numero di vincoli sulle variabili di tipo delle espressioni in questione.
-
-#[
-  #set heading(numbering: none, outlined: false)
-  === Sostituzioni, istanze e unificazione
-]
-
-Se $t$ è un'espressione di tipo e $S$ una sostituzione (cioè un mapping tra variabili di tipo ed espressioni di tipo), la scrittura $S(t)$ indica il risultato che si ottiene sostituendo tutte le occorrenze di ogni variabile di tipo $alpha$ con $S(alpha)$. Chiamiamo $S(t)$ una *istanza* di $t$.
-
-Per esempio, `list(integer)` è un'istanza di `list(`$alpha$`)` poiché è il risultato della sostituzione di $alpha$ con `integer` nell'espressione `list(`$alpha$`)`. Il tipo `integer` $->$ `float`, invece, non è un'istanza di $alpha -> alpha$ poiché una sostituzione prevede che ogni occorrenza di una data variabile di tipo sia rimpiazzata rigorosamente dalla *stessa* espressione di tipo.
-
-Diciamo poi che la sostituzione $S$ è un *unificatore* delle espressioni di tipo $t_1$ e $t_2$ se risulta $S(t_1) = S(t_2)$.
-
-Inoltre, diciamo che $S$ è l'*unificatore più generale* di $t_1$ e $t_2$ se per qualsiasi altro unificatore $S'$ di $t_1$ e $t_2$ e per qualsiasi espressione di tipo $t$, $S'(t)$ è un'istanza di $S(t)$. In altre parole, $S'$ impone su $t$ vincoli più stringenti di quanto non faccia $S$.
+- *Sostituzione ($S$):* È una mappa che associa variabili di tipo a espressioni di tipo.
+- *Istanza:* È il risultato dell'applicazione di una sostituzione a un'espressione. Se applichiamo la sostituzione $S$ all'espressione $t$, otteniamo l'istanza $S(t)$.
+  - _Esempio:_ `list(integer)` è un'istanza di `list(`$alpha$`)` (ottenuta sostituendo $alpha$ con `integer`).
+  - _Controesempio:_ `integer -> float` *non* è un'istanza di $alpha -> alpha$, perché una sostituzione esige che tutte le occorrenze della stessa variabile ($alpha$) vengano rimpiazzate con la *stessa identica* espressione di tipo.
+- *Unificatore:* Una sostituzione $S$ è detta "unificatore" di due espressioni $t_1$ e $t_2$ se la sua applicazione le rende identiche, ovvero se $S(t_1) = S(t_2)$.
+- *Unificatore Più Generale (MGU - Most General Unifier):* Tra tutti i possibili unificatori, il compilatore cerca sempre l'MGU. È la sostituzione che impone il *minor numero di vincoli possibili* sulle variabili. Formalmente, $S$ è l'MGU se qualsiasi altro unificatore $S'$ risulta essere un'istanza di $S$ (cioè $S'$ è più specifico e restrittivo di $S$).
 
 #[
   #set heading(numbering: none, outlined: false)
@@ -663,15 +664,11 @@ La sostituzione di un'espressione al posto di una variabile è implementata aggi
 
 == Flusso di controllo
 
-La traduzione dei costrutti per il controllo del flusso quali `if-then-else` e `while` è strettamente legata alla traduzione delle espressioni booleane. Nei linguaggi di programmazione, infatti, le espressioni booleane sono spesso usate per i seguenti scopi:
+La traduzione di costrutti come `if-then-else` e `while` è strettamente legata alla gestione delle *espressioni booleane*. Il ruolo di queste espressioni cambia a seconda del contesto sintattico in cui si trovano all'interno del codice.
 
-+ *Modificare il flusso di controllo.* Le espressioni booleane sono usate come espressioni condizionali negli statement che modificano il flusso di controllo. Il valore booleano di tali espressioni è implicitamente definito dalla posizione raggiunta dall'esecuzione del programma. Se consideriamo, per esempio, il costrutto `if (`$E$`)` $S$, il valore dell'espressione $E$ deve essere vero se l'esecuzione raggiunge lo statement $S$.
+Quando seguono parole chiave come `if` o `while`, le espressioni booleane servono a *modificare il flusso di controllo*. In questi casi, il loro valore di verità non viene memorizzato, ma è definito implicitamente dal percorso di esecuzione: nel costrutto `if (`$E$`)` $S$, il semplice fatto che il programma raggiunga ed esegua lo statement $S$ implica logicamente che $E$ sia vera.
 
-+ *Calcolare valori logici.* Un'espressione booleana può rappresentare i valori logici `true` o `false` e può essere valutata in modo analogo alle espressioni aritmetiche mediante istruzioni a tre indirizzi relative a operatori logici.
-
-Lo specifico utilizzo di un'espressione booleana dipende dal contesto sintattico in cui essa appare. Per esempio, un'espressione booleana che segue la parola chiave `if` è utilizzata per modificare il flusso di controllo, mentre un'espressione che appare nel lato destro di un'istruzione di assegnamento è utilizzata per denotare un valore logico.
-
-
+Al contrario, quando un'espressione booleana si trova alla destra di un assegnamento, il suo scopo è *calcolare un valore logico* esplicito (`true` o `false`). In questa situazione, l'espressione viene valutata e tradotta in istruzioni a tre indirizzi in modo del tutto analogo alle normali espressioni aritmetiche.
 
 === Espressioni booleane
 
@@ -680,14 +677,14 @@ Le espressioni booleane sono composte da operatori booleani AND, OR e NOT — ch
 Le espressioni relazionali hanno la forma $E_1 text("rel") E_2$, in cui $E_1$ ed $E_2$ sono espressioni aritmetiche. In questo paragrafo considereremo espressioni booleane generate dalla grammatica:
 
 $
-  B -> B || B | B && B | ! B | ( B ) | E text("rel") E | text("true") | text("false")
+  B -> B \|\| B | B \&\& B | ! B | ( B ) | E text("rel") E | text("true") | text("false")
 $
 
 Useremo l'attributo $text("rel")."op"$ per specificare quale dei sei operatori relazionali `<`, `<=`, `=`, `!=`, `>` o `>=` indichi il terminale `rel`.
 
 La definizione della semantica di un linguaggio chiarisce se sia o meno richiesta la valutazione di tutte le parti di un'espressione booleana. Se la semantica stabilisce che è ammesso (o richiesto) che alcune parti di un'espressione booleana non siano valutate, il compilatore può ottimizzarne la valutazione calcolando solamente la porzione minima necessaria a stabilire se l'espressione complessiva sia vera o falsa.
 
-Pertanto, in un'espressione come $B_1 || B_2$, né $B_1$ né $B_2$ sono necessariamente valutate completamente. Ciò significa che se $B_1$ o $B_2$ sono espressioni aventi effetti collaterali (per esempio, se contengono chiamate di funzione che modificano una variabile globale) è possibile ottenere risultati inattesi.
+Pertanto, in un'espressione come $B_1 \|\| B_2$, né $B_1$ né $B_2$ sono necessariamente valutate completamente. Ciò significa che se $B_1$ o $B_2$ sono espressioni aventi effetti collaterali (per esempio, se contengono chiamate di funzione che modificano una variabile globale) è possibile ottenere risultati inattesi.
 
 === Traduzione con corto circuito
 
@@ -700,7 +697,7 @@ Secondo lo schema di traduzione con corto circuito (*short-circuit*), gli operat
     `if ( x < 100 || x > 200 && x != y ) x = 0;`
   ]
 
-  potrebbe essere tradotta nel codice della Figura 6.34. Secondo tale traduzione il valore dell'espressione booleana è vero se l'esecuzione raggiunge l'etichetta $L_2$. Se invece l'espressione risulta falsa, il controllo raggiunge immediatamente l'etichetta $L_3$, saltando oltre $L_2$ senza eseguire l'assegnamento $x = 0$.
+  potrebbe essere tradotta nel codice della Figura 6.34. Secondo tale traduzione il valore dell'espressione booleana è vero se l'esecuzione raggiunge l'etichetta $L_2$. Se invece l'espressione risulta falsa, il controllo raggiunge immediatamente l'etichetta $L_1$, saltando oltre $L_2$ senza eseguire l'assegnamento $x = 0$.
   #figure(image("images/2026-05-18-11-28-10.png"))
 ]
 
@@ -724,8 +721,8 @@ La traduzione del costrutto `if (`$B$`)` $S_1$ consiste del codice $B."code"$ se
 
 Le etichette per i salti all'interno delle porzioni di codice $B."code"$ ed $S."code"$ sono gestite mediante attributi ereditati. A ogni espressione booleana $B$ associamo due etichette $B."true"$ e $B."false"$ che indicano i punti che il controllo raggiunge quando il valore di $B$ è rispettivamente vero oppure falso. A ogni statement $S$ associamo poi un attributo ereditato $S."next"$ che indica l'etichetta dell'istruzione immediatamente successiva al codice relativo a $S$. In alcuni casi l'istruzione immediatamente seguente il codice $S."code"$ è un salto a un'etichetta $L$. Un salto dal codice di $S$ a un'istruzione di salto a un'etichetta $L$ viene evitato ricorrendo a $S."next"$.
 
-#figure(image("images/2026-05-18-11-31-02.png"))
-#figure(image("images/2026-05-18-11-31-12.png"))
+#figure(image("images/2026-05-18-11-31-02.png", width: 60%))
+#figure(image("images/2026-05-18-11-31-12.png", width: 60%))
 
 === Traduzione di espressioni booleane mediante costrutti per il controllo del flusso
 
@@ -746,14 +743,14 @@ La quarta produzione della Figura 6.37, cioè $B -> E_1 text("rel") E_2$, viene 
 Le rimanenti produzioni del non-terminale $B$ sono tradotte come segue:
 
 1. Supponiamo che $B$ abbia la forma $B_1 || B_2$. Se $B_1$ è vera sappiamo immediatamente che anche $B$ è vera, per cui $B_1."true"$ coincide con $B."true"$. Se $B_1$, invece, è falsa è necessario valutare $B_2$ per cui assegniamo a $B_1."false"$ l'etichetta associata alla prima istruzione del codice relativo a $B_2$. Infine, le etichette di uscita di $B_2$ coincidono con quelle di $B$.
-2. La traduzione di $B_1 && B_2$ segue uno schema simile.
+2. La traduzione di $B_1 \&\& B_2$ segue uno schema simile.
 3. La traduzione di un'espressione del tipo $! B_1$ non richiede alcun codice: è sufficiente scambiare le etichette di uscita di $B$ (cioè $B."true"$ e $B."false"$) per ottenere le etichette di uscita di $B_1$.
 4. Le costanti `true` e `false` vengono tradotte con salti incondizionati rispettivamente alle etichette $B."true"$ e $B."false"$.
 
 #example()[
   Consideriamo ancora lo statement:
 
-  $ text("if") ( x < 100 || x > 200 && x != y ) quad x = 0; quad quad (6.13) $
+  #align(center)[`if (x < 100 || x > 200 && x != y) x = 0;`]
 
   Usando le definizioni guidate dalla sintassi delle Figure 6.36 e 6.37 otterremmo il codice a tre indirizzi mostrato nella Figura 6.38.
 
@@ -794,7 +791,7 @@ L'operatore `||` deve valutare $B_1$. Se $B_1$ è falso, bisogna valutare $B_2$.
         if x < 100 goto L2        // Se la prima è vera, salta l'AND e vai a L2
         ifFalse x > 200 goto L1   // Se è falsa, la condizione intera fallisce
         ifFalse x != y goto L1    // Se è falsa, la condizione intera fallisce
-  L2:   x = 0                     // Corpo dell'if (raggiunto in cascata o tramite L2)
+  L2:   x = 0                     // Corpo dell'if
   L1:                             // Uscita
   ```
 ]
@@ -818,7 +815,7 @@ Per esempio, l'assegnamento `x = a < b && c < d` può essere implementato dal co
 
 Un problema cruciale nella generazione del codice per le espressioni booleane e per le istruzioni di controllo del flusso è quello di accoppiare un'istruzione di salto con l'etichetta di destinazione del salto stesso. Per esempio, la traduzione dell'espressione booleana $B$ nell'istruzione `if (`$B$`)` $S$ nel caso in cui $B$ risulti falsa, contiene un salto alla prima istruzione che segue il codice di $S$. In uno schema di traduzione a una sola passata, $B$ deve essere tradotta prima che il non-terminale $S$ venga analizzato. Qual è quindi l'etichetta dell'istruzione `goto` che salta oltre il codice di $S$?
 
-Nel Paragrafo 6.6 abbiamo risolto questo problema propagando le etichette mediante attributi ereditati fino al punto in cui esse sono richieste per la generazione delle relative istruzioni di salto. In questo modo, tuttavia, è necessaria una seconda passata per associare alle etichette gli indirizzi effettivi.
+Precedentemente abbiamo risolto questo problema propagando le etichette mediante attributi ereditati fino al punto in cui esse sono richieste per la generazione delle relative istruzioni di salto. In questo modo, tuttavia, è necessaria una seconda passata per associare alle etichette gli indirizzi effettivi.
 
 In questo paragrafo vedremo un approccio complementare, chiamato *backpatching*, secondo cui opportuni attributi sintetizzati vengono utilizzati per propagare liste di salti. Più precisamente, quando viene generato un salto se ne lascia temporaneamente non specificata la destinazione. Ogni salto di questo tipo viene poi aggiunto a una lista che raccoglie tutti i salti le cui etichette di destinazione dovranno essere specificate in un secondo momento, cioè quando sarà possibile determinarle esattamente. Le liste saranno costruite in modo che tutti i salti in una stessa lista facciano riferimento alla stessa etichetta.
 
@@ -840,7 +837,7 @@ Per semplicità supponiamo di memorizzare le istruzioni generate in un array e d
 Costruiamo ora uno schema di traduzione adatto alla generazione del codice di espressioni booleane durante il parsing bottom-up. Il non-terminale marcatore $M$ permette a un'azione semantica di recuperare — al momento opportuno — l'indice della successiva istruzione che sarà generata. La grammatica è la seguente:
 
 $
-  B & -> B_1 || M B_2 | B_1 && M B_2 | ! B_1 | ( B_1 ) | E_1 text(" rel ") E_2 | text("true") | text("false") \
+  B & -> B_1 \|\| M B_2 | B_1 \&\& M B_2 | ! B_1 | ( B_1 ) | E_1 text(" rel ") E_2 | text("true") | text("false") \
   M & -> epsilon
 $
 
@@ -848,14 +845,14 @@ $
 
 *Sintesi delle azioni semantiche:*
 - *(1) OR ($B -> B_1 || M B_2$)*: Se $B_1$ è vera, $B$ è vera. Se è falsa, è necessario valutare $B_2$. L'etichetta di destinazione dei salti in $B_1."falselist"$ diventa quindi l'inizio del codice di $B_2$ (ottenuta tramite $M."instr"$).
-- *(2) AND ($B -> B_1 && M B_2$)*: Simile all'OR, ma si valuta $B_2$ solo se $B_1$ è vera. Si effettua il backpatch di $B_1."truelist"$ con $M."instr"$.
+- *(2) AND ($B -> B_1 \&\& M B_2$)*: Simile all'OR, ma si valuta $B_2$ solo se $B_1$ è vera. Si effettua il backpatch di $B_1."truelist"$ con $M."instr"$.
 - *(3) NOT e (4) Parentesi*: Il NOT scambia semplicemente le liste `truelist` e `falselist`. Le parentesi vengono ignorate.
 - *(5) Relazionale ($E_1 text(" rel ") E_2$)*: Genera due istruzioni (un salto condizionato e uno incondizionato) lasciando la destinazione temporaneamente non specificata (`_`). Le istruzioni vengono poi inserite nelle rispettive liste puntate da $B."truelist"$ e $B."falselist"$.
 
 #example()[
   #figure(image("images/2026-05-18-11-42-05.png"))
 
-  Consideriamo l'espressione: $x < 100 || x > 200 && x != y$
+  Consideriamo l'espressione: $x < 100 || x > 200 \&\& x != y$
 
   L'albero di parsing annotato (Figura 6.44) viene visitato in profondità. Le azioni vengono eseguite contestualmente alle riduzioni bottom-up:
 
@@ -929,7 +926,7 @@ Nel caso dell'istruzione `break` alla linea 4 il controllo passa alla prima istr
 Se $S$ è il costrutto che contiene lo statement `break`, allora tale statement è di fatto un salto incondizionato alla prima istruzione successiva al codice di $S$. Possiamo generare il codice dell'istruzione `break` in tre passi:
 + Teniamo traccia dello statement contenitore $S$.
 + Generiamo una istruzione incompleta di salto per lo statement `break`.
-+ Inseriamo tale istruzione di salto nella lista $S."nextlist"$, il cui significato è quello discusso nel Paragrafo 6.7.3.
++ Inseriamo tale istruzione di salto nella lista $S."nextlist"$.
 
 In un front-end a due passate per la costruzione di alberi sintattici, $S."nextlist"$ potrebbe essere implementato come un campo del nodo relativo a $S$. Potremmo tenere traccia di $S$ mediante la tabella dei simboli associando il nodo dello statement $S$ a uno speciale identificatore `break`. Questa tecnica permette anche di gestire gli statement `break` con etichetta previsti dal linguaggio Java. La tabella dei simboli, infatti, può essere utilizzata per mappare le etichette ai nodi dell'albero sintattico relativi ai costrutti contenitori.
 
@@ -954,9 +951,11 @@ Un modo compatto di implementare la sequenza di salti consiste nel creare una ta
 
 C'è inoltre un caso speciale — abbastanza comune — che può essere implementato in modo più efficiente di un salto a $n$ vie. Se tutti i valori dei vari casi appartengono a un intervallo limitato tra `min` e `max` e tali casi coprono buona parte dei valori tra `min` e `max`, si può costruire un array di $text("max") - text("min") + 1$ elementi tali che l'elemento con indice $j - text("min")$ contenga l'etichetta dello statement relativo al valore $j$. Agli elementi corrispondenti ai casi non esplicitamente specificati viene inoltre assegnata l'etichetta corrispondente al caso di `default`.
 
-Per eseguire la selezione si valuta l'espressione otenendo un certo valore $j$, si verifica che $j$ appartenga all'intervallo tra `min` e `max`, quindi si trasferisce il controllo in modo indiretto all'etichetta memorizzata nell'elemento dell'array con indice $j - text("min")$. Se, per esempio, l'espressione è di tipo carattere, si può ricorrere a una tabella con 128 elementi (il numero degli elementi dipende dallo specifico insieme di caratteri) per trasferire il controllo allo statement corretto senza effettuare alcuna verifica sull'intervallo.
+Per eseguire la selezione si valuta l'espressione ottenendo un certo valore $j$, si verifica che $j$ appartenga all'intervallo tra `min` e `max`, quindi si trasferisce il controllo in modo indiretto all'etichetta memorizzata nell'elemento dell'array con indice $j - text("min")$. Se, per esempio, l'espressione è di tipo carattere, si può ricorrere a una tabella con 128 elementi (il numero degli elementi dipende dallo specifico insieme di caratteri) per trasferire il controllo allo statement corretto senza effettuare alcuna verifica sull'intervallo.
+#figure(image("images/2026-05-20-17-00-25.png", width: 60%))
 
 === Traduzione guidata dalla sintassi degli statement switch
+
 
 Il codice intermedio mostrato nella Figura 6.48(a) è un esempio di traduzione adatta allo statement `switch` della Figura 6.47. Tutti i test sono posizionati alla fine, cosicché un semplice generatore di codice possa riconoscere il costrutto di selezione a più vie e generare del codice efficiente seguendo la strategia più appropriata tra quelle suggerite nel paragrafo precedente.
 
@@ -970,51 +969,28 @@ Per realizzare la traduzione nella forma suggerita dalla Figura 6.48(a) si proce
 
 Quando si riconosce la fine dello statement `switch`, si può procedere alla generazione del codice del salto a più vie. Leggendo la coda delle coppie valore-etichetta precedentemente costruita si può generare la sequenza di istruzioni a tre indirizzi nella forma mostrata dalla Figura 6.49, in cui $t$ è la variabile temporanea che contiene il valore dell'espressione di selezione $E$, e $L_n$ è l'etichetta relativa allo statement del caso di `default`.
 
-L'istruzione a tre indirizzi `case t ` $V_i$ $L_i$ svolge la stessa funzione dell'istruzione `if t = ` $V_i$ ` goto ` $L_i$ usata nella Figura 6.48(a). Il ricorso a tale specifica istruzione semplifica il compito del generatore di codice finale nel riconoscere potenziali candidati per un trattamento speciale. Durante la generazione del codice finale, infatti, sequenze di istruzioni `case` di questo tipo possono essere tradotte nell'implementazione più efficiente a seconda di quanti casi si hanno e dell'intervallo in cui ricadono i valori.
-
-#figure(image("images/2026-05-18-11-50-10.png"))
-#figure(image("images/2026-05-18-11-50-16.png"))
-
-
-=== Traduzione guidata dalla sintassi degli statement switch
-
-Il codice intermedio mostrato nella Figura 6.48(a) è un esempio di traduzione adatta allo statement `switch` della Figura 6.47. Tutti i test sono posizionati alla fine, cosicché un semplice generatore di codice possa geograficamente? riconoscere il costrutto di selezione a più vie e generare del codice efficiente seguendo la strategia più appropriata tra quelle suggerite nel paragrafo precedente.
-
-Il codice più semplice mostrato nella Figura 6.48(b) richiederebbe un'analisi più complessa e ampia da parte del compilatore per scegliere l'implementazione più efficiente. Si noti che in un compilatore a singola passata non è conveniente posizionare le istruzioni di salto all'inizio, poiché in questo caso il compilatore non potrebbe emettere il codice dei vari statement $S_i$ nel momento in cui li incontra.
-
-Per realizzare la traduzione nella forma suggerita dalla Figura 6.48(a) si procede come segue:
-1. Non appena si incontra la parola chiave `switch` si generano due nuove etichette `test` e `next` e una nuova variabile temporanea $t$.
-2. Durante il parsing dell'espressione $E$ si genera il codice per la sua valutazione, in modo da lasciare il risultato nella variabile temporanea $t$. Dopo aver elaborato $E$, si genera l'istruzione di salto `goto test`.
-3. Non appena si incontra una parola chiave `case` si crea una nuova etichetta $L_i$ e la si inserisce nella tabella dei simboli. Si aggiunge inoltre in una coda — utilizzata solamente per memorizzare i vari casi — una coppia formata dal valore costante $V_i$ associato allo specifico caso e dalla corrispondente etichetta $L_i$ (o dal puntatore all'elemento della tabella dei simboli corrispondente a $L_i$).
-4. Si elabora quindi ogni statement `case ` $V_i : S_i$ emettendo l'etichetta $L_i$ e il codice dello statement corrispondente $S_i$, seguito dall'istruzione di salto `goto next`.
-
-Quando si riconosce la fine dello statement `switch`, si può procedere alla generazione del codice del salto a più vie. Leggendo la coda delle coppie valore-etichetta precedentemente costruita si può generare la sequenza di istruzioni a tre indirizzi nella forma mostrata dalla Figura 6.49, in cui $t$ è la variabile temporanea che contiene il valore dell'espressione di selezione $E$, e $L_n$ è l'etichetta relativa allo statement del caso di `default`.
+#figure(image("images/2026-05-20-17-01-59.png"))
 
 L'istruzione a tre indirizzi `case t ` $V_i$ $L_i$ svolge la stessa funzione dell'istruzione `if t = ` $V_i$ ` goto ` $L_i$ usata nella Figura 6.48(a). Il ricorso a tale specifica istruzione semplifica il compito del generatore di codice finale nel riconoscere potenziali candidati per un trattamento speciale. Durante la generazione del codice finale, infatti, sequenze di istruzioni `case` di questo tipo possono essere tradotte nell'implementazione più efficiente a seconda di quanti casi si hanno e dell'intervallo in cui ricadono i valori.
-
-#figure(image("images/2026-05-18-11-50-10.png"))
-#figure(image("images/2026-05-18-11-50-16.png"))
-
-
 
 
 == Codice intermedio delle procedure
 
 Le produzioni della Figura 6.50 specificano la sintassi della definizione e della chiamata di funzioni. Si noti che questa grammatica genera delle virgole indesiderate dopo l'ultimo parametro, ma è tuttavia adeguata allo scopo di illustrare il processo di traduzione in esame.
 
-#figure(image("images/2026-05-18-11-51-24.png"))
+#figure(image("images/2026-05-18-11-51-24.png", width: 50%))
 
 Sia la definizione di funzioni, sia la loro chiamata possono essere tradotte ricorrendo a concetti già trattati in questo capitolo.
 
 - *Tipo delle funzioni.* Il tipo di una funzione deve codificare sia il tipo del valore restituito, sia il tipo dei vari parametri formali. Sia inoltre `void` un tipo speciale utilizzato col significato di "nessun parametro" o "nessun valore di ritorno". Per esempio, il tipo della funzione `pop()` che restituisce un intero è "funzione da `void` a `integer`". I tipi delle funzioni possono essere rappresentati ricorrendo al costruttore di tipo `fun()` applicato al tipo di ritorno e alla lista ordinata dei tipi dei parametri.
 
 - *Tabelle dei simboli.* Sia $s$ la tabella dei simboli in uso al momento in cui si raggiunge la definizione della funzione. Il nome della funzione dovrà essere aggiunto alla tabella $s$ per un successivo uso nel resto del programma. I parametri formali di una funzione possono essere trattati in modo analogo ai nomi dei campi di un record (Figura 6.18). Nella produzione relativa a $D$, dopo aver riconosciuto in ingresso la parola chiave `define`, si impila $s$ sullo stack e si crea una nuova tabella dei simboli:
-  ```c
+  #align(center)[```c
   Env.push(top); top = new Env(top);
-  ```
-Sia $t$ la nuova tabella dei simboli. Si noti che `top` viene passato come argomento nello pseudocodice `new Env(top)`: in questo modo la nuova tabella $t$ può essere collegata alla precedente tabella $s$. La nuova tabella $t$ viene utilizzata per la traduzione del corpo della funzione. Solo alla fine di tale traduzione si ripristina la vecchia tabella $s$.
+  ```]
+  Sia $t$ la nuova tabella dei simboli. Si noti che `top` viene passato come argomento nello pseudocodice `new Env(top)`: in questo modo la nuova tabella $t$ può essere collegata alla precedente tabella $s$. La nuova tabella $t$ viene utilizzata per la traduzione del corpo della funzione. Solo alla fine di tale traduzione si ripristina la vecchia tabella $s$.
 
-- *Controllo dei tipi.* In un'espressione una funzione viene trattata esattamente come ogni altro operatore. La trattazione del controllo dei tipi vista nel Paragrafo 6.5.2, compresi gli aspetti riguardanti le conversioni di tipo, si estende quindi anche alle funzioni. Per esempio, se `f` è una funzione con un parametro di tipo `real`, nella chiamata `f(2)` il valore intero 2 viene convertito da `integer` a `real` automaticamente.
+- *Controllo dei tipi.* In un'espressione una funzione viene trattata esattamente come ogni altro operatore. La trattazione del controllo dei tipi, compresi gli aspetti riguardanti le conversioni di tipo, si estende quindi anche alle funzioni. Per esempio, se `f` è una funzione con un parametro di tipo `real`, nella chiamata `f(2)` il valore intero 2 viene convertito da `integer` a `real` automaticamente.
 
 - *Chiamate di funzione.* Per generare il codice a tre indirizzi di una chiamata di funzione nella forma `id(E, E, ..., E)` è sufficiente generare il codice per valutare ogni parametro $E$ riducendolo a un indirizzo e facendo seguire il codice generato da un'istruzione `param`. Volendo evitare di mischiare il codice relativo alla valutazione dei parametri con le istruzioni `param` è sufficiente salvare l'attributo $E."addr"$ di ogni espressione $E$ in una opportuna struttura dati, per esempio una coda. Una volta generato il codice per tutte le espressioni si può procedere alla generazione delle istruzioni `param` mentre la coda viene svuotata.
 
@@ -1028,11 +1004,13 @@ Sia $t$ la nuova tabella dei simboli. Si noti che `top` viene passato come argom
     inset: 10pt,
     radius: 4pt,
     [
+      #align(left)[
       `1) t1 = i * 4` \
       `2) t2 = a [ t1 ]` \
       `3) param t2` \
       `4) t3 = call f, 1` \
       `5) n = t3`
+      ]
     ],
   ))
 
