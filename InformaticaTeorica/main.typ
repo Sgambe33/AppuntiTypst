@@ -3,10 +3,15 @@
 
 #dvdtyp(
   title: "Appunti Informatica Teorica",
+  subtitle: "a.a. 2025-2026",
   cover-image: image("cover.jpg", height: 100%, width: 100%),
 )[
-
-  #align(center, "Appunti basati su note prese a lezione e sugli appunti di Elena Simionato.")
+  #align(center)[
+    Appunti basati sulle lezioni del prof. Ferrari (UniFi), 
+    sul libro di Sudkamp (#emph("Languages and Machines"), Addison-Wesley, terza edizione) 
+    e sugli appunti di Elena Simionato.
+  ]
+  #align(center)[Per contribuire: https://github.com/Sgambe33/AppuntiTypst]
   #outline(title: "Contenuti")
 
   #pagebreak()

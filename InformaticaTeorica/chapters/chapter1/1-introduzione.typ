@@ -9,16 +9,16 @@ Lo studio dell'informatica teorica affronta due importanti argomenti:
 - La teoria della computabilità;
 - La teoria della complessità computazionale.
 
-La teoria della computabilità si prefigge lo scopo di trovare delle definizioni formali che si avvicinino il più possibile al concetto di algoritmo, dato che l'algoritmo è un concetto primitivo e non esiste una sua definizione formale. Di conseguenza poi si vuole anche indagare se un dato problema è calcolabile o meno da un algoritmo.
+La teoria della computabilità si prefigge di trovare delle definizioni formali che si avvicinino il più possibile al concetto di algoritmo, dato che l'algoritmo è un concetto primitivo e non esiste una sua definizione formale. Di conseguenza, si vuole anche indagare se un dato problema è calcolabile o meno da un algoritmo.
 
-La teoria della complessità computazionale si occupa, dato un problema, di determinare la quantità minima di risorse (usualmente tempo e spazio) necessaria ad un algoritmo per risolvere tale problema.
+La teoria della complessità computazionale si occupa, dato un problema, di determinare la quantità minima di risorse (usualmente tempo e spazio) necessaria a un algoritmo per risolvere tale problema.
 
 = Teoria della computabilità
 
 == Definizioni preliminari
 
 Consideriamo:
-- $Sigma$ un alfabeto finito o infinito numerabile (infinito);
+- $Sigma$ un alfabeto finito o infinito numerabile;
 - $Sigma^*$ l'insieme delle parole su $Sigma$;
 - $L$ un linguaggio definito sull'alfabeto $Sigma$, con $L subset.eq Sigma^*$.
 
@@ -45,14 +45,14 @@ Diamo ora alcune definizioni:
 ]
 
 Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un linguaggio.
-- Se $Sigma$ è un alfabeto finito, composto da $Sigma = {a_1, a_2, dots, a_n}$, possiamo scrivere tutte le stringhe di lunghezza $k$ in ordine lessicografico, $forall k in NN$.
+- Se $Sigma$ è un alfabeto finito, con $Sigma = {a_1, a_2, dots, a_n}$, possiamo scrivere tutte le stringhe di lunghezza $k$ in ordine lessicografico, $forall k in NN$.
 
-- Se $Sigma$ è un alfabeto infinito, composto da $Sigma = {a_1, a_2, dots, a_n, dots}$, dobbiamo usare un metodo particolare chiamato *diagonalizzazione* o *procedimento diagonale di Cantor*. Questo metodo consiste nel disporre gli elementi dell'alfabeto in verticale e in orizzontale a formare una tabella e poi a visitarla in maniera diagonale. Questa procedura vale per tutte le stringhe di lunghezza $k$ (segue un esempio di stringhe di lunghezza 2).
+- Se $Sigma$ è un alfabeto infinito, con $Sigma = {a_1, a_2, dots, a_n, dots}$, dobbiamo usare un metodo particolare chiamato *diagonalizzazione* o *procedimento diagonale di Cantor*. Questo metodo consiste nel disporre gli elementi dell'alfabeto in verticale e in orizzontale a formare una tabella e poi a visitarla in maniera diagonale. Questa procedura vale per tutte le stringhe di lunghezza $k$ (segue un esempio di stringhe di lunghezza 2).
 
 #figure(image("images/2026-03-03-17-57-48.png", width: 50%))
 
 #observation()[
-  Per passare a stringhe di lunghezza $k$ occorre un ragionamento induttivo; supponendo che le stringhe di lunghezza $k-1$ siano state già tutte enumerate, si fa la procedura descritta sopra mettendo sulle colonne le stringhe di lunghezza $k-1$, elencate secondo l'enumerazione che abbiamo per induzione, e sulle righe i simboli dell'alfabeto.
+  Per passare a stringhe di lunghezza $k$ occorre un ragionamento induttivo; supponendo che le stringhe di lunghezza $k-1$ siano già state tutte enumerate, si fa la procedura descritta sopra mettendo sulle colonne le stringhe di lunghezza $k-1$, elencate secondo l'enumerazione che abbiamo per induzione, e sulle righe i simboli dell'alfabeto.
 ]
 #observation()[
   $Sigma$ enumerabile $==> Sigma^*$ enumerabile.\ Infatti, possiamo enumerare tutte le stringhe di lunghezza 0, poi tutte le stringhe di lunghezza 1, poi tutte le stringhe di lunghezza 2, e così via.
@@ -75,7 +75,7 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 ]
 
 #observation()[
-  In generale, l'implicazione inversa *non* vale: $L$ enumerabile $arrow.r.double.not L$ decidibile. Questo perché se voglio capire se una stringa $x$ appartiene ad un linguaggio $L$ infinito con un algoritmo di enumerazione, potrei dover scorrere $L$ all'infinito senza mai trovare $x$. Vale però il risultato della proposizione seguente, dove $L^c = Sigma^* \\ L$.
+  In generale, l'implicazione inversa *non* vale: $L$ enumerabile $arrow.r.double.not L$ decidibile. Questo perché se voglio capire se una stringa $x$ appartiene a un linguaggio $L$ infinito con un algoritmo di enumerazione, potrei dover scorrere $L$ all'infinito senza mai trovare $x$. Vale però il risultato della proposizione seguente, dove $L^c = Sigma^* \\ L$.
 ]
 
 #proposition()[
@@ -86,7 +86,7 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 
   Per dimostrare che $L$ decidibile $==> L^c$ enumerabile possiamo usare l'algoritmo di enumerazione per $L$ della proposizione precedente modificando le operazioni finali:
   #pseudocode-list[
-    + Sia $w_i$ la i-esima stringa di $Sigma^*$;
+    + Sia $w_i$ la $i$-esima stringa di $Sigma^*$;
     + Eseguo $M$ su $w_i$;
       + Se $w_i in.not L$, la scrivo;
       + Altrimenti no.
@@ -134,11 +134,15 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 
 #index[Linguaggio semidecidibile]
 #definition()[
-  Un linguaggio $L$ è *semidecidibile* quando esiste un algoritmo $M$ che, data una stringa $w in Sigma^*$, $M$ termina su $w$ se $w in L$, altrimenti $M$ non termina.
+  Un linguaggio $L subset.eq Sigma^*$ si dice *semidecidibile* quando esiste
+  un algoritmo $M$ tale che, per ogni $w in Sigma^*$, se $w in L$, $M$ termina e accetta $w$.
 ]
 
 #observation()[
-  $L$ è semidecidibile $<==>$ esiste un algoritmo $M$ che, $forall w in Sigma^*$, se $w in L$ allora $M$ termina su $w$. Non specifico niente per il caso in cui $w in.not L$: $M$ può terminare oppure non terminare.
+  Ne segue che se $w in.not L$, $M$ non può terminare accettando $w$. La differenza rispetto alla decidibilità è che un algoritmo di decisione
+  termina su ogni input: accetta se $w in L$ e rifiuta se $w in.not L$. Un
+  algoritmo di semidecisione, invece, termina solo sugli input appartenenti
+  a $L$; sugli input $w in.not L$ non termina (o comunque non accetta mai).
 ]
 
 #proposition()[
@@ -155,7 +159,7 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 // 25.02.2026
 == Funzioni iniziali
 
-Il nostro obiettivo è quello di trovare una classe di funzioni che colgano il più possibile il concetto di funzione computabile. Le funzioni con cui avremo a che fare sono del tipo
+Il nostro obiettivo è quello di trovare una classe di funzioni che colga nel modo più fedele possibile il concetto di funzione computabile. Le funzioni con cui avremo a che fare sono del tipo
 $
   f: NN^k -> NN, quad (x_1, dots, x_k) |-> f(x_1, dots, x_k)
 $
@@ -192,7 +196,7 @@ Prima di procedere, osserviamo che la scelta della rappresentazione dei numeri n
   $
     rho(a_(i_1) a_(i_2) dots a_(i_m)) = 0 underbrace(1 dots 1, i_1) space 0 underbrace(1 dots 1, i_2) space dots space 0 underbrace(1 dots 1, i_m)
   $
-  cioè ogni lettera viene codificata da uno 0 (separatore) seguito da tanti 1 quanti ne indica il suo indice; per la stringa vuota si decide arbitrariamente di porre $rho = 0$. Poiché $Sigma^*$ è composto sempre da stringhe di lunghezza finita, valgono le tre proprietà richieste, per cui $rho$ è una rappresentazione di $Sigma^*$ in ${0,1}$.
+  cioè ogni lettera viene codificata da uno 0 (separatore) seguito da tanti 1 quanti ne indica il suo indice; per la stringa vuota si decide arbitrariamente di porre $rho(epsilon) = 0$. Poiché $Sigma^*$ è sempre composto da stringhe di lunghezza finita, valgono le tre proprietà richieste, per cui $rho$ è una rappresentazione di $Sigma^*$ in ${0,1}$.
 ]
 
 #observation(multiple: true)[
@@ -251,7 +255,7 @@ Vediamo ora i due "costruttori" di funzioni, a partire dalle iniziali: la compos
   $g, phi$ computabili $==> f$ definita per RP da $g$ e $phi$ è computabile.
 ]
 #proof()[
-  Descriviamo un algoritmo per calcolare $f$ ragionando per induzione sull'ultimo parametro: in pratica, mostriamo che fissato $arrow(x) in NN^k$, $forall y in NN$ so calcolare $f(arrow(x), y)$.
+  Descriviamo un algoritmo per calcolare $f$ ragionando per induzione sull'ultimo parametro: in pratica, mostriamo che, fissato $arrow(x) in NN^k$, $forall y in NN$ si può calcolare $f(arrow(x), y)$.
   - *Caso base*: $y = 0$. Allora $f(arrow(x), 0) = g(arrow(x))$ e $g$ è computabile per ipotesi.
   - *Passo induttivo*: supponiamo di saper calcolare $f(arrow(x), y)$. Allora
     $
@@ -388,7 +392,7 @@ Vediamo ora i due "costruttori" di funzioni, a partire dalle iniziali: la compos
   $
     cases(
       x minus.dot 0 = x = epsilon_1^((1))(x),
-      x minus.dot (y+1) = x - y - 1 = (nu compose epsilon_3^((3)))(x, y, x minus.dot y)
+      x minus.dot (y+1) = nu(x minus.dot y) = (nu compose epsilon_3^((3)))(x, y, x minus.dot y)
     )
   $
 ]
@@ -401,7 +405,7 @@ Vediamo ora i due "costruttori" di funzioni, a partire dalle iniziali: la compos
   $
     d(x, y) = (x minus.dot y) + (y minus.dot x) = (s compose (minus.dot compose (epsilon_1^((2)), epsilon_2^((2))), minus.dot compose (epsilon_2^((2)), epsilon_1^((2)))))(x, y)
   $
-  È dunque *_rp_* perché composizione di funzioni *_rp_*.
+  È dunque *_rp_* in quanto composizione di funzioni *_rp_*.
 ]
 
 #example("Funzione segno")[
@@ -417,7 +421,7 @@ Vediamo ora i due "costruttori" di funzioni, a partire dalle iniziali: la compos
 ]
 
 #example(multiple: true, "Esercizi")[
-  Le due funzioni seguenti sono state lasciate da dimostrare per esercizio.
+  Le due funzioni seguenti sono lasciate da dimostrare per esercizio.
   + *Funzione segno opposto*:
     $
       overline("sg"): NN -> NN, quad overline("sg")(x) = cases(0 & "se" x != 0, 1 & "se" x = 0)
@@ -436,7 +440,7 @@ Vediamo ora i due "costruttori" di funzioni, a partire dalle iniziali: la compos
 
 == Somma e prodotto limitato
 
-Vediamo il caso in cui vogliamo calcolare la somma di più argomenti, però il numero degli argomenti non è fissato, ma è un parametro anch'esso.
+Vediamo il caso in cui vogliamo calcolare la somma di più argomenti, però il numero degli argomenti non è fissato, ma è anch'esso un parametro.
 
 #index[Somma limitata]
 #definition("Somma limitata")[
@@ -625,7 +629,7 @@ Vediamo il caso in cui vogliamo calcolare la somma di più argomenti, però il n
   $
 ]
 
-Questa funzione non sembra intuitivamente computabile, perché la ricerca del minimo potrebbe proseguire all'infinito. Per cui, è necessario dare una limitazione al valore di $z$.
+Questa funzione non sembra intuitivamente computabile, perché la ricerca del minimo potrebbe proseguire all'infinito. Per cui è necessario dare una limitazione al valore di $z$.
 
 #index[Minimalizzazione limitata]
 #definition("Minimalizzazione limitata")[
@@ -663,7 +667,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
     )
   $
   *Caso base*: è immediato, $f(arrow(x), 0) = 0 = C_0^((k))(arrow(x))$, che è *_rp_*.\
-  *Passo induttivo*: per il passo induttivo, supponiamo noto $t=f(arrow(x),y)$. Passando dal limite $y$ al limite $y+1$ si ha che
+  *Passo induttivo*: supponiamo noto $t=f(arrow(x),y)$. Passando dal limite $y$ al limite $y+1$ si ha che
   $
     f(arrow(x), y+1) = cases(
       f(arrow(x), y)\, & " se " exists space 0 <= z <= y "t.c." (arrow(x), z) in R,
@@ -707,7 +711,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
 == Enumerabilità delle funzioni ricorsive primitive
 
 #proposition()[
-  L'insieme delle funzioni *_rp_* è enumerabile. Esiste, ovvero, un algoritmo che genera sistematicamente tutte le funzioni appartenenti a questo insieme.
+  L'insieme delle funzioni *_rp_* è enumerabile. Ovvero, esiste un algoritmo che genera sistematicamente tutte le funzioni appartenenti a questo insieme.
 ]
 #proof()[
   Sia $f$ una generica funzione *_rp_* e sia $f_1, f_2, dots, f_n = f$ la sua derivazione ricorsiva primitiva (drp). È possibile codificare $f$ descrivendola in modo univoco utilizzando unicamente le funzioni iniziali e le operazioni (composizione e ricorsione primitiva) da cui è composta.
@@ -754,7 +758,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
 
   Possiamo fare due osservazioni chiave su $g$:
   - $g$ è computabile: dato un input $x$, è possibile costruire un algoritmo che trovi la funzione $f_x$ nell'enumerazione, ne calcoli il valore per l'argomento $x$ e vi sommi $1$.
-  - Esiste un indice $n$ tale per cui $g = f_n$: per la nostra ipotesi di partenza, essendo $g$ computabile, essa deve essere anche *_rp_*. Pertanto, deve necessariamente comparire all'interno dell'enumerazione.
+  - Esiste un indice $n$ tale che $g = f_n$: per la nostra ipotesi di partenza, essendo $g$ computabile, essa deve essere anche *_rp_*. Pertanto, deve necessariamente comparire all'interno dell'enumerazione.
 
   Se valutiamo la funzione per l'input $n$, per definizione otteniamo:
   $
@@ -787,7 +791,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
   2. $A(2, 3) = A(1, A(2, 2)) = A(1, A(1, A(2, 1))) = A(1, A(1, A(1, A(2, 0)))) = dots$
 ]
 
-È una funzione computabile (anche se difficile da calcolare) e non è ricorsiva primitiva. Cresce enormemente, ma la convergenza del calcolo ricorsivo è lenta: occorrono moltissimi passi per arrivare al risultato. Più il primo argomento è grande, più la $A$ cresce velocemente:
+È una funzione computabile (anche se difficile da calcolare) e non è ricorsiva primitiva. Cresce enormemente, ma la convergenza del calcolo ricorsivo è lenta: occorrono moltissimi passi per arrivare al risultato. Più il primo argomento è grande, più $A$ cresce velocemente:
 
 - $A(0, y) = y + 1$
 - $A(1, y) = y + 2$\
@@ -816,10 +820,10 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
 #proposition()[
   $forall g: NN^k -> NN$ funzione *_rp_*, $exists c in NN$ tale che $forall arrow(x) in NN^k$, $g(arrow(x)) < A(c, sum_(i=1)^k x_i)$
 
-  Ovvero, per qualunque funzione *_rp_* del tipo $g: NN^k -> NN$, esiste una costante (un numero naturale) per cui, data una qualsiasi k-upla, la funzione calcolata su tale k-upla è strettamente minore della funzione di Ackermann con primo argomento la costante e secondo argomento la sommatoria della k-upla.
+  Ovvero, per qualunque funzione *_rp_* del tipo $g: NN^k -> NN$, esiste una costante (un numero naturale) tale che, per ogni $k$-upla, il valore della funzione su tale $k$-upla è strettamente minore della funzione di Ackermann con primo argomento la costante e secondo argomento la somma delle componenti della $k$-upla.
 ]
 #proof()[
-  Si dimostra per induzione strutturale, sulla costruzione dell'insieme delle funzioni *_rp_*:
+  Si dimostra per induzione strutturale sulla costruzione dell'insieme delle funzioni *_rp_*:
   - Caso base: funzioni iniziali
     - $C_0^((k))(arrow(x)) = 0 < 1 + sum_(i=1)^k x_i = A(0, sum_(i=1)^k x_i) => c = 0$
 
@@ -849,9 +853,9 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
 #proof()[
   Supponiamo per assurdo che $A$ sia *_rp_*.
 
-  Allora, anche la funzione $B(x) = A(x, x)$ è *_rp_* ($B = A compose (epsilon_1^((1)), epsilon_1^((1)))$). Posso applicare il lemma precedente, quindi $exists c in NN$ tale che $forall x in NN, B(x) < A(c, x)$.
+  Allora, anche la funzione $B(x) = A(x, x)$ è *_rp_* ($B = A compose (epsilon_1^((1)), epsilon_1^((1)))$). Posso applicare la proposizione precedente, quindi $exists c in NN$ tale che $forall x in NN, B(x) < A(c, x)$.
 
-  Ma allora se scelgo $x = c$ ottengo $B(c) < A(c, c) = B(c)$ per definizione, cioè $B(c)$ strettamente minore di $B(c)$, il che è assurdo. Per cui, $A$ non è *_rp_*.
+  Ma allora se scelgo $x = c$ ottengo $B(c) < A(c, c) = B(c)$ per definizione, cioè $B(c)$ strettamente minore di $B(c)$, il che è assurdo. Quindi $A$ non è *_rp_*.
 ]
 
 #index[Funzione regolare]
@@ -871,10 +875,10 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
   Una *derivazione $mu$-ricorsiva* è una sequenza di funzioni $f_1, f_2, dots, f_n$ t.c. $forall i=1, dots, n$:
   - $f_i$ è una funzione iniziale, oppure
   - $f_i$ è ottenuta per composizione da funzioni precedenti, oppure
-  - $f_i$ è ottenuta per RP da 2 funzioni precedenti, oppure
+  - $f_i$ è ottenuta per RP da due funzioni precedenti, oppure
   - $f_i$ è ottenuta da $f_j$ regolare per minimalizzazione (con $j < i$)
   \
-  Una funzione si dice *$mu$-ricorsiva* quando compare in coda ad una derivazione $mu$-ricorsiva.
+  Una *funzione* si dice *$mu$-ricorsiva* quando compare in coda a una derivazione $mu$-ricorsiva.
 ]
 
 #proposition()[
