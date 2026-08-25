@@ -2,7 +2,7 @@
 #import "@preview/cetz:0.4.2": canvas, draw
 #import "@preview/cetz-plot:0.1.3": plot
 #import "@preview/algo:0.3.6": algo
-#import "@preview/in-dexter:0.7.2": *
+
 #import "@preview/codly:1.3.0": *
 #import "@preview/codly-languages:0.1.1": *
 #show: codly-init.with()
@@ -12,7 +12,7 @@
 #show math.equation: set block(breakable: true)
 = Radici di un'equazione
 
-Data una funzione $f:[a,b] subset.eq RR -> RR$ vogliamo determinare $x^* in [a,b]$ tale che $f(x^*)=0$. In questo caso, diremo che $x^*$ è una #index("Radice di funzione")*radice* (o uno *zero*) di $f(x)$. In generale, $x^*$:
+Data una funzione $f:[a,b] subset.eq RR -> RR$ vogliamo determinare $x^* in [a,b]$ tale che $f(x^*)=0$. In questo caso, diremo che $x^*$ è una *radice* (o uno *zero*) di $f(x)$. In generale, $x^*$:
 + la radice può esistere ed essere unica.
 + può esistere ma non essere unica (es. $f(x)=sin x$).
 + oppure non esiste (es. $f(x)=e^x$).
@@ -24,18 +24,18 @@ $
 Di seguito introduciamo il primo metodo: il metodo di bisezione.
 
 == Metodo di bisezione
-#index("Metodo di bisezione")
+
 Assumiamo che:
 + $f(x)$ sia continua su $[a,b]$;
 + $f(a)f(b)<0$.
 
 #figure(
-  canvas({
+  canvas(length: 20pt,{
     import draw: content
     plot.plot(
       size: (15, 8),
-      x-tick-step: .1,
-      y-tick-step: .1,
+      x-tick-step: .2,
+      y-tick-step: .2,
       y-min: -0.3,
       y-max: 0.4,
       plot-style: (stroke: black),
@@ -45,9 +45,8 @@ Assumiamo che:
         let func = x => calc.pow(calc.exp(1), -x) - 0.588
         plot.add(func, domain: (0, +1), label: $f(x)$, style: (stroke: blue))
         plot.add-hline(0, style: (stroke: black))
-        plot.add-vline(.05, .25, .36, .45, .475, .56, .59, .6, .7, .705, .95, min: -0.01, max: 0.01)
         plot.annotate({
-          content((.55, .025), $x^*$)
+          content((.55, .035), $x^*$)
         })
       },
     )
@@ -78,7 +77,6 @@ fb = f(b)
 while 1
   x1 = (a+b)/2
   f1 = f(x1)
-
   if f1 == 0, break %Questo criterio di arresto non è robusto
   else if fa*f1<0, b=x1
   else a=x1
@@ -132,10 +130,10 @@ questo è il numero massimo di iterazioni di cui avremo bisogno. Questo ci perme
   breakable: false,
 )
 ```matlab
-fa = feval(f,a);
-fb = feval(f,b);
+fa = f(a);
+fb = f(b);
 x = (a+b)/2;
-fx = feval(f,x);
+fx = f(x);
 imax = ceil( log2(b-a) - log2(tol) );
 for i=2:imax
   if fx==0
@@ -148,14 +146,14 @@ for i=2:imax
     fa = fx;
   end
   x = (a+b)/2;
-  fx = feval(f,x);
+  fx = f(x);
 end
 ```
 
 
 In questo caso, evidentemente non si va più in loop per errore. Tuttavia rimane da riformulare in modo più efficace la condizione di uscita. Vediamo geometricamente come interpretare questa cosa:
 
-#figure(canvas({
+#figure(canvas(length: 20pt,{
   import draw: content, rect
   plot.plot(
     axis-style: "school-book",
@@ -278,10 +276,10 @@ Questo ci permette di ottenere questa versione ottimizzata del metodo di bisezio
   breakable: true,
 )
 ```matlab
-fa = feval(f,a);
-fb = feval(f,b);
+fa = f(a);
+fb = f(b);
 x = (a+b)/2;
-fx = feval(f,x);
+fx = f(x);
 imax = ceil( log2(b-a) -log2(tol) );
 for i=2:imax
   fix = abs( (fb-fa)/(b-a) );
@@ -295,7 +293,7 @@ for i=2:imax
     fa = fx;
   end
   x = (a+b)/2;
-  fx = feval(f,x);
+  fx = f(x);
 end
 ```
 
@@ -322,7 +320,7 @@ $
 ]
 
 #definition()[
-  Generalizzando, un qualsiasi metodo iterativo si dice #index("Convergente")*convergente* se l'errore tende a zero man mano che si procede con le iterazioni:
+  Generalizzando, un qualsiasi metodo iterativo si dice *convergente* se l'errore tende a zero man mano che si procede con le iterazioni:
   $
     lim_(i -> infinity) e_i = 0
   $
@@ -335,17 +333,19 @@ $
   $
 ]
 
-Per classificare l'efficienza dei metodi di approssimazione, dobbiamo introdurre il concetto di #index("Ordine di convergenza") *ordine di convergenza*.
+Per classificare l'efficienza dei metodi di approssimazione, dobbiamo introdurre il concetto di  *ordine di convergenza*.
 #definition()[
   Si dice che un metodo ha ordine $p$ se $p$ è il più grande numero reale positivo tale che esista un limite finito non nullo:
+  <2.1>
   $
-    lim_(i -> infinity) abs(e_(i+1))/abs(e_i)^p = c < infinity space space space (1)
+    lim_(i -> infinity) abs(e_(i+1))/abs(e_i)^p = c < infinity space space space (2.1)
   $
   Dove $c$ è detta *costante asintotica dell'errore*.
 ]
-Cerchiamo di dare un significato alla definizione di ordine descritto dalla (1). Per $i>>1$, possiamo scrivere che:
+Cerchiamo di dare un significato alla definizione di ordine descritto dalla #link(<2.1>, [(2.1)]). Per $i>>1$, possiamo scrivere che:
+<2.2>
 $
-  abs(e_(i+1)) approx c dot abs(e_i)^p space space space (2)
+  abs(e_(i+1)) approx c dot abs(e_i)^p space space space (2.2)
 $
 Questa relazione ci dice come l'errore futuro dipende dall'errore attuale. Analizziamo i casi in base a $p$:
 + Se $p<1$: il metodo non converge in quanto l'errore tenderebbe ad aumentare. Affinché si abbia convergenza, bisogna avere $p gt.eq 1$.
@@ -368,7 +368,7 @@ Questa relazione ci dice come l'errore futuro dipende dall'errore attuale. Anali
 
 + Se $p > 1$ (es. Convergenza Quadratica $p=2$): l'errore al passo successivo è proporzionale a una potenza dell'errore corrente. Se l'errore è piccolo (es. $10^(-3)$), elevarlo a potenza (es. al quadrato) lo rende minuscolo ($10^(-6)$).
   #example()[
-    Supponiamo di avere 2 metodi, uno di ordine $p=1$ e l'altro di ordine $p=2$. Supponiamo anche che, per entrambi, la costante asintotica dell'errore sia $c=0.1$ e che l'errore da cui partiamo sia, sempre per entrambi, $abs(e_0) = 0.1$. Otteniamo, premesso che la (2) valga a partire da $i=0$:
+    Supponiamo di avere 2 metodi, uno di ordine $p=1$ e l'altro di ordine $p=2$. Supponiamo anche che, per entrambi, la costante asintotica dell'errore sia $c=0.1$ e che l'errore da cui partiamo sia, sempre per entrambi, $abs(e_0) = 0.1$. Otteniamo, premesso che la #link(<2.2>, [(2.2)]) valga a partire da $i=0$:
 
     #align(center, table(
       align: center,
@@ -470,8 +470,9 @@ $
   x_1 = x_0 - f(x_0)/(f'(x_0))
 $
 è la nuova approssimazione. In generale avremo che:
+<2.3>
 $
-  x_(i+1) = x_i - f(x_i)/(f'(x_i)), quad i=0,1,dots space space space (3)
+  x_(i+1) = x_i - f(x_i)/(f'(x_i)), quad i=0,1,dots space space space (2.3)
 $
 definisce il *metodo di Newton*. Andiamo a fare alcune considerazioni:
 + La funzione $f(x)$ deve essere derivabile (è necessario che sia almeno di classe $C^2$ in un intorno della radice)
@@ -490,7 +491,7 @@ A fronte di questo costo per iterazione più elevato, vale il seguente risultato
   $
   - Sappiamo che $f(x^*) = 0$ (perché $x^*$ è la radice).
   - $epsilon_i$ è un punto sconosciuto che si trova tra $x_i$ e $x^*$ (Resto di Lagrange).
-  Tenendo conto della (3) e per la definizione di errore al passo i-esimo ($e_i =x^*-x_i$) si ottiene:
+  Tenendo conto della #link(<2.3>, [(2.3)]) e per la definizione di errore al passo i-esimo ($e_i =x^*-x_i$) si ottiene:
   $
     e_(i+1)/(e_i)^2 = -1/2 (f''(epsilon_i))/(f'(x_i))
   $
@@ -512,7 +513,7 @@ ovvero, l'ordine di convergenza del metodo di Newton diventa *lineare*, come con
 //21.10.2025
 == Convergenza locale
 
-Facciamo prima un riepilogo dei metodi appena visti per la degli zeri di una funzione.
+Facciamo prima un riepilogo dei metodi appena visti per la ricerca degli zeri di una funzione.
 - Metodo di bisezione:
   - applicabile se $f in C[a,b] and f(a)f(b)<0$;
   - ordine di convergenza lineare;
@@ -578,22 +579,24 @@ non è in generale possibile garantire la convergenza da un generico punto inizi
   )
 ]
 
-La conclusione di questo esempio è che la convergenza ad una radice è garantita, per il metodo di Newton, solo in un opportuno intorno della radice. Si parla in questo caso, di #index("Convergenza locale")*convergenza di tipo locale* mentre, per il metodo di bisezione, la #index("Convergenza globale")*convergenza è globale*, ovvero, avviene sempre, se il metodo è applicabile.
+La conclusione di questo esempio è che la convergenza ad una radice è garantita, per il metodo di Newton, solo in un opportuno intorno della radice. Si parla in questo caso, di *convergenza di tipo locale* mentre, per il metodo di bisezione, la *convergenza è globale*, ovvero, avviene sempre, se il metodo è applicabile.
 
 Cerchiamo di formalizzare questo concetto, per un generico metodo iterativo che denoteremo con
+<2.4>
 $
-  x_(i+1) = Phi(x_i), space i=0,1,... space space space (1)\
+  x_(i+1) = Phi(x_i), space i=0,1,... space space space (2.4)\
   x_0 -> x_1 = Phi(x_0) -> x_2 = Phi(x_1) -> ...
 $
 in cui $Phi(x)$ è detta *funzione di iterazione*. Ad esempio, per il metodo di Newton
 $
   Phi(x) = x-f(x)/(f'(x))
 $
-Se il metodo iterativo (1) serve per determinare la radice $x^*$ di $f(x)$, allora $Phi(x)$ deve soddisfare la #index("Proprietà di consistenza")*proprietà di consistenza*:
+Se il metodo iterativo #link(<2.4>, [(2.4)]) serve per determinare la radice $x^*$ di $f(x)$, allora $Phi(x)$ deve soddisfare la *proprietà di consistenza*:
+<2.5>
 $
-  x^* = Phi(x^*) space space space (2)
+  x^* = Phi(x^*) space space space (2.5)
 $
-che garantisce che, se raggiungiamo la radice, ci fermiamo. Questo significa che il problema di determinare lo zero di $f(x)$ equivale a trovare un *punto fisso* della funzione di iterazione $Phi(x)$. Pertanto, vogliamo vedere sotto quali condizioni per $Phi(x)$, partendo da un intorno del suo punto fisso (2), la successione di approssimazioni (1) converge a $x^*$. Vale il seguente risultato.
+che garantisce che, se raggiungiamo la radice, ci fermiamo. Questo significa che il problema di determinare lo zero di $f(x)$ equivale a trovare un *punto fisso* della funzione di iterazione $Phi(x)$. Pertanto, vogliamo vedere sotto quali condizioni per $Phi(x)$, partendo da un intorno del suo punto fisso #link(<2.5>, [(2.5)]), la successione di approssimazioni #link(<2.4>, [(2.4)]) converge a $x^*$. Vale il seguente risultato.
 
 #theorem()[
   Sia $x^*$ un punto fisso della funzione di iterazione $Phi(x)$ (ovvero $x^* = Phi(x^*)$). Supponiamo che esista un intorno circolare $I = [x^* - delta, x^* + delta]$ con $delta > 0$ tale che $Phi$ sia *Lipschitziana* in $I$ con costante $L < 1$. Ovvero:
@@ -638,7 +641,7 @@ che garantisce che, se raggiungiamo la radice, ci fermiamo. Questo significa che
   Se $exists delta > 0 : forall x in overbrace([x^*-delta, x^*+delta], =I(x^*))$, $abs(Phi'(x)) lt.eq L<1$, allora $x_(i+1)=Phi(x_i)$ converge a $x^*$, per $i-> infinity$.
 ]
 #proof()[
-  $forall x,y in I(x^*)$ e per lo sviluppo di Taylor con resto al primo ordine segue dunque:
+  $forall x,y in I(x^*)$ e per lo sviluppo di Taylor centrato in $x$ ma calcolato in $y$ con resto al primo ordine segue dunque:
   $
     abs(Phi(x)-Phi(y)) = abs(cancel(Phi(x)) - cancel(Phi(x)) - Phi'(epsilon)(x-y)) = abs(Phi'(epsilon)) dot abs(x-y) < L abs(x-y), space "con " L<1
   $
@@ -654,41 +657,6 @@ Se $x^*$ è una radice semplice, allora $f'(x^*) eq.not 0$ e
 $
   Phi'(x^*) = [ 1-(f'(x)^2 - f''(x)f(x))/(f'(x)^2) ] lr(bar, size: #300%)_(x=x^*) = [ (f''(x)overparen(f(x), =0))/(f'(x)^2) ] lr(bar, size: #300%)_(x=x^*) = (f''(x^*)overparen(f(x^*), =0))/(f'(x^*)^2) = 0
 $
-//TODO: migliorare questo grafico
-#figure(canvas({
-  import draw: content, rect
-  plot.plot(
-    axis-style: "school-book",
-    size: (15, 8),
-    x-tick-step: none,
-    y-tick-step: none,
-    y-min: -1,
-    y-max: 1,
-    x-min: calc.pi - 1,
-    x-max: 2 * calc.pi + 1,
-    plot-style: (stroke: black),
-    legend: "inner-north-east",
-    {
-      let func = x => calc.cos(x) * 0.5
-      plot.add(func, domain: (calc.pi, 2 * calc.pi), label: $Phi'(x)$, style: (stroke: colors.at(10)))
-      plot.add-hline(0.0, style: (stroke: black))
-      plot.add-hline(-0.1, min: calc.pi - 1.05, max: 1.5 * calc.pi - .15, style: (stroke: colors.at(8)))
-      plot.add-hline(0.1, min: calc.pi - 1.05, max: 1.5 * calc.pi + .15, style: (stroke: colors.at(8)))
-      plot.add-vline(1.5 * calc.pi - .15, min: -0.1, max: 0.03, style: (stroke: colors.at(8)))
-      plot.add-vline(1.5 * calc.pi + .15, min: -0.03, max: 0.1, style: (stroke: colors.at(8)))
-      plot.add-vline(1.5 * calc.pi, min: -0.03, max: 0.03, style: (stroke: red))
-
-      plot.annotate({
-        content((1.5 * calc.pi, -.1), colmath(1, $x^*$))
-        content((.62 * calc.pi, .1), colmath(1, $L$))
-        content((.6 * calc.pi, -.1), colmath(1, $-L$))
-      })
-      plot.annotate({
-        rect((1.5 * calc.pi - .15, -.05), (1.5 * calc.pi + .15, +.05), fill: rgb("#eaff0075"), stroke: none)
-      })
-    },
-  )
-}))
 Nel caso di una radice multipla di molteplicità $m$, si può dimostrare che
 $
   Phi'(x^*) = (m-1)/m
@@ -741,10 +709,7 @@ Vediamo come ovviare al degrado dell'ordine di convergenza del metodo di Newton 
 - Molteplicità radice nota.
 - Molteplicità radice incognita.
 
-#[
-  #set heading(numbering: none, outlined: false)
-  === La molteplicità della radice è nota
-]
+=== Metodo di Newton modificato
 Se $f(x)$ ha una radice $x^*$ di molteplicità $m>1$, ciò significa che $f(x^*)=f'(x^*)=...=f^(m-1)(x^*)=0$ e $f^m (x^*)eq.not 0$. In questo caso si può vedere che :
 $
   f(x) = (x-x^*)^m g(x)
@@ -759,52 +724,42 @@ $
 $
 Nel caso generale, si dimostra che l'iterazione (primi due passaggi del blocco precedente) ripristina la convergenza quadratica del metodo di Newton. Essa è quella del *metodo di Newton modificato*. Osserviamo che il costo di iterazione rimane lo stesso di quello del metodo di Newton (ovvero 1 valutazione di $f(x)$ + 1 di $f'(x)$).
 
-#[
-  #set heading(numbering: none, outlined: false)
-  === La molteplicità della radice è incognita
-]
+=== Metodo di accelerazione di Aitken
 Supponiamo di voler calcolare la radice $x^*$ di una funzione $f$, ma di non conoscere la molteplicità della radice. Indichiamo con $e_i=x^*-x_i$ l'errore al passo i-esimo. Sappiamo che, se la radice ha molteplicità $m$, allora per il metodo di Newton vale:
 $
   lim_(i->infinity) (e_(i+1))/e_i = (m-1)/m " con" m "molteplicità incognita di "x^*
 $
 cioè la convergenza è *lineare* e non quadratica.
 
-Anche se $m$ non è nota, per $i>>1$ possiamo osservare che:
+Anche se $m$ non è nota, per $i>>1$ sappiamo che:
 $
-  (e_(i+1))/e_i approx frac(e_i, e_(i-1)) approx c = frac(m-1, m)
+  (e_(i+1))/e_i approx c
 $
-Da ciò segue che:
-$
-  #box([
-    $e_(i+1) = c dot e_i$
-  ], stroke: 1pt + black, inset: 5pt)
-  " e "
-  #box([
-    $e_i = c dot e_(i-1)$
-  ], stroke: 1pt + black, inset: 5pt)
-$
-Dividendo membro a membro le due relazioni otteniamo:
+ovvero che $e_(i+1) approx c dot e_i$ e $e_i approx c dot e_(i-1)$, da cui otteniamo, dividendo membro a membro, che:
 $
   (e_(i+1))/e_i approx (e_i)/e_(i-1) => e_(i+1) dot e_(i-1) approx e_i^2
 $
-Andando a sostituire $e_i$ con la sua definizione vale che:
+A questo punto, definiamo $x_i^*$ tale che:
 $
-  (x_i^* - x_(i+1))(x_i^* -x_(i-1)) = (x_i^* - x_i)^2
+  (x^*_i - x_(i+1))(x^*_i -x_(i-1)) approx (x^*_i - x_i)^2
 $
-Sviluppando entrambi i membri e semplificando, si ottiene un’equazione di secondo grado in $x^*$, dalla quale si ricava:
+Sviluppando entrambi i membri e semplificando, si ottiene un'equazione di secondo grado dalla quale si ricava:
 $
-  cancel((x_i^*)^2) -(x_(i+1)+x_(i-1)) dot x_i^* + x_(i+1) dot x_(i-1) = cancel((x_i^*)^2) - 2x_i x_i^* + x_i^2\
-  x_i^*=frac(x_(i+1) dot x_(i-1)-x_i^2, x_(i+1)-2x_i+x_(i-1))
+  cancel((x^*_i)^2) -(x_(i+1)+x_(i-1)) x^*_i + x_(i+1) x_(i-1) & approx cancel((x^*_i)^2) - 2x_i x^*_i + x_i^2 \
+                                  -(x_(i+1)+x_(i-1)-2x_i)x^*_i & approx -x_(i+1)x_(i-1)+x_i^2 \
+                                                         x^*_i & approx frac(x_(i+1)x_(i-1)-x_i^2, x_(i+1)+x_(i-1)-2x_i)
 $
 Questa quantità fornisce una *stima migliorata della radice vera*.
 Il metodo può essere interpretato nel seguente modo:
 + Si applicano due passi del metodo di Newton, ottenendo $x_(i-1), x_i, x_(i+1)$.
 + Usando questi tre valori, si costruisce una nuova approssimazione $x_i^*$ tramite la formula precedente.
 + Il processo può essere ripetuto utilizzando di nuovo il metodo di Newton.
+Questa procedura definisce il *metodo di accelerazione di Aitken*.
+
 #observation()[
   Il costo per iterazione è doppio rispetto al metodo di Newton _standard_. Il vantaggio è che si può dimostrare che la successione ${x_i^*}$ converge quadraticamente a $x^*$ (anche se la convergenza rimane di tipo locale).
 ]
-#index("Metodo di Aitken")Questa procedura definisce il *metodo di accelerazione di Aitken*.
+
 #example()[
   Esempio di come Newton modificato e Aitken portino ad ottenere il valore della radice più velocemente del metodo di Newton standard.
   #figure(
@@ -867,11 +822,10 @@ $
   f'(x_i) = lim_(h->infinity) frac(f(x_i+h)-f(x_i), h)
 $
 Se approssimiamo $f'(x_i)$ con $frac(f(x_i+h)-f(x_i), h)$ con $h$ fissato, otterremo un'approssimazione del metodo di Newton: si parla, in questo caso, di un metodo *"quasi" Newton*. Nello specifico, otterremmo un metodo "quasi" Newton che ha un costo di 2 valutazioni funzionali per iterazione. Per migliorare questo approccio, procediamo come segue.
-#[
-  #set heading(numbering: none, outlined: false)
-  === Metodo delle secanti
-]
-#index("Metodo delle secanti")
+
+=== Metodo delle secanti
+
+
 #figure(
   canvas({
     import draw: content
@@ -930,11 +884,8 @@ $
     La convergenza verso radici multiple è, al pari del metodo di Newton, *solo lineare*. Trattandosi di un approssimazione del metodo di Newton, la sua convergenza è, generalmente, locale.
 ]
 
-#[
-  #set heading(numbering: none, outlined: false)
-  === Metodo delle corde
-]
-#index("Metodo delle corde")
+=== Metodo delle corde
+
 #figure(
   canvas({
     import draw: content

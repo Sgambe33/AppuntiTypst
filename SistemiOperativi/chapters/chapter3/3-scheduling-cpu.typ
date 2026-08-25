@@ -135,9 +135,9 @@ L'algoritmo soffre dell'*effetto convoglio*, dove processi brevi possono essere 
 
 SJF/SRTF possono causare *inedia (starvation)* per processi con CPU burst lunghi.
 
-#image("images/2025-08-07-17-01-21.png")
+#figure(image("images/2025-08-07-17-01-21.png", width: 60%))
 
-#image("images/2025-08-07-17-01-33.png")
+#figure(image("images/2025-08-07-17-01-33.png", width: 60%))
 
 #index("Media esponenziale")
 Il problema di SJF/SRTF è che richiedono la conoscenza della lunghezza del prossimo CPU burst, che può solo essere stimata. Si usa la *media esponenziale* dei burst precedenti:
@@ -157,14 +157,14 @@ $tau_(n+1)=t_n$ ovvero conta solo l'ultimo burst effettivo.
 
 NORMALMENTE SI USA $alpha=0.5$ NELLA MEDIA.
 
-#image("images/2025-08-07-17-12-31.png")
+#figure(image("images/2025-08-07-17-12-31.png", width: 60%))
 
 === Scheduling Circolare (Round Robin, RR)
 
 #index("Algoritmo scheduling", "RR")
 A turno, ogni processo ottiene la CPU per un *quanto di tempo (time slice)*, tipicamente tra 10 e 100 millisecondi. Simile a FCFS ma con prelazione, è progettato per sistemi time-sharing.
 
-#image("images/2025-08-07-17-13-57.png")
+#figure(image("images/2025-08-07-17-13-57.png", width: 60%))
 
 Il diagramma di Gantt mostra l'alternarsi dei processi in blocchi da 20ms (o meno se il burst è più corto) fino al completamento. Ad esempio, P1 esegue per 20ms, poi P2 per 17ms, P3 per 20ms, P4 per 20ms, poi P1 riprende per 20ms, e così via.
 
@@ -173,18 +173,18 @@ Il tempo di completamento è tipicamente più alto rispetto a SJF, ma il tempo d
 - un `q` grande si avvicina a FCFS
 - un `q` piccolo aumenta il parallelismo virtuale ma anche l'overhead di context switch.
 
-#image("images/2025-08-07-17-15-57.png")
+#figure(image("images/2025-08-07-17-15-57.png", width: 60%))
 
 Anche il tempo di completamento dipende dalla lunghezza del quanto di tempo.
 
-#image("images/2025-08-07-17-17-12.png")
+#figure(image("images/2025-08-07-17-17-12.png", width: 60%))
 
 === Scheduling a Priorità
 
 #index("Algoritmo scheduling", "Priorità")
 Assegna la CPU al processo con la priorità più alta. Le priorità possono essere interne (misurate dal sistema, es. uso CPU, I/O) o esterne (es. importanza utente). Anche qui esistono schemi con e senza prelazione. Ad esempio SJF è uno scheduling a priorità e senza prelazione in cui la priorità è data dalla lunghezza del successivo tempo di burst di CPU.
 
-#image("images/2025-08-07-17-20-48.png")
+#figure(image("images/2025-08-07-17-20-48.png", width: 60%))
 
 Il problema principale è l'*inedia (starvation)*, dove processi a bassa priorità potrebbero non essere mai eseguiti. La soluzione è l'*invecchiamento (aging)*, che aumenta gradualmente la priorità di un processo in attesa.
 
@@ -193,11 +193,11 @@ Il problema principale è l'*inedia (starvation)*, dove processi a bassa priorit
 #index("Algoritmo scheduling", "Code multilivello")
 Consiste nel suddividere la coda dei pronti in code separate, tipicamente per tipi di processi (es. foreground/I/O-bound e background/CPU-bound), ciascuna con il proprio algoritmo di scheduling (es. RR per foreground, FCFS per background). La gestione dello scheduling tra le code può essere a priorità fissa (con rischio di starvation) o tramite partizione di tempo (es. 80% del tempo a foreground, 20% a background).
 
-#image("images/2025-08-07-17-23-37.png")
+#figure(image("images/2025-08-07-17-23-37.png", width: 60%))
 
 Si può sviluppare ulteriormente suddividendo i processo su più code separate per ciascuna priorità distinta.
 
-#image("images/2025-08-07-17-25-13.png")
+#figure(image("images/2025-08-07-17-25-13.png", width: 60%))
 
 Rimane il problema di dover gestire lo scheduling fra le code:
 - Scheduling con priorità fissa: prima tutti i processi nella coda con priorità più elevata (porta a starvation)
@@ -217,7 +217,7 @@ Ad esempio, un processo interrotto per scadenza del quanto può essere spostato 
 #example(
   "Un sistema con tre code RR (Q0 con 8ms, Q1 con 16ms, Q2 senza quanto",
 )[
-  #image("images/2025-08-07-17-30-27.png", width: 70%)
+  #figure(image("images/2025-08-07-17-30-27.png", width: 60%))
   - Lo scheduling interno sposta un processo da Q0 a Q1 se non termina in 8ms, e da Q1 a Q2 se non termina in 16ms.
   - Lo scheduling tra le code esegue prima Q0, poi Q1, poi Q2. Un nuovo processo va in Q0 e può prelazionare processi in Q1 o Q2. L'aging sposta processi che attendono troppo a lungo a priorità più alta.
 ]
@@ -232,8 +232,8 @@ Un LightWeight Process è una sorta di processore virtuale che permette la comun
 Il kernel fornisce a ogni applicazione uno o più LWP, ciascuno associato a un thread del kernel. Il SO esegue lo scheduling dei thread del kernel sui processori. L'applicazione esegue lo scheduling dei thread utente sui LWP disponibili. Se un thread del kernel si blocca, il LWP associato si blocca, così come il thread a livello utente associato. Tramite una procedura nota come upcall, il kernel informa l'applicazione del verificarsi di determinati eventi. Le upcall sono gestite dalla libreria di thread a livello utente mediante un apposito gestore eseguito su uno dei LWP assegnati all'applicazione.
 
 
-#figure(image("images/2025-08-07-17-46-45.png", height: 30%), caption: [
-  L'immagine illustra la relazione tra thread utente, LWP e thread kernel. Il kernel schedula i thread kernel sui processori fisici, mentre l'applicazione schedula i thread utente sui LWP disponibili. Eventi importanti vengono comunicati dal kernel all'applicazione tramite *upcall*.])
+#figure(image("images/2025-08-07-17-46-45.png", height: 20%))
+L'immagine illustra la relazione tra thread utente, LWP e thread kernel. Il kernel schedula i thread kernel sui processori fisici, mentre l'applicazione schedula i thread utente sui LWP disponibili. Eventi importanti vengono comunicati dal kernel all'applicazione tramite *upcall*.
 
 
 #index[SCS-System Contemption Scope]
@@ -253,7 +253,7 @@ Gli approcci principali allo scheduling multiprocessore sono:
 #index("Multielaborazione", "Simmetrica")
 - *Multielaborazione simmetrica (SMP)*: ogni processore ha il proprio scheduler che esamina la coda dei pronti e sceglie il thread da eseguire. Questo è l'approccio standard nei SO moderni. Le strategie per organizzare i thread pronti includono una coda ready comune (che richiede sincronizzazione e può creare problemi di performance) o code ready private per ogni processore (che possono richiedere algoritmi di bilanciamento del carico ed è l'approccio più utilizzato).
 
-#image("images/2025-08-08-17-16-31.png")
+#figure(image("images/2025-08-08-17-16-31.png", width: 60%))
 
 === Processori Multicore e Core Multithread
 #index[Multicore]
@@ -264,19 +264,19 @@ Gli approcci principali allo scheduling multiprocessore sono:
 #index[Core multithread]
 Per affrontare lo *stallo della memoria* (il tempo che un core trascorre in attesa dei dati dalla memoria), l'hardware recente implementa *core multithread*.
 
-#image("images/2025-08-08-17-19-21.png")
+#figure(image("images/2025-08-08-17-19-21.png", width: 60%))
 
 Due o più thread hardware (HW) sono assegnati a ogni core, permettendo al core di eseguire un altro thread HW se uno si blocca.
 
-#image("images/2025-08-08-17-19-30.png")
+#figure(image("images/2025-08-08-17-19-30.png", width: 60%))
 
 Dal punto di vista del SO, ogni thread HW è una *CPU logica* (nota come *Chip MultiThreading - CMT* o *hyperthreading* di Intel).
 
-#image("images/2025-08-08-17-20-34.png", height: 40%)
+#figure(image("images/2025-08-08-17-20-34.png", height: 30%))
 
 *Un core multithread richiede due livelli di scheduling*: il livello 1 (thread SW) è responsabilità del SO, mentre il livello 2 (thread HW) è gestito dal core stesso (spesso con Round Robin o priorità). Le risorse del core sono condivise tra i suoi thread HW, quindi può eseguire solo un thread HW alla volta. Il SO può migliorare le prestazioni schedulando i thread SW su thread HW che non condividono risorse.
 
-#image("images/2025-08-08-17-20-45.png", height: 40%)
+#figure(image("images/2025-08-08-17-20-45.png", height: 30%))
 
 Il *bilanciamento del carico* è cruciale nei sistemi multiprocessore per un uso efficiente. Nei sistemi con una coda ready comune, il bilanciamento del carico non è necessario, poiché quando un processore diventa inattivo, estrae immediatamente un thread eseguibile dalla coda pronta condivisa. Nei sistemi con code ready private, esistono due strategie:
 - *Migrazione push*: un processore monitora i carichi e sposta i thread dai processori sovraccarichi.
@@ -286,7 +286,7 @@ Queste strategie spesso convivono nello stesso sistema.
 #index[Processor Affinity]
 La *predilezione per il processore (processor affinity)* si riferisce al fatto che un thread tende a rimanere sul processore su cui è in esecuzione, a causa del costo di invalidare e ripopolare la cache su un altro processore. Può essere *debole (soft affinity)*, dove il SO cerca di mantenere il thread sullo stesso processore ma il load balancer può spostarlo, o *forte (hard affinity)*, dove il SO permette di specificare un sottoinsieme di processori utilizzabili. L'affinity può essere influenzata dalle architetture di memoria, come nei sistemi *NUMA (Non Uniform Memory Access)*, dove l'accesso di una CPU alla propria memoria locale è più veloce. L'immagine mostra un'architettura NUMA con due chip e memoria locale.
 
-#image("images/2025-08-08-17-22-28.png", width: 70%)
+#figure(image("images/2025-08-08-17-22-28.png", width: 70%))
 
 #index[Multiprocessore eterogenei]
 I *sistemi multiprocessore eterogenei (HMP)*, come l'architettura ARM big.LITTLE o i processori Intel ibridi (P-core e E-core), combinano core con diverse velocità e gestioni energetiche. L'obiettivo è gestire il consumo energetico, allocando task a lungo termine o a basso consumo sui core LITTLE/E-core, e task interattivi sui core big/P-core. Windows 10 supporta lo scheduling HMP permettendo ai thread di selezionare la politica di scheduling per le proprie esigenze energetiche.
@@ -300,16 +300,16 @@ I metodi di valutazione includono:
 Analizzano le prestazioni di un algoritmo per un *carico di lavoro predeterminato*. Sono semplici e rapidi, utili a fini didattici, ma richiedono la conoscenza a priori del carico di lavoro, che non è sempre disponibile o costante.
 
 #example("Esempio I")[
-  #image("images/2025-08-08-17-28-23.png")
-  #image("images/2025-08-08-17-29-04.png")
+  #figure(image("images/2025-08-08-17-28-23.png", width: 60%))
+  #figure(image("images/2025-08-08-17-29-04.png", width: 60%))
 ]
 
 #example("Esempio II")[
-  #image("images/2025-08-08-17-29-15.png")
+  #figure(image("images/2025-08-08-17-29-15.png", width: 60%))
 ]
 
 #example("Esempio III")[
-  #image("images/2025-08-08-17-29-26.png")
+  #figure(image("images/2025-08-08-17-29-26.png", width: 60%))
 ]
 
 === Modelli con Reti di Code
