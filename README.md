@@ -7,9 +7,9 @@ Questi appunti riguardano alcuni corsi del I°, II° e III° anno della laura tr
 - [x] Basi di dati
 - [x] Sistemi Operativi
 - [x] Interpreti e Compilatori
-- [ ] Reti di calcolatori (_In corso_) 
+- [x] Reti di calcolatori
 - [x] Calcolo numerico
-
+- [ ] Informatica Teorica (_In corso_)
 > Le versioni più recenti potrebbero contenere diversi errori di battitura e teoria. Studiare con precauzione!
 
 ## Segnalazione errori
