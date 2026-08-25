@@ -11,7 +11,7 @@ Lo studio dell'informatica teorica affronta due importanti argomenti:
 
 La teoria della computabilità si prefigge di trovare delle definizioni formali che si avvicinino il più possibile al concetto di algoritmo, dato che l'algoritmo è un concetto primitivo e non esiste una sua definizione formale. Di conseguenza, si vuole anche indagare se un dato problema è calcolabile o meno da un algoritmo.
 
-La teoria della complessità computazionale si occupa, dato un problema, di determinare la quantità minima di risorse (usualmente tempo e spazio) necessaria ad un algoritmo per risolvere tale problema.
+La teoria della complessità computazionale si occupa, dato un problema, di determinare la quantità minima di risorse (usualmente tempo e spazio) necessaria a un algoritmo per risolvere tale problema.
 
 = Teoria della computabilità
 
@@ -75,7 +75,7 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 ]
 
 #observation()[
-  In generale, l'implicazione inversa *non* vale: $L$ enumerabile $arrow.r.double.not L$ decidibile. Questo perché se voglio capire se una stringa $x$ appartiene ad un linguaggio $L$ infinito con un algoritmo di enumerazione, potrei dover scorrere $L$ all'infinito senza mai trovare $x$. Vale però il risultato della proposizione seguente, dove $L^c = Sigma^* \\ L$.
+  In generale, l'implicazione inversa *non* vale: $L$ enumerabile $arrow.r.double.not L$ decidibile. Questo perché se voglio capire se una stringa $x$ appartiene a un linguaggio $L$ infinito con un algoritmo di enumerazione, potrei dover scorrere $L$ all'infinito senza mai trovare $x$. Vale però il risultato della proposizione seguente, dove $L^c = Sigma^* \\ L$.
 ]
 
 #proposition()[
@@ -86,7 +86,7 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 
   Per dimostrare che $L$ decidibile $==> L^c$ enumerabile possiamo usare l'algoritmo di enumerazione per $L$ della proposizione precedente modificando le operazioni finali:
   #pseudocode-list[
-    + Sia $w_i$ l'i-esima stringa di $Sigma^*$;
+    + Sia $w_i$ la $i$-esima stringa di $Sigma^*$;
     + Eseguo $M$ su $w_i$;
       + Se $w_i in.not L$, la scrivo;
       + Altrimenti no.
@@ -159,7 +159,7 @@ Vediamo una procedura per scrivere tutte le stringhe di lunghezza $k$ di un ling
 // 25.02.2026
 == Funzioni iniziali
 
-Il nostro obiettivo è quello di trovare una classe di funzioni che colgano nel modo più fedele possibile il concetto di funzione computabile. Le funzioni con cui avremo a che fare sono del tipo
+Il nostro obiettivo è quello di trovare una classe di funzioni che colga nel modo più fedele possibile il concetto di funzione computabile. Le funzioni con cui avremo a che fare sono del tipo
 $
   f: NN^k -> NN, quad (x_1, dots, x_k) |-> f(x_1, dots, x_k)
 $
@@ -711,7 +711,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
 == Enumerabilità delle funzioni ricorsive primitive
 
 #proposition()[
-  L'insieme delle funzioni *_rp_* è enumerabile. Esiste, ovvero, un algoritmo che genera sistematicamente tutte le funzioni appartenenti a questo insieme.
+  L'insieme delle funzioni *_rp_* è enumerabile. Ovvero, esiste un algoritmo che genera sistematicamente tutte le funzioni appartenenti a questo insieme.
 ]
 #proof()[
   Sia $f$ una generica funzione *_rp_* e sia $f_1, f_2, dots, f_n = f$ la sua derivazione ricorsiva primitiva (drp). È possibile codificare $f$ descrivendola in modo univoco utilizzando unicamente le funzioni iniziali e le operazioni (composizione e ricorsione primitiva) da cui è composta.
@@ -820,7 +820,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
 #proposition()[
   $forall g: NN^k -> NN$ funzione *_rp_*, $exists c in NN$ tale che $forall arrow(x) in NN^k$, $g(arrow(x)) < A(c, sum_(i=1)^k x_i)$
 
-  Ovvero, per qualunque funzione *_rp_* del tipo $g: NN^k -> NN$, esiste una costante (un numero naturale) tale che, per ogni $k$-upla, il valore della funzione su tale $k$-upla è strettamente minore della funzione di Ackermann con primo argomento la costante e secondo argomento la sommatoria della $k$-upla.
+  Ovvero, per qualunque funzione *_rp_* del tipo $g: NN^k -> NN$, esiste una costante (un numero naturale) tale che, per ogni $k$-upla, il valore della funzione su tale $k$-upla è strettamente minore della funzione di Ackermann con primo argomento la costante e secondo argomento la somma delle componenti della $k$-upla.
 ]
 #proof()[
   Si dimostra per induzione strutturale sulla costruzione dell'insieme delle funzioni *_rp_*:
@@ -878,7 +878,7 @@ Questa funzione non sembra intuitivamente computabile, perché la ricerca del mi
   - $f_i$ è ottenuta per RP da due funzioni precedenti, oppure
   - $f_i$ è ottenuta da $f_j$ regolare per minimalizzazione (con $j < i$)
   \
-  Una *funzione* si dice *$mu$-ricorsiva* quando compare in coda ad una derivazione $mu$-ricorsiva.
+  Una *funzione* si dice *$mu$-ricorsiva* quando compare in coda a una derivazione $mu$-ricorsiva.
 ]
 
 #proposition()[

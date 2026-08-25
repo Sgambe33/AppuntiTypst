@@ -34,7 +34,7 @@ Adesso definiamo le notazioni asintotiche:
   $
     exists D > 0, exists n_0 in NN, forall n gt.eq n_0 : frac(f(n), g(n)) gt.eq D "oppure" f(n) gt.eq D dot g(n)
   $
-  ovvero quando il rapporto tra queste due funzioni sta sempre sopra ad un certo valore costante.
+  ovvero quando il rapporto tra queste due funzioni sta sempre sopra a un certo valore costante.
 ]
 
 #index[Notazione Theta]
@@ -86,7 +86,7 @@ Adesso definiamo le notazioni asintotiche:
     $
       [1+2 + (2k-2)] + [1+2 + (2k-3)] + [1+2 + (2k-4)] + dots+ [1+2 + 2] + [1+2 + 1] \ = 4+ sum_(i=0)^(2k-2) (3+i) = 4+3(2k-1) + frac((2k-2)(2k-1), 2) = 4+3n + frac(n(n-1), 2)
     $
-  Quindi, in conclusione, abbiamo che la complessità è di tipo polinomiale, più precisamente è quadratica. ($Theta(n^2)$)
+  Quindi, in conclusione, abbiamo che la complessità è di tipo polinomiale, più precisamente è quadratica ($Theta(n^2)$).
 ]
 
 === Complessità nelle MdT multitraccia
@@ -101,7 +101,7 @@ Adesso definiamo le notazioni asintotiche:
 #proof()[
   Consideriamo una MdT $M$ a $k$ nastri e prendiamo la MdT $M'$ a $2k+1$ tracce che è equivalente a $M$ già descritta nella prima parte del corso (Proposizione 2.5.1), ma ricordiamo com'è fatta per $k=2$:
   #figure(image("images/MdTmultitracciaPerSimulareMdTmultinastro.png", width: 60%))
-  Sia $w$ una stringa di lunghezza $n$ su cui eseguiamo $M$ e supponiamo che $M$ su $w$ esegua $f(n)$ transizioni. Vediamo prima quante transizioni di $M'$ sono necessarie per simulare la $t$-esima transizione di $M$ su $w$: dapprima si ha il momento della raccolta delle informazioni, in cui la testina di $M'$ si   sposta sulle tracce in corrispondenza della posizione delle testine dei nastri per leggere i simboli e salvarli nello stato. La posizione di ciascuna testina simulata può trovarsi a distanza al massimo $t$ dalla posizione iniziale, perché alla $t$-esima transizione una testina può essersi spostata di al massimo $t$ celle. Giunti alla cella, si legge il simbolo e si torna indietro: per cui vengono fatti al massimo $t$ passi avanti e $t$ passi indietro per tutti i $k$ nastri di $M$, dunque il costo di questa fase è $2t k$ (vedere la Proposizione 2.5.1 per i passaggi in dettaglio). Per simulare correttamente la transizione poi la si deve eseguire effettivamente, quindi si deve tornare sulla posizione $k$ per effettuare scritture/spostamenti delle testine simulate, e anche in questo caso il costo è $2t k$. Quindi la stima del numero massimo di transizioni che $M'$ deve effettuare per simulare la $t$-esima transizione di $M$ è $2t k + 2t k = 4t k$.\ A questo punto possiamo stimare il limite superiore del numero di transizioni eseguite da $M'$ su input di lunghezza $n$ nel caso peggiore:
+  Sia $w$ una stringa di lunghezza $n$ su cui eseguiamo $M$ e supponiamo che $M$ su $w$ esegua $f(n)$ transizioni. Vediamo prima quante transizioni di $M'$ sono necessarie per simulare la $t$-esima transizione di $M$ su $w$: dapprima si ha il momento della raccolta delle informazioni, in cui la testina di $M'$ si sposta sulle tracce in corrispondenza della posizione delle testine dei nastri per leggere i simboli e salvarli nello stato. La posizione di ciascuna testina simulata può trovarsi a distanza al massimo $t$ dalla posizione iniziale, perché alla $t$-esima transizione una testina può essersi spostata di al massimo $t$ celle. Giunti alla cella, si legge il simbolo e si torna indietro: per cui vengono fatti al massimo $t$ passi avanti e $t$ passi indietro per tutti i $k$ nastri di $M$, dunque il costo di questa fase è $2t k$ (vedere la Proposizione 2.5.1 per i passaggi in dettaglio). Per simulare correttamente la transizione poi la si deve eseguire effettivamente, quindi si deve tornare sulla posizione $k$ per effettuare scritture/spostamenti delle testine simulate, e anche in questo caso il costo è $2t k$. Quindi la stima del numero massimo di transizioni che $M'$ deve effettuare per simulare la $t$-esima transizione di $M$ è $2t k + 2t k = 4t k$.\ A questo punto possiamo stimare il limite superiore del numero di transizioni eseguite da $M'$ su input di lunghezza $n$ nel caso peggiore:
   $
     sum_(t=1)^(f(n)) 4 t k =
     4k dot sum_(t=1)^(f(n)) t = 4k dot frac(f(n) dot (f(n)+1), 2) = Omicron(f(n)^2)
@@ -334,7 +334,7 @@ Adesso definiamo le notazioni asintotiche:
     })
   ]
 
-  La prima transizione (dall'alto) che va da $q_1$ a $q_2$ gestisce il caso di stringhe di lunghezza dispari (si salta il simbolo centrale nel nastro 1 e poi si parte col confronto), l'altra quelle di lunghezza pari (la testina sul nastro 1 è già in posizione corretta, bisogna solo spostare quella del nastro 2). Il caso peggiore si ha quando la MdT rifiuta la stringa, più precisamente la computazione in cui copio tutta la stringa sul secondo nastro: la macchina sceglie nondeterministicamente se continuare a copiare o meno, quindi può darsi che scelga una computazione in cui tutta la stringa viene copiata e quindi $t c_M (n)= 1 + 2n$ (costo 1 per la transzione $q_0 -> q_1$, poi fa 2 operazioni (copia e spostamento) per $n$ simboli in $q_1$ e si arresta).
+  La prima transizione (dall'alto) che va da $q_1$ a $q_2$ gestisce il caso di stringhe di lunghezza dispari (si salta il simbolo centrale nel nastro 1 e poi si parte col confronto), l'altra quelle di lunghezza pari (la testina sul nastro 1 è già in posizione corretta, bisogna solo spostare quella del nastro 2). Il caso peggiore si ha quando la MdT rifiuta la stringa, più precisamente la computazione in cui copio tutta la stringa sul secondo nastro: la macchina sceglie nondeterministicamente se continuare a copiare o meno, quindi può darsi che scelga una computazione in cui tutta la stringa viene copiata e quindi $t c_M (n)= 1 + 2n$ (costo 1 per la transizione $q_0 -> q_1$, poi fa 2 operazioni (copia e spostamento) per $n$ simboli in $q_1$ e si arresta).
 ]
 == Classi P e NP
 Sebbene le complessità di alcuni algoritmi ($n^3, n^4, ...$) siano considerate elevate, noi saremo più permissivi e considereremo efficienti tutte le complessità polinomiali. Alla luce delle considerazioni fatte sulle varie tipologie di MdT, definiamo le seguenti classi di linguaggi (o "problemi", più in generale):
@@ -395,7 +395,7 @@ Un algoritmo _naive_ (perché prova tutti i cammini possibili) che risolve quest
 
 - Nastro 1: contiene la rappresentazione del grafo in input;
 - Nastro 2: contiene la sequenza dei nodi attualmente in analisi (lunga $n+1$, inizia e termina con il nodo 1);
-- Nastro 3: è quello di lavoro, cioè quello che si usa per vedere se la sequenza è hamiltoniana: ci si scrive tutti i nodi che passano il controllo;
+- Nastro 3: è quello di lavoro, cioè quello che si usa per vedere se la sequenza è hamiltoniana: in cui si scrivono tutti i nodi che passano il controllo;
 - Nastro 4: serve per indicare quando fermare la generazione, contiene l'ultima sequenza possibile da controllare;
 #figure(image("images/naiveHamNastri.png", width: 50%))
 La MdT opera in questo modo:
@@ -419,12 +419,12 @@ Vediamo un'altra MdT, stavolta non deterministica, che risolve il problema HAM. 
 
 Dal punto di vista della complessità in tempo, che rappresentiamo in funzione di $k$ numero di archi, il caso peggiore è quello dell'accettazione. In tal caso si ha $k >= n$. I costi dei vari passi sono:
 
-- Controllo che il grafo abbia almeno $n$ archi: scorro la lista del nastro 1 e mantengo un contatore. Ogni volta che trovo \#\#  incremento di 1 e infine faccio un confronto con $n$. Poiché ogni vertice $v_i$, $i = 1, dots, n$, è codificato in binario, occupa al più $O(log n)$ celle. Dunque se la codifica di un arco è $v_i \# v_j$, anche un arco occupa $O(log n)$ celle. Essendoci $k$ archi, il costo di questo passo è $O(k log n)$.
+- Controllo che il grafo abbia almeno $n$ archi: scorro la lista del nastro 1 e mantengo un contatore. Ogni volta che trovo \#\# incremento di 1 e infine faccio un confronto con $n$. Poiché ogni vertice $v_i$, $i = 1, dots, n$, è codificato in binario, occupa al più $O(log n)$ celle. Dunque se la codifica di un arco è $v_i \# v_j$, anche un arco occupa $O(log n)$ celle. Essendoci $k$ archi, il costo di questo passo è $O(k log n)$.
 - Generazione della sequenza sul nastro 2: scrivo al più $n$ vertici, ciascuno che occupa al più $O(log n)$ celle, quindi il costo del passo è $O(n log n)$.
 - Controllo della sequenza: per ogni iterazione del ciclo:
   - controllo che il nuovo vertice non sia già comparso: $O(n log n)$;
   - verifico che ci sia un arco dal vertice precedente al nuovo vertice: $O(k log n)$;
-  - riposiziono  la testina del nastro 3: $O(n log n)$;
+  - si riposiziona la testina del nastro 3: $O(n log n)$;
   - ci sono al più $n$ iterazioni, dunque la complessità è $O(k log n)$ per iterazione, ossia $O(n k log n)$ in totale.
 Complessivamente si ha:
 $
@@ -439,7 +439,7 @@ da questo deduciamo anche che HAM $in$ NP (in realtà andrebbe considerata la lu
     - $forall w in Sigma_1^*, space w in L_1 <=> f(w) in L_2$
     - $f$ è computabile
   - $f$ è computabile in tempo polinomiale
-  In questo caso $f$ si dice *riduzione polinomiale* da $L_1$ a $L_2$ e se $F$ è la MdT che la calcola si ha che $t c_F (n) in O(n^r)$, $r in NN$
+  In questo caso $f$ si dice *riduzione polinomiale* da $L_1$ a $L_2$ e se $F$ è la MdT che la calcola si ha che $t c_F (n) in O(n^r)$, $r in NN$.
 ]
 #proposition()[
   Sia $f$ una riduzione polinomiale da $L_1 subset.eq Sigma_1^*$ a $L_2 subset.eq Sigma_2^*$ e $L_2 in P$. Allora $L_1 in P$.
@@ -618,7 +618,7 @@ La scelta di una certa codifica per un determinato problema può avere un impatt
 $
   "rep" : overbracket({p_1, p_2, dots, p_i}, "istanze di un problema") --> Sigma^* quad quad
 $
-cioè una funzione che traduca ciascuna istanza di un problema (che sarebbero gli input, ad esempio un grafo $G$ nel caso del problema HAM) in una parola su un opportuno alfabeto $Sigma$, in modo da poterla fornire in input ad una MdT.
+cioè una funzione che traduca ciascuna istanza di un problema (che sarebbero gli input, ad esempio un grafo $G$ nel caso del problema HAM) in una parola su un opportuno alfabeto $Sigma$, in modo da poterla fornire in input a una MdT.
 #index[Trasformazione polinomiale]
 #definition()[
   Date $"rep"_1 : {p_1, p_2, dots, p_i} --> Sigma_1^*$ e $"rep"_2 : {p_1, p_2, dots, p_i} --> Sigma_2^*$, \ $"rep"_1$ è *polinomialmente trasformabile* in $"rep"_2$ quando $exists space t : Sigma_1^* --> Sigma_2^*$ tale che:
@@ -832,7 +832,7 @@ G_(u,t,i,j) =
 ]
 Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una riduzione polinomiale da SAT, che sappiamo essere NP-difficile, a 3-SAT.
 #proposition()[
-  3-SAT è NP-difficile
+  3-SAT è NP-difficile.
 ]
 #proof()[
   Dato un polinomio booleano $p$ in CNF $p = u_1 and u_2 and dots and u_m$, dove le $u_i$ sono clausole, vogliamo costruire un polinomio $tilde(p)$ in 3-CNF, dunque ogni $u_i$ dovrà diventare una clausola (o un insieme di clausole) $tilde(u)_i$ con esattamente 3 letterali. Le clausole di $p$ possono essere, a seconda dei casi:
@@ -1182,7 +1182,7 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
   Il problema Clique $in$ NP.
 ]
 #proposition()[
-  Il problema Clique è NP-difficile
+  Il problema Clique è NP-difficile.
 ]
 
 #proof()[
@@ -1453,9 +1453,9 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
     grid.cell(rowspan: 1, [\ \
     - esiste un arco da $t_(i,j)$ a $f_(i,j)$ e viceversa;]),
     grid.cell(rowspan: 2, [\ \
-    con $r_i$ = massimo fra le occorrenze di $x_i "e" x_i^'$ in _p_.]),
+    con $r_i$ = massimo fra le occorrenze di $x_i "e" x_i^'$ in $p$.]),
   )
-  I pezzi di grafo così costruiti si connettono aggiungendo un lato da $o_i "a" e_(i+1)$, per ogni $i$, infine si aggiunge un lato da $o_n "a" e_1$. Nel grafo sopra, ogni variabile ha 2 cammini hamiltoniani da $e_j "a" o_j$:
+  I pezzi di grafo così costruiti si connettono aggiungendo un arco da $o_i$ a $e_(i+1)$, per ogni $i$, e infine un arco da $o_n$ a $e_1$. Nel grafo sopra, ogni variabile ha 2 cammini hamiltoniani da $e_j$ a $o_j$:
   #grid(
     columns: (0.5fr, 0.5fr),
     align: center,
@@ -1696,9 +1696,9 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
     $
       p = (x_1 or x_2 or x_3^') and (x_1^' or x_2 or x_4^') and (x_1 or x_2^' or x_4) and (x_1^' or x_3 or x_4)
     $
-    Devo sapere quanti nodi vanno scritti, sapere quindi quanto vale $r_i$ (massimo delle occorrenze di $x_i "e" x_i^' "in" p$). \
+    Devo sapere quanti nodi vanno scritti, sapere quindi quanto vale $r_i$ (massimo fra le occorrenze di $x_i$ e $x_i^'$ in $p$). \
     Esempio per $x_1$: $x_1$ appare 2 volte, $x_1^'$ appare 2 volte $==> r_i = 2 ==>$ sono 3 nodi $0, 1, 2$.
-    #figure(image("/assets/image-17.png", width: 75%))
+    #figure(image("images/image-17.png", width: 75%))
   ]
 #observation()[
   A lezione il professore si è fermato all'esempio qui sopra, non terminando la dimostrazione.
@@ -1867,7 +1867,7 @@ Abbiamo visto (Sottosezione 3.4.1) che se $"P" eq.not "NP"$, ci sono dei linguag
   Se $"P" eq.not "NP"$, allora $"NP-I" eq.not emptyset$
 ]
 === co-NP
-Le classi P ed NP sono chiuse rispetto ad unione e intersezione. Infatti, dati $L_1$, $L_2 in$ P, si ha che $L_1 union L_2 in$ P e $L_1 inter L_2 in$ P: basta eseguire i due algoritmi deterministici polinomiali e per l'unione si accetta se almeno uno accetta, per l'intersezione si accetta solo se entrambi accettano. Un ragionamento analogo si può fare per NP.\
+Le classi P ed NP sono chiuse rispetto a unione e intersezione. Infatti, dati $L_1$, $L_2 in$ P, si ha che $L_1 union L_2 in$ P e $L_1 inter L_2 in$ P: basta eseguire i due algoritmi deterministici polinomiali e per l'unione si accetta se almeno uno accetta, per l'intersezione si accetta solo se entrambi accettano. Un ragionamento analogo si può fare per NP.\
 P è anche chiusa rispetto alla complementazione (P = co-P): se un linguaggio $L$ è in P, esiste per definizione una MdT deterministica $M$ che lo decide in tempo polinomiale. Poiché $M$ termina sempre, per decidere il complementare $L^'$ (in questa sezione indichiamo con $'$ il complementare)  è sufficiente utilizzare la stessa macchina $M$ e scambiare gli stati finali di accettazione e rifiuto. Questa operazione non aggiunge transizioni, preservando la complessità polinomiale del calcolo. Ci chiediamo se anche NP è chiusa per complementazione.
 #index[Classe co-NP]
 #definition()[
@@ -1990,7 +1990,7 @@ Questo algoritmo è *sbagliato*: applica il punto 2 del teorema di Fermat nel ve
   $
   Il numero di congruenze da controllare è quindi inferiore.
 ]
-L'algoritmo visto sopra rimane tuttavia non deterministico. Si può arrivare ad una procedura deterministica? Forse testando la condizione del piccolo teorema di Fermat per un certo numero di $a$? Non funziona, perché esistono i seguenti numeri:
+L'algoritmo visto sopra rimane tuttavia non deterministico. Si può arrivare a una procedura deterministica? Forse testando la condizione del piccolo teorema di Fermat per un certo numero di $a$? Non funziona, perché esistono i seguenti numeri:
 
 #index[Numeri di Carmichael]
 #definition()[
@@ -2038,7 +2038,7 @@ Le congruenze da testare sono circa $n = 2^l$. #underline("Idea"): dividere i po
 $
   (x+a)^n equiv x^n + a quad (n, x^r - 1)
 $
-e ne trovo uno per cui non vale. Il "giusto" $r$ e i "pochi" $a$ si dimostra che sono polinomiali in $l$. Quindi siamo arrivati ad un algoritmo deterministico per determinare se un numero è primo con complessità polinomiale.
+e ne trovo uno per cui non vale. Il "giusto" $r$ e i "pochi" $a$ si dimostra che sono polinomiali in $l$. Quindi siamo arrivati a un algoritmo deterministico per determinare se un numero è primo con complessità polinomiale.
 
 == Classi di linguaggi esponenziali (EXP e NEXP)
 === EXP
@@ -2227,7 +2227,7 @@ Vediamo adesso che relazioni ci sono tra complessità spaziale e temporale:
   $
 ]
 #proof()[
-  Nel caso peggiore, $M$ legge una nuova cella sul nastro di lavoro ad ogni transizione, aggiungendo la cella iniziale: $s c_M (n) <= f(n) + 1$
+  Nel caso peggiore, $M$ legge una nuova cella sul nastro di lavoro a ogni transizione, aggiungendo la cella iniziale: $s c_M (n) <= f(n) + 1$
 ]
 
 #proposition()[
@@ -2473,7 +2473,7 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
     - $G$ ha un circuito hamiltoniano $<==>$ $G'$ ha almeno $n^n^2$ cicli.
 
   Costruzione di $G'$: al posto di ogni lato $(u, v)$ di G mettiamo questo gadget:
-  #figure(image("/assets/image-9.png", width: 60%), caption: "Anche sopra ci sono m nuovi vertici")
+  #figure(image("images/image-9.png", width: 60%), caption: "Anche sopra ci sono m nuovi vertici")
   Ogni lato $(u, v)$ di $G$ corrisponde a $2^m$ cammini semplici da _u_ a _v_ in $G'$ (per ogni nodo intermedio aggiunto ho 2 strade per arrivare a $v$). Pertanto, ogni ciclo semplice di lunghezza _l_ di $G$ corrisponde a $(2^m)^l$ cicli semplici in $G'$.\
   Scegliamo $m = n log_2(n)$ (per semplicità, supponiamo che _n_ sia una potenza di 2). Mostriamo che $G$ ha un circuito hamiltoniano $<==>$ $G'$ ha almeno $n^n^2$ cicli:
 

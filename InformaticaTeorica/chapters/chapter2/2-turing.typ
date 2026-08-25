@@ -52,7 +52,7 @@ ed è funzionale nei primi 2 argomenti, cioè fissati uno stato e un simbolo c'�
         quad space &q_0 && * && 1 space && q_0 text(": Se la cella corrente è vuota, scrive 1 e non cambia stato")\
         &q_0 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e cambia lo stato a ")q_1\
         &q_1 && * && 1 && q_1 text(": Se la cella corrente è vuota, scrive 1 e non cambia stato")\
-        &q_1 && 1 && 1 && q_0 text(": Se la cella corrente è 1, riscrivo 1 e cambio lo stato a ")q_0
+        &q_1 && 1 && 1 && q_0 text(": Se la cella corrente è 1, scrive 1 e cambia lo stato a ")q_0
       $,
     )
     Questa macchina non termina mai e riempie il nastro di simboli 1.
@@ -62,7 +62,7 @@ ed è funzionale nei primi 2 argomenti, cioè fissati uno stato e un simbolo c'�
       $
         quad space &q_0 && * && D space && q_1 text(": Se la cella corrente è vuota, la testina si sposta a destra e cambia lo stato a") q_1\
         &q_1 && 1 && D && q_1 text(": Se la cella corrente è 1, la testina si sposta a destra e non cambia stato ")\
-        &q_1 && * && 1 && q_2 text(": Se la cella corrente è vuota, scrivo 1 e cambia lo stato a ")q_2\
+        &q_1 && * && 1 && q_2 text(": Se la cella corrente è vuota, scrive 1 e cambia lo stato a ")q_2\
         &q_2 && 1 && S && q_2 text(": Se la cella corrente è 1, la testina si sposta a sinistra e non cambia lo stato")
       $,
     )
@@ -187,7 +187,7 @@ Dato un alfabeto $Sigma$ e un linguaggio $L subset.eq Sigma^*$, ci chiediamo se 
 #observation()[
   #block(
     $
-      #underline("Via tesi di church"): & bold("ric. enum." <--> "semidecidibile") \
+      #underline("Via tesi di Church"): & bold("ric. enum." <--> "semidecidibile") \
                                         & bold("ricorsivo" <--> "decidibile")
     $,
   )
@@ -349,15 +349,15 @@ L'insieme delle stringhe accettate da $M$ per arresto è il *linguaggio* accetta
   + $L$ è accettato per *unico stato finale* quando $exists M$ MdT con un solo stato finale che accetta $L$. Dimostrare $L$ accettato per stati finali se e solo se $L$ è accettato per unico stato finale.\
     #proof()[
       \ $<==)$ Ovvio.
-      \ $==>)$ $M$ MdT che accetta $L$ per stati finali. Costruiamo $N$ aggiungendo un nuovo stato $accent(q, ~)$ che M raggiungerà ogni volta che termina in uno stato finale (inoltre $accent(q, ~)$ sarà l'unico stato finale di $N$).
+      \ $==>)$ $M$ MdT che accetta $L$ per stati finali. Costruiamo $N$ aggiungendo un nuovo stato $accent(q, ~)$ che $M$ raggiungerà ogni volta che termina in uno stato finale (inoltre $accent(q, ~)$ sarà l'unico stato finale di $N$).
     ]
 
-  + $M$ accetta _w_ *per ingresso* quando, durante l'esecuzione di $M$ su un input _w_, la MdT entra in uno stato finale. Un linguaggio $L$ è accettato per ingresso quando $exists M$ MdT che accetta tutte e sole le stringhe di $L$ per ingresso. Dimostrare che $L$ è accettato per stati finali se e solo se $L$ è accettato per ingresso.\
+  + $M$ accetta $w$ *per ingresso* quando, durante l'esecuzione di $M$ su un input $w$, la MdT entra in uno stato finale. Un linguaggio $L$ è accettato per ingresso quando $exists M$ MdT che accetta tutte e sole le stringhe di $L$ per ingresso. Dimostrare che $L$ è accettato per stati finali se e solo se $L$ è accettato per ingresso.\
     #proof()[
-      \ $==>$) Sia $M$ MdT che accetta _$L$_ per stati finali.\
+      \ $==>$) Sia $M$ MdT che accetta $L$ per stati finali.\
       $M'$ che accetta per ingresso si costruisce a partire da $M$, aggiungendo un nuovo stato $tilde(q)$ (che sarà l'unico stato finale) e transizioni che portano in $tilde(q)$ da ogni stato finale in corrispondenza di caratteri per cui non ci sono transizioni uscenti in $M$.
 
-      $<==$) Sia $M$ MdT che accetta _L_ per ingresso.\
+      $<==$) Sia $M$ MdT che accetta $L$ per ingresso.\
       $M'$ MdT che accetta $L$ per stati finali si ottiene da $M$ eliminando tutte le transizioni uscenti dagli stati finali.
     ]
 
@@ -383,7 +383,7 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
 ]
 #proof()[
   \ $<==)$ Ovvio. Posso simulare una MdT con una traccia usando una MdT a $k$ tracce in cui ignoro (cioè lascio vuoto) il contenuto di tutte le tracce tranne la prima.
-  \ $==>)$ Data $M$ MdT a $k$ tracce che accetta $L$, posso ottenere una MdT $M'$ che accetta $L$ a una traccia semplicemente sostituendo l'alfabeto $Sigma$ di $M$ con $Sigma^k$, eseguendo  le medesime transizioni (se in $M$ si legge, dal basso verso l'alto, a, b, a, \*, a in $k=5$ celle diverse, in $M'$ si leggerà la quintupla (a, b, a, \*, a) in una sola cella).
+  \ $==>)$ Data $M$ MdT a $k$ tracce che accetta $L$, posso ottenere una MdT $M'$ che accetta $L$ a una traccia semplicemente sostituendo l'alfabeto $Sigma$ di $M$ con $Sigma^k$, eseguendo le medesime transizioni (se in $M$ si legge, dal basso verso l'alto, a, b, a, \*, a in $k=5$ celle diverse, in $M'$ si leggerà la quintupla (a, b, a, \*, a) in una sola cella).
 ]
 
 == MdT limitata a sinistra
@@ -402,7 +402,7 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
   $<==)$ Sia $M'$ una MdT con nastro limitato a sinistra che accetta $L$. Per simulare una computazione di $M'$ usando una MdT classica $M$, possiamo scrivere sul nastro un particolare simbolo, per esempio \#, che indichi che tale cella è quella iniziale. Quando una computazione di questa MdT cerca di portare la testina a sinistra di tale simbolo, facciamo in modo che la computazione termini, rifiutando la stringa.
   #figure(image("images/2026-03-11-12-09-22.png"))
 
-  $==>)$ Sia $M$ una MdT classica che accetta $L$. Consideriamo una MdT $M'$ con nastro limitato a sinistra che abbia due tracce. Per simulare una computazione di $M$ su $M'$, si considera il nastro di $M$ (che è infinito sia a destra che a sinistra) e si assegna alla prima cella vuota a sinistra della stringa in input la posizione 0. A sinistra di tale  posizione avremo una numerazione  negativa delle celle, mentre alla sua destra  le celle avranno una numerazione positiva crescente.
+  $==>)$ Sia $M$ una MdT classica che accetta $L$. Consideriamo una MdT $M'$ con nastro limitato a sinistra che abbia due tracce. Per simulare una computazione di $M$ su $M'$, si considera il nastro di $M$ (che è infinito sia a destra che a sinistra) e si assegna alla prima cella vuota a sinistra della stringa in input la posizione 0. A sinistra di tale posizione avremo una numerazione negativa delle celle, mentre alla sua destra le celle avranno una numerazione positiva crescente.
   #figure(image("images/2026-03-11-12-11-42.png"))
 
   Possiamo sistemare il contenuto a destra della posizione 0 nella prima traccia della MdT $M'$, mentre nella seconda traccia ci sarà l'eventuale contenuto delle celle a sinistra della posizione 0.
@@ -445,10 +445,10 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
 
   1. Prima vengono raccolte tutte le informazioni riguardanti le celle lette sui due nastri. Queste informazioni possono essere memorizzate, ad esempio, definendo opportunamente l'insieme degli stati: la macchina, ogni volta che incontra il marcatore della traccia $i$, legge il simbolo corrispondente e lo memorizza cambiando il proprio stato interno.  Tecnicamente, l'insieme degli stati di $M'$ viene quindi esteso a un prodotto cartesiano del tipo $Q times (Sigma union {*})^k$, dove le componenti aggiuntive fungono da buffer temporaneo. Alla fine della scansione, lo stato di $M'$ contiene tutte le informazioni necessarie per decidere la transizione della macchina multinastro originale;
   2. Cerca sulla traccia 2 il simbolo $x$, che corrisponde alla posizione della testina del nastro 1 di $M$;
-  3. Legge sulla traccia 1 il simbolo nella cella la cui posizione è indicata dalla $x$ sulla traccia 2 e compie l'operazione di scrittura, se necesario, altrimenti compie l'operazione di spostamento della testina operando sulla traccia 2 e riscrivendo la $x$ in corrispondenza della sua nuova posizione;
+  3. Legge sulla traccia 1 il simbolo nella cella la cui posizione è indicata dalla $x$ sulla traccia 2 e compie l'operazione di scrittura, se necessario, altrimenti compie l'operazione di spostamento della testina operando sulla traccia 2 e riscrivendo la $x$ in corrispondenza della sua nuova posizione;
   4. Torna all'inizio del nastro sfruttando la traccia 5, ovvero quando legge il simbolo \# si ferma (perché tale simbolo indica l'inizio del nastro);
   5. Cerca sulla traccia 4 il simbolo $x$, che corrisponde alla posizione della testina del nastro 2 di $M$;
-  6. Legge sulla traccia 3 il simbolo nella cella la cui posizione è indicata dalla $x$ sulla traccia 4 e compie l'operazione di scrittura, se deve, altrimenti compie l'operazione di spostamento della testina operando sulla traccia 4 e riscrivendo la $x$ in corrispondenza della sua nuova posizione;
+  6. Legge sulla traccia 3 il simbolo nella cella la cui posizione è indicata dalla $x$ sulla traccia 4 e compie l'operazione di scrittura, se necessario, altrimenti compie l'operazione di spostamento della testina operando sulla traccia 4 e riscrivendo la $x$ in corrispondenza della sua nuova posizione;
   7. Torna all'inizio del nastro.
 ]
 
@@ -499,7 +499,7 @@ C'è una sola testina che legge/scrive sulle $k$ tracce simultaneamente.
   Una MdT si dice *non deterministica* quando le transizioni non sono necessariamente funzionali nei primi due argomenti.
 ]
 #observation()[
-  Dalla definizione sopra, emerge che le MdT deterministiche (o standard) sono MdT non deterministiche, ma il viceversa non è sempre vero.
+  Dalla definizione sopra emerge che le MdT deterministiche (o standard) sono MdT non deterministiche, ma il viceversa non è sempre vero.
 ]
 
 #definition()[
@@ -732,7 +732,7 @@ Questa è la *forma generalizzata* della tesi di Church, che inizialmente avevam
 ]
 
 #theorem("Teorema dell'arresto V1")[
-  L'insieme $R={(n,m) in NN^2 | M_n "termina su" m}$ è semidecidibile ma non è decidibile   (il problema dell'arresto è indecidibile).
+  L'insieme $R={(n,m) in NN^2 | M_n "termina su" m}$ è semidecidibile ma non è decidibile (il problema dell'arresto è indecidibile).
 ]
 #proof()[\
   Se per assurdo $R$ fosse decidibile, allora potrei decidere, in particolare, se $(n,n) in R space (forall n in NN)$. Ma tale "sottoproblema" è equivalente al problema di decisione per $K$, che abbiamo dimostrato essere indecidibile.
@@ -778,7 +778,7 @@ Vediamo quindi la formulazione alternativa del Teorema dell'arresto, dal punto d
 ]
 
 #proposition()[
-  $cal(L)_("Halt")^c$ (complementare di $cal(L)_("Halt")$) non è semidecidibile
+  $cal(L)_("Halt")^c$ (complementare di $cal(L)_("Halt")$) non è semidecidibile.
 ]
 #proof()[
   Supponiamo per assurdo che $cal(L)_("Halt")^c$ sia semidecidibile. Sappiamo dal teorema precedente che anche $cal(L)_("Halt")$ è semidecidibile. Ma un linguaggio è decidibile se e solo se esso e il suo complementare sono entrambi semidecidibili, per cui $cal(L)_("Halt")$ sarebbe decidibile: assurdo, perché abbiamo dimostrato che non lo è.
@@ -829,8 +829,8 @@ Un tema centrale della teoria della computabilità è quello di stabilire se un 
     \ $L_2 = {a^i b^i c^i, i>=0} subset.eq {a,b,c}^* -->$ decidibile, $M_2$ MdT che decide $L_2$
     \ MdT che realizza (calcola) una riduzione da $L_1$ a $L_2$ su input $w in {a,b,c}^*$:
     - controlliamo se $w = u u$, per qualche $u in {a,b,c}^*$;
-    - se non è così, cancello _w_ e scrivo _a_;
-    - se $w = u u$, cancelliamo la seconda metà di _w_, mantenendo solo _u_.
+    - se non è così, cancelliamo $w$ e scriviamo $a$;
+    - se $w = u u$, cancelliamo la seconda metà di $w$, mantenendo solo $u$.
 
   + $Sigma_1 = {x,y}, Sigma_2 = {a}$. $L = {(x y^n) in Sigma_1^*| n >= 0}, Q={a^(2n) in Sigma_2^* | n >= 0}.$ Vogliamo trovare una riduzione da $L$ a $Q$, ossia una funzione $f: Sigma_1^* --> Sigma_2^*$ t.c. $w in L <==> f(w) in Q$. La strategia della MdT che calcola $f$ è la seguente:
     - se l'input $w$ è della forma corretta $x y^n$ la macchina produce in output la stringa vuota $epsilon$ (la più semplice accettata da $Q$);
@@ -977,7 +977,7 @@ Adesso generalizziamo questo concetto di proprietà di un linguaggio semidecidib
       + se _M_ non termina su _w_ ($R(M)w in.not cal(L)_"HALT"$), _N_ non accetta nessuna stringa _y_, quindi: $L(N)=emptyset in.not cal(L)_cal(P) ==> R(N) in.not cal(L)_cal(P)$
     #figure(image("images/rice.png", width: 35%))
     Quindi, non avendo un algoritmo per decidere $cal(L)_"HALT"$, non possiamo avere un algoritmo per decidere $cal(L)_cal(P)$.
-  + $cal(P)$ proprietà non banale. Supponiamo che il linguaggio vuoto $emptyset$ soddisfi la proprietà $cal(P)$: allora  $emptyset$ non soddisfa $not cal(P)$. Essendo $cal(P)$ non banale, lo è anche $not cal(P)$ e quindi per il punto 1 di questa dimostrazione $cal(L)_(not cal(P))$ non è decidibile.\ Supponiamo per assurdo che $cal(L)_cal(P)$ sia decidibile. Allora si ha che $cal(L_P)^c = cal(L)_(not cal(P)) union {"stringhe che non codificano MdT"}$ deve essere decidibile, e dunque anche  $cal(L)_(not cal(P))$: assurdo.
+  + $cal(P)$ proprietà non banale. Supponiamo che il linguaggio vuoto $emptyset$ soddisfi la proprietà $cal(P)$: allora $emptyset$ non soddisfa $not cal(P)$. Essendo $cal(P)$ non banale, lo è anche $not cal(P)$ e quindi per il punto 1 di questa dimostrazione $cal(L)_(not cal(P))$ non è decidibile.\ Supponiamo per assurdo che $cal(L)_cal(P)$ sia decidibile. Allora si ha che $cal(L)_cal(P)^c = cal(L)_(not cal(P)) union {"stringhe che non codificano MdT"}$ deve essere decidibile, e dunque anche $cal(L)_(not cal(P))$: assurdo.
 
   #figure(image("images/rice2.png", width: 35%))
 ]
@@ -999,7 +999,7 @@ Adesso generalizziamo questo concetto di proprietà di un linguaggio semidecidib
 #example(multiple: true)[
   1. Dato un linguaggio semidecidibile $L$, determinare se esiste una MdT riproducibile $M$ che accetta $L$.\
 
-    Questo è decidibile, in quanto  tutti i linguaggi hanno tale proprietà (vedi osservazione sopra).
+    Questo è decidibile, in quanto tutti i linguaggi hanno tale proprietà (vedi osservazione sopra).
 
   2. Dato un linguaggio semidecidibile $L$, determinare se $exists$ MdT riproducibile con meno di 10 stati che accetta $L$:\
 
@@ -1010,7 +1010,7 @@ Riprendiamo in mano la tesi di Church.
   Ogni funzione $mu$-ricorsiva è $tau$-ricorsiva.
 ]
 #proof()[
-  (un'idea). Per induzione strutturale sulla costruzione di una funzione $mu$-ricorsiva. Dobbiamo mostrare che ogni funzione che si trova in coda ad una derivazione $mu$-ricorsiva è calcolabile da una MdT (ovvero è $tau$-ricorsiva).
+  (un'idea). Per induzione strutturale sulla costruzione di una funzione $mu$-ricorsiva. Dobbiamo mostrare che ogni funzione che si trova in coda a una derivazione $mu$-ricorsiva è calcolabile da una MdT (ovvero è $tau$-ricorsiva).
 
   1. *Caso base*: le funzioni iniziali $C_0^(k)$, $S$ e $epsilon_j^(k)$ sono $tau$-ricorsive: una MdT per il calcolo del successore l'abbiamo già vista; la funzione costante zero è calcolata da una MdT che cancella l'input e scrive un singolo "1" (zero in unario); le proiezioni sono calcolate da MdT che scansionano il nastro e mantengono solo l'argomento $j$-esimo cancellando gli altri.
 
