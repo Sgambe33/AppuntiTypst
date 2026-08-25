@@ -2043,11 +2043,11 @@ e ne trovo uno per cui non vale. Il "giusto" $r$ e i "pochi" $a$ si dimostra che
 == Classi di linguaggi esponenziali (EXP e NEXP)
 === EXP
 #index[Classe EXP]
-Definiamo:
+#definition()[
 $
   "EXP" = {L | exists M "MdT deterministica che accetta" L "t.c." t c_M (n) = Omicron(2^n^k)"," exists k >= 1}
 $
-
+]
 #observation(multiple: true)[
   - $L in "EXP" <==> exists M$ MdT deterministica che accetta $L$ t.c. $t c_M (n) = Omicron(c^(p(n)))$, per opportuni $c > 1$ e $p(n)$ polinomio di grado $>= 1$ (sennò sarebbe costante).
   - $"P" subset.eq "EXP"$
@@ -2132,10 +2132,11 @@ per cui $L in "EXP"$.
 === NEXP
 #index[Classe NEXP]
 Definiamo un'altra classe di linguaggi esponenziali:
+#definition()[
 $
   "NEXP" = { L "linguaggio" | exists M "MdT non deterministica che accetta "L \ "t.c." t c_M (n) = Omicron(2^n^k), exists k >= 1}
 $
-
+]
 #observation()[
   $ "EXP" subset.eq "NEXP" $
 ]
