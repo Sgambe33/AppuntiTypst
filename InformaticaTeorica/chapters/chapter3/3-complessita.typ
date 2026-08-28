@@ -2075,7 +2075,7 @@ per cui $L in "EXP"$.
 ]
 
 #problem("Aperto")[
-  Ancora non si sa se le inclusioni sono strette o no:
+  Ancora non si sa quale delle due inclusioni sia stretta:
   $
     "P" limits(subset.eq)^? "NP" limits(subset.eq)^? "EXP"
   $
