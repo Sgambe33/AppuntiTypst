@@ -41,7 +41,7 @@ Adesso definiamo le notazioni asintotiche:
 #definition("Notazione Theta")[
   Siano $f,g : NN ->NN$. Allora $f in Theta(g)$, quando $f in O(g)$ e $f in Omega(g)$, cioè quando
   $
-    exists C,D > 0, exists n_0 in NN, forall n gt.eq n_0 : C lt.eq frac(f(n), g(n)) lt.eq D
+    exists C,D > 0, exists n_0 in NN, forall n gt.eq n_0 : D lt.eq frac(f(n), g(n)) lt.eq C
   $
   ovvero il rapporto tra queste due funzioni rimane compreso tra un valore minimo e un valore massimo.
 ]
@@ -471,7 +471,7 @@ da questo deduciamo anche che HAM $in$ NP (in realtà andrebbe considerata la lu
 #index[NP-difficile]
 #definition()[
   Un linguaggio $L$ si dice *NP-difficile* quando $forall Q in "NP"$, $Q$ è polinomialmente riducibile a $L$. \
-  
+
   In altri termini: "$Q$ è difficile *al più* quanto $L$" o equivalentemente "$L$ è difficile *almeno* quanto $Q$". Quindi risolvere $L$ è sufficiente per risolvere $Q$.
 ]
 
@@ -549,41 +549,41 @@ I diagrammi sopra illustrano le due possibili soluzioni al più grande problema 
 
 
 #proposition()[
-  Supponiamo che $"P" = "NP"$. Sia $L in "NP"$, con $L eq.not emptyset$ e $overline(L) eq.not Sigma^*$. Allora $L in "NPC"$. \
+  Supponiamo che $"P" = "NP"$. Sia $L in "NP"$, con $L eq.not emptyset$ e $L eq.not Sigma^*$. Allora $L in "NPC"$. \
 ]
 #proof()[
-Poiché $L in$ NP, per dimostrare che $L$ è NP-completo è sufficiente
-mostrare che $L$ è NP-difficile.
+  Poiché $L in$ NP, per dimostrare che $L$ è NP-completo è sufficiente
+  mostrare che $L$ è NP-difficile.
 
-Dalle ipotesi $L != emptyset$ e $L != Sigma^*$ esistono due stringhe fissate
-$alpha$ e $beta$ tali che $alpha in L$ e $beta in.not L$. Sia ora $Q in$ NP un linguaggio arbitrario. Poiché per ipotesi P = NP,
-si ha anche $Q in P$; esiste quindi un algoritmo deterministico che decide
-in tempo polinomiale, per ogni stringa $w$, se $w in Q$.
+  Dalle ipotesi $L != emptyset$ e $L != Sigma^*$ esistono due stringhe fissate
+  $alpha$ e $beta$ tali che $alpha in L$ e $beta in.not L$. Sia ora $Q in$ NP un linguaggio arbitrario. Poiché per ipotesi P = NP,
+  si ha anche $Q in P$; esiste quindi un algoritmo deterministico che decide
+  in tempo polinomiale, per ogni stringa $w$, se $w in Q$.
 
-Definiamo la funzione
-$
-  f(w) := cases(
-    alpha & "se " w in Q,
-    beta & "se " w in.not Q.
-  )
-$
+  Definiamo la funzione
+  $
+    f(w) := cases(
+      alpha & "se " w in Q,
+      beta & "se " w in.not Q.
+    )
+  $
 
-Verifichiamo che $f$ è una riduzione polinomiale da $Q$ a $L$. Per costruzione:
-- se $w in Q$, allora $f(w) = alpha in L$;
-- se $w in.not Q$, allora $f(w) = beta in.not L$.
+  Verifichiamo che $f$ è una riduzione polinomiale da $Q$ a $L$. Per costruzione:
+  - se $w in Q$, allora $f(w) = alpha in L$;
+  - se $w in.not Q$, allora $f(w) = beta in.not L$.
 
-Pertanto $w in Q <==> f(w) in L.$ Resta da verificare che $f$ sia calcolabile in tempo polinomiale.
-Su input $w$, l'algoritmo che calcola $f$ procede nel modo seguente:
+  Pertanto $w in Q <==> f(w) in L.$ Resta da verificare che $f$ sia calcolabile in tempo polinomiale.
+  Su input $w$, l'algoritmo che calcola $f$ procede nel modo seguente:
 
-1. decide se $w in Q$ usando l'algoritmo polinomiale per $Q$ (che esiste in quanto $Q in$ P);
-2. se $w in Q$ restituisce $alpha$, altrimenti restituisce $beta$.
+  1. decide se $w in Q$ usando l'algoritmo polinomiale per $Q$ (che esiste in quanto $Q in$ P);
+  2. se $w in Q$ restituisce $alpha$, altrimenti restituisce $beta$.
 
-Il primo passo richiede tempo polinomiale in $|w|$ (lunghezza di $w$); il secondo richiede
-tempo costante, poiché $alpha$ e $beta$ sono due stringhe fissate,
-indipendenti da $w$. Dunque $f$ è calcolabile in tempo polinomiale.
+  Il primo passo richiede tempo polinomiale in $|w|$ (lunghezza di $w$); il secondo richiede
+  tempo costante, poiché $alpha$ e $beta$ sono due stringhe fissate,
+  indipendenti da $w$. Dunque $f$ è calcolabile in tempo polinomiale.
 
-Abbiamo quindi costruito, per un arbitrario $Q in$ NP, una riduzione
-polinomiale da $Q$ a $L$. Ne segue che $L$ è NP-difficile, ed essendo anche in NP, $L$ è NP-completo.\
+  Abbiamo quindi costruito, per un arbitrario $Q in$ NP, una riduzione
+  polinomiale da $Q$ a $L$. Ne segue che $L$ è NP-difficile, ed essendo anche in NP, $L$ è NP-completo.\
 ]
 
 #observation()[
@@ -718,15 +718,15 @@ In questo polinomio abbiamo quindi 3 variabili ($x_1, x_2, x_3$) e 4 letterali (
     - *Se sono uguali*: il letterale $v$ è soddisfatto e quindi la clausola in cui compare è soddisfatta (poiché è fatta da soli operatori $or$); posso quindi passare a esaminare la clausola successiva. Se la clausola appena esaminata era l'ultima, accetto e termino.
     - *Se non sono uguali*: il letterale $v$ non è soddisfatto, quindi passo a esaminare il letterale successivo. Se il letterale appena esaminato era l'ultimo della clausola, allora termino e rifiuto il polinomio, poiché la clausola in cui compariva tale letterale non è soddisfatta (il polinomio è una congiunzione di clausole, per cui devono essere tutte vere perché il polinomio sia soddisfatto). Si dice in questo caso che il polinomio non è soddisfacibile.
 
-Analizziamo la complessità nel caso peggiore, ovvero il caso dell'accettazione (quando tutte le clausole sono soddisfatte), considerando $n$ variabili e $k$ letterali. Possiamo stimare la lunghezza dell'input in questo modo:
-$
-  overbrace(n log n, "n numeri binari per \n codificare la lista \n delle variabili") + overbrace(k log n, "k numeri binari per \n codificare i letterali \n (codifica polinomio)") = (n+k) log n quad
-$
-(il contributo di simboli come \#, $and$, $or$ e così via sarebbe costante quindi l'O-grande è comunque ciò che è scritto sopra). A questo punto stimiamo il numero di transizioni:
-$
-   overbrace(n log n, "genero assegnamento") + overbrace(k n log n, "percorro nastro") <= n^2 + k n^2 <= ((n+k)log n)^2 + ((n+k)log n)^3
-$
-Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di conseguenza, la MdT costruita opera effettivamente in tempo polinomiale.
+  Analizziamo la complessità nel caso peggiore, ovvero il caso dell'accettazione (quando tutte le clausole sono soddisfatte), considerando $n$ variabili e $k$ letterali. Possiamo stimare la lunghezza dell'input in questo modo:
+  $
+    overbrace(n log n, "n numeri binari per \n codificare la lista \n delle variabili") + overbrace(k log n, "k numeri binari per \n codificare i letterali \n (codifica polinomio)") = (n+k) log n quad
+  $
+  (il contributo di simboli come \#, $and$, $or$ e così via sarebbe costante quindi l'O-grande è comunque ciò che è scritto sopra). A questo punto stimiamo il numero di transizioni:
+  $
+    overbrace(n log n, "genero assegnamento") + overbrace(k n log n, "percorro nastro") <= n^2 + k n^2 <= ((n+k)log n)^2 + ((n+k)log n)^3
+  $
+  Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di conseguenza, la MdT costruita opera effettivamente in tempo polinomiale.
 ]
 #observation()[
   Per una MdT deterministica il numero di assegnamenti da generare e verificare sarebbe invece esponenziale, poiché si dovrebbero generare e verificare tutte le possibili combinazioni.
@@ -742,7 +742,7 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
 #proof()[
   Sia $L in$ NP. Vogliamo costruire una riduzione polinomiale da $L$ a SAT (o meglio, da $L$ al linguaggio di SAT). Sia $M$ MdT non deterministica polinomiale che accetta $L$ e sia $p(n) = t c_M (n)$. Per semplicità, supponiamo che $forall$ stringa $w$ di lunghezza $n$, il numero di transizioni di $M$ su $w$ sia esattamente $p(n)$ (non è restrittivo, basta allungare le computazioni "corte") e che $M$ sia una MdT standard limitata a sinistra con le celle numerate.
 
-  Formalmente vogliamo quindi trovare una funzione $Phi : Sigma_L ^ * -> Sigma_("SAT")^*$ computabile in tempo polinomiale e t.c. $forall w in Sigma_L ^*$, $w in L "("<==> M "accetta" w")" <==> Phi(w)$ è un polinomio booleano in forma CNF soddisfacibile.\
+  Formalmente vogliamo quindi trovare una funzione $Phi : Sigma_L^* -> Sigma_("SAT")^*$ computabile in tempo polinomiale e t.c. $forall w in Sigma_L^*$, $w in L "("<==> M "accetta" w")" <==> Phi(w)$ è un polinomio booleano in forma CNF soddisfacibile.\
   Gli stati di $M$ sono $Q={q_1, dots, q_s}$, con $|Q| = s$, mentre l'alfabeto di $M$ è $Sigma={a_1, dots, a_r}$, con $|Sigma| = r$. $F subset.eq Q$ è l'insieme degli stati finali.
 
   Le variabili del polinomio $Phi(w)$ (con $w$ lunga $n$) sono di tre tipi:
@@ -799,20 +799,18 @@ Tale espressione è un polinomio nella lunghezza dell'input $(n+k) log n$. Di co
   5) $or.big_(q_u in F) S(u, p(n))=E$ (*CNF*)
 
   6) $and.big_(t=0)^(p(n)-1) and.big_(i=1)^(p(n)+1) ( L(i, t) or (and.big_(j=1)^r C(i, j, t) "XNOR" C(i, j, t+ 1)))=F$ (che è quasi *CNF*)
-  $ 
+  $
     "con" x "XNOR" y = (x' or y) and (x or y')
   $
-  7) $
-G_(u,t,i,j) =
-      S(u,t)' or L(i,t)' or C(i,j,t)' or \
-      or.big_((q_u', a_j', v) in delta(q_u, a_j))
-      (
-        S(u', t+1) and
-        C(i, j', t+1) and
-        L(i+v, t+1)
-      )\
-      "e poi" G = and.big_(u, t, i, j)G_(u, t, i, j)
-    $
+  7) $ G_(u,t,i,j) =
+  S(u,t)' or L(i,t)' or C(i,j,t)' or \
+  or.big_((q_u', a_j', v) in delta(q_u, a_j))
+  (
+    S(u', t+1) and
+    C(i, j', t+1) and
+    L(i+v, t+1)
+  )\
+  "e poi" G = and.big_(u, t, i, j)G_(u, t, i, j) $
 
   Osserviamo che tutti i polinomi sopra sono in CNF tranne il 6, per cui basta applicare $L or (A and B) equiv (L or A) and (L or B)$, e il 7 che però può essere trasformato in CNF in tempo polinomiale.
 
@@ -855,9 +853,9 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
     (v_1 or v_2 or x').
   $
   Se $v_1 or v_2=1$, entrambe le clausole sono soddisfatte indipendentemente dal valore di $x$; se invece $v_1=v_2=0$, le due clausole richiederebbero contemporaneamente $x=1$ e $x=0$. Dunque anche in questo caso $u " soddisfacibile" <==> tilde(u) " soddisfacibile".$
-  
+
   3. $u = v_1 or v_2 or v_3$, che contiene già tre letterali, non occorre modificarla. Quindi $tilde(u)=u.$
-  
+
   4. $u = v_1 or v_2 or dots or v_k$, clausola che contiene $k>3$ letterali: introduciamo $k-3$ nuove variabili $y_1, dots, y_(k-3)$ e poniamo
   $
     tilde(u) =
@@ -871,23 +869,23 @@ Adesso mostriamo anche che 3-SAT è NP-difficile. Per fare ciò cercheremo una r
     and
     (y_(k-3) ' or v_(k-1) or v_k).
   $
-  
+
   Mostriamo che anche in questo caso $u$ è soddisfacibile $<==>$ $tilde(u)$ è soddisfacibile:
-  
-- $==>$) Supponiamo che $u$ sia soddisfacibile. Sia $V$ l'insieme delle variabili che compaiono in $p$ e sia $t : V -> {0,1}$ un assegnamento t.c. $t(u)=1$. Poiché $u$ è soddisfatta da $t$, esiste almeno un letterale di $u$ soddisfatto: sia $v_j$ il primo letterale t.c. $t(v_j)=1$. Estendiamo $t$ alle nuove variabili $y_1, dots, y_(k-3)$ definendo $tilde(t) : V union {y_1, dots, y_(k-3)} -> {0,1}$ come segue:
-  $
-    tilde(t)(x) =
-    cases(
-      t(x) & "se " x in V,
-      1 & "se " x = y_1","dots","y_(j-2),
-      0 & "se " x = y_(j-1)","dots","y_(n-3).
-    )
-  $
-  
-  Con questo assegnamento, le clausole che precedono quella contenente $v_j$ sono soddisfatte dalle variabili $y_1, dots, y_(j-2)$; le clausole successive sono soddisfatte dai letterali $y_(j-1) ', dots, y_(k-3) '$; la clausola contenente $v_j$ è soddisfatta proprio da $v_j$. Quindi $tilde(t)(tilde(u))=1$, e dunque $tilde(u)$ è soddisfacibile.
-  
+
+  - $==>$) Supponiamo che $u$ sia soddisfacibile. Sia $V$ l'insieme delle variabili che compaiono in $p$ e sia $t : V -> {0,1}$ un assegnamento t.c. $t(u)=1$. Poiché $u$ è soddisfatta da $t$, esiste almeno un letterale di $u$ soddisfatto: sia $v_j$ il primo letterale t.c. $t(v_j)=1$. Estendiamo $t$ alle nuove variabili $y_1, dots, y_(k-3)$ definendo $tilde(t) : V union {y_1, dots, y_(k-3)} -> {0,1}$ come segue:
+    $
+      tilde(t)(x) =
+      cases(
+        t(x) & "se " x in V,
+        1 & "se " x = y_1","dots","y_(j-2),
+        0 & "se " x = y_(j-1)","dots","y_(n-3).
+      )
+    $
+
+    Con questo assegnamento, le clausole che precedono quella contenente $v_j$ sono soddisfatte dalle variabili $y_1, dots, y_(j-2)$; le clausole successive sono soddisfatte dai letterali $y_(j-1) ', dots, y_(k-3) '$; la clausola contenente $v_j$ è soddisfatta proprio da $v_j$. Quindi $tilde(t)(tilde(u))=1$, e dunque $tilde(u)$ è soddisfacibile.
+
   - $<==$) Viceversa, supponiamo che $tilde(u)$ sia soddisfacibile e che, per assurdo, tutti i letterali $v_1, dots, v_k$ siano falsi. La prima clausola impone allora $y_1=1$. La seconda impone $y_2=1$ e, procedendo allo stesso modo lungo la catena, si ottiene $y_1 = y_2 = dots = y_(k-3) = 1$. L'ultima clausola diventa però $y_(k-3) ' or v_(k-1) or v_k = 0$, assurdo. Quindi almeno uno dei letterali $v_j$ deve essere vero e pertanto $u$ è soddisfatta.
-  
+
   Infine si ottiene $tilde(p) = tilde(u)_1 and tilde(u)_2 and dots and tilde(u)_m$ e, per costruzione, $p " è soddisfacibile" <==> tilde(p) " è soddisfacibile"$.\
   Inoltre, una clausola di $k$ letterali viene sostituita da un numero $O(k)$ di clausole e variabili ausiliarie; la dimensione di $tilde(p)$ è quindi lineare, e in particolare polinomiale, nella dimensione di $p$. Anche la trasformazione può essere eseguita in tempo polinomiale. Abbiamo dunque costruito una riduzione polinomiale da SAT a 3-SAT, e poiché SAT è NP-difficile, segue che 3-SAT è NP-difficile.
 ]
@@ -902,7 +900,10 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
 #definition()[
   Dato $G=(V, E)$ grafo non orientato, un *vertex cover* (VC) di $G$ è un sottoinsieme $C subset.eq V$ t.c. $forall{x,y} in E, space x in C "oppure" y in C$
 ]
-#figure(image("images/2026-08-11-11-08-48.png", width: 60%), caption: "Un vertex cover di questo grafo è C = {1,6,4,7,2,3,8}. Un VC minimo potrebbe essere invece {1,3,4,7,8}.")
+#figure(
+  image("images/2026-08-11-11-08-48.png", width: 60%),
+  caption: "Un vertex cover di questo grafo è C = {1,6,4,7,2,3,8}. Un VC minimo potrebbe essere invece {1,3,4,7,8}.",
+)
 
 #index[Problema del Vertex Cover]
 #problem("Vertex Cover")[
@@ -925,7 +926,7 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
   $V = {x_1, dots, x_n}$ insieme delle variabili di $p$, $|V| = n$ e $m =$ numero di clausole di $p$.
 
   Costruiamo un grafo non orientato $G(p)$ nel seguente modo:
-  
+
   - scriviamo un nodo per ogni variabile del polinomio e un nodo per ogni negazione di variabile;
   - colleghiamo ogni coppia variabile-variabile negata con un lato;
   - scriviamo un nodo per ogni letterale di ogni clausola;
@@ -1035,8 +1036,8 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
   - $forall i = 1, dots, n$ scegliamo
   $
     cases(
-        x_i &"se" t(x_i) = 1,
-        x'_i &"se" t(x_i) = 0
+      x_i & "se" t(x_i) = 1,
+      x'_i & "se" t(x_i) = 0
     )
   $
   - Per ogni clausola, individuiamo un letterale che soddisfa la clausola e scegliamo i rimanenti 2 (quindi in tutto scelgo 2 nodi su 3 per ogni clausola $=> 2m$).
@@ -1156,10 +1157,10 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
   $
     t(x_i) = cases(
       1 & "se" x_i in V C,
-      0 & "se" x'_i in.not V C
+      0 & "se" x_i in.not V C
     )
   $
-  Con questo assegnamento, ogni clausola è soddisfatta dal letterale corrispondente al nodo non appartenente al VC di ogni "triangolo" $u_(i,0), u_(i,1), u_(i,2)$.\ Dunque abbiamo ottenuto che $p in $ 3-SAT $<==> G(p) "ha un VC con cardinalità" k(p)$. Poiché la funzione che costruisce il grafo dal polinomio è computabile in tempo polinomiale, 3-SAT è polinomialmente riducibile a VC: essendo 3-SAT NP-difficile, anche VC è NP-difficile.
+  Con questo assegnamento, ogni clausola è soddisfatta dal letterale corrispondente al nodo non appartenente al VC di ogni "triangolo" $u_(i,0), u_(i,1), u_(i,2)$.\ Dunque abbiamo ottenuto che $p in$ 3-SAT $<==> G(p) "ha un VC con cardinalità" k(p)$. Poiché la funzione che costruisce il grafo dal polinomio è computabile in tempo polinomiale, 3-SAT è polinomialmente riducibile a VC: essendo 3-SAT NP-difficile, anche VC è NP-difficile.
 ]
 
 === Problema Clique
@@ -1191,7 +1192,7 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
     & p = u_1 and u_2 and dots and u_k \
     & u_i = (u_(i, 1) or u_(i, 2) or u_(i, 3))
   $
-  Costruiamo un grafo $G(p) = (V, E)$  in cui: 
+  Costruiamo un grafo $G(p) = (V, E)$  in cui:
 
   - c'è un vertice per ciascun letterale di ogni clausola;
   - non ci sono lati tra letterali della stessa clausola;
@@ -1362,8 +1363,8 @@ Vediamo una serie di problemi NP-completi: per quasi tutti useremo una riduzione
       circle((x, 0), radius: 0.08, fill: white, stroke: 1.5pt)
       circle((x, -1.2), radius: 0.08, fill: white, stroke: 1.5pt)
     }
-  })) 
-Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardinalità" k$, con $k$ numero di clausole di $p$. Inoltre, $G(p)$ è costruibile in tempo polinomiale nella dimensione di $p$: contiene $3k$ vertici e gli archi si ottengono considerando le coppie di letterali appartenenti a clausole diverse e non opposti. Quindi 3-SAT è polinomialmente riducibile a Clique e poiché 3-SAT è NP-difficile, anche Clique è NP-difficile.
+  }))
+  Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardinalità" k$, con $k$ numero di clausole di $p$. Inoltre, $G(p)$ è costruibile in tempo polinomiale nella dimensione di $p$: contiene $3k$ vertici e gli archi si ottengono considerando le coppie di letterali appartenenti a clausole diverse e non opposti. Quindi 3-SAT è polinomialmente riducibile a Clique e poiché 3-SAT è NP-difficile, anche Clique è NP-difficile.
 ]
 
 === Problema HAM
@@ -1447,13 +1448,15 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
       line("tr", "o", mark: (end: ">"))
       line("fr", "o", mark: (end: ">"))
     })),
-    grid.cell(rowspan: 2, [ \ \
+    grid.cell(rowspan: 2, [
+      \ \
       - esiste un arco tra un vertice $t_(i,j)$ e un vertice $f_(i, j+1)$ e un arco tra un vertice $f_(i,j)$ e un vertice $t_(i,j+1)$;
     ]),
     grid.cell(rowspan: 1, [\ \
-    - esiste un arco da $t_(i,j)$ a $f_(i,j)$ e viceversa;]),
+      - esiste un arco da $t_(i,j)$ a $f_(i,j)$ e viceversa;
+    ]),
     grid.cell(rowspan: 2, [\ \
-    con $r_i$ = massimo fra le occorrenze di $x_i "e" x_i^'$ in $p$.]),
+      con $r_i$ = massimo fra le occorrenze di $x_i "e" x_i^'$ in $p$.]),
   )
   I pezzi di grafo così costruiti si connettono aggiungendo un arco da $o_i$ a $e_(i+1)$, per ogni $i$, e infine un arco da $o_n$ a $e_1$. Nel grafo sopra, ogni variabile ha 2 cammini hamiltoniani da $e_j$ a $o_j$:
   #grid(
@@ -1646,7 +1649,6 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
       content((dx, y-out), text(size: 1.4em, $"out"_(j,2)$), name: "out2")
       content((2 * dx, y-out), text(size: 1.4em, $"out"_(j,3)$), name: "out3")
 
-
       // Frecce verticali in ingresso
       line((0, y-in + 1.5), "in1.north", mark: (end: ">"))
       line((dx, y-in + 1.5), "in2.north", mark: (end: ">"))
@@ -1670,7 +1672,6 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
       line("out3.west", "out2.east", mark: (end: ">"))
       line("out2.west", "out1.east", mark: (end: ">"))
 
-
       // Curva superiore: in3 -> in1, passando sotto
       bezier(
         "in3.south",
@@ -1690,7 +1691,7 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
         shorten-start: 0.15,
         shorten-end: 0.15,
       )
-  })]
+    })]
   #example()[
     Consideriamo:
     $
@@ -1700,28 +1701,31 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
     Esempio per $x_1$: $x_1$ appare 2 volte, $x_1^'$ appare 2 volte $==> r_i = 2 ==>$ sono 3 nodi $0, 1, 2$.
     #figure(image("images/image-17.png", width: 75%))
   ]
-#observation()[
-  A lezione il professore si è fermato all'esempio qui sopra, non terminando la dimostrazione.
-  L'idea della conclusione comunque è mostrare la correttezza della riduzione, provando che
-  il polinomio $p$ è soddisfacibile $<==>$ il grafo costruito $G(p)$ possiede un circuito hamiltoniano.
-  
-  $==>$) Se $p$ è soddisfacibile, per ogni variabile scegliamo il cammino nel gadget
-  ("lato true", o "lato false") coerente con l'assegnamento. Poiché ogni clausola è soddisfatta
-  da almeno un letterale, il circuito può effettuare una "deviazione" dal cammino della variabile
-  corrispondente per visitare i nodi della clausola e tornare subito nel gadget, riuscendo così
-  a toccare tutti i nodi.
-  
-  $<==$) Se esiste un circuito hamiltoniano, la struttura a "catena" dei gadget impone che per ogni variabile venga scelto uno dei due possibili cammini, definendo così un assegnamento di verità. Il fatto che il circuito riesca a visitare anche i nodi delle clausole garantisce che ogni clausola abbia almeno un letterale vero.
-  
-  Poiché la costruzione del grafo richiede tempo polinomiale rispetto alla dimensione del
-  polinomio, si ha che 3-SAT è polinomialmente riducibile a HAM ed essendo 3-SAT NP-completo, e quindi NP-difficile, ne consegue che HAM è NP-difficile.
-]
+  #observation()[
+    A lezione il professore si è fermato all'esempio qui sopra, non terminando la dimostrazione.
+    L'idea della conclusione comunque è mostrare la correttezza della riduzione, provando che
+    il polinomio $p$ è soddisfacibile $<==>$ il grafo costruito $G(p)$ possiede un circuito hamiltoniano.
+
+    $==>$) Se $p$ è soddisfacibile, per ogni variabile scegliamo il cammino nel gadget
+    ("lato true", o "lato false") coerente con l'assegnamento. Poiché ogni clausola è soddisfatta
+    da almeno un letterale, il circuito può effettuare una "deviazione" dal cammino della variabile
+    corrispondente per visitare i nodi della clausola e tornare subito nel gadget, riuscendo così
+    a toccare tutti i nodi.
+
+    $<==$) Se esiste un circuito hamiltoniano, la struttura a "catena" dei gadget impone che per ogni variabile venga scelto uno dei due possibili cammini, definendo così un assegnamento di verità. Il fatto che il circuito riesca a visitare anche i nodi delle clausole garantisce che ogni clausola abbia almeno un letterale vero.
+
+    Poiché la costruzione del grafo richiede tempo polinomiale rispetto alla dimensione del
+    polinomio, si ha che 3-SAT è polinomialmente riducibile a HAM ed essendo 3-SAT NP-completo, e quindi NP-difficile, ne consegue che HAM è NP-difficile.
+  ]
 ]
 === Problema Independent Set (IS)
 #definition()[
   Sia $G=(V,E)$ un grafo non orientato, $I subset.eq V$ si dice *indipendente* quando $forall x,y in I$, ${x,y} in.not E$.
 ]
-#figure(image("images/esempioIS.png",  width: 35%), caption: "I nove vertici blu formano un insieme indipendente massimo per questo grafo")
+#figure(
+  image("images/esempioIS.png", width: 35%),
+  caption: "I nove vertici blu formano un insieme indipendente massimo per questo grafo",
+)
 #problem("IS")[
   Dato un grafo non orientato $G$ e un intero $k$, determinare se $G$ contiene un sottoinsieme indipendente di cardinalità $k$.
 ]
@@ -1763,7 +1767,7 @@ Dunque abbiamo che $p in "3-SAT" <==> G(p) " ha un sottografo completo di cardin
 Vediamo innanzitutto come costruire il grafo associato a $p$. Sia $p = u_1 and u_2 and dots and u_s " con " u_i = u_(i, 1) or u_(i, 2)$ un polinomio booleano in 2-CNF. Costruiamo un grafo orientato $G(p)$ nel seguente modo:
 
 - vertici: $forall x$ variabile che compare in _p_, si scrivono i vertici $x "e" x'$;
-- archi: $forall "clausola" u_i$, 2 archi: 
+- archi: $forall "clausola" u_i$, 2 archi:
 $
   cases(u_(i, 1)^' --> u_(i, 2), u_(i, 2)^' --> u_(i, 1))
 $
@@ -1816,27 +1820,49 @@ $
 ]
 
 #proposition()[
-  _p_ è soddisfacibile $<==> exists.not x "variabile di" p "tale che in" G(p) space x arrow.squiggly.long x' "e" x' arrow.squiggly.long x$
+  $p$ è soddisfacibile $<==> exists.not x$ variabile di $p$ tale che in $G(p)$ $x arrow.squiggly.long x'$ e $x' arrow.squiggly.long x$
 ]
 
 #proof()[\
-  $==>)$ Usiamo la contronominale. Supponiamo che esista una variabile $x$ t.c. $x arrow.squiggly.long x'$ e $x' arrow.squiggly.long x$; mostriamo che $p$ non è soddisfacibile. Sia $t$ un qualunque assegnamento.
-  - Se $t(x)=1$, considerando il cammino $x arrow.squiggly.long x'$, poiché $t(x')=0$ deve esistere lungo il cammino un arco $alpha --> beta$ in cui si passa per la prima volta dal valore $1$ al valore $0$: $ &x --> gamma_1 --> dots --> alpha --> beta --> dots --> gamma_n --> x' \ &t(x)=1 space space space space space space space space space space t(alpha)=1, space t(beta)=0 space space space space space space space space space t(x')=0 $ Ma l'arco $alpha --> beta$ deriva dalla clausola $alpha' or beta$ di $p$, che sotto $t$ vale $ t(alpha')=0, quad t(beta)=0, $ e quindi non è soddisfatta.
+  $==>)$ Usiamo la contronominale. Supponiamo che esista una variabile $x$ tale che $x arrow.squiggly.long x'$ e $x' arrow.squiggly.long x$; mostriamo che $p$ non è soddisfacibile. Sia $t$ un qualunque assegnamento.
 
-  - Se $t(x)=0$, allora $t(x')=1$ e si applica lo stesso ragionamento al cammino $x' arrow.squiggly.long x$, ottenendo nuovamente una clausola non soddisfatta.
-  
-  In entrambi i casi $t$ non soddisfa $p$; essendo $t$ arbitrario, $p$ non è soddisfacibile.
-  
-  $<==)$ Senza perdita di generalità, supponiamo che $exists alpha$ letterale t.c. in _p_ compaiono sia $alpha$ che $alpha'$ (altrimenti _p_ sarebbe banalmente soddisfacibile).
-  Se, per assurdo, $forall alpha$ letterale t.c. $alpha, alpha'$ compaiono in _p_, $alpha arrow.long.squiggly alpha'$, allora, se $beta$ è uno di questi letterali si ha  $beta arrow.long.squiggly beta'$ e $beta' arrow.long.squiggly beta$ (per l'osservazione sopra). Questo è assurdo perché contraddice l'ipotesi.\
-  Pertanto $exists alpha$ letterale di _p_ t.c. $alpha'$ è anch'esso letterale di _p_ e $alpha cancel(arrow.long.squiggly) alpha'$.
-  Sia $alpha$ uno di tali letterali, definiamo l'assegnamento _t_ ponendo:
-  - $t(alpha) = 1$
-  - $forall beta "t.c." alpha arrow.long.squiggly beta, space t(beta) = 1$
+  - Se $t(x)=1$, considerando il cammino $x arrow.squiggly.long x'$, poiché $t(x')=0$ deve esistere lungo il cammino un arco $alpha --> beta$ in cui si passa per la prima volta dal valore $1$ al valore $0$:
+    $
+      &x --> gamma_1 --> dots --> alpha --> beta --> dots --> gamma_n --> x' \
+      &t(x)=1 space space space space space space space space space space t(alpha)=1, space t(beta)=0 space space space space space space space space space t(x')=0
+    $
+    Ma l'arco $alpha --> beta$ deriva da una clausola equivalente a $alpha' or beta$ in $p$, che sotto $t$ vale $t(alpha')=0$ e $t(beta)=0$, e quindi non è soddisfatta.
+
+  - Se $t(x)=0$, allora $t(x')=1$ e si applica lo stesso identico ragionamento al cammino $x' arrow.squiggly.long x$, ottenendo nuovamente una clausola non soddisfatta.
+
+  In entrambi i casi $t$ non soddisfa $p$. Essendo $t$ arbitrario, $p$ non è soddisfacibile.
+
+  $arrow.l.double)$
+  Procediamo costruendo esplicitamente un assegnamento soddisfacente.
+
+  *Caso banale.* Se ogni variabile compare in $p$ con una sola polarità, assegniamo $1$ al letterale che compare: ogni clausola è immediatamente soddisfatta. Da ora assumiamo che esista almeno una coppia $alpha, alpha'$ entrambi presenti in $p$.
+
+  *Trovare un punto di partenza.* Cerchiamo un letterale $alpha$ (con $alpha'$ anch'esso in $p$) tale che $alpha cancel(arrow.squiggly.long) alpha'$. Se per assurdo ogni coppia $gamma, gamma'$ in $p$ soddisfacesse $gamma arrow.squiggly.long gamma'$, allora prendendo una qualunque coppia $beta, beta'$ avremmo sia $beta arrow.squiggly.long beta'$ che $beta' arrow.squiggly.long beta$, contraddicendo l'ipotesi. Quindi un tale $alpha$ esiste.
+
+  *Costruire l'assegnamento.* Poniamo $t(beta) = 1$ per ogni $beta$ raggiungibile da $alpha$ nel grafo (incluso $alpha$ stesso). Tutto il resto resta non assegnato per ora.
+
   #observation()[
-    Fin qui _t_ è ben definito, perché non può accadere che $t(beta') = 1$, in quanto $alpha cancel(arrow.long.squiggly) beta'$: infatti, se per assurdo fosse $alpha arrow.long.squiggly beta'$, allora si avrebbe $beta arrow.long.squiggly alpha'$ (per l'osservazione di prima) e quindi $alpha arrow.long.squiggly alpha'$, in contraddizione a quanto appena stabilito.
+    Questo assegnamento è coerente: non può accadere che $alpha arrow.squiggly.long beta$ e $alpha arrow.squiggly.long beta'$ simultaneamente, perché per simmetria del grafo delle implicazioni:
+    $
+      alpha arrow.squiggly.long beta' ==> beta arrow.squiggly.long alpha'
+    $
+    e concatenando i cammini otterremmo $alpha arrow.squiggly.long beta arrow.squiggly.long alpha'$, ovvero $alpha arrow.squiggly.long alpha'$, contraddicendo la scelta di $alpha$.
   ]
-  Eliminiamo ora da $p$ tutte le clausole soddisfatte da $t$. Le clausole rimanenti contengono soltanto letterali non ancora assegnati: infatti, se una clausola $beta' or gamma$ contenesse $beta'$ con $t(beta)=1$, avremmo l'arco $beta --> gamma$ e poiché $alpha arrow.long.squiggly beta$ avremmo anche $alpha arrow.long.squiggly gamma$, da cui $t(gamma)=1$; la clausola sarebbe dunque già stata eliminata. Ripetiamo il procedimento sul polinomio rimanente. A ogni passo viene eliminata almeno una clausola, quindi dopo un numero finito di passi otteniamo un assegnamento che soddisfa tutte le clausole di $p$. Pertanto $p$ è soddisfacibile.
+
+  *Nessuna clausola è falsificata.* Eliminiamo da $p$ le clausole già soddisfatte. Nelle rimanenti non può comparire nessun letterale $beta'$ con $t(beta)=1$: tale clausola avrebbe la forma $beta' or gamma$, a cui corrisponde l'arco $beta --> gamma$. Ma allora:
+  $
+    alpha arrow.squiggly.long beta --> gamma ==> alpha arrow.squiggly.long gamma
+  $
+  quindi avremmo dovuto porre $t(gamma)=1$, soddisfacendo la clausola fin dal principio. Contraddizione.
+
+  Le clausole rimaste contengono quindi *solo letterali non ancora assegnati*.
+
+  *Iterazione.* Applichiamo lo stesso procedimento alle clausole rimaste. Ad ogni passo assegniamo almeno una variabile nuova; essendo le variabili finite, dopo un numero finito di iterazioni otteniamo un assegnamento completo che soddisfa $p$. $square$
 ]
 
 === Algoritmo per 2-SAT
@@ -1922,8 +1948,8 @@ P è anche chiusa rispetto alla complementazione (P = co-P): se un linguaggio $L
     e quindi, per definizione, $L_1 inter L_2 in "co-NP".$
 
   2. Differenza tra un linguaggio in NP e un suo sottolinguaggio in co-NP: siano $L in "NP"$, $L_1 subset.eq L$ e $L_1 in "co-NP"$. Vogliamo mostrare che $L without L_1 in "NP"$.\
-  
-   Poiché $L_1 in "co-NP"$, per definizione $L'_1 in "NP"$. Inoltre, $L without L_1 = L inter L'_1$. Siccome $L in "NP"$ e $L'_1 in "NP"$ e NP è chiusa rispetto all'intersezione, segue che $L inter L'_1 in "NP"$. Pertanto $L without L_1 in "NP"$.
+
+    Poiché $L_1 in "co-NP"$, per definizione $L'_1 in "NP"$. Inoltre, $L without L_1 = L inter L'_1$. Siccome $L in "NP"$ e $L'_1 in "NP"$ e NP è chiusa rispetto all'intersezione, segue che $L inter L'_1 in "NP"$. Pertanto $L without L_1 in "NP"$.
 ]
 == Test di primalità
 Vogliamo trovare un algoritmo che, dato un numero $n in NN$ in input, determini se tale numero è primo.
@@ -2044,9 +2070,9 @@ e ne trovo uno per cui non vale. Il "giusto" $r$ e i "pochi" $a$ si dimostra che
 === EXP
 #index[Classe EXP]
 #definition()[
-$
-  "EXP" = {L | exists M "MdT deterministica che accetta" L "t.c." t c_M (n) = Omicron(2^n^k)"," exists k >= 1}
-$
+  $
+    "EXP" = {L | exists M "MdT deterministica che accetta" L "t.c." t c_M (n) = Omicron(2^n^k)"," exists k >= 1}
+  $
 ]
 #observation(multiple: true)[
   - $L in "EXP" <==> exists M$ MdT deterministica che accetta $L$ t.c. $t c_M (n) = Omicron(c^(p(n)))$, per opportuni $c > 1$ e $p(n)$ polinomio di grado $>= 1$ (sennò sarebbe costante).
@@ -2065,13 +2091,13 @@ $
     (m_1, m_2, dots, m_(n^k)) quad "dove" quad m_i in {1, dots, delta}
   $
 
-Il numero di transizioni di una singola computazione è $O(n^k)$, mentre,
-poiché a ogni passo vi sono al più $delta$ possibili scelte, il numero delle
-possibili computazioni è al più $delta^(n^k)$. Pertanto
-$
-  t c_N (n) = O(n^k dot delta^(n^k))
-$
-per cui $L in "EXP"$.
+  Il numero di transizioni di una singola computazione è $O(n^k)$, mentre,
+  poiché a ogni passo vi sono al più $delta$ possibili scelte, il numero delle
+  possibili computazioni è al più $delta^(n^k)$. Pertanto
+  $
+    t c_N (n) = O(n^k dot delta^(n^k))
+  $
+  per cui $L in "EXP"$.
 ]
 
 #problem("Aperto")[
@@ -2133,9 +2159,9 @@ per cui $L in "EXP"$.
 #index[Classe NEXP]
 Definiamo un'altra classe di linguaggi esponenziali:
 #definition()[
-$
-  "NEXP" = { L "linguaggio" | exists M "MdT non deterministica che accetta "L \ "t.c." t c_M (n) = Omicron(2^n^k), exists k >= 1}
-$
+  $
+    "NEXP" = { L "linguaggio" | exists M "MdT non deterministica che accetta "L \ "t.c." t c_M (n) = Omicron(2^n^k), exists k >= 1}
+  $
 ]
 #observation()[
   $ "EXP" subset.eq "NEXP" $
@@ -2159,8 +2185,8 @@ $
   $
 
   Notare che dopo $x$ si aggiunge un numero di "1" proporzionale al tempo esponenziale necessario a $M$.\
-  
-  *1*. Facciamo vedere che $accent(L, tilde) in "NP"$. 
+
+  *1*. Facciamo vedere che $accent(L, tilde) in "NP"$.
   Sia $N$ MdT non deterministica che accetta $accent(L, tilde)$ su input $y$:
 
   - controllo se $exists z "t.c." y = z 1^2^(|z|^k)$, altrimenti rifiuto;
@@ -2219,7 +2245,7 @@ $
     s c_M (n) = 2 dot (ceil(log(n+1))+2)
   $
 ]
-Vediamo adesso che relazioni ci sono tra complessità spaziale e temporale: 
+Vediamo adesso che relazioni ci sono tra complessità spaziale e temporale:
 #proposition()[
   Se $M$ MdT a 2 nastri, allora:
   $
@@ -2336,7 +2362,7 @@ Vediamo adesso che relazioni ci sono tra complessità spaziale e temporale:
 
 #proof()[
   + $"P" subset.eq "PSPACE"$ è ovvio. Sia $Q in "PSPACE"$. Poiché $L$ è PSPACE-completo, $exists f$ riduzione polinomiale in tempo da $Q$ a $L$.
-  
+
     Algoritmo per decidere $Q$:
     - Dato _w_, calcolo $f(w) -->$ tempo polinomiale;
     - Decido se $f(w) in L -->$ tempo polinomiale (perché $L in "P"$),
@@ -2347,7 +2373,7 @@ Vediamo adesso che relazioni ci sono tra complessità spaziale e temporale:
     Algoritmo nondeterministico per decidere $Q$:
     - Dato _w_, calcolo $f(w) -->$ tempo polinomiale;
     - Decido se $f(w) in L -->$ tempo polinomiale non deterministico (perché $L in$ NP).
-    
+
     Dunque $Q in$ NP e poiché $Q$ è arbitrario vale PSPACE $subset.eq$ NP e quindi NP = PSPACE.
 ]
 
@@ -2445,7 +2471,7 @@ I problemi di conteggio si occupano di stabilire quante possono essere le soluzi
   - $forall k$, $L_k in "PSPACE" ==> L_k in "P"$;
   - Il numero di linguaggi da controllare non è $2^q(n)$, ma $Omicron(log(2^(q(n)))) = Omicron(q(n))$ (ricerca binaria)
 
-  Dunque la complessità è polinomiale, perciò $f in$ FP e, essendo $f in$ \#P arbitraria, vale la tesi.\ 
+  Dunque la complessità è polinomiale, perciò $f in$ FP e, essendo $f in$ \#P arbitraria, vale la tesi.\
 ]
 === Esempi di problemi di conteggio
 #index[Problema \#SAT]
