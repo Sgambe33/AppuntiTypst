@@ -8,6 +8,7 @@
   cover-image: image("cover.jpg", height: 100%, width: 100%)
 )[
 
+  #align(center)[Per contribuire: https://github.com/Sgambe33/AppuntiTypst]
   #outline(title: "Contenuti")
 
   #pagebreak()

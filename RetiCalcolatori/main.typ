@@ -5,8 +5,9 @@
   title: "Appunti Reti di Calcolatori",
   author: none,
   subtitle: "Teoria\nCorso 2025/2026",
-  cover-image: image("cover.jpg", height: 100%, width: 100%)
+  cover-image: image("cover.jpg", height: 100%, width: 100%),
 )[
+  #align(center)[Per contribuire: https://github.com/Sgambe33/AppuntiTypst]
   #outline(title: "Contenuti")
 
   #pagebreak()
