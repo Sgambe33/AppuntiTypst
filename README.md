@@ -1,6 +1,6 @@
 # Raccolta di appunti 
 
-Questi appunti riguardano alcuni corsi del I°, II° e III° anno della laura triennale in informatica all'UNIFI.
+Questi appunti riguardano alcuni corsi del II° e III° anno della laura triennale in informatica all'UNIFI.
 
 ## Corsi disponibili/futuri
 
@@ -9,7 +9,7 @@ Questi appunti riguardano alcuni corsi del I°, II° e III° anno della laura tr
 - [x] Interpreti e Compilatori
 - [x] Reti di calcolatori
 - [x] Calcolo numerico
-- [ ] Informatica Teorica (_In corso_)
+- [x] Informatica Teorica
 > Le versioni più recenti potrebbero contenere diversi errori di battitura e teoria. Studiare con precauzione!
 
 ## Segnalazione errori
