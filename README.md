@@ -2,17 +2,15 @@
 
 Questi appunti riguardano alcuni corsi del I°, II° e III° anno della laura triennale in informatica all'UNIFI.
 
-## Corsi disponibili
+## Corsi disponibili/futuri
 
-- [ ] Architetture degli elaboratori (_Da convertire_)
-- [ ] Basi di dati (_Da convertire_)
-- [ ] Metodologie di Programmazione (_Da convertire_). Si consiglia di non fidarsi di ciò che è scritto in questi appunti. Gli argomenti del corso cambiano e questa NON è una fonte affidabile.
-
-- [x] Sistemi Operativi (_Completo_)
-- [ ] Parallel Computing (_In corso_)
-- [ ] Interpreti e Compilatori (_In corso_)
-- [ ] Gestione d'azienda (_In corso_)
-- [ ] Reti di calcolatori (_In corso_)
+- [x] Basi di dati
+- [x] Sistemi Operativi
+- [x] Interpreti e Compilatori
+- [x] Reti di calcolatori
+- [x] Calcolo numerico
+- [ ] Informatica Teorica (_In corso_)
+> Le versioni più recenti potrebbero contenere diversi errori di battitura e teoria. Studiare con precauzione!
 
 ## Segnalazione errori
 

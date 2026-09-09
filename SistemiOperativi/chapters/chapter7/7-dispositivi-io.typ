@@ -46,7 +46,7 @@ Nonostante l'enorme varietà, l'hardware di I/O è costituito da tre componenti 
 - *Controllori dei dispositivi*
 - *Componenti di connessione*: come i *bus* (insieme di linee di connessione condivise) e le *porte* (punti di connessione).
 
-#figure(image("images/2025-08-18-15-23-29.png"))
+#figure(image("images/2025-08-18-15-23-29.png", width: 75%))
 
 ==== Controllori dei dispositivi
 #index[Controllore di dispositivi]
@@ -128,7 +128,7 @@ Un'istruzione di alto livello per un dispositivo di I/O può corrispondere a una
 
 Per rendere più efficiente la gestione, si associa al dispositivo un *semaforo di sospensione S* (inizializzato a 0). Nel processo interno, il ciclo di attesa attiva viene sostituito da una `wait(S)`, che può sospendere il processo.
 Al completamento dell'operazione, il controllore del dispositivo lancia un *segnale di interruzione*. La CPU, dopo ogni istruzione, controlla la presenza di interruzioni, salva lo stato corrente e passa all'esecuzione della *routine di gestione dell'interruzione*. Questa routine attiva una funzione di risposta che esegue una `signal(S)`, sbloccando il processo interno.
-#figure(image("images/2025-08-18-15-32-05.png", width: 70%))
+#figure(image("images/2025-08-18-15-32-05.png", width: 60%))
 
 *Miglioramento*: Se un processo deve trasferire `n` blocchi di dati, per `n-1` volte viene sospeso e riattiviato inutilmente in quando deve subito (ri)sospendersi. Se  è disponibile una funzione che accetta come argomento il numero `n` dei blocchi di dati da trasferire e l'indirizzo di memoria dove memorizzarli o da dove leggerli, si può bloccare il processo interno fino al trasferimento dell'ultimo blocco, riattivandolo solo allora.
 #figure(image("images/2025-08-18-15-32-17.png", width: 70%))
@@ -168,7 +168,7 @@ Il funzionamento tipico di un driver include:
 I timer sono utilizzati per lanciare interruzioni cadenzate nel tempo (non per trasferire dati), ad esempio per la gestione della data di sistema, lo scheduling della CPU in sistemi time-sharing, attese programmate e segnali di time-out. Il driver di un timer è costituito da:
 - La primitiva `delay()`, che i processi possono invocare passandogli la durata dell'attesa.
 - Un *descrittore* che, oltre agli indirizzi dei registri di controllo e stato, ha campi specifici: `fine_attesa[]` (array di semafori per sospendere processi che hanno invocato `delay()`), `ritardo[]` (array di interi per le unità di tempo rimanenti) e `contatore` (un registro in cui la CPU può scrivere un intero; il timer lo decrementa periodicamente, quando si azzera lancia un'interruzione e reimposta contatore con il valore più piccolo contenuto nell'array `ritardo[]`).
-#figure(image("images/2025-08-18-15-38-44.png", width: 60%), caption: "Descrittore di un timer")
+#figure(image("images/2025-08-18-15-38-44.png", width: 30%), caption: "Descrittore di un timer")
 
 === Accesso Diretto in Memoria (DMA)
 
