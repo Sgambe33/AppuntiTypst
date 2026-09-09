@@ -4,9 +4,8 @@
 #dvdtyp(
   title: "Appunti Basi di Dati",
   author: none,
-  subtitle: "Corso 2024/2025",
-  cover-image: image("cover.jpg", height: 100%, width: 100%),
-  bottom-logo: image("../unifi.png", width: 100%),
+  subtitle: "Teoria\nCorso 2024/2025",
+  cover-image: image("cover.jpg", height: 100%, width: 100%)
 )[
 
   #outline(title: "Contenuti")
