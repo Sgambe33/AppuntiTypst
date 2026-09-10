@@ -444,7 +444,7 @@ Per poter spostare avanti il puntatore _forward_ è necessario prima verificare 
 
 === Sentinelle
 
-Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo _forward_ in avanti dovremmo verificare che non vada oltre la fine di uno dei due buffer. Quindi per ogni carattere dobbiamo effettuare due controlli: il primo per verificare se il puntatore ha raggiunto la fine del buffer e il secondo per verificare quale carattere è stato letto. Possiamo combinare i due test estendendo il buffer in modo da contenere un carattere che non può main comparire come parte di un programma sorgente: *eof* è perfetto.
+Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo _forward_ in avanti dovremmo verificare che non vada oltre la fine di uno dei due buffer. Quindi per ogni carattere dobbiamo effettuare due controlli: il primo per verificare se il puntatore ha raggiunto la fine del buffer e il secondo per verificare quale carattere è stato letto. Possiamo combinare i due test estendendo il buffer in modo da contenere un carattere che non può mai comparire come parte di un programma sorgente: *eof* è perfetto.
 
 ```c
   switch(*forward++){
@@ -457,7 +457,7 @@ Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo 
         forward = inizio del primo buffer;
       }
       else { /* eof nel mezzo di un buffer indica la fine del file */
-        termina l analisi;
+        termina l’analisi;
       }
       break;
     /* casi per gli altri caratteri */

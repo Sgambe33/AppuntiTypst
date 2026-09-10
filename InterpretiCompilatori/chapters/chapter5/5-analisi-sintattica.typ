@@ -104,7 +104,7 @@ Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta più ri
     & S -> A a bar b \
     & A -> A c bar S d bar epsilon
   $
-  Tecnicamente, non è garantito che l'algoritmo funzioni a causa dela presenza di una produzione-$epsilon$. Tuttavia, in questo caso, essa è innocua. Per prima cosa fissiamo l'ordine dei non-terminali: $S,A$. Non vi è ricorsione sinistra immediata tra le produzioni per $S$, per cui nella prima iterazione, con $i=1$, del ciclo più esterno non succede nulla. Per $i=2$, sostituiamo $S$ nella produzione $A-> S d$, ottenendo le seguenti produzioni per $A$:
+  Tecnicamente, non è garantito che l'algoritmo funzioni a causa della presenza di una produzione-$epsilon$. Tuttavia, in questo caso, essa è innocua. Per prima cosa fissiamo l'ordine dei non-terminali: $S,A$. Non vi è ricorsione sinistra immediata tra le produzioni per $S$, per cui nella prima iterazione, con $i=1$, del ciclo più esterno non succede nulla. Per $i=2$, sostituiamo $S$ nella produzione $A-> S d$, ottenendo le seguenti produzioni per $A$:
   $
     A -> A c bar A a d bar b d bar epsilon
   $
@@ -131,7 +131,7 @@ Quando la scelta tra due produzioni alternative per un non-terminale $A$ non è 
   _stmt_ $->$ *if* _expr_ *then* _stmt_ *else* _stmt_\
   $bar$ *if* _expr_ *then* _stmt_
 ])
-Leggendo il token *if* non siamo in grado di decidere immediatamente quale delle due produzioni utilizzare per espandere _stmt_. In generale, se $A -> alpha beta_1 bar alpha beta_2$ sono due produzioni per $A$ e la sequenza d'ingresso inizia con una stringa non vuota derivata da $alpha$, non sappiamo se espandere $A$ come $alpha beta_1$ oppure come $alpha beta_2$. Tuttavia, possiamo rimandare la decisione espandendo $A$ in $alpha A'$. Quindi, dopo aver letto la stringa derivata $alpha$, possiamo espandere $A'$ in $beta_1$ o $beta_2$. Le produzioni originali, una volta fattorizzate a sinistra diventano:
+Leggendo il token *if* non siamo in grado di decidere immediatamente quale delle due produzioni utilizzare per espandere _stmt_. In generale, se $A -> alpha beta_1 bar alpha beta_2$ sono due produzioni per $A$ e la sequenza d'ingresso inizia con una stringa non vuota derivata da $alpha$, non sappiamo se espandere $A$ come $alpha beta_1$ oppure come $alpha beta_2$. Tuttavia, possiamo rimandare la decisione espandendo $A$ in $alpha A'$. Quindi, dopo aver letto la stringa derivata da $alpha$, possiamo espandere $A'$ in $beta_1$ o $beta_2$. Le produzioni originali, una volta fattorizzate a sinistra diventano:
 $
   & A-> alpha A' \
   & A' -> beta_1 bar beta_2
@@ -300,7 +300,7 @@ Per calcolare FOLLOW($A$) per tutti i non-terminali $A$ si proceda applicando le
 
 == Parsing Top-Down
 Il parsing top-down può essere visto come il tentativo di trovare una derivazione sinistra per una stringa d'ingresso, costruendo l'albero di parsing corrispondente a partire dalla radice.
-La seguente grammatica genera un sottoinsieme degli statement di C e di java.
+La seguente grammatica genera un sottoinsieme degli statement di C e di Java.
 $
      italic("stmt") & --> && bold("expr"); \
                     & |   && bold("if ( expr )") italic("stmt") \
@@ -791,7 +791,7 @@ Il parser è dotato di:
 
 Inizialmente lo stack contiene il simbolo \$ (in fondo) e il simbolo distinto della grammatica. Ad ogni passo, il parser considera il simbolo $X$ in cima allo stack e il simbolo d'ingresso corrente $a$.
 - Se $X$ è una variabile, il parser esamina l'elemento $M[X, a]$
-  - se contiene una regola $X -> alpha$ allora, nello stack, $X$ viene sostituito da $alpha$ (il primo simbolo in testa), ed eventualmente costruiti i nodi corrispondenti nell'albero di parsing;
+  - se contiene una regola $X -> alpha$ allora, nello stack, $X$ viene sostituito da $alpha$ (il primo simbolo in testa), ed eventualmente vengono costruiti i nodi corrispondenti nell'albero di parsing;
   - se è vuoto si ha una situazione di errore che può essere segnalata.
 - Se $X$ è un terminale, viene confrontato col simbolo in ingresso a
   - se sono uguali $X$ viene rimosso dallo stack e si avanza al prossimo simbolo in ingresso
@@ -953,7 +953,7 @@ Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la string
 
 == Parsing Bottom-Up
 
-Il parsing bottom-up procede alla costruzione di un albero di parsing per una data stringa d'ingresso cominciando dalle foglie (bottom) e procedendo verso I'alto (up) fino alla radice.
+Il parsing bottom-up procede alla costruzione di un albero di parsing per una data stringa d'ingresso cominciando dalle foglie (bottom) e procedendo verso l'alto (up) fino alla radice.
 
 #example(multiple: true)[
   #block(
@@ -1430,7 +1430,7 @@ Data una grammatica aumentata $G'$ (ottenuta aggiungendo la regola radice $S' ->
 La funzione `GOTO(I, X)` definisce lo spostamento del punto in avanti a fronte della lettura di un simbolo $X$ (terminale o non-terminale):
 $ text("GOTO")(I, X) = text("CLOSURE")({[A -> alpha X dot beta] | [A -> alpha dot X beta] in I}) $
 
-Viene usata per definire le transizioni dell'automa LR(0). Gli stati dell'automa corrispondono a insiemi di item e GOTO($I$, X)definisce la transizione dallo stato $I$ col simbolo $X$.
+Viene usata per definire le transizioni dell'automa LR(0). Gli stati dell'automa corrispondono a insiemi di item e GOTO($I$, X) definisce la transizione dallo stato $I$ col simbolo $X$.
 
 #example()[
   Se $I = {[E' -> E dot], [E -> E dot + T ]}$ allora:
@@ -1585,7 +1585,7 @@ Se, applicando la restrizione del `FOLLOW`, tutte le celle della tabella risulta
 //   $
 // ]
 
-// Viene usata per definire le transizioni dell'automa LR(0). Gli stati dell'automa corrispondono a insiemi di item e GOTO($I$, X)definisce la transizione dallo stato $I$ col simbolo $X$.
+// Viene usata per definire le transizioni dell'automa LR(0). Gli stati dell'automa corrispondono a insiemi di item e GOTO($I$, X) definisce la transizione dallo stato $I$ col simbolo $X$.
 
 // #example()[
 //   Se $I = {[E' -> E dot], [E -> E dot + T ]}$ allora:

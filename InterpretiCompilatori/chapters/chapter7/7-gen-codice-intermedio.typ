@@ -105,7 +105,7 @@ Il codice a tre indirizzi prevede al più un operatore nel lato destro di una is
 - `t1 = y * z`
 - `t2 = x + t1`
 
-in cui `t1`e `t2` sono nomi temporanei generati dal compilatore. Il ricorso a nomi temporanei per memorizzare i valori intermedi calcolati da un dato programma rende il codice a tre indirizzi particolarmente semplice da riorganizzare.
+in cui `t1` e `t2` sono nomi temporanei generati dal compilatore. Il ricorso a nomi temporanei per memorizzare i valori intermedi calcolati da un dato programma rende il codice a tre indirizzi particolarmente semplice da riorganizzare.
 
 #example()[
   Il codice a tre indirizzi è una rappresentazione lineare di un albero sintattico o di un DAG, in cui i nomi temporanei espliciti corrispondono ai nodi interni del grafo.
@@ -137,7 +137,7 @@ Le istruzioni più comuni appaiono invece nelle seguenti forme:
 ]
 
 === Quadruple
-La descrizione delle istruzioni a tre indirizzi specifica le varie componenti di ogni tipo di istruzione, ma non fornisce alcuna indicazione a proposito dell'implementazione dell'istruzione in un'opportuna struttura dati. In un compilatore reale le istruzioni possono essere implementate come oggetti o come record aventi opportuni campi per l'operatore e per gli operandi. Tre comuni rappresentazioni sono le “quadruple”, le “triple” e le “triple indirette” .
+La descrizione delle istruzioni a tre indirizzi specifica le varie componenti di ogni tipo di istruzione, ma non fornisce alcuna indicazione a proposito dell'implementazione dell'istruzione in un'opportuna struttura dati. In un compilatore reale le istruzioni possono essere implementate come oggetti o come record aventi opportuni campi per l'operatore e per gli operandi. Tre comuni rappresentazioni sono le “quadruple”, le “triple” e le “triple indirette”.
 
 Una *quadrupla* o *quad* ha quattro campi che chiamiamo `op`, `arg1`, `arg2` e `result`. Il campo `op` contiene un codice interno che indica l'operatore. Per esempio, l'istruzione a tre indirizzi `x = y + z` è rappresentata assegnando `+` al campo `op`, `y` ad `arg1`, `z` ad `arg2`, e `x` a `result`.
 
@@ -147,7 +147,7 @@ Alcune eccezioni a questa regola generale sono:
 + Le istruzioni di salto condizionato e incondizionato salvano l'etichetta in `result`.
 
 #example()[
-  II codice a tre indirizzi dell'assegnamento `a = b*-c + b*-c;` è mostrato nella figura che segue. L'operatore speciale `minus` è utilizzato per distinguere   il meno unario, come in `-b`, dall'operatore binario di sottrazione, come in `b - c`. Si noti che le istruzioni relative al meno unario, così come l'istruzione di copia `a = t5`, utilizzano solamente due dei tre indirizzi.
+  Il codice a tre indirizzi dell'assegnamento `a = b*-c + b*-c;` è mostrato nella figura che segue. L'operatore speciale `minus` è utilizzato per distinguere il meno unario, come in `-b`, dall'operatore binario di sottrazione, come in `b - c`. Si noti che le istruzioni relative al meno unario, così come l'istruzione di copia `a = t5`, utilizzano solamente due dei tre indirizzi.
   #figure(image("images/2026-05-18-09-42-44.png"))
 ]
 
@@ -158,10 +158,10 @@ Come si nota dalla Figura 6.10(b), il campo `result` è utilizzato principalment
 
 #example()[
   #figure(image("images/2025-11-30-21-30-33.png"))
-  L'albero sintattico e le triple della figura corrispondono alle quadruple e al codice a tre indirizzi mostrato nella figura ancora precedente. Secondo la rappresentazione basata sulle triple della figura (b), l'istruzione di copia `a= t5` è codificata ponendo `a` nel campo `arg1` il valore numerico `(4)` nel campo `arg2`.
+  L'albero sintattico e le triple della figura corrispondono alle quadruple e al codice a tre indirizzi mostrato nella figura ancora precedente. Secondo la rappresentazione basata sulle triple della figura (b), l'istruzione di copia `a= t5` è codificata ponendo `a` nel campo `arg1` e il valore numerico `(4)` nel campo `arg2`.
 ]
 
-Uno dei vantaggi delle quadruple rispetto alle triple emerge considerando i compilatori ottimizzanti, in cui spesso le istruzioni vengono riorganizzate e spostate. Usando le quadruple, infatti, se spostiamo un'istruzione che calcola una variabile temporanea `t`, le istruzioni che utilizzano `t` non richiedono alcuna modifica. Usando le triple, invece, ci si riferisce al risultato di un'operazione mediante la sua posizione nel codice, perciò spostare un istruzione richiede una modifica a tutte le triple che fanno riferimento al risultato che questa calcola. Tale problema, tuttavia, può essere risolto grazie alle triple indirette.
+Uno dei vantaggi delle quadruple rispetto alle triple emerge considerando i compilatori ottimizzanti, in cui spesso le istruzioni vengono riorganizzate e spostate. Usando le quadruple, infatti, se spostiamo un'istruzione che calcola una variabile temporanea `t`, le istruzioni che utilizzano `t` non richiedono alcuna modifica. Usando le triple, invece, ci si riferisce al risultato di un'operazione mediante la sua posizione nel codice, perciò spostare un'istruzione richiede una modifica a tutte le triple che fanno riferimento al risultato che questa calcola. Tale problema, tuttavia, può essere risolto grazie alle triple indirette.
 
 
 === Triple indirette
@@ -177,7 +177,7 @@ Le *triple indirette* consistono in una lista di puntatori a triple, piuttosto c
 == Tipi e dichiarazioni
 L'uso dei tipi ha diversi obiettivi, raggruppabili in due classi.
 - *Controllo di tipo* o *type checking*: analizzare staticamente quello che sarà il comportamento del programma. Analisi che garantisce che i tipi degli operandi siano adatti all'operazione.
-- *Traduzione*: in baso al tipo di un nome, il compilatore può determinare lo spazio di memoria necessario a run-time per l'oggetto a il cui nome si riferisce. Inoltre, le informazioni di tipo sono necessarie per calcolare l'indirizzo relativo a un elemento di un array, per realizzare opportune conversioni di tipo, per selezionare la versione corretta di ogni operatore aritmetico e molto altro ancora.
+- *Traduzione*: in base al tipo di un nome, il compilatore può determinare lo spazio di memoria necessario a run-time per l'oggetto a cui il nome si riferisce. Inoltre, le informazioni di tipo sono necessarie per calcolare l'indirizzo relativo a un elemento di un array, per realizzare opportune conversioni di tipo, per selezionare la versione corretta di ogni operatore aritmetico e molto altro ancora.
 
 Vedremo i tipi e l'organizzazione della memoria per i nomi dichiarati all'interno di una procedura o di una classe.
 
@@ -229,7 +229,7 @@ L'SDT seguente viene utilizzato per calcolare il tipo e la relativa larghezza pe
 #figure(image("images/2026-05-18-10-38-58.png"))
 
 #example()[
-  Le linee tratteggiate della Figura 6.16 mostrano l'albero di parsing relativo al tipo `int[2][3]`. Le linee continue, invece, mostrano come le informazioni di tipo e larghezza siano propagate dapprima da B alla sequenza discendente di $C$, attraverso le variabili `t` e `w`, e poi, all'indietro, risalendo la sequenza di $C'$ attraverso gli attributi i sintetizzati _type_ e _width_.
+  Le linee tratteggiate della Figura 6.16 mostrano l'albero di parsing relativo al tipo `int[2][3]`. Le linee continue, invece, mostrano come le informazioni di tipo e larghezza siano propagate dapprima da B alla sequenza discendente di $C$, attraverso le variabili `t` e `w`, e poi, all'indietro, risalendo la sequenza di $C'$ attraverso gli attributi sintetizzati _type_ e _width_.
   #figure(image("images/2026-05-18-10-39-19.png"))
 ]
 
@@ -305,7 +305,7 @@ Per gestire correttamente i record, il compilatore deve sospendere temporaneamen
 #figure(image("images/2026-05-18-10-52-43.png"))
 
 == Traduzione delle espressioni
-Vediamo ora la traduzione delle espressioni e delle istruzioni. Iniziamo qui con la traduzione delle espressioni in codice a tre indirizzi. Una espressione, come `a+b*c`, contenente più di un operatore sarà tradotta in istruzioni a tre indirizzi, ognuna contenente un solo operatore. Un riferimento a un elemento di un array, come `A[i][j]` sarà espansa in una sequenza di più istruzioni a tre indirizzi che calcolano l'indirizzo dell'elemento specificato.
+Vediamo ora la traduzione delle espressioni e delle istruzioni. Iniziamo qui con la traduzione delle espressioni in codice a tre indirizzi. Una espressione, come `a+b*c`, contenente più di un operatore sarà tradotta in istruzioni a tre indirizzi, ognuna contenente un solo operatore. Un riferimento a un elemento di un array, come `A[i][j]` sarà espanso in una sequenza di più istruzioni a tre indirizzi che calcolano l'indirizzo dell'elemento specificato.
 
 === Operazioni nelle espressioni
 #figure(image("images/2025-12-02-17-15-13.png"))
@@ -945,7 +945,7 @@ Il comportamento previsto della traduzione dello statement `switch` è il seguen
 + Ricerca, nell'elenco dei possibili casi, del valore $V_j$ uguale al risultato della valutazione di $E$. Si ricordi che il valore di `default` soddisfa la ricerca se nessuno dei casi espliciti corrisponde al valore di $E$.
 + Esecuzione dello statement $S_j$ associato al valore $V_j$ trovato.
 
-Il passo (2) è un salto a $n$ via che può essere implementato in diversi modi. Se il numero di casi è basso, indicativamente inferiore a 10, è ragionevole utilizzare una sequenza di salti condizionati ognuno dei quali esegue il confronto con uno specifico valore e trasferisce il controllo al codice degli statement corrispondenti.
+Il passo (2) è un salto a $n$ vie che può essere implementato in diversi modi. Se il numero di casi è basso, indicativamente inferiore a 10, è ragionevole utilizzare una sequenza di salti condizionati ognuno dei quali esegue il confronto con uno specifico valore e trasferisce il controllo al codice degli statement corrispondenti.
 
 Un modo compatto di implementare la sequenza di salti consiste nel creare una tabella di coppie, ognuna formata da un valore e dall'etichetta del codice dello statement corrispondente. Il valore effettivo dell'espressione stessa, accoppiato all'etichetta dello statement di `default`, viene poi aggiunto alla fine della tabella al momento dell'esecuzione.
 
