@@ -217,7 +217,7 @@ Un grafo delle dipendenze rappresenta il flusso di informazioni attraverso gli a
 ]
 
 #example()[
-  Un esempio di grafo delle dipendenze più complesso si ottiene analizzando una grammatica a cui è stata rimossa la ricorsione sinistra (introducendo il non-terminale ausiliario $T'$). Per calcolare le espressioni da sinistra verso destra, è obbligatorio usare attributi ereditati (`"inh"`) come accumulatori parziali.
+  Un esempio di grafo delle dipendenze più complesso si ottiene analizzando una grammatica da cui è stata rimossa la ricorsione sinistra (introducendo il non-terminale ausiliario $T'$). Per calcolare le espressioni da sinistra verso destra, è obbligatorio usare attributi ereditati (`"inh"`) come accumulatori parziali.
   #align(center)[
     #table(
       stroke: none,
@@ -469,7 +469,7 @@ Ogni traduzione reale comporta spesso effetti collaterali, ad esempio la stampa 
         edge(<9>, <10>, "-|>", bend: -45deg),
         edge(<1>, <10>, "-|>"),
       ),
-      caption: "Grafo delle deipendenze per float " + $i d_1, i d_2, i d_3$,
+      caption: "Grafo delle dipendenze per float " + $i d_1, i d_2, i d_3$,
     )
 
     6, 8 e 10: attributi fittizi utilizzati per rappresentare le chiamate alla
@@ -561,7 +561,7 @@ Poiché molti compilatori usano gli alberi sintattici come rappresentazione inte
       edge(<l31>, <l41>),
     )],
   ),
-  caption: "Albero sintattico a sx e alberi d parsing a dx",
+  caption: "Albero sintattico a sx e alberi di parsing a dx",
 )
 
 Ogni nodo di un albero sintattico rappresenta un costrutto logico e i figli di tale nodo rappresentano le parti significative che lo compongono. Un nodo che rappresenta un'espressione del tipo $E_1 + E_2$ ha come etichetta il simbolo logico dell'operatore $+$ e come figli due nodi che rappresentano le sotto-espressioni $E_1$ e $E_2$.
@@ -666,7 +666,7 @@ Ogni oggetto ha un campo `op` che costituisce l'etichetta del nodo.
 
       edge(<l81>, <l82>, dash: "dotted"),
 
-      // EDGES trattegiati //
+      // EDGES tratteggiati //
       edge(<l50>, <l64>, dash: "dashed", "-|>", bend: 15deg),
       edge(<l21>, <l25.north>, dash: "dashed", "-|>", bend: -30deg),
       edge(<l81>, <l95>, dash: "dashed", "-|>", bend: 30deg),
@@ -801,7 +801,7 @@ Ogni oggetto ha un campo `op` che costituisce l'etichetta del nodo.
       edge(<T3>, <S41>, dash: "loosely-dotted"),
       edge(<E3>, <S43>, dash: "loosely-dotted"),
 
-      // EDGES freccie //
+      // EDGES frecce //
       edge(<N21>, <N11>, "-|>"),
       edge(<N11>, <N12>, "-|>", bend: 30deg),
 
@@ -890,7 +890,7 @@ In generale possiamo permettere la presenza di più attributi per ogni simbolo s
 ]
 
 #example()[
-  Si utilizza la tabella di parsing SRL (già vista) per il parsing della stringa 3 \* ( 5 + 2 ). I record nella pila sono costituiti da due campi: quello che contiene il simbolo grammaticale caratteristico dello stato dell'automa LR(0) e quello che contiene il valore dell'attributo. Si assume che quando il parser impila un digit, il token _d_ viene posto nel primo campo e il suo attributo nel secondo.
+  Si utilizza la tabella di parsing SLR (già vista) per il parsing della stringa 3 \* ( 5 + 2 ). I record nella pila sono costituiti da due campi: quello che contiene il simbolo grammaticale caratteristico dello stato dell'automa LR(0) e quello che contiene il valore dell'attributo. Si assume che quando il parser impila un digit, il token _d_ viene posto nel primo campo e il suo attributo nel secondo.
   #figure(image("images/2025-11-19-19-09-50.png"))
 ]
 
@@ -1025,7 +1025,7 @@ Il corpo della funzione $A()$ deve occuparsi sia del parsing, sia della gestione
 + chiamare le funzioni corrispondenti ai non-terminali nel corpo della produzione selezionata e passare a tali funzioni gli argomenti corretti;
 
 #example()[
-  Consideriamo la SDD e lo SDT relativi allo statement `while`. Il seguente è un'implementazione di esso mediante un parser a discesa ricorsiva.
+  Consideriamo la SDD e lo SDT relativi allo statement `while`. La seguente è un'implementazione di esso mediante un parser a discesa ricorsiva.
   #algo(
     title: [*string* S],
     parameters: ([*label* _next_],),
@@ -1068,7 +1068,7 @@ Tali condizioni implicano che l'attributo principale può essere costruito emett
   Le funzioni `S()` e `C()` non restituiscono alcun valore, poiché tutti i loro attributi sintetizzati sono prodotti mediante stampa. Inoltre, la posizione delle istruzioni di stampa nella funzione è importante. L'ordine in cui i vari elementi vengono stampati è il seguente: per prima cosa la stringa "label" L1, quindi il codice relativo al non-terminale C (che coincide con il valore della variabile _C.code_), la stringa "label" L2, e infine il codice derivante dalla chiamata ricorsiva della funzione S (ovvero il valore della variabile _S.code_).
 ]
 #example()[
-  Possiamo fare lo stesso tipo di modifica direttamente sullo SDT sottostante sostituendo le azioni che costruiscono un attributo principale in azioni che emettono gli elementi che compongono tale attributo.
+  Possiamo fare lo stesso tipo di modifica direttamente sullo SDT sottostante sostituendo le azioni che costruiscono un attributo principale con azioni che emettono gli elementi che compongono tale attributo.
   #figure(image("images/2025-11-27-15-18-21.png"))
 ]
 === Definizioni L-attribuite e parsing LL
@@ -1095,7 +1095,7 @@ Oltre ai record che rappresentano i terminali e i non-terminali della grammatica
   #figure(image("images/2026-05-18-08-51-00.png"))
 ]
 
-=== Definizione LL-attribuite con parser LR
+=== Definizioni L-attribuite con parser LR
 Ogni traduzione realizzabile in modo top-down può anche essere implementata secondo un approccio bottom-up. Più precisamente, data una definizione guidata dalla sintassi (SDD) L-attribuita, possiamo adattare la grammatica in modo da poter calcolare la stessa SDD durante un parsing LR.
 
 Le regole per effettuare questa trasformazione sono le seguenti:
