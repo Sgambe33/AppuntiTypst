@@ -86,4 +86,5 @@ Dato l'albero sintattico in input, si restituisce un altro albero sintattico a c
 
 #example()[
   #align(center, image("images/2025-09-22-21-11-15.png"))
+  con $<bold(id), 1>$, si ha che le informazioni riguardante l'identificatore $bold(id)$ sono memorizzate nella tabella dei simboli all'indirizzo 1.
 ]
