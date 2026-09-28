@@ -30,7 +30,7 @@ $
 $
 
 #definition()[
-  Due stringhe sono *uguali* ($u$ = $v$) se:
+  Due stringhe $u = x_1 dots x_n$ e $v = y_1 dots y_k$ sono *uguali* ($u$ = $v$) se:
   $abs(u) = abs(v)$ e $x_i = y_i$ per $i=1,2,3,...,n$.
 ]
 
@@ -69,7 +69,7 @@ per qualsiasi stringa $s$. Gode solo della proprietà associativa. Ovviamente la
 
 ==== Potenza
 
-La potenza $u^n$ con $n gt 0$ indica la concatenazione della stringa con se stessa $n$ volte.
+La potenza $u^n$ con $n gt.eq 0$ indica la concatenazione della stringa con se stessa $n$ volte.
 $
   u^0 = epsilon space space space abs(u^n) = n times abs(u)
 $
@@ -83,7 +83,7 @@ $
 
 == Linguaggi
 
-Un linguaggio $L$ è un insieme numerabile di stringhe di un dato alfabeto $Sigma$:
+Un linguaggio $L$ è un insieme finito o numerabile di stringhe di un dato alfabeto $Sigma$:
 $
   L subset.eq Sigma^*
 $
@@ -192,7 +192,7 @@ I linguaggi formali possono essere definiti in modo ricorsivo tramite tre compon
   + Linguaggio $L={a^i b^j bar 0 < i < j}$
     - $underline(text("Base")): a b b in L$
     - $underline(text("Passo ricorsivo")):$ se $u in L ==> u b, a u b in L$
-    Supponiamo di voler ottenere $a^5 b^8$. Diventa: abb $=>$ aabbb $=>$ aaabbbb $=>$ aaaabbbbb $=>$ aaaaabbbbbb $=>$ aaaaabbbbbbbb
+    Supponiamo di voler ottenere $a^5 b^8$. Diventa: abb $=>$ aabbb $=>$ aaabbbb $=>$ aaaabbbbb $=>$ aaaaabbbbbb $=>$ aaaaabbbbbbb $=>$ aaaaabbbbbbbb
 
   + Linguaggio $L'={a^i b^j bar i > j > 0}$
     - $underline(text("Base")): a a b in L'$
@@ -274,9 +274,9 @@ x^+=x x^* =x^* x$
   + ${a, b}$, non contengono $a b a ==> (b bar a^+ b b)^*(epsilon bar a^+ | a^+ b)$
   + ${a, b}$, ogni $a$ è preceduta o seguita da $b$
     $
-      (b bar a b | b a)^* => ((epsilon bar a)b bar (epsilon | a) b a)^* ==> ((epsilon bar a) (b bar b a))^*
+      (b bar a b | b a | a b a)^* => ((epsilon bar a)b bar (epsilon | a) b a)^* ==> ((epsilon bar a) (b bar b a))^*
     $
-  + ${a, b}$, in cui il terzultimo carattere è $b ==> (a bar b)^*b bar (a bar b)(a bar b)$
+  + ${a, b}$, in cui il terzultimo carattere è $b ==> (a bar b)^*b(a bar b)(a bar b)$
   + ${a, b}$, con numero pari di $a$ e un numero pari di $b$\
   $
     (a a | b b | (a b | b a) (a a | b b)^* (a b | b a))^*
@@ -444,7 +444,7 @@ Per poter spostare avanti il puntatore _forward_ è necessario prima verificare 
 
 === Sentinelle
 
-Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo _forward_ in avanti dovremmo verificare che non vada oltre la fine di uno dei due buffer. Quindi per ogni carattere dobbiamo effettuare due controlli: il primo per verificare se il puntatore ha raggiunto la fine del buffer e il secondo per verificare quale carattere è stato letto. Possiamo combinare i due test estendendo il buffer in modo da contenere un carattere che non può main comparire come parte di un programma sorgente: *eof* è perfetto.
+Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo _forward_ in avanti dovremmo verificare che non vada oltre la fine di uno dei due buffer. Quindi per ogni carattere dobbiamo effettuare due controlli: il primo per verificare se il puntatore ha raggiunto la fine del buffer e il secondo per verificare quale carattere è stato letto. Possiamo combinare i due test estendendo il buffer in modo da contenere un carattere che non può mai comparire come parte di un programma sorgente: *eof* è perfetto.
 
 ```c
   switch(*forward++){
@@ -457,7 +457,7 @@ Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo 
         forward = inizio del primo buffer;
       }
       else { /* eof nel mezzo di un buffer indica la fine del file */
-        termina l analisi;
+        termina l’analisi;
       }
       break;
     /* casi per gli altri caratteri */

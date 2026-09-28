@@ -72,7 +72,7 @@ Oltre alle produzioni ci sono anche delle convenzioni specifiche per riconoscere
   La *derivazione* è il meccanismo generativo centrale su cui si basano le grammatiche. Data una stringa, consente di ottenerne una nuova sostituendo un simbolo non terminale presente in essa con la parte destra di una delle sue produzioni.
 ]
 
-Quando applichiamo una singola produzione, si dice che la stringa $w$ *produce direttamente* la stringa $z$ oppure, se letta la contrario, la stringa $z$ *deriva direttamente* dalla stringa $w$.
+Quando applichiamo una singola produzione, si dice che la stringa $w$ *produce direttamente* la stringa $z$ oppure, se letta al contrario, la stringa $z$ *deriva direttamente* dalla stringa $w$.
 
 #example()[
   Data una regola di produzione $A -> alpha$ e una stringa iniziale $beta A gamma$, la sostituzione *produce direttamente* la stringa $beta alpha gamma$:
@@ -260,7 +260,7 @@ Ovvero:
 
 Guardando la forma delle produzioni, si può notare che c'è un solo modo per terminare la derivazione (e ottenere una stringa di soli terminali): applicare una regola della forma $X -> a$ oppure $X -> epsilon$, che elimina definitivamente l'ultimo non terminale.
 
-Generalmente, negli esempi sottostanti useremo la grammatica regolare destra (che è la più naturale per costruire automi a stati finiti). Il non-terminale fine di una forma di frase può essere utilizzato per rappresentare delle informazioni sulla sequenza di terminali che lo precede.
+Generalmente, negli esempi sottostanti useremo la grammatica regolare destra (che è la più naturale per costruire automi a stati finiti). Il non-terminale alla fine di una forma di frase può essere utilizzato per rappresentare delle informazioni sulla sequenza di terminali che lo precede.
 
 #example(multiple: true)[
   + Stringhe su {a,b} di lunghezza pari. Se io volessi usare una grammatica regolare:\
@@ -416,7 +416,7 @@ Generalmente, negli esempi sottostanti useremo la grammatica regolare destra (ch
       table(
         columns: (auto, auto, auto),
 
-        [], [contiene $a a$], [ultimo caratere],
+        [], [contiene $a a$], [ultimo carattere],
         [S], [_no_], [_b($epsilon$)_],
         [A], [_no_], [_a_],
         table.cell(fill: rgb("#68e86680"), "B"), [*_sì_*], [_a_],
