@@ -20,17 +20,17 @@ Una stringa vuota, che non contiene simboli, si indica con $epsilon$. Il numero 
 
 L'insieme di tutte le stringhe di lunghezza $k$ con $k gt.eq 0$ si indica con $Sigma^k$. $Sigma^0 = {epsilon}$.
 
-L'insieme di tutte le stringhe di qualsiasi lunghezza è $Sigma^*$ che per definizione può essere riscritto come:
+L'insieme di tutte le stringhe di qualsiasi lunghezza sull'alfabeto $Sigma$ è $Sigma^*$ che per definizione può essere riscritto come:
 $
-  Sigma^* = Sigma^0 union Sigma^1 union Sigma^2 union ...
+  Sigma^* = Sigma^0 union Sigma^1 union Sigma^2 union ... = union.big_(k gt.eq 0) Sigma^k
 $
 Si può anche indicare l'insieme delle stringhe di lunghezza almeno 1:
 $
-  Sigma^+ = Sigma^1 union Sigma^2 union ...
+  Sigma^+ = Sigma^1 union Sigma^2 union ... = union.big_(k gt.eq 1) Sigma^k
 $
 
 #definition()[
-  Due stringhe sono *uguali* ($u$ = $v$) se:
+  Due stringhe $u = x_1 dots x_n$ e $v = y_1 dots y_k$ sono *uguali* ($u$ = $v$) se:
   $abs(u) = abs(v)$ e $x_i = y_i$ per $i=1,2,3,...,n$.
 ]
 
@@ -44,6 +44,10 @@ $
   - $k$ è *suffisso* di $u$ se $u=w k$
 ]
 
+#observation()[
+  1. $epsilon$ è sottostringa, prefisso e suffisso di ogni stringa;
+  2. dato che esiste $epsilon$, ogni stringa è sottostringa, prefisso e suffisso di se stessa.
+]
 
 === Operazioni su stringhe
 
@@ -69,9 +73,9 @@ per qualsiasi stringa $s$. Gode solo della proprietà associativa. Ovviamente la
 
 ==== Potenza
 
-La potenza $u^n$ con $n gt 0$ indica la concatenazione della stringa con se stessa $n$ volte.
+La potenza $u^n$ con $n gt.eq 0$ indica la concatenazione della stringa con se stessa $n$ volte:
 $
-  u^0 = epsilon space space space abs(u^n) = n times abs(u)
+  u^0 = epsilon, space space space abs(u^n) = n times abs(u)
 $
 
 ==== Reverse
@@ -89,6 +93,7 @@ $
 $
 
 Essendo i linguaggi degli insiemi a tutti gli effetti, è possibile applicare le classiche operazioni insiemistiche su di essi:
+
 - Concatenazione
 - Unione
 - Intersezione
@@ -141,17 +146,23 @@ $
 ]
 
 Si definiscono inoltre:
-- $Sigma^*$ (*linguaggio universale*): l'insieme di tutte le possibili stringhe sull'alfabeto $Sigma$;
-- $Sigma^+$ (*linguaggio universale positivo*): l'insieme di tutte le stringhe di $Sigma^*$ ad eccezione della stringa vuota $epsilon$ (quindi $Sigma^+ = Sigma^* - {epsilon}$);
+
+- $L(Sigma^*) = Sigma^*$ (*linguaggio universale*): l'insieme di tutte le possibili stringhe sull'alfabeto $Sigma$;
+- $L(Sigma^+) = Sigma^+$ (*linguaggio universale positivo*): l'insieme di tutte le stringhe di $Sigma^*$ ad eccezione della stringa vuota $epsilon$ (quindi $Sigma^+ = Sigma^* - {epsilon}$);
 - $overline(L) = Sigma^* - L$ (*linguaggio complementare*): l'insieme delle stringhe di $Sigma^*$ che non appartengono a $L$.
+- Linguaggio ${epsilon}$ fatto dalla sola stringa vuota (*non è vuoto*, ha cardinalità 1).
+- Linguaggio vuoto $emptyset$ (questo ha cardinalità 0).
+- $L(Sigma) = Sigma^1$ linguaggio fatto dai simboli dell'alfabeto $Sigma$.
 
 === Definizione ricorsiva di linguaggio
 
-I linguaggi formali possono essere definiti in modo ricorsivo tramite tre componenti essenziali:
-- #underline("Base"): fornisce un insieme finito di stringhe iniziali che appartengono sicuramente a $L$.
-- #underline("Passo ricorsivo"): regole di produzione che indicano come generare nuove stringhe partendo da stringhe già note in $L$ (es: se $v_1, dots, v_j "in" L$, allora $f(v_1, dots, v_j) "in" L$)
+I linguaggi formali possono essere definiti in modo *ricorsivo* tramite tre componenti essenziali:
+
+- #underline("Base"): $a_1, dots, a_k in L$ (fornisce un insieme finito di stringhe iniziali che appartengono sicuramente a $L$).
+- #underline("Passo ricorsivo"): $v_1, dots, v_j in L$, allora $f(v_1, dots, v_j) in L$ (regole di produzione che indicano come generare nuove stringhe partendo da stringhe già note in $L$).
 - #underline("Chiusura"): una stringa $w$ appartiene a $L$ solo se può essere ottenuta dagli elementi di base con un numero finito di applicazioni del passo ricorsivo.
 
+Di seguito una serie di esempi:
 
 #example(multiple: true)[
   + Stringhe su {a,b} che iniziano con a e hanno lunghezza pari.
@@ -167,7 +178,7 @@ I linguaggi formali possono essere definiti in modo ricorsivo tramite tre compon
     - $underline(text("Passo ricorsivo")): text("se") u in L ==> u a, u a b in L$
     - $underline(text("Passo ricorsivo")): text("se") u in L ==> a u, a b u in L$
 
-  + Espressioni con $n$, +, -, \*, ), (, /
+  + Linguaggio delle espressioni aritmetiche che coinvolgono $n in {1, dots, 9}$, +, -, \*, ), (, /
     - $underline(text("Base")): n in L$
     - $underline(text("Passo ricorsivo")):$ se $u,v in L ==> (u),u+v,u-v,u*v,u\/v in L$
 
@@ -192,41 +203,47 @@ I linguaggi formali possono essere definiti in modo ricorsivo tramite tre compon
   + Linguaggio $L={a^i b^j bar 0 < i < j}$
     - $underline(text("Base")): a b b in L$
     - $underline(text("Passo ricorsivo")):$ se $u in L ==> u b, a u b in L$
-    Supponiamo di voler ottenere $a^5 b^8$. Diventa: abb $=>$ aabbb $=>$ aaabbbb $=>$ aaaabbbbb $=>$ aaaaabbbbbb $=>$ aaaaabbbbbbbb
+    Supponiamo di voler ottenere $a^5 b^8$. Diventa: abb $=>$ aabbb $=>$ aaabbbb $=>$ aaaabbbbb $=>$ aaaaabbbbbb $=>$ aaaaabbbbbbb $=>$ aaaaabbbbbbbb.
 
   + Linguaggio $L'={a^i b^j bar i > j > 0}$
     - $underline(text("Base")): a a b in L'$
     - $underline(text("Passo ricorsivo")):$ se $u in L' ==> a u, a u b in L'$
 
   + Linguaggio $L''={a^i b^j bar i != j; quad i, j > 0}$\
-    $L'' = L union L'$
-    - $underline(text("Base")): a a b, a b b in L$
-    - #underline("Passo ricorsivo"): se $u in L ==> a u b in L$ attenzione, questo genera un linguaggio incompleto!
+    Qui non c'è un passo ricorsivo, ma basta osservare che $L'' = L union L'$ (unione degli ultimi 2 linguaggi visti).
+
+  + Linguaggio $L = {w in {a,b}^* bar w = w^R}$ ($w = w_1 dots w_k => w^R = w_k dots w_1$)
+    - $underline(text("Base")): epsilon, a, b in L$
+    - $underline(text("Passo ricorsivo")):$ se $u in L ==> a u a, b u b in L$
 ]
 
 === Linguaggi regolari
 
 I linguaggi regolari su un alfabeto $Sigma$ sono definiti ricorsivamente a partire dagli elementi di base usando le operazioni di unione, concatenazione e chiusura.
 
-- #underline("Base"): i seguenti insiemi elementari sono regolari
-  - L'insieme vuoto $emptyset$
-  - L'insieme contenente solo la stringa vuota ${epsilon}$
-  - L'insieme contenente un singolo simbolo dell'alfabeto ${t}, forall t in Sigma$
+- #underline("Base"): i seguenti insiemi elementari sono regolari:
+  - L'insieme vuoto ($emptyset$);
+  - L'insieme ${epsilon}$;
+  - L'insieme ${t}$ che contiene un solo simbolo dell'alfabeto $Sigma, forall t in Sigma$.
+
 - #underline("Passo ricorsivo"): se $x$ e $y$ sono insiemi regolari, allora anche $x union y, x y, x^*, x^+$ sono regolari.
-- #underline("Chiusura"): un insieme è regolare se e solo se può essere ottenuto dagli elementi di base tramite un numero finito di applicazioni del passo ricorsivo.
+- #underline("Chiusura"): un insieme è regolare se può essere ottenuto dagli elementi di base tramite un numero finito di applicazioni del passo ricorsivo.
 
 #example()[
-  $L$ su $Sigma = {a,b}$ in cui ogni occorrenza di b è preceduta da a.
+  $L$ su $Sigma = {a,b}$ in cui ogni occorrenza di $b$ è preceduta da $a$:
+
   + ${a}$ è regolare
   + ${b}$ è regolare
-  + ${a}{b}$ è regolare
-  + ${a} union {a}{b}$ è regolare
-  + $({a} union {a}{b})^*$ è regolare
+  + ${a}^+$ è regolare
+  + ${a}^+{b}$ è regolare
+  + ${a}^*$ è regolare
+  + $({a}^+{b})^*{a}^*$ è regolare
 ]
 
 == Espressioni regolari
 #definition()[
-  Le espressioni regolari sono una notazione sintetica per i linguaggi regolari ed operano sui simboli dell'alfabeto.
+  Le espressioni regolari sono un formalismo, una notazione sintetica per descrivere i linguaggi regolari ed operano sui simboli dell'alfabeto.
+
   - Un simbolo $t$ rappresenta il linguaggio composto dal simbolo stesso: ${t}$;
   - $epsilon$ rappresenta ${epsilon}$;
   - $emptyset$ rappresenta $emptyset$;
@@ -248,6 +265,9 @@ x^+=x x^* =x^* x$
 4. unione di $x$ e $y$, $x + y$ oppure $x | y$, indica $L_x union L_y$
 5. opzionalità di $x$, $[x]$ oppure $x?$, indica $L_x union {epsilon} ==> x? = x | epsilon$
 
+#observation()[
+$x y^* = x (y)^*$, ma $(x y)^* != x^*y^*$
+]
 === Proprietà
 
 - *Unione*:
@@ -267,6 +287,7 @@ x^+=x x^* =x^* x$
   + $(a | b)^*$: una qualsiasi sequenza di $a$, $b$ o stringa vuota
   + $(b | a b)^* (a | epsilon)$: non ci sono $a$ consecutive
   + $((a | b)(a | b))^* => (a a | a b | b a | b b)^*$: tutte stringhe di lunghezza pari
+  + $({a}^+{b})^*{a}^* => (a^+ b)^* a^*$: tutte le stringhe in cui ogni $b$ è preceduta da $a$
 ]
 
 #example(multiple: true)[
@@ -274,9 +295,10 @@ x^+=x x^* =x^* x$
   + ${a, b}$, non contengono $a b a ==> (b bar a^+ b b)^*(epsilon bar a^+ | a^+ b)$
   + ${a, b}$, ogni $a$ è preceduta o seguita da $b$
     $
-      (b bar a b | b a)^* => ((epsilon bar a)b bar (epsilon | a) b a)^* ==> ((epsilon bar a) (b bar b a))^*
+      (b bar a b | b a | a b a)^* = ((epsilon bar a)b bar (epsilon | a) b a)^* = ((epsilon bar a) (b bar b a))^*
     $
-  + ${a, b}$, in cui il terzultimo carattere è $b ==> (a bar b)^*b bar (a bar b)(a bar b)$
+
+  + ${a, b}$, in cui il terzultimo carattere è $b$: $(a bar b)^*b bar (a bar b)(a bar b)$
   + ${a, b}$, con numero pari di $a$ e un numero pari di $b$\
   $
     (a a | b b | (a b | b a) (a a | b b)^* (a b | b a))^*
@@ -285,7 +307,7 @@ x^+=x x^* =x^* x$
   $
     b^*(a b^* a b^*)^* | a^* b a^* (b a^* b a^*)^*
   $
-  7. ${a, b}$, stringhe di lunghezza dispari che contengono esattamente 2 $b$
+  7. ${a, b}$, stringhe di lunghezza dispari che contengono esattamente due $b$
   $
     underbrace(a(a a)^* b a(a a)^* b a(a a)^*, text("3 slot dispari")) |
     underbrace(a(a a)^* b (a a)^* b (a a)^*, text("1° dispari")) |
@@ -295,6 +317,10 @@ x^+=x x^* =x^* x$
   8. ${a, b}$, stringhe dove $a a$ occorre una sola volta
   $
     (b | a b)^* a a (b | b a)^*
+  $
+  9. ${a, b}$, stringhe che non iniziano con $a a a$:
+  $
+    (b | a b | a a b)^* bar (epsilon | a | a a)
   $
 ]
 
@@ -311,7 +337,7 @@ x^+=x x^* =x^* x$
   dove ogni $d_i$ è un simbolo nuovo rispetto all'alfabeto di base $Sigma$ ($d_i in.not Sigma$) e ogni $r_i$ è un'espressione regolare sull'alfabeto $Sigma union {d_1, dots, d_(i-1)}$ per $i = 1,dots,n$.
 ]
 
-Sia $Sigma={A,B,dots,Z,a,b,dots,z,0,1,dots,9,\_}$ l'alfabeto di tutti i caratteri che possono essere contenuti in un identificatore di variabile. L'espressione regolare estesa per verificare la correttezza di un identificatore è la seguente.
+Sia $Sigma={A,B,dots,Z,a,b,dots,z,0,1,dots,9,\_}$ l'alfabeto di tutti i caratteri che possono essere contenuti in un identificatore di variabile nel linguaggio C. L'espressione regolare estesa per verificare la correttezza di un identificatore è la seguente.
 $
   (A|B|dots|Z|a|b|dots|z|\_)(A|B|dots|Z|a|b|dots|z|\_|0|1|dots|9)^*
 $
@@ -362,9 +388,9 @@ Alcune delle estensioni più comuni introdotte da programmi UNIX sono:
   ]
 
 
-+ *Zero o una occorrenza*: l'operatore unario postfisso '$?$' indica l'opzionale presenza dell'operando a cui viene applicato. Quindi $r?$ equivale a $r | epsilon$ (in termini di linguaggi: $L(r?) = L(r) union {epsilon}$). Come il precedente, ha la stessa precedenza e associatività dell'operatore '$*$'.
++ *Zero o una occorrenza*: l'operatore unario postfisso '$?$' indica l'opzionalità dell'operando a cui viene applicato. Quindi $r?$ equivale a $r | epsilon$ (in termini di linguaggi: $L(r?) = L(r) union {epsilon}$). Come il precedente, ha la stessa precedenza e associatività dell'operatore '$*$'.
 
-+ *Classi di caratteri*: un'espressione regolare formata da un'unione di singoli caratteri come $a_1 | a_2 | ... | a_n$, in cui i simboli $a_i$ appartengono all'alfabeto $Sigma$, può essere sostituita dalla forma compatta $[a_1 a_2 ... a_n]$. Inoltre, quando i simboli formano una sequenza logica (per esempio lettere maiuscole, lettere minuscole o cifre in base alla codifica ASCII), si può ulteriormente sintetizzare l'espressione indicando il range: $[a_1 - a_n]$.
++ *Classi di caratteri*: un'espressione regolare formata da un'unione di singoli caratteri come $a_1 | a_2 | ... | a_n$, in cui i simboli $a_i$ appartengono all'alfabeto $Sigma$, può essere sostituita dalla forma compatta $[a_1 a_2 ... a_n]$. Inoltre, quando i simboli formano una sequenza logica (per esempio lettere maiuscole, lettere minuscole o cifre in base alla codifica ASCII), si può ulteriormente sintetizzare l'espressione indicando il range: $[a_1 - a_n]$. Attenzione: abbiamo visto in precedenza che con $[ dot ]$ si indica anche l'opzionalità, quindi attenzione a non confondere le due notazioni (si capisce di solito in base al contesto).
 
 #example()[
   $
@@ -384,21 +410,38 @@ $
   "digits" & -> "digit"^+ \
   "number" & -> "digits" ("." "digits")? ("E" [+-]? "digits")?
 $
+#example()[
+  Definizione regolare per validare un indirizzo email. Le regole (di esempio) sono:
 
+  - Il nome utente può contenere caratteri alfanumerici, ., $\_$, -, ?, !, {, };
+  - Il nome utente non può iniziaro con un punto, né finire con un punto, né contenere due punti consecutivi;
+  - Il dominio può contenere caratteri alfanumerici e punti, ma non può iniziare o finire con un punto, né contenere due punti consecutivi.
+$
+  "lettere" & -> [A-Z a-z] \
+  "cifre" & -> [0-9] \
+  "alfanum" & -> "lettere" | "cifre" \
+  "carattere" & -> "alfanum" | "_" | "-" | "?" | "!" | "{" | "}" \
+  "pezzo_nome" & -> "carattere"^+ \
+  "nome" & -> "pezzo_nome" ("." "pezzo_nome")^* \
+  "pezzo_dominio" & -> "alfanum" ("alfanum" | "-")^* \
+  "dominio" & -> "pezzo_dominio" ("." "pezzo_dominio")^+ \
+  "email" & -> "nome" "@" "dominio"
+$
+]
 == Buffering dell'ingresso
 
 Siccome il codice sorgente di ogni programma risiede in memoria secondaria, e di conseguenza anche tutti i suoi simboli/token, risulta costoso accedervi per l'analisi. Per questo motivo si usano dei buffer nella RAM.
 
-Uno dei sistemi più utilizzati si basa su due buffer di dimensione $N$, dove $N$ di solito ha la stessa dimensione di un blocco del disco, per esempio 4096 byte. Con una singola operazione di lettura è possibile leggere un intero blocco di $N$ caratteri (molto meglio di $N$ letture di singoli caratteri). Quando meno di $N$ caratteri rimangono nel file, il carattere *eof* segnala la fine del file.
+Uno dei sistemi più utilizzati si basa su due buffer di dimensione $N$, dove $N$ di solito ha la stessa dimensione di un blocco del disco, per esempio 4096 byte (esempio con due buffer nel diagramma sotto con l'espressione $E = M dot C^2$). Con una singola operazione di lettura è possibile leggere un intero blocco di $N$ caratteri (molto meglio di $N$ letture di singoli caratteri). Quando meno di $N$ caratteri rimangono nel file, il carattere *eof* segnala la fine del file.
 
 Per la gestione del buffer si usano due puntatori:
-- _*lexemeBegin*_: indica l'indirizzo del lessema corrente, la cui lunghezza deve essere determinata.
+
+- _*lexemeBegin*_: indica l'inizio del lessema corrente, la cui lunghezza deve essere determinata.
 - _*forward*_: si sposta in avanti finché non si riconosce un lessema corrispondente a un pattern.
 
-Una volta individuato il lessema, si sposta il puntatore _forward_ sul carattere immediatamente alla destra del lessema stesso. Quindi, dopo che tale lessema è stato memorizzato come attributo di token, il puntatore _lexemeBegin_ viene spostato immediatamente dopo il lessema appena trovato.
-
+Una volta individuato il lessema, si sposta il puntatore _forward_ sul carattere immediatamente alla destra del lessema stesso. Quindi, dopo che tale lessema è stato memorizzato come valore d'attributo di un token, il puntatore _lexemeBegin_ viene spostato immediatamente dopo il lessema appena trovato.
 $
-  #let elements = ("A", none, none, none, "E", none, "=", none, "M", $"*"$, "C", [$"*"$#pin(1)], $"*"$, [2#pin(2)], "eof", none, none, none, none, none)
+  #let elements = (none, none, none, none, "E", none, "=", none, "M", $"*"$, "C", [$"*"$#pin(1)], $"*"$, [2#pin(2)], "eof", none, none, none, none, none)
   #cetz.canvas(length: 25pt, {
     import draw: content, line, rect
     draw.rect((-0.5, 0.5), (19.5, 1.5))
@@ -418,33 +461,12 @@ $
   #linebreak()
   #linebreak()
   #linebreak()
-  #let elements = ("A", none, none, none, "E", none, "=", none, "M", $"*"$, "eof", "C", [$"*"$#pin(3)], $"*"$, [2#pin(4)], "eof", none, none, none, none, none, "eof")
-  #cetz.canvas(length: 25pt, {
-    import draw: content, line, rect
-    draw.rect((-0.5, 0.5), (21.5, 1.5))
-    for i in range(1, elements.len()) {
-      if (i != 11) { draw.line((i - 0.5, 0.5), (i - 0.5, 1.5), stroke: (dash: "dotted")) } else {
-        draw.line((i - 0.5, 0.5), (i - 0.5, 1.5))
-      }
-    }
-
-    for i in range(0, elements.len()) { content((i, 1), elements.at(i)) }
-  })
-  #pinit-point-from(3, pin-dx: -2pt, pin-dy: 12pt, body-dy: -10pt, offset-dx: -2pt, offset-dy: 50pt)[#text(font: "Libertinus Serif", style: "italic")[lexemeBegin]]
-  #pinit-point-from(4, pin-dx: -2pt, pin-dy: 12pt, body-dy: -10pt, offset-dx: -2pt, offset-dy: 35pt)[#text(font: "Libertinus Serif", style: "italic")[forward]]
-  #linebreak()
-  #linebreak()
-  #linebreak()
-  #linebreak()
-  #linebreak()
-  #linebreak()
 $
-
-Per poter spostare avanti il puntatore _forward_ è necessario prima verificare se si è raggiunta la fine di uno dei due buffer. In questo caso si deve ricaricare l'altro buffer con i caratteri letti dal file sorgente e spostare _forward_ all'inizio del buffer appena riempito. Affinché ciò avvenga senza problemi è necessario che la lunghezza di un lessema più il numero di caratteri letti in anticipo non superi la dimensione $N$ di ogni buffer, in caso contrario si sovrascriverebbe l'inizio di un lessema prima di avere finito di riconoscerlo.
+Per poter spostare avanti il puntatore _forward_ è necessario prima verificare se si è raggiunta la fine di uno dei due buffer. In questo caso si deve ricaricare l'altro buffer con i caratteri letti dal file sorgente e spostare _forward_ all'inizio del buffer appena riempito. Affinché ciò avvenga senza problemi è necessario che la lunghezza di un lessema più il numero di caratteri letti in anticipo (per esempio in $c a r = 20$ devo prima leggere $=$ per capire che il lessema $c a r$ è terminato) non superi la dimensione $N$ di ogni buffer, perché in caso contrario si sovrascriverebbe l'inizio di un lessema prima di aver finito di riconoscerlo.
 
 === Sentinelle
 
-Se utilizzassimo il sistema precedentemente descritto, ogni volta che spostiamo _forward_ in avanti dovremmo verificare che non vada oltre la fine di uno dei due buffer. Quindi per ogni carattere dobbiamo effettuare due controlli: il primo per verificare se il puntatore ha raggiunto la fine del buffer e il secondo per verificare quale carattere è stato letto. Possiamo combinare i due test estendendo il buffer in modo da contenere un carattere che non può main comparire come parte di un programma sorgente: *eof* è perfetto.
+Se utilizzassimo il sistema precedentemente descritto esattamente così com'è, ogni volta che spostiamo _forward_ in avanti dovremmo verificare che non vada oltre la fine di uno dei due buffer. Quindi per ogni carattere dobbiamo effettuare due controlli: il primo per verificare se il puntatore ha raggiunto la fine del buffer e il secondo per verificare quale carattere è stato letto. Possiamo combinare i due test estendendo ogni buffer in modo che contenga, nell'ultima posizione, un carattere sentinella che non può mai essere parte di un programma sorgente: *eof* è perfetto.
 
 ```c
   switch(*forward++){
