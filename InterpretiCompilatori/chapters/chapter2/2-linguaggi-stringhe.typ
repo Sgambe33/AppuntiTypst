@@ -87,7 +87,7 @@ $
 
 == Linguaggi
 
-Un linguaggio $L$ è un insieme numerabile di stringhe di un dato alfabeto $Sigma$:
+Un linguaggio $L$ è un insieme finito o numerabile di stringhe di un dato alfabeto $Sigma$:
 $
   L subset.eq Sigma^*
 $
@@ -295,10 +295,9 @@ $x y^* = x (y)^*$, ma $(x y)^* != x^*y^*$
   + ${a, b}$, non contengono $a b a ==> (b bar a^+ b b)^*(epsilon bar a^+ | a^+ b)$
   + ${a, b}$, ogni $a$ è preceduta o seguita da $b$
     $
-      (b bar a b | b a | a b a)^* = ((epsilon bar a)b bar (epsilon | a) b a)^* = ((epsilon bar a) (b bar b a))^*
+      (b bar a b | b a | a b a)^* => ((epsilon bar a)b bar (epsilon | a) b a)^* ==> ((epsilon bar a) (b bar b a))^*
     $
-
-  + ${a, b}$, in cui il terzultimo carattere è $b$: $(a bar b)^*b bar (a bar b)(a bar b)$
+  + ${a, b}$, in cui il terzultimo carattere è $b ==> (a bar b)^*b(a bar b)(a bar b)$
   + ${a, b}$, con numero pari di $a$ e un numero pari di $b$\
   $
     (a a | b b | (a b | b a) (a a | b b)^* (a b | b a))^*
@@ -479,7 +478,7 @@ Se utilizzassimo il sistema precedentemente descritto esattamente così com'è, 
         forward = inizio del primo buffer;
       }
       else { /* eof nel mezzo di un buffer indica la fine del file */
-        termina l analisi;
+        termina l’analisi;
       }
       break;
     /* casi per gli altri caratteri */
