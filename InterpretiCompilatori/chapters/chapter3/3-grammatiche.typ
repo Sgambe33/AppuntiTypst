@@ -4,12 +4,13 @@
 
 #pagebreak()
 
-= Grammatiche (4.2)
+= Grammatiche
 
-Le grammatiche sono una notazione utilizzata per specificare la sintassi di un linguaggio. Descrivono in maniera naturale la struttura gerarchica dei costrutti di molti linguaggi di programmazione.
+Le grammatiche si basano su un meccanismo generativo (la derivazione) utilizzato per produrre le stringhe appartenenti a un determinato linguaggio, la cui struttura è definita dalle regole di produzione. Le grammatiche in generale (come quelle non contestuali) sono più potenti delle espressioni regolari: ogni linguaggio descrivibile da un'espressione regolare può essere generato da una grammatica, ma esistono linguaggi generabili da grammatiche (come $a^n b^n$) che non possono essere espressi da alcuna espressione regolare.
 
-#definition("par 4.2.1")[
-  Formalmente una grammatica G è una quadrupla $(V, Sigma, P, S)$ dove:
+#definition("Grammatica")[
+  Formalmente una *grammatica* $G$ è una quadrupla $(V, Sigma, P, S)$ dove:
+
   - *$V$* è l'insieme dei simboli non terminali
   - *$Sigma$* è l'insieme dei simboli terminali
   - *$P$* è l'insieme delle produzioni della grammatica
@@ -17,19 +18,17 @@ Le grammatiche sono una notazione utilizzata per specificare la sintassi di un l
 ]<defGrammar>
 
 Prima di continuare bisogna chiarire cosa sono i simboli terminali e non terminali:
-- *Simboli terminali*: corrispondono a tutti quei simboli che compongono le stringhe del linguaggio.
+
+- *Simboli terminali*: corrispondono a tutti quei simboli che compongono le stringhe del linguaggio ("nome di token" è sinonimo di terminale).
 - *Simboli non terminali*: sono tutti quei simboli che *non* fanno parte del linguaggio, ma aiutano alla sua generazione.
 
-Sapendo ciò si può capire che l'intersezione tra $Sigma$ e $V$ corrisponde ad un insieme vuoto:
-$
-  Sigma inter V = nothing
-$
+Sapendo ciò si può capire che l'intersezione tra $Sigma$ e $V$ deve essere vuota: $Sigma inter V = nothing$.
 
-Ci sono vari tipi di grammatiche in base alla struttura delle regole $P$ ma per ora assumiamo di lavorare con grammatiche _* context-free*_.
+Ci sono vari tipi di grammatiche in base alla struttura delle regole $P$ ma per ora assumiamo di lavorare con grammatiche _* context-free*_, nelle quali le produzioni (dette anche regole) sono fatte come illustrato di seguito.
 
 == Produzioni delle grammatiche
 
-Le produzioni delle grammatiche assumono la seguente forma:
+Le produzioni delle grammatiche context-free assumono la seguente forma:
 $
   A -> alpha, quad quad quad "con " A in V " e " alpha in (V union Sigma)^*
 $
@@ -44,9 +43,25 @@ $
     & dots.v quad quad quad ==> quad A -> alpha_1 | alpha_2 | dots | alpha_n \
   A & -> alpha_n
 $
+#example()[
+  La seguente grammatica definisce semplici espressioni aritmetiche:
+  $
+    "expression" & -> "expression" + "term" \
+    "expression" & -> "expression" - "term" \
+    "expression" & -> "term" \
+          "term" & -> "term" * "factor" \
+          "term" & -> "term / factor" \
+          "term" & -> "factor" \
+        "factor" & -> ( "expression" ) \
+        "factor" & -> upright("id")
+  $
+  In questa grammatica i simboli terminali sono
+  $ upright("id") quad + quad - quad * quad "/" quad ( quad ) $
+  mentre i non-terminali sono expression, term e factor e il non-terminale expression è il simbolo iniziale.
+]
+Di seguito indichiamo delle convenzioni specifiche per riconoscere a colpo d'occhio i simboli:
 
-Oltre alle produzioni ci sono anche delle convenzioni specifiche per riconoscere a colpo d'occhio i simboli:
-+ I seguenti simboli sono terminali\
++ I seguenti simboli sono terminali:\
   #set enum(numbering: "a)")
   + Le lettere minuscole all'inizio dell'alfabeto, come: $a, b, c$, ecc.;
   + I simboli degli operatori, come: $+$, $*$, ecc.;
@@ -54,6 +69,7 @@ Oltre alle produzioni ci sono anche delle convenzioni specifiche per riconoscere
   + Le cifre $0, 1, dots, 9$;
   + Le stringhe in grassetto, come *id* e *if*, ognuna delle quali rappresenta un unico simbolo terminale.
   #set enum(numbering: "1.")
+
 + I seguenti simboli sono non terminali:
   #set enum(numbering: "a)")
   + Le lettere maiuscole all'inizio dell'alfabeto, come: $A, B, C$, ecc.;
@@ -69,10 +85,11 @@ Oltre alle produzioni ci sono anche delle convenzioni specifiche per riconoscere
 == Derivazioni
 
 #definition()[
-  La *derivazione* è il meccanismo generativo centrale su cui si basano le grammatiche. Data una stringa, consente di ottenerne una nuova sostituendo un simbolo non terminale presente in essa con la parte destra di una delle sue produzioni.
+  La *derivazione* è il meccanismo generativo su cui si basano le grammatiche. Data una stringa, consente di ottenerne una nuova sostituendo un simbolo non terminale presente in essa con la parte destra di una delle sue produzioni.
 ]
 
-Quando applichiamo una singola produzione, si dice che la stringa $w$ *produce direttamente* la stringa $z$ oppure, se letta al contrario, la stringa $z$ *deriva direttamente* dalla stringa $w$.
+Quando applichiamo una singola produzione (regola), si dice che la stringa $w$ *produce direttamente* la stringa $z$ (in simboli, $w => z$) oppure, se letta la contrario, la stringa $z$ *deriva direttamente* dalla stringa $w$. Attenzione:
+spesso i termini produrre e derivare saranno usati in maniera intercambiabile per indicare l'operazione $w => z$ (anche quella in più passi).
 
 #example()[
   Data una regola di produzione $A -> alpha$ e una stringa iniziale $beta A gamma$, la sostituzione *produce direttamente* la stringa $beta alpha gamma$:
@@ -81,20 +98,23 @@ Quando applichiamo una singola produzione, si dice che la stringa $w$ *produce d
   $
 ]
 
-Per descrivere derivazioni composte da più passaggi consecutivi, la notazione si può compattare per evitare di scrivere ogni singola regola applicata:
+Per descrivere derivazioni composte da più passaggi consecutivi (applicando più produzioni), la notazione si può compattare per evitare di scrivere ogni singola regola applicata:
+
 - Se abbiamo una sequenza $alpha => beta_1 => beta_2 => dots => beta_n = gamma$, possiamo condensare il tutto scrivendo:
   $
     alpha =>^+ gamma
   $
-  Questo indica che $alpha$ deriva $gamma$ in *uno o più passaggi* (chiusura positiva).
-- La notazione $alpha =>^* gamma$, invece, indica che $alpha$ deriva $gamma$ in *zero o più passaggi*. Questa espressione racchiude due casi:
+  Questo indica che $alpha$ deriva $gamma$ in *uno o più passi*.
+
+- La notazione $alpha =>^* gamma$, invece, indica che $alpha$ deriva $gamma$ in *zero o più passi*. Questa espressione racchiude due casi:
+
   1. $alpha =>^+ gamma$ (produce $gamma$ con almeno 1 derivazione, identica alla forma precedente);
   2. $alpha = gamma$ (zero derivazioni, la stringa di arrivo è identica a quella di partenza).
 
 La relazione di derivazione $der(*)$ può essere formalizzata anche tramite una definizione ricorsiva:
 $
-       mtext("Base"): & alpha der(*) alpha \
-  mtext("Induzione"): & "se " alpha der(*) beta " e " beta => gamma, " allora " alpha der(*) gamma
+       text("Base:") & alpha der(*) alpha \
+  text("Induzione:") & "se " alpha der(*) beta " e " beta => gamma, " allora " alpha der(*) gamma
 $
 
 Come si evince chiaramente dal passo induttivo, la relazione di derivazione gode della *proprietà transitiva*.
@@ -102,18 +122,16 @@ Come si evince chiaramente dal passo induttivo, la relazione di derivazione gode
 === Linguaggio generato da una grammatica
 
 #definition("Forma di frase")[
-  Data una grammatica G, una stringa $beta$ si dice *forma di frase* di G se e solo se $beta$ è *derivabile dal simbolo iniziale S* di G, quindi:
+  Data una grammatica $G$, una stringa $beta$ si dice *forma di frase* di $G$ se e solo se $beta$ è derivabile in zero o più passi dal simbolo iniziale S di G, cioè se e solo se $S der(*) beta$.
+]
+#definition("Frase")[
+  Una *frase* di G è una particolare forma di frase composta da soli simboli terminali. Quindi, una stringa $w$ è una frase di $G$ se e solo se:
   $
-    S der(*) beta
+    S der(+)w " e " w in Sigma^*
   $
 ]
 
-Una *frase* di G è una particolare forma di frase composta da soli simboli terminali. Quindi, una stringa $w$ è una frase di $G$ se e solo se:
-$
-  S der(+)w " e " w in Sigma^*
-$
-
-Sapendo tutto questo possiamo dire:
+Sapendo tutto questo possiamo dare la seguente definizione:
 
 #definition()[
   Il *linguaggio generato da una grammatica $G$*, indicato con $L(G)$, corrisponde all'insieme formato da tutte le frasi di $G$:
@@ -168,11 +186,17 @@ $
       & => a b * (b 0 1 + I b) \
       & => a b * (b 0 1 + a b)
   $
+  se scrivo l'albero della derivazione sinistra, ottengo:
+  #figure(
+    image("chap-3-figures/alberoGrammExpr.jpeg", width: 60%),
+  )
+  tale albero viene sempre allo stesso modo sia che si usi la derivazione sinistra che quella destra. Facendo una visita in pre-order dell'albero e registrando ogni derivazione ottengo una derivazione sinistra.
 ]
 
-== Correttezza e completezza di una grammatica (par 4.2.6)
+== Correttezza e completezza di una grammatica
 
-Supponiamo di dover dimostrare che un certo linguaggio $L$ coincida esattamente con il linguaggio generato da una grammatica $G$ (ovvero $L = L(G)$). Per fare ciò, bisogna dimostrare due proprietà fondamentali:
+Supponiamo di dover dimostrare che un certo linguaggio $L$ coincida esattamente con il linguaggio generato da una grammatica $G$ (ovvero $L equiv L(G)$). Per fare ciò, bisogna dimostrare due proprietà fondamentali:
+
 - *Correttezza ($L(G) subset.eq L$)*: ogni stringa generata da $G$ appartiene effettivamente ad $L$ (la grammatica non genera "spazzatura").
 - *Completezza ($L subset.eq L(G)$)*: ogni stringa valida di $L$ può essere generata da $G$.
 #example()[
@@ -184,61 +208,88 @@ Supponiamo di dover dimostrare che un certo linguaggio $L$ coincida esattamente 
   $
     S => 1 S 1 => 1 0 S 0 1 => 1 0 1 S 1 0 1 => 1 0 1 1 S 1 1 0 1 => 1 0 1 1 0 1 1 0 1
   $
-  Iniziamo dimostrando la *completezza* ($L subset.eq L(G)$):\
-  Supponiamo che una generica stringa $w$ sia palindroma e mostriamo per induzione sulla sua lunghezza $|w|$ che $w in L(G)$.
+  Iniziamo dimostrando la *completezza* ($L subset.eq L(G)$): supponiamo che una generica stringa $w$ sia palindroma e mostriamo, per induzione #underline[sulla sua lunghezza] $|w|$, che $w in L(G)$.
+
   - _Caso base_: se $|w|=0$ oppure $|w|=1$, allora $w$ può essere solo $epsilon$, $0$ o $1$. Utilizzando direttamente le regole base della grammatica:
     $
       S -> epsilon quad quad quad quad
       S -> 0 quad quad quad quad
       S -> 1
     $
-    Abbiamo banalmente che $S der(+) w$
-  - _Passo induttivo_: se $|w| > 1$, essendo palindroma, $w$ deve iniziare e finire con lo stesso simbolo. Quindi $w = 0 x 0$ oppure $w = 1 x 1$, dove $x$ è a sua volta una stringa palindroma con $|x| = |w| - 2$.\
-    Per l'ipotesi induttiva sappiamo che $S der(+) x$:
-  - se $w = 0 x 0$, allora la grammatica può derivarla così: $S => 0 S 0 =>^+ 0 x 0 = w$
-  - se $w = 1 x 1$, allora la grammatica può derivarla così: $S => 1 S 1 =>^+ 1 x 1 = w$
+    Abbiamo banalmente che $S der(+) w$.
 
-    #line(length: 100%, stroke: .25pt)
+  - _Passo induttivo_: se $|w| > 1$, essendo palindroma, $w$ deve iniziare e finire con lo stesso simbolo. Quindi $w = 0 x 0$ oppure $w = 1 x 1$, dove $x$ è a sua volta una stringa palindroma con $|x| = |w| - 2$. Per l'ipotesi induttiva sappiamo che $S der(+) x$:
 
-    Ora passiamo a dimostrare la *correttezza* ($L(G) subset.eq L$):\
-    Iniziamo supponendo che $S =>^+ w$ (ovvero $w$ è generata da $G$) e mostriamo per induzione sul numero di passi della derivazione che $w$ è necessariamente palindroma.
+    - se $w = 0 x 0$, allora la grammatica può derivarla così: $S => 0 S 0 =>^+ 0 x 0 = w$
+    - se $w = 1 x 1$, allora la grammatica può derivarla così: $S => 1 S 1 =>^+ 1 x 1 = w$
 
-    - _Caso base_: Se la derivazione utilizza un solo passo, può usare solo 3 delle regole terminali:
+  Ora passiamo a dimostrare la *correttezza* ($L(G) subset.eq L$): iniziamo supponendo che $S =>^+ w$ (ovvero $w$ è generata da $G$) e mostriamo, per induzione #underline[sul numero di passi della derivazione], che $w$ è necessariamente palindroma.
+
+  - _Caso base_: Se la derivazione utilizza un solo passo (che si può scrivere come $S der(1) w$), può usare solo 3 delle regole terminali:
     $
       S -> epsilon quad quad quad
       S -> 0 quad quad quad
       S -> 1
     $
-    Queste regole generano stringhe che sono sicuramente palindrome (essendo di lunghezza $0$ o $1$).
-    - _Passo induttivo_: Supponiamo l'enunciato vero per tutte le derivazioni in $n$ passi, e consideriamo una derivazione che usa $n+1$ passi. La stringa generata sarà espansa all'inizio tramite una delle regole ricorsive:
-    $
-      S => 0 S 0 =>^+ 0 x 0 = w quad "oppure" quad S => 1 S 1 =>^+ 1 x 1 = w
-    $
-    Poiché la porzione $S =>^+ x$ impiega esattamente $n$ passi, per l'ipotesi induttiva $x$ è palindroma. Di conseguenza, circondare un palindromo con due simboli identici agli estremi (ottenendo $0 x 0$ o $1 x 1$) genera stringhe che restano palindrome.
+  Queste regole generano stringhe che sono sicuramente palindrome (essendo di lunghezza $0$ o $1$).
+
+  - _Passo induttivo_: Supponiamo l'enunciato vero per tutte le derivazioni in $n$ passi, e consideriamo una derivazione che usa $n+1$ passi. La stringa generata sarà espansa all'inizio tramite una delle regole ricorsive:
+  $
+    S => 0 S 0 =>^+ 0 x 0 = w quad "oppure" quad S => 1 S 1 =>^+ 1 x 1 = w
+  $
+  Poiché la porzione $S =>^+ x$ impiega esattamente $n$ passi, per l'ipotesi induttiva $x$ è palindroma. Di conseguenza, circondare un palindromo con due simboli identici agli estremi (ottenendo $0 x 0$ o $1 x 1$) genera stringhe che restano palindrome.
 ]
 
 #example(multiple: true)[
-  + Stringhe su ${a,b}$ che *iniziano con $a$* e hanno *lunghezza pari*\
-    $S->"ab"|"aa"|S"aa"|S"ab"|S"ba"|"Sbb"$\
++ $L = {a^n b^n | n >= 0}$. Si ha che $L$ è generato dalla grammatica $G$ avente simbolo iniziale $S$ e produzioni $S -> epsilon | a S b$.
+
+  Mostriamo che $L equiv L(G)$:
+
+  - $L subset.eq L(G)$: vediamo che $w in L => w in L(G)$. Procediamo per induzione su $|w|$ (che è sempre $2n$, ovvero pari).
+
+    - Base: se $|w| = 0$, allora $w = epsilon$. Esiste la derivazione $S => epsilon$, quindi $epsilon in L(G)$.
+    
+    - Ipotesi induttiva: se $|w| <= 2n$, allora $S der(*) w$ ($w in L(G)$). Consideriamo una stringa $w in L$ tale che $|w| = 2(n+1) = 2n + 2$.\ Poiché $n+1 >= 1$, la stringa $w$ si scrive come $w = a^(n+1) b^(n+1) = a u b$, dove $u = a^n b^n in L$ ha lunghezza $|u| = 2n$. Per ipotesi induttiva, dato che $|u| = 2n$, si ha $S der(*) u$. Sfruttando la regola $S -> a S b$, possiamo costruire la derivazione per $w$: $S => a S b der(*) a u b = w$, dunque $w in L(G)$.
+
+  - $L(G) subset.eq L$: vediamo che $w in L(G) => w in L$. Procediamo per induzione sul numero di passi della derivazione.
+    - Base: se il numero di passi della derivazione è 1, allora $S => epsilon$, $epsilon in L$, quindi OK.
+    
+    - Ipotesi induttiva: se il numero di passi è $<= n$, allora $w in L$, dunque $S der(*) w$.\ Prendo una derivazione lunga $n+1$ passi ($S der(n+1) w$). Si ha $S => a S b der(n) a u b$, quindi $u in L$ per ipotesi induttiva e allora $u = a^k b^k$. Quindi si ha $a u b = a^(k+1) b^(k+1) in L$.
+
++ $L = {w in {a, b}^* | w = a u and |w| = 2n"," n > 0}$, ovvero le stringhe su ${a,b}$ che iniziano con $a$ e hanno lunghezza pari\.
+
     - #underline("Base"): $a a, a b in L$\
-    - #underline("Passo"): se $u in L$, allora $u a a, u a b, u b a, u b b in L$
-  + Stringhe su {a,b} in cui ogni *$b$* è *preceduta da $a$*\
+    - #underline("Passo ricorsivo"): se $u in L$, allora $u a a, u a b, u b a, u b b in L$
+
+    $S-> a b | a a | S a a | S a b | S b a | S b b$\
+
+    Per esercizio, dimostrare completezza e correttezza.
+
++ Stringhe su ${a,b}$ in cui ogni $b$ è immediatamente preceduta da $a$
+
     - #underline("Base"): $epsilon in L$\
-    - #underline("Passo"): se $u in L$, allora $u a, u a b in L$\
+    - #underline("Passo ricorsivo"): se $u in L$, allora $u a, u a b in L$\
     $S -> epsilon | S a | S a b$
-  + Stringhe su {a,b} di lunghezze dispari in cui il primo carattere e quello centrale sono uguali:
+
+    Per esercizio, dimostrare completezza e correttezza.
++ $L = {w in {a,b}^* | |w|_a = |w|_b}$\
+
+  - #underline("Base"): $epsilon in L$\
+  - #underline("Passo ricorsivo"): se $u, v in L$, allora $a u b v$, $b u a v in L$. 
+  $S -> epsilon | a S b S | b S a S$
+
++ Stringhe su ${a,b}$ di lunghezze dispari in cui il primo carattere e quello centrale sono uguali: $L = {w in {"a,b"}^* | w = a x a y && or w= b x b y "con" |y|=|x|+1}$.
     $
-      & L = {w in {"a,b"}^* |w = "axay"  && or w="bxby con" |y|=|x|+1} \
-      & S->"aA | bB " quad quad "oppure" && S-> "aAX" | "bBX" \
-      & A-> "XAX" | "aX"                 && A-> "XAX" | "a" \
-      & A-> "XBX" | "bX"                 && B-> "XBX" | "b" \
-      & X-> "a | b"                      && X-> "a | b"
+      S &-> a A | b B       & quad "oppure" quad & S &-> a A X | b B X \
+      A &-> X A X | a X     &           & A &-> X A X | a \
+      B &-> X B X | b X     &           & B &-> X B X | b \
+      X &-> a | b           &           & X &-> a | b
     $
 ]
+#pagebreak()
+== Grammatiche regolari
 
-== Grammatiche regolari (par 4.2.7)
-
-Così chiamate perché i linguaggi generati sono esattamente quelli rappresentabili tramite espressioni regolari. La differenza con le generiche grammatiche context-free risiede nei vincoli imposti alle produzioni. Nelle grammatiche regolari, esse possono avere solo la seguente forma:
+Le *grammatiche regolari* sono chiamate così perché i linguaggi generati sono esattamente quelli rappresentabili tramite espressioni regolari. La differenza con le generiche grammatiche context-free risiede nei vincoli imposti alla forma delle produzioni. Nelle grammatiche regolari, le produzioni possono avere solo la seguente forma:
 $
   & "Destre" quad quad quad quad && "Sinistre" \
   & X -> a Y                     && X -> Y a \
@@ -247,39 +298,42 @@ $
 $
 $ "con " X,Y in V " e " a in Sigma $
 
-A seconda della tipologia, le *forme di frase* (le stringhe intermedie prodotte durante la derivazione) avranno una struttura speculare:
+A seconda della tipologia, le forme di frase (le stringhe intermedie prodotte durante la derivazione) avranno una struttura speculare:
 $
-  & "Destre":   & S =>^* w X quad & "con " w in Sigma^*, space X in V \
-  & "Sinistre": & S =>^* X w quad & "con " w in Sigma^*, space X in V
+  & "Destre:"  & S =>^* w X quad & "con " w in Sigma^*, space X in V \
+  & "Sinistre:" & S =>^* X w quad & "con " w in Sigma^*, space X in V
 $
 Ovvero:
+
 - In una *grammatica regolare destra*, la forma di frase è composta da zero o più simboli terminali ($w$) seguiti da un singolo simbolo non terminale ($X$) posizionato in fondo a destra.
 - In una *grammatica regolare sinistra*, la forma di frase inizia con un singolo simbolo non terminale ($X$) a sinistra, seguito da zero o più simboli terminali ($w$).
 
-#observation()[Le grammatiche sono *esclusivamente* destre o sinistre, non ci sono forme ibride (mescolare regole destre e sinistre nella stessa grammatica può generare linguaggi non regolari).]
+#observation()[
+  Le grammatiche sono *esclusivamente* destre o sinistre, non ci sono forme ibride (mescolare regole destre e sinistre nella stessa grammatica può generare linguaggi non regolari).
+]
 
 Guardando la forma delle produzioni, si può notare che c'è un solo modo per terminare la derivazione (e ottenere una stringa di soli terminali): applicare una regola della forma $X -> a$ oppure $X -> epsilon$, che elimina definitivamente l'ultimo non terminale.
 
 Generalmente, negli esempi sottostanti useremo la grammatica regolare destra (che è la più naturale per costruire automi a stati finiti). Il non-terminale alla fine di una forma di frase può essere utilizzato per rappresentare delle informazioni sulla sequenza di terminali che lo precede.
 
 #example(multiple: true)[
-  + Stringhe su {a,b} di lunghezza pari. Se io volessi usare una grammatica regolare:\
+  + Stringhe su ${a,b}$ di lunghezza pari. Se voglio usare una grammatica regolare, comincio assegnando delle variabili alle due condizioni:\
     $
       & |w|= "pari": S \
       & |w|= "dispari": D
     $
-    Assegno delle variabili alle due condizioni.
     - Se la derivazione produce $S$ abbiamo finito.
     - Se produce $D$, devo aggiungere $a$ o $b$.
     $
       & S->epsilon | a D | b D \
       & D->a S | b S
     $
-  + Stringhe su {a,b} che contengono tre *$a$* consecutive:\
-    - $w$ non contiene "aaa" e termina con b: $S$\
-    - $w$ non contiene "aaa" e termina con a: $A$\
-    - $w$ non contiene "aaa" e termina con baa: $B$\
-    - $w$ contiene "aaa": $C$
+  + Stringhe su ${a,b}$ che contengono tre $a$ consecutive:
+
+    - $w$ non contiene $a a a$ e termina con b: $S$\
+    - $w$ non contiene $a a a$ e termina con a: $A$\
+    - $w$ non contiene $a a a$ e termina con baa: $B$\
+    - $w$ contiene $a a a$: $C$
     $
       & S->b S | a A \
       & A -> a B | b S \
@@ -287,75 +341,76 @@ Generalmente, negli esempi sottostanti useremo la grammatica regolare destra (ch
       & C -> epsilon | a C | b C
     $
 
-  3. Stringhe su {a,b} che non contengono tre *$a$* consecutive:\
+  3. Stringhe su ${a,b}$ che non contengono tre $a$ consecutive:
+
     $
-      (b+a b+a a b)^*(epsilon+a+a a)
+      (b | a b | a a b)^*(epsilon | a | a a)
     $
     #block(
       $
-        & S -> a A|b S| epsilon quad quad quad quad quad quad && "se "S der(*)w S "allora" w = epsilon "oppure" w=u b \
-        & A -> a B|b S| epsilon                               && "se "S der(*)w A "allora" w = a "oppure" w=u b a \
-        & B-> b S| epsilon                                    && "se "S der(*)w B "allora" w = a a "oppure" w=u b a a
+        & S -> a A|b S| epsilon && quad "se "S der(*)w S "allora" w = epsilon "oppure" w=u b \
+        & A -> a B|b S| epsilon && quad "se "S der(*)w A "allora" w = a "oppure" w=u b a \
+        & B -> b S| epsilon     && quad "se "S der(*)w B "allora" w = a a "oppure" w=u b a a
       $,
     )
-    La differenza con l'esempio precedente è in $B$, non potendo più aggiungere una '$a$' (che formerebbe "aaa"), ma solo una '$b$' o terminare la derivazione.
+    La differenza con l'esempio precedente è in $B$, in cui non si può più aggiungere una $a$ (che formerebbe $a a a$), ma solo una $b$ o terminare la derivazione.
 
-  + Stringhe su {a,b} che non cominciano con "aaa":\
+  + Stringhe su ${a,b}$ che non cominciano con $a a a$:\
     $
-      (b+a b+a a b)(a+b)^*+epsilon+a+a a
+    (b | a b | a a b)(a | b)^* | epsilon | a | a a
     $
 
     #block(
       $
         & S->a A | b C | epsilon \
-        & A->a B | b C | epsilon quad quad quad quad quad && "se" S der(*)w A "allora" w=a \
-        & B->b C | epsilon                                && "se" S der(*)w B "allora" w=a a \
-        & C->a C | b C | epsilon                          && "se" S der(*)w c "allora" w "inizia con "b, a b" o "a a b
+        & A->a B | b C | epsilon && quad "se" S der(*)w A "allora" w=a \
+        & B->b C | epsilon       && quad "se" S der(*)w B "allora" w=a a \
+        & C->a C | b C | epsilon && quad "se" S der(*)w c "allora" w "inizia con "b, a b" o "a a b
       $,
     )
-  + Stringhe su {a,b} che non contengono la sottostringa "aba":
+  + Stringhe su ${a,b}$ che non contengono la sottostringa $a b a$:
     $
-      (b+a^+b b)^*(epsilon+a^++a^+b)
+      (b | a^+b b)^*(epsilon | a^+ | a^+b)
     $
     #block(
       $
-        &S->a A | b S | epsilon quad quad quad quad quad quad quad quad quad &&"se" S der(*)w S "allora" w=epsilon, w=b "oppure" w=u b b\
-        &A->a A | b B | epsilon &&"se" S der(*)w A "allora" w=u a\
-        &B->b S |epsilon &&"se" S der(*)w B "allora" w=u a b
+        & S->a A | b S | epsilon && quad "se" S der(*)w S "allora" w=epsilon, w=b "oppure" w=u b b \
+        & A->a A | b B | epsilon && quad "se" S der(*)w A "allora" w=u a \
+        & B->b S | epsilon       && quad "se" S der(*)w B "allora" w=u a b
       $,
     )
-  + Stringhe su {a,b} che NON contengono due $a$ consecutive:
+  + Stringhe su ${a,b}$ che NON contengono due $a$ consecutive:
     $
-      (b + a b + b a + a b a)^*
+      (b | a b | b a | a b a)^*
     $
     #block(
       $
-        & S->a A | b B | epsilon #h(3.5cm) && "se" S der(*)w S "allora" w = u b a "oppure" w = epsilon \
-        & A->b B                           && "se" S der(*)w A "allora" w=a "oppure" w=u b a a \
-        & B->a S | b B | epsilon           && "se" S der(*)w B "allora" w=u b \
+        & S->a A | b B | epsilon && quad "se" S der(*)w S "allora" w = u b a "oppure" w = epsilon \
+        & A->b B                 && quad "se" S der(*)w A "allora" w=a "oppure" w=u b a a \
+        & B->a S | b B | epsilon && quad "se" S der(*)w B "allora" w=u b
       $,
     )
-  + Stringhe su {a,b} in cui il terzultimo carattere è $b$:
+  + Stringhe su ${a,b}$ in cui il terzultimo carattere è $b$:
     $
-      (a+b)^*b(a+b)(a+b)
+      (a | b)^*b(a | b)(a | b)
     $
     #block(
       $
         & S->a S | b S | b A \
-        & A->a B | b B #h(4cm) && "se" S der(*)w A "allora" w=u b \
-        & B->a | b             && "se" S der(*)w B "allora" w = u b a "oppure" w = u b b
+        & A->a B | b B       && quad "se" S der(*)w A "allora" w=u b \
+        & B->a | b           && quad "se" S der(*)w B "allora" w = u b a "oppure" w = u b b
       $,
     )
-  + Stringhe su {a,b} con un numero pari di $a$ o un numero dispari di $b$:
+  + Stringhe su ${a,b}$ con un numero pari di $a$ e un numero pari di $b$:
     $
-      (a a+b b+(a b+b a)(a a+b b)^*(a b+b a))^*
+      (a a | b b | (a b | b a)(a a | b b)^*(a b | b a))^*
     $
     #block(
       $
-        & S->a A | b B | epsilon #h(4cm) && S der(*)w S "allora" abs(w)_a "e" abs(w)_b "sono pari" \
-        & A->a S | b C                   && S der(*)w A "allora" abs(w)_a "è dispari e" abs(w)_b "è pari" \
-        & B->a C | b S                   && S der(*)w B "allora" abs(w)_a "è pari e" abs(w)_b "è dispari" \
-        & C->a B | b A                   && S der(*)w C "allora" abs(w)_a "e" abs(w)_b "sono dispari" \
+        & S->a A | b B | epsilon && quad S der(*)w S "allora" abs(w)_a "e" abs(w)_b "sono pari" \
+        & A->a S | b C         && quad S der(*)w A "allora" abs(w)_a "è dispari e" abs(w)_b "è pari" \
+        & B->a C | b S         && quad S der(*)w B "allora" abs(w)_a "è pari e" abs(w)_b "è dispari" \
+        & C->a B | b A         && quad S der(*)w C "allora" abs(w)_a "e" abs(w)_b "sono dispari"
       $,
     )
     #figure(
@@ -364,16 +419,16 @@ Generalmente, negli esempi sottostanti useremo la grammatica regolare destra (ch
         rows: (auto, auto, auto, auto, auto),
 
         [], [$abs(w)_a$], [$abs(w)_b$],
-        table.cell(fill: rgb("#68e86680"), "S"), [*_pari_*], [*_dispari_*],
+        table.cell(fill: rgb("#68e86680"), "S"), [*_pari_*], [*_pari_*],
         align: center,
         [A], [_dispari_], [_pari_],
         [B], [_pari_], [_dispari_],
         [C], [_dispari_], [_dispari_],
       ),
     )
-  + Stringhe su {a,b} di lunghezza dispari che contengono esattamente due $b$:
+  + Stringhe su ${a,b}$ di lunghezza dispari che contengono esattamente due $b$:
     $
-      a(a a)^*b(a a)^*b(a a)^* + (a a)^*b a(a a)^*b(a a)^*+(a a)^*b(a a)^*b a(a a)^*+a(a a)^*b a(a a)^*b a(a a)
+      a(a a)^*b(a a)^*b(a a)^* | (a a)^*b a(a a)^*b(a a)^* | (a a)^*b(a a)^*b a(a a) | a(a a)^*b a(a a)^*b a(a a)^*
     $
     Ci sono 6 possibili situazioni per $S =>^* w X$:
     #figure(
@@ -392,24 +447,24 @@ Generalmente, negli esempi sottostanti useremo la grammatica regolare destra (ch
     )
     #block(
       $
-        & S->a A | b B #h(4cm) && "se" S der(*)w S "allora" abs(w) "è pari e" abs(w)_b = 0 \
-        & A->a S | b C         && "se" S der(*)w A "allora" abs(w) "è dispari e" abs(w)_b = 0 \
-        & B->a C | b D         && "se" S der(*)w B "allora" abs(w) "è dispari e" abs(w)_b = 1 \
-        & C->a B | b E         && "se" S der(*)w C "allora" abs(w) "è pari e" abs(w)_b = 1 \
-        & D->a E               && "se" S der(*)w D "allora" abs(w) "è pari e" abs(w)_b = 2 \
-        & E->a D | epsilon     && "se" S der(*)w E "allora" abs(w) "è dispari e" abs(w)_b = 2
+        & S->a A | b B     && quad "se" S der(*)w S "allora" abs(w) "è pari e" abs(w)_b = 0 \
+        & A->a S | b C     && quad "se" S der(*)w A "allora" abs(w) "è dispari e" abs(w)_b = 0 \
+        & B->a C | b D     && quad "se" S der(*)w B "allora" abs(w) "è dispari e" abs(w)_b = 1 \
+        & C->a B | b E     && quad "se" S der(*)w C "allora" abs(w) "è pari e" abs(w)_b = 1 \
+        & D->a E           && quad "se" S der(*)w D "allora" abs(w) "è pari e" abs(w)_b = 2 \
+        & E->a D | epsilon && quad "se" S der(*)w E "allora" abs(w) "è dispari e" abs(w)_b = 2
       $,
     )
-  + Stringhe su {a,b} in cui "aa" occorre esattamente una volta:
+  + Stringhe su ${a,b}$ in cui $a a$ occorre esattamente una volta:
     $
-      (b+a b)^*a a(b+b a)^*
+      (b | a b)^*a a(b | b a)^*
     $
     #block(
       $
-        & S->a A | b S #h(4cm)   && "se" S der(*)w S "allora" w = epsilon "oppure" w = u b \
-        & B->b C | epsilon       && "se" S der(*)w A "allora" w = a "oppure" w = u b a \
-        & A->a B | b S           && "se" S der(*)w B "allora" w = u a" e "w "contiene" a a \
-        & C->a B | b C | epsilon && "se" S der(*)w C "allora" w = u b" e "w "contiene" a a
+        & S->a A | b S           && quad "se" S der(*)w S "allora" w = epsilon "oppure" w = u b \
+        & B->b C | epsilon       && quad "se" S der(*)w A "allora" w = a "oppure" w = u b a \
+        & A->a B | b S           && quad "se" S der(*)w B "allora" w = u a" e "w "contiene" a a \
+        & C->a B | b C | epsilon && quad "se" S der(*)w C "allora" w = u b" e "w "contiene" a a
       $,
     )
     #figure(
@@ -423,17 +478,17 @@ Generalmente, negli esempi sottostanti useremo la grammatica regolare destra (ch
         table.cell(fill: rgb("#68e86680"), "C"), [*_sì_*], [_b_],
       ),
     )
-  11. Stringhe su {a,b} in cui "aa" occorre almeno due volte:
+  11. Stringhe su ${a,b}$ in cui $a a$ occorre almeno due volte:
     $
-      (a+b)^*(a a(a+b)^*a a+a a a)(a+b)^*
+      (a | b)^*(a a(a | b)^*a a | a a a)(a | b)^*
     $
     #block(
       $
-        & S->a A | b S #h(3.5cm) && "se" S der(*)w S "allora" w = epsilon "oppure" w = u b \
-        & A->a B | b S           && "se" S der(*)w A "allora" w = a "oppure" w = u b a \
-        & B->a D | b C           && "se" S der(*)w B "allora" w = u a "e w contiene" a a \
-        & C->a B | b C           && "se" S der(*)w C "allora" w = u b" e "w" contiene "a a \
-        & D->a D | b D | epsilon && "se" S der(*)w D "allora" w "contiene 2 volte" a a
+        & S->a A | b S           && quad "se" S der(*)w S "allora" w = epsilon "oppure" w = u b \
+        & A->a B | b S           && quad "se" S der(*)w A "allora" w = a "oppure" w = u b a \
+        & B->a D | b C           && quad "se" S der(*)w B "allora" w = u a "e w contiene" a a \
+        & C->a B | b C           && quad "se" S der(*)w C "allora" w = u b" e "w" contiene "a a \
+        & D->a D | b D | epsilon && quad "se" S der(*)w D "allora" w "contiene 2 volte" a a
       $,
     )
     #figure(
@@ -450,13 +505,15 @@ Generalmente, negli esempi sottostanti useremo la grammatica regolare destra (ch
     )
 ]
 
-== Gerarchie di Chomsky
+#pagebreak()
 
-Ci sono 4 classi di grammatiche, distinte tra di loro per la struttura delle loro regole di produzione. I tipi partono da 0 e, ad ogni incremento, aumenta il numero di restrizioni fino al tipo 3.
+== Gerarchia di Chomsky
+
+Ci sono quattro classi di grammatiche, che si distinguono per il formato delle loro regole. I tipi partono da 0 e, ad ogni incremento, aumenta il numero di restrizioni fino al tipo 3.
 
 0. *#link(<gramNoRes>)[Grammatiche senza restrizioni (a struttura di frase)]*
-+ *#link(<gramCont>)[Grammatiche contestuali (Context-sensitive)]*
-+ *#link(<gramNoCont>)[Grammatiche non contestuali (Context-free)]*
++ *#link(<gramCont>)[Grammatiche contestuali (context-sensitive)]*
++ *#link(<gramNoCont>)[Grammatiche non contestuali (context-free)]*
 + *#link(<gramReg>)[Grammatiche regolari]*
 
 Ovviamente hanno sempre in comune la definizione base di grammatica (#ref(<defGrammar>)). Le grammatiche non contestuali (context-free) e regolari, anche se già spiegate, verranno rispiegate molto brevemente.
@@ -469,7 +526,7 @@ $
 $
 Ovvero $alpha$ non può essere una stringa nulla. Inoltre, affinché la derivazione abbia senso, è necessario imporre che $alpha$ contenga *almeno un simbolo non terminale*:
 $
-  alpha in (V union Sigma)^* V (V union Sigma)^* \
+  alpha in (V union Sigma)^* V (V union Sigma)^*.
 $
 
 I concetti di derivazione diretta e indiretta e tutte le nozioni introdotte per le grammatiche context-free rimangono validi, ma applicati a stringhe più complesse a sinistra della freccia.
@@ -484,7 +541,7 @@ $
   L(G) = {w in Sigma^* | S der(+) w}
 $
 
-=== Grammatiche contestuali (Context-sensitive) <gramCont>
+=== Grammatiche contestuali (context-sensitive) <gramCont>
 
 Queste grammatiche hanno due definizioni formali che, seppur diverse nella sintassi, si dimostrano essere matematicamente equivalenti (generano la stessa classe di linguaggi):
 #definition()[
@@ -500,7 +557,7 @@ Queste due definizioni sono, come detto, equivalenti, ma la seconda spiega molto
 
 In altre parole, la regola scatta solo quando $A$ è strettamente preceduta dal prefisso $alpha_1$ e seguita dal suffisso $alpha_2$. Se ci fosse un contesto diverso (es. un $alpha_3 != alpha_1$ prima di $A$), non potremmo applicare questa specifica regola di produzione.
 
-=== Grammatiche non contestuali (Context-free) <gramNoCont>
+=== Grammatiche non contestuali (context-free) <gramNoCont>
 In questo tipo di grammatica, la forma delle regole di produzione è la seguente:
 $
   A -> beta quad "con " A in V " e " beta in (V union Sigma)^*
@@ -519,13 +576,13 @@ $
 $ "con " X,Y in V " e " a in Sigma $
 
 === Considerazioni sulla gerarchia
-- Ogni grammatica di tipo $i > 0$ è anche di tipo $i - 1$ (tenendo conto che, per i linguaggi contestuali di tipo 1, non sono ammesse regole del tipo $X -> epsilon$). Inoltre, si dice che un linguaggio è *strettamente* di tipo $i$ se è generato da una grammatica di tipo $i$, ma non esiste alcuna grammatica di tipo $i+1$ in grado di generarlo.
+- Ogni grammatica di tipo $i > 0$ è anche di tipo $i - 1$ (tenendo conto che, per i linguaggi contestuali di tipo 1, non sono ammesse regole del tipo $X -> epsilon$). Il viceversa non vale. Inoltre, si dice che un linguaggio è *strettamente* di tipo $i$ se è generato da una grammatica di tipo $i$, ma non esiste alcuna grammatica di tipo $i+1$ in grado di generarlo.
 
 - Data una grammatica $G = (V, Sigma, P, S)$ che genera il linguaggio $L(G)$, esiste sempre una grammatica equivalente $G_1$ che genera $L(G) - {epsilon}$ senza usare regole del tipo $X -> epsilon$. Esiste, di conseguenza, anche una grammatica $G_2$ tale che $L(G) = L(G_2)$ e che contiene al massimo un'unica regola che produce $epsilon$ (nella forma $S' -> epsilon$, a patto che il nuovo simbolo iniziale $S'$ non compaia mai nella parte destra di nessuna produzione).
 
 - Le *grammatiche non contestuali* (Tipo 2) sono usate per definire la sintassi dei linguaggi di programmazione e costituiscono il cuore della fase di *analisi sintattica* (Parsing) nei compilatori.
 
-- Le *grammatiche regolari* (Tipo 3) sono usate nella fase di *analisi lessicale* (Lexing/Tokenization) dei compilatori, per riconoscere le parole chiave e i simboli base.
+- Le *grammatiche regolari* (Tipo 3) sono usate nella fase di *analisi lessicale* (Lexing/Tokenization) dei compilatori, per riconoscere le parole chiave e i simboli base. Possono essere usate per controllare lunghezza delle stringhe, numero di occorrenze di simboli, presenza o assenza di sottostringhe, presenza di un carattere in una certa posizione e così via.
 
 - Ad ogni classe di grammatiche corrisponde in modo biunivoco la classe dei linguaggi generati:
   - Grammatiche senza restrizioni $space <--> space$ Linguaggi ricorsivamente enumerabili
@@ -567,57 +624,68 @@ Ad ogni classe corrisponde inoltre uno specifico modello matematico (macchina as
 ]
 
 #example(multiple: true, "Grammatiche non contestuali")[
-  - ${a^n b^n | n >= 0}$\
+  - ${a^n b^n | n >= 0}$
+
     $S -> a S b | epsilon$
 
-  - ${w in {a,b}^* | abs(w)_a = abs(w)_b}$\
+  - ${w in {a,b}^* | abs(w)_a = abs(w)_b}$
+
     $S -> a S b S | b S a S | epsilon$
 
-  - ${w in {0,1}^* | w = w^R}$\
+  - ${w in {0,1}^* | w = w^R}$
+
     $S -> epsilon | 0 | 1 | 0 S 0 | 1 S 1$
 
-  - ${a^n b^n c^k | n,k >= 0}$\
+  - ${a^n b^n c^k | n,k >= 0}$
+
     $S -> A B$\
     $A -> a A b | epsilon$\
     $B -> c B | epsilon$
 
-  - ${a^n b^n c^k d^k | n,k >= 0}$\
+  - ${a^n b^n c^k d^k | n,k >= 0}$
+
     $S -> A B$\
     $A -> a A b | epsilon$\
     $B -> c B d | epsilon$
 
-  - ${a^n b^k c^k d^n | n,k > 0}$\
+  - ${a^n b^k c^k d^n | n,k > 0}$
+
     $S -> a S d | a A d$\
     $A -> b A c | b c$
 
-  - ${a^n b^k c^(2n+k) | n,k > 0}$\
+  - ${a^n b^k c^(2n+k) | n,k > 0}$
+
     $S -> a S c c | a B c c$\
     $B -> b B c | b c$
 
   #line(length: 100%, stroke: 0.25pt)
   Non tutti i linguaggi possono essere generati da una grammatica non contestuale:
+
   - ${a^n b^n c^n | n > 0}$
   - ${a^n b^k c^n d^k | n,k > 0}$
   - ${w w | w in {a,b}^*}$
 ]
 
-
 #example(multiple: true, "Grammatiche contestuali")[
-  - ${a^n b^n c^n | n > 0}$\
+  - ${a^n b^n c^n | n > 0}$
+
     $S &-> a b c | a X b c$\
     $X &-> a X b C | a b C$\
     $C b &-> b C$\
     $C c &-> c c$
 
     *Derivazione per $n=3$:*\
-    $S => a underline(X) b c => a bold(a underline(X) b C) b c => a a bold(a b C) underline(C b) c => a a a b bold(b C) C c => a a a b b C underline(C c) => a a a b b underline(C bold(c c)) => a a a b b b c c c$
+    $
+      S => a underline(X) b c => a bold(a underline(X) b C) b c => a a a bold(b underline(C)) underline(b) C b c => a a a b bold(b C) underline(C b) c => a a a b b underline(C bold(b)) bold(C) c => a a a b b bold(b C) underline(C c) => \ a a a b b b underline(C bold(c)) bold(c) => a a a b b b bold(c c) c
+    $
 
-    Più in generale si può scrivere la forma contratta:
+    Più in generale si può scrivere:
     $
       S => a X b c =>^+ a^n (b C)^(n-1) b c =>^+ a^n b^n C^(n-1) c =>^+ a^n b^n c^n
     $
 
-  - ${a^n b^k c^n d^k | n,k > 0}$\
+  - ${a^n b^k c^n d^k | n,k > 0}$
+
     $S &-> A B$\
     $A &-> a A C | a C$\
     $B &-> b B d | b d$\
@@ -630,24 +698,23 @@ Ad ogni classe corrisponde inoltre uno specifico modello matematico (macchina as
       S => A B =>^+ a^n C^n B =>^+ a^n C^n b^k d^k =>^+ a^n b^k C^n d^k => a^n b^k C^(n-1) c d^k =>^+ a^n b^k c^n d^k
     $
 
-  - ${w w | w in {a,b}^*}$
-    #line(length: 100%, stroke: .25pt)
+  - ${w w | w in {a,b}^+}$
     #block(
       $
-        & S -> a A S | b B S | X a | Y b quad quad quad S =>^+ a A union b B)^* (X a union Y b)) \
+        & quad \
+        & S -> a A S | b B S | X a | Y b quad quad quad "ovvero" S =>^+ (a A union b B)^* (X a union Y b) \
         & A a -> a A quad quad A b -> b A \
         & B a -> a B quad quad B b -> b B \
+        & quad \
         & "dove i non terminali" A "e" B "scivolano verso destra superando i terminali."
       $,
     )
-    #line(length: 100%, stroke: .25pt)
     #block(
       $
-        & A X -> X a quad quad A Y -> Y a quad quad && "Quando " A " o " B " incontrano il centro (" X " o " Y ")," \
+        & A X -> X a quad quad A Y -> Y a quad quad && "Quando" A "o" B "incontrano il centro ("X" o "Y")," \
         & B X -> X b quad quad B Y -> Y b quad quad && "lo attraversano e si trasformano nel terminale definitivo."
       $,
     )
-    #line(length: 100%, stroke: .25pt)
     #block(
       $
         & X -> a quad quad quad quad quad quad quad quad quad quad quad && "Alla fine, il marcatore centrale svanisce" \
@@ -655,11 +722,9 @@ Ad ogni classe corrisponde inoltre uno specifico modello matematico (macchina as
       $,
     )
     Esempio di derivazione per $w = a b b a$ (stringa finale $w w = a b b a a b b a$):
-    #block(
       $
-        S & => a A S => a A b B S => a A b B b B S => bold(a A b B b B X a) \
-          & => a b A b B B X a => a b b A B B X a => bold(a b b A B X b a) \
-          & => a b b A X b b a => bold(a b b X a b b a) => bold(a b b a a b b a)
-      $,
-    )
+        S => a A S => a A b B S => a A b B b B S => bold(a A b B b B X a) => a b A B b B X a
+          \ => a b A b B B X a => a b b A B B X a => bold(a b b A B X b a)
+          => a b b A X b b a => \ bold(a b b X a b b a) => bold(a b b a a b b a)
+      $
 ]
