@@ -87,7 +87,7 @@ $
 
 == Linguaggi
 
-Un linguaggio $L$ è un insieme finito o numerabile di stringhe di un dato alfabeto $Sigma$:
+Un linguaggio $L$ è un insieme numerabile di stringhe di un dato alfabeto $Sigma$:
 $
   L subset.eq Sigma^*
 $
