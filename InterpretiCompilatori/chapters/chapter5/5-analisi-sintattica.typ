@@ -6,20 +6,22 @@
 = Analisi sintattica
 
 == Parser e classificazione
-Secondo il nostro modello di compilatore, il parser riceve una sequenza di token dall'analizzatore lessicale (lexer) e verifica se tale sequenza può essere generata dalla grammatica del linguaggio sorgente.
-
+Secondo il nostro modello di compilatore, il *parser* riceve una sequenza di token dall'analizzatore lessicale (_lexer_) e verifica se tale sequenza può essere generata dalla grammatica del linguaggio sorgente.
+#figure(image("images/introParser.png", width: 80%))
 Ci aspettiamo che il parser sia in grado di segnalare in una forma chiara e intelligibile gli eventuali errori e, dopo aver rilevato quelli più comuni, sia in grado di riprendere l'analisi della parte restante del programma (tramite tecniche di *error recovery*).
 
-Concettualmente, per i programmi ben formati (cioè sintatticamente corretti), il parser costruisce un albero di parsing e lo passa alla parte restante del compilatore per una successiva elaborazione. Di fatto, *non è necessario costruire esplicitamente l'intero albero in memoria*: molto spesso le fasi successive (analisi semantica e generazione del codice intermedio) vengono eseguite "al volo" durante l'analisi sintattica stessa, eseguendo le azioni semantiche man mano che il parser riconosce i vari costrutti (nella cosiddetta *traduzione guidata dalla sintassi*).
+Concettualmente, per i programmi ben formati (cioè sintatticamente corretti), il parser costruisce un albero di parsing e lo passa alla parte restante del compilatore per una successiva elaborazione. Di fatto, *non è necessario costruire* esplicitamente l'*intero albero in memoria*: molto spesso le fasi successive (analisi semantica e generazione del codice intermedio) vengono eseguite "al volo" durante l'analisi sintattica stessa, eseguendo le azioni semantiche man mano che il parser riconosce i vari costrutti (nella cosiddetta *traduzione guidata dalla sintassi*).
 
-I *parser* vengono classificati come segue:
+I parser vengono classificati come segue:
+
 - Top-down (dall'alto verso il basso)
   - Con backtracking
-    + A discesa ricorsiva
+    - A discesa ricorsiva
   - Senza backtracking
     + A discesa ricorsiva predittiva
     + Tabellari
     + LL($k$)
+
 - Bottom-up (dal basso verso l'alto)
   - Shift-Reduce (tecnica generale basata su stack e input)
   - LR (Left-to-right, Rightmost derivation in reverse)
@@ -178,8 +180,8 @@ in cui $A'$ è un nuovo non-terminale. Si ripeta questo procedimento finché non
     rows: 4,
     columns: 3,
     row-gutter: 8pt,
-    [*1) Fattorizzo il prefisso* $A b c$*:*], [$quad => quad$], [*2) Rimuovo la ricorsione da* $A$*:*],
-    [$A -> A b c A' | a b f$], [], [$A -> a b f A''$],
+    [*1) Fattorizzo il prefisso* $A b c$*:*], [], [*2) Rimuovo la ricorsione da* $A$*:*],
+    [$A -> A b c A' | a b f$], [$quad => quad$], [$A -> a b f A''$],
     [$A' -> d | e$], [], [$A'' -> b c A' A'' | epsilon$],
     [], [], [$A' -> d | e$],
   ))
@@ -1503,13 +1505,6 @@ Se, applicando la restrizione del `FOLLOW`, tutte le celle della tabella risulta
   #figure(image("images/2026-05-17-19-22-44.png", width: 60%))
   #figure(image("images/2026-05-17-19-22-52.png", width: 60%))
 ]
-
-
-
-
-
-
-
 
 // === Insiemi di item
 
