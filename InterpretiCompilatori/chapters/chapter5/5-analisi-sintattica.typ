@@ -29,6 +29,8 @@ I parser vengono classificati come segue:
     + SLR(1) (Simple LR, usa gli insiemi FOLLOW per risolvere i conflitti)
     + LR(1) (Canonical LR, il più potente ma genera tabelle enormi)
 
+I metodi top-down e bottom-up più efficienti si applicano solamente a opportune sottoclassi di grammatiche, molte delle quali tuttavia (come le grammatiche LL e LR) sono sufficientemente espressive da descrivere la maggior parte dei costrutti sintattici tipici dei moderni linguaggi di programmazione.
+
 == Trasformazione delle grammatiche
 Affinché i parser top-down possano gestire correttamente le grammatiche, esse devono soddisfare determinate proprietà. Se non le soddisfano, è possibile applicare degli algoritmi per trasformarle.
 
@@ -36,17 +38,19 @@ Affinché i parser top-down possano gestire correttamente le grammatiche, esse d
 #definition()[
   Una grammatica è detta *ricorsiva a sinistra* se ha un non-terminale $A$ per cui esiste una derivazione $A der(+) A alpha$ della stringa $alpha$.
 ]
-
+Si parla di ricorsione perché il non-terminale $A$ appare nuovamente nella derivazione di se stesso, in particolare come simbolo più a sinistra del lato destro. Nella definizione sopra la derivazione è in più passi, ma può essere anche immediata:
 #definition()[
   Una grammatica è detta *ricorsiva immediata a sinistra* se esiste una produzione del tipo $A -> A alpha$ dove $A$ è un non terminale e $alpha$ è una sequenza (eventualmente vuota) di simboli terminali e/o non terminali.
 ]
 
-I parser top-down non possono gestire grammatiche con ricorsione sinistra, per cui si rende necessario un metodo di trasformazione mirato a eliminare tale ricorsione. La coppia di produzioni $A -> A alpha bar beta$ con ricorsione sinistra può essere sostituita dalle produzioni non ricorsive a sinistra:
+I parser top-down non possono gestire grammatiche con ricorsione sinistra, per cui si rende necessario un metodo di trasformazione mirato a eliminare tale ricorsione.
+
+La coppia di produzioni $A -> A alpha bar beta$ con ricorsione sinistra può essere eliminata mediante riscrittura sostituendola con le seguenti produzioni non ricorsive a sinistra:
 $
   & A-> beta A' \
   & A'-> alpha A' bar epsilon
 $
-senza modificare l'insieme di stringhe derivabile da $A$. Questa singola regola è sufficiente per molte grammatiche. Vediamo ora il caso generale.
+in questo modo non viene modificato l'insieme di stringhe derivabile da $A$. Questa singola regola è sufficiente per molte grammatiche, ma vediamo ora il caso generale.
 
 La ricorsione sinistra immediata può essere eliminata mediante la seguente tecnica, applicabile a un numero arbitrario di produzioni per $A$. Per prima cosa si raggruppano tutte le produzioni come:
 $
@@ -57,16 +61,15 @@ $
   & A -> beta_1 A' bar beta_2 A' bar ... bar beta_n A' \
   & A' -> alpha_1 A' bar alpha_2 A' bar ... bar alpha_m A' bar epsilon
 $
-Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta più ricorsione a sinistra. Questo metodo elimina la ricorsione sinistra da tutte le produzioni per $A$ (a patto che nessuno degli $alpha_i$ coincida con $epsilon$), ma non è in grado di eliminarla nel caso di derivazioni che richiedono due o più passi (ricorsione sinistra *non* immediata).
-
+Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta più ricorsione a sinistra.
 #example()[
   Consideriamo questa grammatica:
   $
-    & E-> E+T bar E-T bar T space && "(due ricorsioni)" \
-    & T-> T*F bar F space         && "(una ricorsione)" \
+    & E-> E+T bar E-T bar T space && "(due produzioni ricorsive a sx)" \
+    & T-> T*F bar F space         && "(una produzione ricorsiva a sx)" \
     & F->(E) bar "id"
   $
-  Applicando il metodo appena visto si ottiene quest'altra grammatica equivalente, pronta per un parser Top-Down:
+  Applicando il metodo appena visto si ottiene quest'altra grammatica equivalente, pronta per un parser top-down:
   $
     & E->T E' \
     & E'->+T E' bar - T E' bar epsilon \
@@ -76,6 +79,7 @@ Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta più ri
   $
 ]
 
+Questo metodo elimina la ricorsione sinistra da tutte le produzioni per $A$ e $A'$ (a patto che nessuno degli $alpha_i$ coincida con $epsilon$), ma non è in grado di eliminarla nel caso di derivazioni che richiedono due o più passi (quando la ricorsione sinistra non è immediata). Vediamo un algoritmo che elimina sistematicamente la ricorsione sinistra, anche quando non è immediata.
 #[
   #set heading(numbering: none, outlined: false)
   === Algoritmo di eliminazione della ricorsione sinistra
@@ -87,7 +91,7 @@ Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta più ri
   algo(
     title: "Eliminazione ricorsione sinistra",
   )[
-    ordina arbitrariamente i non-terminali come $A_1, A_2, dots, a_n$.\
+    ordina arbitrariamente i non-terminali come $A_1, A_2, dots, A_n$.\
     for ( ogni $i$ da 1 fino a $n$ ) {#i\
     for ( ogni $j$ da 1 fino a $i - 1$ ) {#i\
     sostituisci ogni produzione nella forma $A_i --> A_j gamma$ \
@@ -95,7 +99,7 @@ Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta più ri
     in cui $A_j --> delta_1 | delta_2 | dots | delta_k$ sono tutte le\
     produzioni per il non-terminale $A_j$ in esame.#d\
     }\
-    elimina la ricorsione sinistra immediata dalle produzioni per $A_i$#d\
+    elimina la ricorsione sinistra immediata dalle produzioni per $A_i$#d usando il metodo noto\
     }
   ],
 )
@@ -106,7 +110,7 @@ Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta più ri
     & S -> A a bar b \
     & A -> A c bar S d bar epsilon
   $
-  Tecnicamente, non è garantito che l'algoritmo funzioni a causa della presenza di una produzione-$epsilon$. Tuttavia, in questo caso, essa è innocua. Per prima cosa fissiamo l'ordine dei non-terminali: $S,A$. Non vi è ricorsione sinistra immediata tra le produzioni per $S$, per cui nella prima iterazione, con $i=1$, del ciclo più esterno non succede nulla. Per $i=2$, sostituiamo $S$ nella produzione $A-> S d$, ottenendo le seguenti produzioni per $A$:
+  Tecnicamente, non è garantito che l'algoritmo funzioni a causa della presenza di una produzione-$epsilon$ ($A -> epsilon$). Tuttavia, in questo caso, essa è innocua. Per prima cosa fissiamo l'ordine dei non-terminali: $S,A$. Non vi è ricorsione sinistra immediata tra le produzioni per $S$, per cui nella prima iterazione, con $i=1$, del ciclo più esterno non succede nulla. Per $i=2$, sostituiamo $S$ nella produzione $A-> S d$, ottenendo le seguenti produzioni per $A$:
   $
     A -> A c bar A a d bar b d bar epsilon
   $
@@ -121,7 +125,7 @@ Il non-terminale $A$ genera le stesse stringhe di prima, ma non presenta più ri
 
 === Fattorizzazione sinistra
 #definition()[
-  La *fattorizzazione sinistra* è una trasformazione utile per ottenere una grammatica più adatta per il parsing predittivo (top-down).
+  La *fattorizzazione sinistra* è una trasformazione utile per ottenere una grammatica più adatta per il parsing _predittivo_ (top-down).
 ]
 Quando la scelta tra due produzioni alternative per un non-terminale $A$ non è chiara, possiamo riscriverle in modo da differire tale scelta finché non avremo letto abbastanza simboli d'ingresso da poter prendere la decisione corretta. Consideriamo per esempio le due produzioni:
 //TODO: fix bar sotto ->
@@ -168,7 +172,7 @@ in cui $A'$ è un nuovo non-terminale. Si ripeta questo procedimento finché non
     [], [], [$A' -> d | e$],
   ))
 
-  Rivediamolo ma con una piccola variazione (introduzione della ricorsione):
+  Rivediamolo con una piccola variazione (introduzione della ricorsione):
   $
     A -> A b c d | A b c e | a b f
   $
@@ -187,8 +191,331 @@ in cui $A'$ è un nuovo non-terminale. Si ripeta questo procedimento finché non
   ))
 ]
 
+== Parsing Top-Down
+Il parsing top-down può essere visto come il problema della costruzione di un albero di parsing corrispondente a una stringa d'ingresso, partendo dalla radice dell'albero e creando nodi in preordine. In modo equivalente, può essere visto come il problema di trovare una derivazione sinistra per una stringa d'ingresso.
+La seguente grammatica genera un sottoinsieme degli statement di C e di Java.
+$
+     italic("stmt") & --> && bold("expr"); \
+                    & |   && bold("if ( expr )") italic("stmt") \
+                    & |   && bold("for (") italic("optexpr") ";" italic("optexpr") ";" italic("optexpr")")" \
+                    & |   && bold("other") \
+                    \
+  italic("optexpr") & --> && epsilon; \
+                    & |   && bold("expr") \
+$
+#figure(
+  diagram(
+    cell-size: 5mm,
+    spacing: 3mm,
+
+    // NODES //
+    node((4, 0), $s t m t$, name: <top>),
+
+    node((0, 1), [*for*], name: <for>),
+    node((1, 1), $($, name: <parO>),
+    node((2, 1), $o p t e x p r$, name: <opt1>),
+    node((3, 1), $;$, name: <semC1>),
+    node((4, 1), $o p t e x p r$, name: <opt2>),
+    node((5, 1), $;$, name: <semC2>),
+    node((6, 1), $o p t e x p r$, name: <opt3>),
+    node((7, 1), $)$, name: <parC>),
+    node((8, 1), $s t m t$, name: <stmt>),
+
+    node((2, 2), $epsilon$, name: <eps>),
+    node((4, 2), [*expr*], name: <expr1>),
+    node((6, 2), [*expr*], name: <expr2>),
+    node((8, 2), [*other*], name: <other>),
+
+    // EDGES //
+    edge(<top>, <for>, bend: -7.5deg),
+    edge(<top>, <parO>, bend: -5deg),
+    edge(<top>, <opt1>, bend: -2.5deg),
+    edge(<top>, <semC1>),
+    edge(<top>, <opt2>),
+    edge(<top>, <semC2>),
+    edge(<top>, <opt3>, bend: 2.5deg),
+    edge(<top>, <parC>, bend: 5deg),
+    edge(<top>, <stmt>, bend: 7.5deg),
+
+    edge(<opt1>, <eps>),
+    edge(<opt2>, <expr1>),
+    edge(<opt3>, <expr2>),
+    edge(<stmt>, <other>),
+  ),
+  caption: "Un esempio di albero di parsing",
+)
+La costruzione di un albero di parsing come quello sopra, avviene partendo dalla radice, etichettata dal non-terminale iniziale _stmt_ e ripetendo iterativamente i due passi:
++ Al nodo $N$, etichettato dal non-terminale $A$, si sceglie una delle produzioni per $A$ e si costruiscono i figli di $N$ in base ai simboli presenti nel corpo della produzione.
+
++ Si cerca il prossimo nodo per cui è necessario costruire un sottoalbero, in genere il non-terminale non ancora elaborato più a sinistra nell'albero.
+
+Il terminale in esame durante la scansione viene detto *simbolo di lookahead*: questo inizialmente è il primo terminale, cioè il più a sinistra nella stringa di ingresso. Vediamo la costruzione dell'albero di parsing relativo alla stringa di ingresso `for(;expr;expr) other`.
+
+Inizialmente il terminale *for* è il simbolo di lookahead; la radice etichettata dell'albero è il non-terminale iniziale _stmt_.
+
+#figure(diagram(
+  cell-size: 5mm,
+  spacing: 3mm,
+
+  // NODES //
+  node((1, 0), $bold(#text(8pt)[Albero]) \ bold(#text(8pt)[di parsing])$),
+  node((6.5, 0), $s t m t$, name: <top>),
+
+  node((0.25, 1), $(a)$),
+
+  node((1, 2), $bold(#text(8pt)[Input])$),
+  node((3, 2), [*for*], name: <for>),
+  node((4, 2), [*(*], name: <parO>),
+  node((5, 2), [*;*], name: <semC1>),
+  node((6, 2), [*expr*], name: <opt2>),
+  node((7, 2), [*;*], name: <semC2>),
+  node((8, 2), [*expr*], name: <opt3>),
+  node((9, 2), [*)*], name: <parC>),
+
+  // EDGES //
+  edge((.5, 1), (10.75, 1)),
+  edge((6.5, 0.6), <top>, "-|>", mark-scale: .75),
+  edge((3, 2.7), <for>, "-|>", mark-scale: .75),
+
+  // BORDI //
+  edge((0, -1), (11, -1), "="),
+  edge((0, 3), (11, 3), "="),
+))
+
+Lo scopo è quello di costruire il resto dell'albero in modo che la stringa da questo generata coincida con la stringa d'ingresso. Affinché ci sia una corrispondenza, _stmt_ deve poter generare una stringa che inizia col simbolo di lookahead *for*. Nella grammatica precedentemente illustrata, c'è solo una produzione per _stmt_ che deriva tale stringa; la selezioniamo e costruiamo i nuovi nodi, figli della radice,
+etichettandoli con i simboli nel corpo della produzione.
+
+#figure(diagram(
+  cell-size: 5mm,
+  spacing: 3mm,
+
+  // NODES //
+  node((1, 0), $bold(#text(8pt)[Albero]) \ bold(#text(8pt)[di parsing])$),
+  node((6, 0), $s t m t$, name: <top>),
+
+  node((0.25, 2), $(b)$),
+
+  node((1, 3), $bold(#text(8pt)[Input])$),
+  node((3, 3), [*for*], name: <startG>),
+  node((4, 3), [*(*]),
+  node((5, 3), [*;*]),
+  node((6, 3), [*expr*]),
+  node((7, 3), [*;*]),
+  node((8, 3), [*expr*]),
+  node((9, 3), [*)*]),
+
+  node((2, 1), [*for*], name: <for>),
+  node((3, 1), $($, name: <parO>),
+  node((4, 1), $o p t e x p r$, name: <opt1>),
+  node((5, 1), $;$, name: <semC1>),
+  node((6, 1), $o p t e x p r$, name: <opt2>),
+  node((7, 1), $;$, name: <semC2>),
+  node((8, 1), $o p t e x p r$, name: <opt3>),
+  node((9, 1), $)$, name: <parC>),
+  node((10, 1), $s t m t$, name: <stmt>),
+
+  // EDGES //
+  edge(<top>, <for>, bend: -7.5deg),
+  edge(<top>, <parO>, bend: -5deg),
+  edge(<top>, <opt1>, bend: -2.5deg),
+  edge(<top>, <semC1>),
+  edge(<top>, <opt2>),
+  edge(<top>, <semC2>),
+  edge(<top>, <opt3>, bend: 2.5deg),
+  edge(<top>, <parC>, bend: 5deg),
+  edge(<top>, <stmt>, bend: 7.5deg),
+
+  edge((.5, 2), (11.75, 2)),
+  edge((2, 1.7), <for>, "-|>", mark-scale: .75),
+  edge((3, 3.7), <startG>, "-|>", mark-scale: .75),
+
+  // BORDI //
+  edge((0, -1), (12, -1), "="),
+  edge((0, 4), (12, 4), "="),
+))
+
+Quando il nodo che si sta considerando nell'albero di parsing corrisponde a un terminale e tale terminale corrisponde al simbolo di lookahead corrente, allora si passa al figlio successivo nell'albero e al terminale successivo nella stringa d'ingresso.
+
+#figure(
+  diagram(
+    cell-size: 5mm,
+    spacing: 3mm,
+
+    // NODES //
+    node((1, 0), $bold(#text(8pt)[Albero]) \ bold(#text(8pt)[di parsing])$),
+    node((6, 0), $s t m t$, name: <top>),
+
+    node((0.25, 2), $(c)$),
+
+    node((1, 3), $bold(#text(8pt)[Input])$),
+    node((3, 3), [*for*]),
+    node((4, 3), [*(*], name: <startG>),
+    node((5, 3), [*;*]),
+    node((6, 3), [*expr*]),
+    node((7, 3), [*;*]),
+    node((8, 3), [*expr*]),
+    node((9, 3), [*)*]),
+
+    node((2, 1), [*for*], name: <for>),
+    node((3, 1), $($, name: <parO>),
+    node((4, 1), $o p t e x p r$, name: <opt1>),
+    node((5, 1), $;$, name: <semC1>),
+    node((6, 1), $o p t e x p r$, name: <opt2>),
+    node((7, 1), $;$, name: <semC2>),
+    node((8, 1), $o p t e x p r$, name: <opt3>),
+    node((9, 1), $)$, name: <parC>),
+    node((10, 1), $s t m t$, name: <stmt>),
+
+    // EDGES //
+    edge(<top>, <for>, bend: -7.5deg),
+    edge(<top>, <parO>, bend: -5deg),
+    edge(<top>, <opt1>, bend: -2.5deg),
+    edge(<top>, <semC1>),
+    edge(<top>, <opt2>),
+    edge(<top>, <semC2>),
+    edge(<top>, <opt3>, bend: 2.5deg),
+    edge(<top>, <parC>, bend: 5deg),
+    edge(<top>, <stmt>, bend: 7.5deg),
+
+    edge((.5, 2), (11.75, 2)),
+    edge((3, 1.7), <parO>, "-|>", mark-scale: .75),
+    edge((4, 3.7), <startG>, "-|>", mark-scale: .75),
+
+    // BORDI //
+    edge((0, -1), (12, -1), "="),
+    edge((0, 4), (12, 4), "="),
+  ),
+)
+
+Nel passo $(c)$ la freccia nell'albero di parsing si è spostata sul secondo figlio e la freccia nella stringa di ingresso 
+si è spostata sul terminale successivo, cioè *(*. Il successivo passo porta la freccia nell'albero sul nodo $o p t e x p r$ e 
+quella nell'input sul terminale *;*. Considerando il nodo relativo al non-terminale $o p t e x p r$ si ripete la ricerca e la selezione di una produzione per quel simbolo. In questo caso scegliamo la $epsilon$-produzione perchè il terminale *;* non consente di scegliere l'altra produzione che ha *expr* come corpo; tuttavia, le produzioni nulle meriterebbero un trattamento speciale che per ora ignoriamo, le trattiamo semplicemente come scelta di default quando tutte le altre produzioni non possono essere scelte.
+
+In generale, la scelta di una produzione per un dato non-terminale richiede più tentativi. In altre parole, è necessario 
+scegliere una certa produzione ed eventualmente ritornare indietro rileggendo più di una volta parte della stringa di ingresso (*backtracking*) qualora tale produzione si rivelasse non adatta. Una produzione si rivela non adatta qualora la sua scelta rendesse impossibile completare l'albero di parsing per la stringa d'ingresso. Il problema cruciale ad ogni passo del parsing top-down è determinare quale produzione applicare per un certo non-terminale $A$.
+
+In particolare la tipologia di parsing top-down che può richiedere backtracking si dice *a discesa ricorsiva*. Esiste anche un caso particolare di parsing a discesa ricorsiva che non richiede backtracking, detto *parsing predittivo*.
+
+=== Parsing a discesa ricorsiva
+Un programma per il parsing a discesa ricorsiva consiste in un insieme di procedure, una per ogni non-terminale. L'esecuzione inizia dalla procedura relativa al simbolo iniziale, che termina con successo se il suo corpo scandisce correttamente tutta la stringa d'ingresso. Come detto poc'anzi, questa tipologia di parsing può richiedere backtracking, anche se è raro che sia necessario con i costrutti dei tipici linguaggi di programmazione.
+
+Una procedura per un tipico non-terminale è la seguente:
+#figure(
+  algo()[
+    void A() {#i\
+    Scegli, per $A$, una produzione $A --> X_1X_2 dots X_k;$\
+    for ($i$ da 1 fino a $k$)#i\
+    if ($X_i$ è un non-terminale)#i\
+    richiama la procedura $X_i ()$;#d\
+    else if ($X_i$ è uguale al simbolo d'ingresso corrente $a$)#i\
+    procedi al simbolo successivo nella sequenza d'ingresso;#d\
+    else \/\* si è verificato un errore \*\/;#d\
+    }#d\
+    }
+  ],
+  caption: "Procedura tipica per un non-terminale in un parser top-down",
+)
+Si noti che questo pseudocodice è non-deterministico poiché inizia con la scelta di una produzione per A senza indicare come effettuare tale scelta: in realta alla riga 2 si vuole dire che è necessario provare una produzione, eventualmente "fallire" alla riga 8 e quindi riprovare con una nuova produzione. Quando non vi sono più produzioni da provare allora si segnala la presenza di un errore nella stringa di ingresso.
+
+#example("Parsing a discesa ricorsiva con backtracking")[
+  Consideriamo la grammatica seguente e la stringa in ingresso $c a d$:
+  $
+    S & -> c A d \
+    A & -> a b | a
+  $
+
+  Traccia dell'esecuzione, con forward puntatore che indica il simbolo d'ingresso corrente e $k$ che indica la posizione del simbolo del corpo della produzione (parte destra) attualmente in corso di esame:
+  #block(
+    $
+      & S -> && limits(c)_1 limits(A)_2 limits(d)_3 \
+      & && k=1 => &&&& text("match(c); forward++;") && quad text("(input rimanente: ad)") \
+      & && k=2 => &&&& A -> limits(a)_1 limits(b)_2 && quad text("(prova prima produzione)") \
+      & && &&&& k=1 => text("match(a); forward++;") && quad text("(input rimanente: d)") \
+      & && &&&& k=2 => text("errore (b != d); BTK! forward--;") && quad text("(input ripristinato: ad)") \
+      & && k=2 => &&&& A -> limits(a)_1 && quad text("(prova seconda produzione)") \
+      & && &&&& k=1 => text("match(a); forward++;") && quad text("(input rimanente: d)") \
+      & && k=3 => &&&& text("match(d); forward++;") && quad text("(input rimanente: vuoto)") \
+      & && &&&& text("Successo!") &&
+    $,
+  )
+  Alberi di parsing relativi alle scelte delle produzioni per $A$ (secondo l'ordine di esecuzione sopra):
+  #import "@preview/cetz:0.5.0"
+
+  #align(center)[
+    #cetz.canvas({
+      import cetz.draw: *
+
+      // Impostiamo un po' di padding in modo che le linee
+      // si fermino a una distanza elegante dai caratteri
+      set-style(content: (padding: 0.1))
+
+      // --- ALBERO (a) ---
+      group(name: "tree_a", {
+        content((0, 0), $S$, name: "S")
+        content((-1, -1.2), $c$, name: "c")
+        content((0, -1.2), $A$, name: "A")
+        content((1, -1.2), $d$, name: "d")
+
+        // Cetz calcola automaticamente l'intersezione ai bordi del contenuto
+        line("S", "c")
+        line("S", "A")
+        line("S", "d")
+      })
+
+      // --- ALBERO (b) ---
+      group(name: "tree_b", {
+        // Trasliamo l'intero albero verso destra
+        translate(x: 4.5)
+
+        content((0, 0), $S$, name: "S")
+        content((-1, -1.2), $c$, name: "c")
+        content((0, -1.2), $A$, name: "A")
+        content((1, -1.2), $d$, name: "d")
+
+        // Figli del nodo A (più vicini tra loro rispetto a c e d)
+        content((-0.6, -2.4), $a$, name: "a_child")
+        content((0.6, -2.4), $b$, name: "b_child")
+
+        line("S", "c")
+        line("S", "A")
+        line("S", "d")
+
+        line("A", "a_child")
+        line("A", "b_child")
+      })
+
+      // --- ALBERO (c) ---
+      group(name: "tree_c", {
+        // Trasliamo ulteriormente verso destra
+        translate(x: 9)
+
+        content((0, 0), $S$, name: "S")
+        content((-1, -1.2), $c$, name: "c")
+        content((0, -1.2), $A$, name: "A")
+        content((1, -1.2), $d$, name: "d")
+
+        // Singolo figlio centrato
+        content((0, -2.4), $a$, name: "a_child")
+
+        line("S", "c")
+        line("S", "A")
+        line("S", "d")
+
+        line("A", "a_child")
+      })
+    })
+  ]
+]
+
+Può accadere che un parser a discesa ricorsiva entri in un ciclo infinito. Un tale problema si presenta a causa di produzioni ricorsive sinistre, come
+$
+  mtext("expr") -> mtext("expr") + mtext("term")
+$
+Infatti potremmo trovarci nella situazione di espandere il non terminale _expr_ in _expr + term_, e poi espandere nuovamente _expr_ in _expr + term_, e così via, senza mai riuscire a consumare alcun simbolo della stringa d'ingresso. Per questo è necessario riformulare la grammatica in modo da eliminare la ricorsione sinistra.
+
 === Insiemi FIRST e FOLLOW
-La costruzione dei parser bottom-up e top-down utilizza due funzioni, *FIRST* e *FOLLOW*, associate a una grammatica $G$. In particolare, nel parsing top-down predittivo, queste funzioni ci permettono di scegliere quale produzione applicare basandoci esclusivamente sul simbolo d'ingresso successivo.
+
+La costruzione dei parser bottom-up e top-down utilizza due funzioni, *FIRST* e *FOLLOW*, associate a una grammatica $G$. In particolare, nel parsing top-down *predittivo*, queste funzioni ci permettono di scegliere quale produzione applicare basandoci esclusivamente sul simbolo d'ingresso successivo.
 
 #[
   #set heading(numbering: none, outlined: false)
@@ -299,333 +626,9 @@ Per calcolare FOLLOW($A$) per tutti i non-terminali $A$ si proceda applicando le
   + *L'effetto "fine riga" (es. $X -> alpha A$):* Se $A$ è in fondo alla regola, non ha nessuno a destra. In questo caso, chiunque segua $X$, seguirà anche $A$. Quindi il FOLLOW di $A$ "ruba" il *FOLLOW* di $X$. *(Nota: questo vale anche se $X -> alpha A B$ ma $B$ può svanire diventando $epsilon$!)*
 ]
 
-
-== Parsing Top-Down
-Il parsing top-down può essere visto come il tentativo di trovare una derivazione sinistra per una stringa d'ingresso, costruendo l'albero di parsing corrispondente a partire dalla radice.
-La seguente grammatica genera un sottoinsieme degli statement di C e di Java.
-$
-     italic("stmt") & --> && bold("expr"); \
-                    & |   && bold("if ( expr )") italic("stmt") \
-                    & |   && bold("for (") italic("optexpr") ";" italic("optexpr") ";" italic("optexpr")")" \
-                    & |   && bold("other") \
-                    \
-  italic("optexpr") & --> && epsilon; \
-                    & |   && bold("expr") \
-$
-#figure(
-  diagram(
-    cell-size: 5mm,
-    spacing: 3mm,
-
-    // NODES //
-    node((4, 0), $s t m t$, name: <top>),
-
-    node((0, 1), [*for*], name: <for>),
-    node((1, 1), $($, name: <parO>),
-    node((2, 1), $o p t e x p r$, name: <opt1>),
-    node((3, 1), $;$, name: <semC1>),
-    node((4, 1), $o p t e x p r$, name: <opt2>),
-    node((5, 1), $;$, name: <semC2>),
-    node((6, 1), $o p t e x p r$, name: <opt3>),
-    node((7, 1), $)$, name: <parC>),
-    node((8, 1), $s t m t$, name: <stmt>),
-
-    node((2, 2), $epsilon$, name: <eps>),
-    node((4, 2), [*expr*], name: <expr1>),
-    node((6, 2), [*expr*], name: <expr2>),
-    node((8, 2), [*other*], name: <other>),
-
-    // EDGES //
-    edge(<top>, <for>, bend: -7.5deg),
-    edge(<top>, <parO>, bend: -5deg),
-    edge(<top>, <opt1>, bend: -2.5deg),
-    edge(<top>, <semC1>),
-    edge(<top>, <opt2>),
-    edge(<top>, <semC2>),
-    edge(<top>, <opt3>, bend: 2.5deg),
-    edge(<top>, <parC>, bend: 5deg),
-    edge(<top>, <stmt>, bend: 7.5deg),
-
-    edge(<opt1>, <eps>),
-    edge(<opt2>, <expr1>),
-    edge(<opt3>, <expr2>),
-    edge(<stmt>, <other>),
-  ),
-  caption: "Un esempio di albero di parsing",
-)
-La costruzione di un albero di parsing come quello precedente, avviene partendo dalla radice, etichettata dal non-terminale iniziale _stmt_ e ripetendo iterativamente i due passi:
-+ Al nodo $N$, etichettato dal non-terminale $A$, si sceglie una delle produzioni per $A$ e si costruiscono i figli di $N$ in base ai simboli presenti nel corpo della produzione.
-
-+ Si cerca il prossimo nodo per cui è necessario costruire un sottoalbero, in genere il non-terminale non ancora elaborato più a sinistra nell'albero.
-
-Il terminale in esame durante la scansione viene detto *simbolo di lookahead*. Vediamo la costruzione dell'albero di parsing relativo alla stringa `for(;expr;expr) other`:
-
-Inizialmente il terminale *for* è il simbolo di lookahead; la radice etichettata dell'albero è il non-terminale iniziale _stmt_.
-
-#figure(diagram(
-  cell-size: 5mm,
-  spacing: 3mm,
-
-  // NODES //
-  node((1, 0), $bold(#text(8pt)[Albero]) \ bold(#text(8pt)[di parsing])$),
-  node((6.5, 0), $s t m t$, name: <top>),
-
-  node((0.25, 1), $(a)$),
-
-  node((1, 2), $bold(#text(8pt)[Input])$),
-  node((3, 2), [*for*], name: <for>),
-  node((4, 2), [*(*], name: <parO>),
-  node((5, 2), [*;*], name: <semC1>),
-  node((6, 2), [*expr*], name: <opt2>),
-  node((7, 2), [*;*], name: <semC2>),
-  node((8, 2), [*expr*], name: <opt3>),
-  node((9, 2), [*)*], name: <parC>),
-
-  // EDGES //
-  edge((.5, 1), (10.75, 1)),
-  edge((6.5, 0.6), <top>, "-|>", mark-scale: .75),
-  edge((3, 2.7), <for>, "-|>", mark-scale: .75),
-
-  // BORDI //
-  edge((0, -1), (11, -1), "="),
-  edge((0, 3), (11, 3), "="),
-))
-
-Lo scopo è quello di costruire il resto dell'albero in modo che la stringa da questo generata coincida con la stringa d'ingresso. Affinché ci sia una corrispondenza, _stmt_ deve poter generare una stringa che inizia col simbolo di lookahead *for*. Nella grammatica precedentemente illustrata, c'è solo una produzione per _stmt_ che deriva tale stringa; la selezioniamo e costruiamo i nuovi figli della radice.
-
-#figure(diagram(
-  cell-size: 5mm,
-  spacing: 3mm,
-
-  // NODES //
-  node((1, 0), $bold(#text(8pt)[Albero]) \ bold(#text(8pt)[di parsing])$),
-  node((6, 0), $s t m t$, name: <top>),
-
-  node((0.25, 2), $(b)$),
-
-  node((1, 3), $bold(#text(8pt)[Input])$),
-  node((3, 3), [*for*], name: <startG>),
-  node((4, 3), [*(*]),
-  node((5, 3), [*;*]),
-  node((6, 3), [*expr*]),
-  node((7, 3), [*;*]),
-  node((8, 3), [*expr*]),
-  node((9, 3), [*)*]),
-
-  node((2, 1), [*for*], name: <for>),
-  node((3, 1), $($, name: <parO>),
-  node((4, 1), $o p t e x p r$, name: <opt1>),
-  node((5, 1), $;$, name: <semC1>),
-  node((6, 1), $o p t e x p r$, name: <opt2>),
-  node((7, 1), $;$, name: <semC2>),
-  node((8, 1), $o p t e x p r$, name: <opt3>),
-  node((9, 1), $)$, name: <parC>),
-  node((10, 1), $s t m t$, name: <stmt>),
-
-  // EDGES //
-  edge(<top>, <for>, bend: -7.5deg),
-  edge(<top>, <parO>, bend: -5deg),
-  edge(<top>, <opt1>, bend: -2.5deg),
-  edge(<top>, <semC1>),
-  edge(<top>, <opt2>),
-  edge(<top>, <semC2>),
-  edge(<top>, <opt3>, bend: 2.5deg),
-  edge(<top>, <parC>, bend: 5deg),
-  edge(<top>, <stmt>, bend: 7.5deg),
-
-  edge((.5, 2), (11.75, 2)),
-  edge((2, 1.7), <for>, "-|>", mark-scale: .75),
-  edge((3, 3.7), <startG>, "-|>", mark-scale: .75),
-
-  // BORDI //
-  edge((0, -1), (12, -1), "="),
-  edge((0, 4), (12, 4), "="),
-))
-
-Quando il nodo che si sta considerando nell'albero di parsing corrisponde a un terminale e tale terminale corrisponde al simbolo di lookahead corrente, allora si passa al figlio successivo nell'albero e al terminale successivo nella stringa d'ingresso.
-
-#figure(
-  diagram(
-    cell-size: 5mm,
-    spacing: 3mm,
-
-    // NODES //
-    node((1, 0), $bold(#text(8pt)[Albero]) \ bold(#text(8pt)[di parsing])$),
-    node((6, 0), $s t m t$, name: <top>),
-
-    node((0.25, 2), $(c)$),
-
-    node((1, 3), $bold(#text(8pt)[Input])$),
-    node((3, 3), [*for*]),
-    node((4, 3), [*(*], name: <startG>),
-    node((5, 3), [*;*]),
-    node((6, 3), [*expr*]),
-    node((7, 3), [*;*]),
-    node((8, 3), [*expr*]),
-    node((9, 3), [*)*]),
-
-    node((2, 1), [*for*], name: <for>),
-    node((3, 1), $($, name: <parO>),
-    node((4, 1), $o p t e x p r$, name: <opt1>),
-    node((5, 1), $;$, name: <semC1>),
-    node((6, 1), $o p t e x p r$, name: <opt2>),
-    node((7, 1), $;$, name: <semC2>),
-    node((8, 1), $o p t e x p r$, name: <opt3>),
-    node((9, 1), $)$, name: <parC>),
-    node((10, 1), $s t m t$, name: <stmt>),
-
-    // EDGES //
-    edge(<top>, <for>, bend: -7.5deg),
-    edge(<top>, <parO>, bend: -5deg),
-    edge(<top>, <opt1>, bend: -2.5deg),
-    edge(<top>, <semC1>),
-    edge(<top>, <opt2>),
-    edge(<top>, <semC2>),
-    edge(<top>, <opt3>, bend: 2.5deg),
-    edge(<top>, <parC>, bend: 5deg),
-    edge(<top>, <stmt>, bend: 7.5deg),
-
-    edge((.5, 2), (11.75, 2)),
-    edge((3, 1.7), <parO>, "-|>", mark-scale: .75),
-    edge((4, 3.7), <startG>, "-|>", mark-scale: .75),
-
-    // BORDI //
-    edge((0, -1), (12, -1), "="),
-    edge((0, 4), (12, 4), "="),
-  ),
-)
-
-Nel passo (_c_) la freccia nell'albero di parsing si è spostata sul secondo figlio e la freccia nella stringa di ingresso si è spostata sul terminale successivo. In generale, la scelta di una produzione per un dato non-terminale richiede più tentativi. In altre parole, è necessario scegliere una certa produzione ed eventualmente ritornare indietro (effettuare, cioè, *backtracking*) se tale produzione si rivelasse non adatta. Una produzione si rivela non adatta qualora la sua scelta rendesse impossibile completare l’albero di parsing per la stringa d’ingresso. Il passo cruciale è determinare quale produzione $A -> alpha$ applicare per un non-terminale $A$.
-
-=== Discesa ricorsiva e backtracking
-Un programma per il parsing a discesa ricorsiva consiste in un insieme di procedure, una per ogni non-terminale. L’esecuzione inizia dalla procedura relativa al simbolo iniziale, che termina con successo se il suo corpo scandisce correttamente tutta la stringa d'ingresso.
-
-#observation()[
-  Il metodo generale di discesa ricorsiva può richiedere backtracking, cioè può richiedere di rileggere più di una volta una parte della stringa d’ingresso.
-]
-
-Una procedura per un tipico non-terminale è la seguente:
-#figure(
-  algo()[
-    void A() {#i\
-    Scegli, per $A$, una produzione $A --> X_1X_2 dots X_k;$\
-    for ($i$ da 1 fino a $k$)#i\
-    if ($X_i$ è un non-terminale)#i\
-    richiama la procedura $X_i ()$;#d\
-    else if ($X_i$ è uguale al simbolo d'ingresso corrente $a$)#i\
-    procedi al simbolo successivo nella sequenza d'ingresso;#d\
-    else \/\* si è verificato un errore \*\/;#d\
-    }#d\
-    }
-  ],
-  caption: "Procedura tipica per un non-terminale in un parser top-down",
-)
-Si noti che questo pseudocodice è non-deterministico poiché inizia con la  scelta di quale produzione utilizzare per A senza indicare come effettuare tale scelta.
-
-#example()[
-  Consideriamo la grammatica seguente e la stringa in ingresso $c a d$:
-  $
-    S & -> c A d \
-    A & -> a b | a
-  $
-
-  Traccia dell'esecuzione (parsing a discesa ricorsiva con backtracking):
-  #block(
-    $
-      & S -> && limits(c)_1 limits(A)_2 limits(d)_3 \
-      & && k=1 => &&&& text("match(c); forward++;") && quad text("(input rimanente: ad)") \
-      & && k=2 => &&&& A -> limits(a)_1 limits(b)_2 && quad text("(prova prima alternativa)") \
-      & && &&&& k=1 => text("match(a); forward++;") && quad text("(input rimanente: d)") \
-      & && &&&& k=2 => text("errore (b != d); BTK! forward--;") && quad text("(input ripristinato: ad)") \
-      & && k=2 => &&&& A -> limits(a)_1 && quad text("(prova seconda alternativa)") \
-      & && &&&& k=1 => text("match(a); forward++;") && quad text("(input rimanente: d)") \
-      & && k=3 => &&&& text("match(d); forward++;") && quad text("(input rimanente: vuoto)") \
-      & && &&&& text("Successo!") &&
-    $,
-  )
-  #import "@preview/cetz:0.5.0"
-
-  #align(center)[
-    #cetz.canvas({
-      import cetz.draw: *
-
-      // Impostiamo un po' di padding in modo che le linee
-      // si fermino a una distanza elegante dai caratteri
-      set-style(content: (padding: 0.1))
-
-      // --- ALBERO (a) ---
-      group(name: "tree_a", {
-        content((0, 0), $S$, name: "S")
-        content((-1, -1.2), $c$, name: "c")
-        content((0, -1.2), $A$, name: "A")
-        content((1, -1.2), $d$, name: "d")
-
-        // Cetz calcola automaticamente l'intersezione ai bordi del contenuto
-        line("S", "c")
-        line("S", "A")
-        line("S", "d")
-
-        content((0, -3.2), [(a)])
-      })
-
-      // --- ALBERO (b) ---
-      group(name: "tree_b", {
-        // Trasliamo l'intero albero verso destra
-        translate(x: 4.5)
-
-        content((0, 0), $S$, name: "S")
-        content((-1, -1.2), $c$, name: "c")
-        content((0, -1.2), $A$, name: "A")
-        content((1, -1.2), $d$, name: "d")
-
-        // Figli del nodo A (più vicini tra loro rispetto a c e d)
-        content((-0.6, -2.4), $a$, name: "a_child")
-        content((0.6, -2.4), $b$, name: "b_child")
-
-        line("S", "c")
-        line("S", "A")
-        line("S", "d")
-
-        line("A", "a_child")
-        line("A", "b_child")
-
-        content((0, -3.2), [(b)])
-      })
-
-      // --- ALBERO (c) ---
-      group(name: "tree_c", {
-        // Trasliamo ulteriormente verso destra
-        translate(x: 9)
-
-        content((0, 0), $S$, name: "S")
-        content((-1, -1.2), $c$, name: "c")
-        content((0, -1.2), $A$, name: "A")
-        content((1, -1.2), $d$, name: "d")
-
-        // Singolo figlio centrato
-        content((0, -2.4), $a$, name: "a_child")
-
-        line("S", "c")
-        line("S", "A")
-        line("S", "d")
-
-        line("A", "a_child")
-
-        content((0, -3.2), [(c)])
-      })
-    })
-    *Figura 4.13* Passi in un esempio di parsing top-down.
-  ]
-]
-
-Può accadere che un parser a discesa ricorsiva entri in un ciclo infinito. Un tale problema si presenta a causa di produzioni “ricorsive sinistre” come:
-$
-  mtext("expr") -> mtext("expr") + mtext("term")
-$
-in cui il simbolo più a sinistra del corpo è uguale al non-terminale della testa della produzione.
-
 === Grammatiche LL(1) e parsing predittivo
 E' sempre possibile costruire un parser predittivo - cioè un parser a discesa ricorsiva senza backtracking - a partire da una grammatica della classe LL(1). La prima “L” indica che la sequenza d'ingresso viene analizzata da sinistra (left, appunto) verso destra, la seconda “L” specifica che si costruisce una derivazione sinistra e infine l'“1” fra parentesi indica che le decisioni durante il parsing vengono prese analizzando un solo simbolo di lookahead cioè guardando il prossimo simbolo della stringa in ingresso. La classe LL(1) è sufficientemente ricca da coprire la maggior parte dei linguaggi di programmazione.
+
 - Una grammatica che presenta *ricorsione sinistra non è LL(1)*.
 - Una grammatica in cui *le produzioni per una variabile hanno
   prefissi comuni non è LL(1)* (grammatica ambigua e che richiede fattorizzazione).
