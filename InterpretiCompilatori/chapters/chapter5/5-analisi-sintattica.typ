@@ -524,66 +524,92 @@ La costruzione dei parser bottom-up e top-down utilizza due funzioni, *FIRST* e 
 #definition()[
   Data $G$ grammatica e $alpha$ forma di frase (stringa di terminali e non-terminali), si definisce FIRST($alpha$) come:
   $
-    "FIRST"(alpha) = {a in Sigma | alpha =>^* a beta} union {epsilon | alpha =>^* epsilon}
+    "FIRST"(alpha) = {a in Sigma | alpha =>^* a beta} union { epsilon }bar_(alpha =>^* epsilon)
   $
   Ovvero, l'insieme dei simboli terminali che costituiscono l'inizio delle stringhe derivabili da $alpha$. Se $alpha$ può derivare la stringa vuota, allora $epsilon$ appartiene a FIRST($alpha$).
 ]
 
-Per calcolare *FIRST* si seguono queste indicazioni:
-- Se $X$ è un terminale:
-  $
-    "FIRST("X")"= {X}
-  $
-- Se $X$ è una variabile ed esiste in G una produzione $X->Y_1 Y_2 ... Y_k$ con $k gt.eq 1$.
-  + Se $Y_1 Y_2 ... Y_(i-1) der(*) epsilon$ e $Y_i cancel(der(*)) epsilon$, allora:
-    $
-      "FIRST("X")" #box(scale(x: -100%, [$subset.eq$])) union.big_(j=1)^k "FIRST("Y_j")" \\ {epsilon}
-    $
-  + Se $Y_1 Y_2 ... Y_k der(*) epsilon$, allora:
-    $
-      "FIRST("X")" #box(scale(x: -100%, [$subset.eq$])) union.big_(j=1)^k "FIRST("Y_j")"
-    $
-- Se $X-> epsilon$:
-  $
-    epsilon in "FIRST("X")"
-  $
+Per calcolare *FIRST* si seguono questi passaggi:
+
+- Se $X$ è un terminale, allora $"FIRST("X")"= {X}$
+
+- Se $X-> epsilon$ è una regola di $G$, allora $epsilon in "FIRST("X")"$
+
+- Se $X$ è una variabile ed esiste in $G$ una produzione $X->Y_1 Y_2 ... Y_k$ con $k gt.eq 1$:
+
+    + Se $Y_1 Y_2 ... Y_(i-1) der(*) epsilon$ e $Y_i cancel(der(*)) epsilon$, allora
+      $
+        "FIRST("X")" #box(scale(x: -100%, [$subset.eq$])) union.big_(j=1)^i "FIRST("Y_j")" without {epsilon}
+      $
+    + Se $Y_1 Y_2 ... Y_k der(*) epsilon$, allora
+      $
+        "FIRST("X")" #box(scale(x: -100%, [$subset.eq$])) union.big_(j=1)^k "FIRST("Y_j")"
+      $
 
 Allo stesso modo, se si vuole calcolare FIRST su un insieme di variabili:
-+ Se $X_1 X_2 ... X_(i-1) der(*) epsilon$ e $X_i cancel(der(*)) epsilon$, allora:
+
++ Se $X_1 X_2 ... X_(i-1) der(*) epsilon$ e $X_i cancel(der(*)) epsilon$, allora
   $
-    "FIRST("X_1 X_2 ... X_n")" = union.big_(j=1)^k "FIRST("X_j")" \\ {epsilon}
+    "FIRST("X_1 X_2 ... X_n")" = union.big_(j=1)^i "FIRST("X_j")" without {epsilon}
   $
-+ Se $X_1 X_2 ... X_n der(*) epsilon$, allora:
++ Se $X_1 X_2 ... X_n der(*) epsilon$, allora
   $
     "FIRST("X_1 X_2 ... X_n")" = union.big_(j=1)^k "FIRST("X_j")" union {epsilon}
   $
 
 #example()[
+
+  Sia $G$ la grammatica
   $
     & A-> B C a \
     & B-> b bar epsilon \
     & C-> c bar epsilon
   $
   FIRST($A$) = FIRST($B$) $union$ FIRST($C$) $union$ FIRST($a$) = ${b} union {c} union {a} = {a b c}$
-  #observation()[
-    Attenzione: $epsilon$ *non* è presente in FIRST($A$) perché $A$ non può dare origine a una stringa vuota (c'è per forza il terminale "a" in fondo).
-  ]
+
+  Attenzione: in questo caso $epsilon$ *non* appartiene a FIRST($A$) perché $A$ non può dare origine a una stringa vuota (c'è per forza il terminale "a" in fondo).
 ]
 
 #example()[
-  $
-    & S->A x bar y B quad quad quad && "FIRST("S")"=overshell({y,x,z,a}, "Non c'è" epsilon \ "perché non"\ "generabile") \
-    & B-> epsilon bar z B           && "FIRST("B")" = {epsilon, z} \
-    & A-> epsilon bar B a S         && "FIRST("A")" = {epsilon, z, a}
-  $
+
+Sia $G$ la grammatica
+$
+  S &-> A x | y B \
+  B &-> epsilon | z B \
+  A &-> epsilon | B a S .
+$
+
+Si ha:
+
+$"FIRST"(S) supset.eq "FIRST"(A) union "FIRST"(x) backslash { epsilon } = "FIRST"(A) union { x } backslash { epsilon }$ (nella prima produzione di $S$ il terminale $x$ funge da $Y_i$ con $i = 2$);
+
+$"FIRST"(S) supset.eq "FIRST"(y) = { y }$ (nella seconda produzione di $S$ il teminale $y$ funge da $Y_i$ con $i = 1$);
+
+$"FIRST"(A) in.rev epsilon$ (ciò è dovuto alla prima produzione di $A$);
+
+$"FIRST"(A) supset.eq "FIRST"(B) union "FIRST"(a) backslash { epsilon }$ (nella seconda produzione di $A$ il terminale $a$ funge da $Y_i$ con $i = 2$);
+
+$"FIRST"(B) in.rev epsilon$ (ciò è dovuto alla prima produzione di $B$);
+
+$"FIRST"(B) supset.eq "FIRST"(z) = { z }$ (nella seconda produzione di $B$ il terminale $z$ funge da $Y_i$ con $i = 1$);
+
+Pertanto:
+
+$"FIRST"(B) = { z, epsilon };$
+
+$"FIRST"(A) = { epsilon, z, a };$
+
+$"FIRST"(S) = { y, x, z, a }.$
+
+Di norma si comincia il calcolo di FIRST dalle produzioni che contengono terminali o $epsilon$ (tipo $B$ in questo caso) e si procede a ritroso fino a calcolare FIRST di tutte le variabili.
 ]
 
 #observation()[
   Il FIRST di una variabile risponde alla domanda: _"Se espando questa variabile, quali sono i primissimi caratteri terminali che posso leggere?"_
 
-  + *Se inizia con un terminale (es. $A -> c B$):* Facilissimo. Il FIRST è `{c}`.
-  + *Se inizia con un non-terminale (es. $A -> B c$):* Il FIRST di $A$ "ruba" il FIRST di $B$.
-  + *L'effetto domino dell'$epsilon$:* Se $A -> B C$ e sai che $B$ può scomparire (cioè ha $epsilon$ nel suo FIRST), allora devi guardare anche cosa c'è dopo! Quindi il FIRST di $A$ prenderà il FIRST di $B$ *più* il FIRST di $C$. Se anche $C$ può scomparire, continui a guardare a destra.
+  + *Se inizia con un terminale (es. $A -> c B$):* facile, Il FIRST è `{c}`.
+  + *Se inizia con un non-terminale (es. $A -> B c$):* il FIRST di $A$ "ruba" il FIRST di $B$.
+  + *L'effetto domino dell'$epsilon$:* se $A -> B C$ e sai che $B$ può scomparire (cioè ha $epsilon$ nel suo FIRST), allora devi guardare anche cosa c'è dopo. Quindi il FIRST di $A$ prenderà il FIRST di $B$ *più* il FIRST di $C$. Se anche $C$ può scomparire, continui a guardare a destra. Questo procedimento di "guardare a desatra" continua finché non si trova un terminale o una variabile che non può scomparire (non può produrre $epsilon$).
   + *Quando metto $epsilon$ nel FIRST?* Solo se *tutta* la produzione può svanire nel nulla.
 ]
 
@@ -603,46 +629,104 @@ Allo stesso modo, se si vuole calcolare FIRST su un insieme di variabili:
   ]
 ]
 
-Per calcolare FOLLOW($A$) per tutti i non-terminali $A$ si proceda applicando le regole seguenti finché non sia più possibile aggiungere nulla all'insieme FOLLOW, supponendo che ogni stringa sia seguita dal marcatore \$.
-+ Si aggiunga \$ a FOLLOW($S$).
-+ Se esiste una produzione del tipo $A -> a B beta$, allora si aggiunga a FOLLOW($B$) ogni elemento di FIRST($beta$) eccetto $epsilon$.
-+ Se esiste una produzione del tipo $A -> alpha B$ oppure del tipo $A -> alpha B beta$ per cui FIRST($beta$) contiene $epsilon$, allora tutti i simboli in FOLLOW($A$) appartengono anche a FOLLOW($B$).
+Per calcolare il FOLLOW di tutte le variabili di una grammatica $G$ si procede applicando le regole seguenti finché non è più possibile aggiungere nulla all'insieme FOLLOW, supponendo che ogni stringa sia seguita dal marcatore \$ di fine stringa:
+
++ $ \$ in "FOLLOW"(S)$, $S$ simbolo iniziale.
++ Se esiste una produzione del tipo $A -> alpha B beta$, allora $"FOLLOW"(B) supset.eq "FIRST"(beta) without epsilon$.
++ Se esiste una produzione del tipo $A -> alpha B$ oppure del tipo $A -> alpha B beta$ dove $beta der(*) epsilon$ (cioè FIRST($beta$) contiene $epsilon$), allora $"FOLLOW"(B) supset.eq "FOLLOW"(A)$.
 
 #example()[
+  Sia $G$ la grammatica
+
   $
-    & S-> A C B bar C b b bar B a quad quad quad && "FOLLOW("S")"={\$}\
-    & A-> d a bar B C && "FOLLOW("A")" #box(scale(x: -100%, [$subset.eq$])) "FIRST("C B")" \\ {epsilon}\
-    & B-> g bar epsilon\
-    & C-> h bar epsilon
+    & S -> A C B bar C b b bar B a \
+    & A -> d a bar B C \
+    & B -> g bar epsilon \
+    & C -> h bar epsilon.
+  $
+
+  Si ha:
+
+ #grid(
+  columns: (1.1fr, 1.4fr),
+  column-gutter: 0.8em,
+  row-gutter: 1em,
+
+  [$"FOLLOW"(S) = { \$ }$],
+  [poiché $S$ è il simbolo iniziale e non compare in nessun'altra produzione;],
+
+  [$"FOLLOW"(A) supset.eq "FIRST"(C B) without {epsilon}$],
+  [poiché esiste $S -> A C B$;],
+
+  [$"FOLLOW"(A) supset.eq "FOLLOW"(S)$],
+  [poiché esiste $S -> A C B$ e $C B =>^* epsilon$;],
+
+  [$"FOLLOW"(B) supset.eq "FIRST"(a) without {epsilon}$],
+  [poiché esiste $S -> B a$;],
+
+  [$"FOLLOW"(B) supset.eq "FOLLOW"(S)$],
+  [poiché esiste $S -> A C B$;],
+
+  [$"FOLLOW"(B) supset.eq "FIRST"(C) without {epsilon}$],
+  [poiché esiste $A -> B C$;],
+
+  [$"FOLLOW"(B) supset.eq "FOLLOW"(A)$],
+  [poiché esiste $A -> B C$ e $C -> epsilon$;],
+
+  [$"FOLLOW"(C) supset.eq "FIRST"(b b) without {epsilon}$],
+  [poiché esiste $S -> C b b$;],
+
+  [$"FOLLOW"(C) supset.eq "FIRST"(B) without {epsilon}$],
+  [poiché esiste $S -> A C B$;],
+
+  [$"FOLLOW"(C) supset.eq "FOLLOW"(S)$],
+  [poiché esiste $S -> A C B$ e $B -> epsilon$;],
+
+  [$"FOLLOW"(C) supset.eq "FOLLOW"(A)$],
+  [poiché esiste $A -> B C$.],
+)
+
+  Poiché $"FIRST"(C B) = "FIRST"(B) union "FIRST"(C) = {h, g, epsilon}$ si ha:
+  $
+    & "FOLLOW"(A) = {h, g, \$}; \
+    & "FOLLOW"(B) = {a, \$, h, g}; \
+    & "FOLLOW"(C) = {b, \$, g, h}.
   $
 ]
-#observation()[
-  Il FOLLOW di $A$ risponde alla domanda: _"Nelle regole degli altri, chi c'è seduto immediatamente a destra di $A$?"_
-  *Attenzione:* Per calcolare il FOLLOW di $A$, non devi *mai* guardare le regole che iniziano con $A -> ...$, ma devi cercare dove $A$ compare a destra della freccia!
 
-  + *La partenza:* Metti sempre il simbolo di fine stringa `$` nel FOLLOW del simbolo iniziale (es. $S$).
-  + *Chi c'è a destra? (es. $X -> alpha A b$):* Se a destra di $A$ c'è un terminale (`b`), mettilo nel FOLLOW di $A$.
-  + *A destra c'è un non-terminale? (es. $X -> alpha A B$):* Se a destra c'è $B$, il FOLLOW di $A$ "ruba" il *FIRST* di $B$ (escluso l'$epsilon$).
-  + *L'effetto "fine riga" (es. $X -> alpha A$):* Se $A$ è in fondo alla regola, non ha nessuno a destra. In questo caso, chiunque segua $X$, seguirà anche $A$. Quindi il FOLLOW di $A$ "ruba" il *FOLLOW* di $X$. *(Nota: questo vale anche se $X -> alpha A B$ ma $B$ può svanire diventando $epsilon$!)*
+#observation()[
+  Il FOLLOW di $A$ risponde alla domanda: _"Nelle regole degli altri, chi c'è seduto immediatamente a destra di $A$?"_.
+  *Attenzione:* Per calcolare il FOLLOW di $A$, non devi *mai* guardare le regole che iniziano con $A -> ...$, ma devi cercare dove $A$ compare a destra della freccia (nel corpo delle produzioni).
+
+  + *La partenza:* metti sempre il simbolo di fine stringa $\$$ nel FOLLOW del simbolo iniziale (es. $S$).
+  + *Chi c'è a destra?*: se a destra c'è un terminale $B$, es. $X -> alpha A B$, il FOLLOW di $A$ "ruba" il *FIRST* di $B$ escluso l'$epsilon$. In particolare, se a destra c'è un non terminale $b$, allora si ha che $"FIRST"(b) = {b}$ e quindi $b in "FOLLOW"(A)$.
+  + *L'effetto "fine riga" (es. $X -> alpha A$)*: se $A$ è in fondo alla regola, non ha nessuno a destra. In questo caso, chiunque segua $X$, seguirà anche $A$. Quindi il FOLLOW di $A$ "ruba" il *FOLLOW* di $X$ (NB: questo vale anche se $X -> alpha A B$ ma $B$ può svanire diventando $epsilon$).
 ]
 
 === Grammatiche LL(1) e parsing predittivo
-E' sempre possibile costruire un parser predittivo - cioè un parser a discesa ricorsiva senza backtracking - a partire da una grammatica della classe LL(1). La prima “L” indica che la sequenza d'ingresso viene analizzata da sinistra (left, appunto) verso destra, la seconda “L” specifica che si costruisce una derivazione sinistra e infine l'“1” fra parentesi indica che le decisioni durante il parsing vengono prese analizzando un solo simbolo di lookahead cioè guardando il prossimo simbolo della stringa in ingresso. La classe LL(1) è sufficientemente ricca da coprire la maggior parte dei linguaggi di programmazione.
+
+Per le grammatiche della classe LL(1) è sempre possibile costruire un parser top-down predittivo (deterministico), cioè un parser a discesa ricorsiva senza backtracking. La prima "L" indica che le stringhe in ingresso sono scandite da sinistra (_Left_, appunto) verso destra, la seconda "L" specifica che si costruisce una derivazione sinistra (_Leftmost derivation_) e infine l'"1" fra parentesi indica che le decisioni durante il parsing vengono prese analizzando un solo simbolo di lookahead, cioè guardando il prossimo simbolo della stringa in ingresso. La classe LL(1) è sufficientemente ricca da coprire la maggior parte dei linguaggi di programmazione.
 
 - Una grammatica che presenta *ricorsione sinistra non è LL(1)*.
 - Una grammatica in cui *le produzioni per una variabile hanno
-  prefissi comuni non è LL(1)* (grammatica ambigua e che richiede fattorizzazione).
+  prefissi comuni non è LL(1)* (in genere richiede fattorizzazione a sinistra).
 
-#definition()[
-  Una grammatica $G$ è LL(1) se e solo se soddisfa le seguenti condizioni per ogni variabile $A$:
+#definition("Grammatica LL(1)")[
+  Una grammatica $G$ è *LL(1)* se e solo se soddisfa le seguenti condizioni $forall$ variabile $A$.
 
-  Se $A -> alpha_1 bar alpha_2 bar ... bar alpha_k$ sono le produzioni per $A$, allora
+  Se $A -> alpha_1 bar alpha_2 bar ... bar alpha_k$ sono le produzioni per $A$, allora:
+
   - FIRST($alpha_i$) $inter$ FIRST($alpha_j$) $= emptyset quad forall i eq.not j$
-  - se $exists i$ tale che $alpha_i der(*) epsilon$ allora
-    - $alpha_j cancel(der(*)) epsilon quad forall j eq.not i$ e
+
+  - se $exists space i$ tale che $alpha_i der(*) epsilon$ allora
+
+    - $alpha_j cancel(der(*)) epsilon quad forall j eq.not i quad$ e
     - FOLLOW($A$) $inter$ FIRST($A$) $= emptyset$
-  Per ogni variabile:
-  - Gli insiemi FIRST relativi alle parti destre delle produzioni sono due a due disgiunti.
+  
+  Ovvero, per ogni variabile:
+
+  - gli insiemi FIRST relativi alle parti destre delle produzioni sono due a due disgiunti.
+
   - Esiste al più una parte destra che può derivare $epsilon$ in questo caso l'insieme FOLLOW della variabile deve essere disgiunto dagli insiemi FIRST di tutte le parti destre, cioè dal FIRST della variabile.
 ]
 
@@ -659,7 +743,7 @@ Se le regole per la variabile $A$ sono $A-> alpha_1 bar alpha_2 bar ... bar alph
     $quad quad space space dots.v$#d\
     else if ($a in "FIRST"(alpha_k)$)#i\
     {codice per $alpha_k$;}#d\
-    else if ($A cancel(der(*)) epsilon$ *or* $a$ $cancel(in) "FOLLOW"(A)$)#i\
+    else if ($A cancel(der(*)) epsilon$ *or* $a in.not "FOLLOW"(A)$)#i\
     {errore();}#d\
     }
   ],
@@ -683,20 +767,68 @@ Se le regole per la variabile $A$ sono $A-> alpha_1 bar alpha_2 bar ... bar alph
     }
   ],
 ))
-//TODO: manca esempio da slide "Sulle LL(1).pptx"
+
+Cioè, in una grammatica LL(1), la produzione da applicare a un non-terminale $A$ può essere scelta osservando un solo simbolo di ingresso. Supponiamo di aver costruito una derivazione
+  $S =>^* u A beta$ e che la stringa in ingresso sia $u a v$.
+
+  + Se $a in "FIRST"(alpha_i)$, si applica la produzione
+    $A -> alpha_i$, ottenendo
+    $S =>^* u A beta => u alpha_i beta$.
+
+  + Se $A =>^* epsilon$ e $a in "FOLLOW"(A)$, $A$ può essere
+    annullato, ottenendo
+    $S =>^* u A beta => u beta$.
+
+  La proprietà LL(1) garantisce che la scelta possa essere effettuata
+  utilizzando un solo simbolo di lookahead.
+
+I costrutti per il controllo del flusso, grazie alle loro specifiche parole chiave, generalmente soddisfano i vincoli della classe LL(1). Per esempio, date le produzioni:
+$
+  s t m t & -> bold("if") "(" e x p r ")" s t m t bold("else") s t m t \ & bar bold("while") "(" e x p r ")" s t m t \ & bar
+  { s t m t"_"l i s t }
+$
+si ha
+  $
+    & "FIRST"(bold("if") "(" e x p r ")" s t m t bold("else") s t m t)
+      = {bold("if")}, \
+    & "FIRST"(bold("while") "(" e x p r ")" s t m t)
+      = {bold("while")}, \
+    & "FIRST"({s t m t"_"l i s t})
+      = {{}}.
+  $
+Poiché questi insiemi sono disgiunti, il prossimo simbolo in ingresso determina *univocamente* quale produzione di $s t m t$ applicare: *if*, *while* oppure ${$.
+
+L'esempio precedente mostra il caso in cui la produzione viene scelta
+tramite gli insiemi $"FIRST"$. Se invece una delle alternative può derivare $epsilon$, entra in gioco anche il $"FOLLOW"$. Per esempio, data la produzione
+
+$
+  E' -> + T E' bar epsilon
+$
+
+si ha
+
+$
+  "FIRST"(+ T E') = {+}
+  quad "e" quad
+  "FOLLOW"(E') = {), \$}.
+$
+
+Quindi, se il simbolo di lookahead è $+$, si applica
+$E' -> + T E'$; se invece il lookahead appartiene a
+$"FOLLOW"(E')$, cioè è $)$ oppure $\$$, si sceglie
+$E' -> epsilon$.
 
 ==== Tabelle di parsing predittivo
 Le informazioni fornite dagli insiemi FIRST e FOLLOW possono essere raccolte in una tabella di parsing predittivo, $M$, in cui le righe corrispondono alle variabili e le colonne ai terminali e al marcatore di fine stringa \$. Il contenuto di $M[A, a]$ indica la regola da utilizzare per espandere la variabile $A$ quando il prossimo simbolo in ingresso è $a$.
 
 La costruzione della tabella si basa sul fatto che la regola $A-> alpha$ viene scelta soltanto se il simbolo in ingresso $a in$ FIRST($alpha$), oppure $alpha der(*) epsilon$ e $a in$ FOLLOW($A$) (in questo caso può essere $a = \$$).
 
-#[
-  #set heading(numbering: none, outlined: false)
-  === Algoritmo di costruzione di una tabella di parsing predittivo
-]
+Di seguito l'*algoritmo di costruzione* della tabella di parsing predittivo $M$ per una grammatica $G$:
+
 *INPUT*: Una grammatica $G$.\
 *OUTPUT*: Una tabella di parsing $M$.\
 *METODO*: Per ogni produzione $A-> alpha$ della grammatica $G$:
+
 + per ogni terminale $a in$ FIRST($alpha$) si aggiunge $A-> alpha$ a $M[A,a]$
 + se $epsilon in$ FIRST($alpha$), allora per ogni simbolo $b in$ FOLLOW($A$) (incluso eventualmente \$) si aggiunge $A-> alpha$ a $M[A,b]$
 
