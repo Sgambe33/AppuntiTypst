@@ -1534,6 +1534,7 @@ Nelle prossime sezioni andremo a vedere come costruire la collezione canonica LR
 ==== Funzione CLOSURE
 
 Se $I$ è un insieme di item di G, CLOSURE($I$) è un insieme di item costruito a partire da $I$ seguendo queste regole:
+
  + Inizialmente CLOSURE($I$) contiene tutti gli item di $I$
  + Se $A -> alpha dot B beta$ appartiene a CLOSURE($I$) e $B -> gamma$ è una produzione in $G$, allora si aggiunge $B -> dot gamma$ a CLOSURE($I$), se non è già presente. Si ripete questa regola finché non è più possibile aggiungere nuovi item a CLOSURE($I$).
 
@@ -1820,7 +1821,7 @@ La tabella costruita con questo metodo è detta tabella SLR(1) di $G$, il parser
   + $T -> T * F quad " FOLLOW"(T) = {*, +, ), \$}$
   + $T -> F$
   + $F -> (E) quad quad "FOLLOW"(F) = {*, +, ), \$}$
-  + $F -> text("id")$
+  + $F -> bold(text("id"))$
 
   Nella tabella SLR(1) che segue:
   1. $s_i$ significa "impila lo stato $i$";
