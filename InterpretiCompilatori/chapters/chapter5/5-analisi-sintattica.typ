@@ -401,22 +401,24 @@ Un programma per il parsing a discesa ricorsiva consiste in un insieme di proced
 
 Una procedura per un tipico non-terminale è la seguente:
 #figure(
-  algo()[
-    void A() {#i\
-    Scegli, per $A$, una produzione $A --> X_1X_2 dots X_k;$\
-    for ($i$ da 1 fino a $k$)#i\
-    if ($X_i$ è un non-terminale)#i\
-    richiama la procedura $X_i ()$;#d\
-    else if ($X_i$ è uguale al simbolo d'ingresso corrente $a$)#i\
-    procedi al simbolo successivo nella sequenza d'ingresso;#d\
-    else \/\* si è verificato un errore \*\/;#d\
-    }#d\
-    }
-  ],
+  block(
+    width: auto,
+    algo()[
+      void A() {#i\
+      Scegli, per $A$, una produzione $A --> X_1X_2 dots X_k;$\
+      for ($i$ da 1 fino a $k$)#i\
+      if ($X_i$ è un non-terminale)#i\
+      richiama la procedura $X_i ()$;#d\
+      else if ($X_i$ è uguale al simbolo d'ingresso corrente $a$)#i\
+      procedi al simbolo successivo nella sequenza d'ingresso;#d\
+      else \/\* si è verificato un errore \*\/;#d\
+      }#d\
+      }
+    ]
+  ),
   caption: "Procedura tipica per un non-terminale in un parser top-down",
 )
 Si noti che questo pseudocodice è non-deterministico poiché inizia con la scelta di una produzione per A senza indicare come effettuare tale scelta: in realta alla riga 2 si vuole dire che è necessario provare una produzione, eventualmente "fallire" alla riga 8 e quindi riprovare con una nuova produzione. Quando non vi sono più produzioni da provare allora si segnala la presenza di un errore nella stringa di ingresso.
-
 #example("Parsing a discesa ricorsiva con backtracking")[
   Consideriamo la grammatica seguente e la stringa in ingresso $c a d$:
   $
@@ -727,10 +729,10 @@ Per le grammatiche della classe LL(1) è sempre possibile costruire un parser to
 
   - gli insiemi FIRST relativi alle parti destre delle produzioni sono due a due disgiunti.
 
-  - Esiste al più una parte destra che può derivare $epsilon$ in questo caso l'insieme FOLLOW della variabile deve essere disgiunto dagli insiemi FIRST di tutte le parti destre, cioè dal FIRST della variabile.
+  - Esiste al più una parte destra che può derivare $epsilon$ e in questo caso l'insieme FOLLOW della variabile deve essere disgiunto dagli insiemi FIRST di tutte le parti destre, cioè dal FIRST della variabile.
 ]
 
-Se le regole per la variabile $A$ sono $A-> alpha_1 bar alpha_2 bar ... bar alpha_k$ allora:
+Se le regole per la variabile $A$ sono $A-> alpha_1 bar alpha_2 bar ... bar alpha_k$, allora:
 #figure(grid(
   columns: 3,
   algo(
@@ -819,7 +821,7 @@ $"FOLLOW"(E')$, cioè è $)$ oppure $\$$, si sceglie
 $E' -> epsilon$.
 
 ==== Tabelle di parsing predittivo
-Le informazioni fornite dagli insiemi FIRST e FOLLOW possono essere raccolte in una tabella di parsing predittivo, $M$, in cui le righe corrispondono alle variabili e le colonne ai terminali e al marcatore di fine stringa \$. Il contenuto di $M[A, a]$ indica la regola da utilizzare per espandere la variabile $A$ quando il prossimo simbolo in ingresso è $a$.
+Le informazioni fornite dagli insiemi FIRST e FOLLOW possono essere raccolte in una tabella di parsing predittivo $M$, ovvero una matrice bidimensionale in cui le righe corrispondono alle variabili e le colonne ai terminali e al marcatore di fine stringa \$. Il contenuto di $M[A, a]$ indica la regola da utilizzare per espandere la variabile $A$ quando il prossimo simbolo in ingresso è $a$.
 
 La costruzione della tabella si basa sul fatto che la regola $A-> alpha$ viene scelta soltanto se il simbolo in ingresso $a in$ FIRST($alpha$), oppure $alpha der(*) epsilon$ e $a in$ FOLLOW($A$) (in questo caso può essere $a = \$$).
 
@@ -836,6 +838,8 @@ Se in $M[A, a]$ non c'è nessuna regola si ha una condizione di errore: il simbo
 Se $M[A, a]$ contiene più di una regola allora la grammatica non è LL(1) perché $a$ appartiene agli insiemi FIRST di due regole distinte oppure $A der(*) epsilon$ e $a$ appartiene al FOLLOW($A$) e al FIRST di una regola per $A$.
 
 #example(multiple: true)[
+
+  1)
   #grid(
     column-gutter: 12.5%,
     columns: 3,
@@ -878,7 +882,9 @@ Se $M[A, a]$ contiene più di una regola allora la grammatica non è LL(1) perch
     [$T'$], [            ], [$T' -> epsilon'$], [$T' -> *F T'$], [           ], [$T' -> epsilon$], [$T' -> epsilon$],
     [$F$], [$F ->$ *id*], [                ], [             ], [$F -> (E)$], [               ], [               ],
   ))
-  #line(length: 100%)
+  Gli spazi vuoti nelle colonne di questa tabella indicano condizioni di errore, gli altri indicano quale produzione usare per espandere un non-terminale.\
+
+  2)
   #block(
     $
       & S -> i E t S | i E t S e S | a \
@@ -905,15 +911,15 @@ Se $M[A, a]$ contiene più di una regola allora la grammatica non è LL(1) perch
       & "FOLLOW"(bold(id)) && ="FOLLOW"(S) && ={e, \$}
     $],
   )
-  #figure(table(
-    columns: (.33fr, .9fr, 1fr, 1fr, 1fr, .75fr, .75fr),
-    rows: (1.75em, 1.75em, 3.5em, 1.75em),
-    align: horizon,
-    table.header([], [$a$], [$b$], [$e$], [$i$], [$t$], [\$]),
-    [$S$], [$S -> a$], [        ], [                             ], [$S -> i E t S S'$], [], [               ],
-    [$S'$], [        ], [        ], [$&S' -> e S \ &S' -> epsilon$], [                 ], [], [$S' -> epsilon$],
-    [$E$], [        ], [$E -> b$], [                             ], [                 ], [], [               ],
-  ))
+#figure(table(
+  columns: (.33fr, .9fr, 1fr, 1fr, 1fr, .75fr, .75fr),
+  rows: (1.75em, 1.75em, 3.5em, 1.75em),
+  align: horizon,
+  table.header([], [$a$], [$b$], [$e$], [$i$], [$t$], [\$]),
+  [$S$], [$S -> a$], [ ], [ ], [$S -> i E t S S'$], [], [ ],
+  [$S'$], [ ], [ ], text(fill: red)[$S' -> e S$ \ $S' -> epsilon$], [ ], [], [$S' -> epsilon$],
+  [$E$], [ ], [$E -> b$], [ ], [ ], [], [ ],
+))
   Questa non è quindi una grammatica LL(1).
 ]
 
@@ -927,6 +933,7 @@ Il parser è dotato di:
 - uno stream di uscita
 
 Inizialmente lo stack contiene il simbolo \$ (in fondo) e il simbolo distinto della grammatica. Ad ogni passo, il parser considera il simbolo $X$ in cima allo stack e il simbolo d'ingresso corrente $a$.
+
 - Se $X$ è una variabile, il parser esamina l'elemento $M[X, a]$
   - se contiene una regola $X -> alpha$ allora, nello stack, $X$ viene sostituito da $alpha$ (il primo simbolo in testa), ed eventualmente vengono costruiti i nodi corrispondenti nell'albero di parsing;
   - se è vuoto si ha una situazione di errore che può essere segnalata.
@@ -934,7 +941,7 @@ Inizialmente lo stack contiene il simbolo \$ (in fondo) e il simbolo distinto de
   - se sono uguali $X$ viene rimosso dallo stack e si avanza al prossimo simbolo in ingresso
   - se sono diversi si ha una situazione di errore.
 
-Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la stringa in esame è stata scandita completamente, la stringa viene accettata. Il comportamento del parser è descritto dalle sue configurazioni che sono costituite dal contenuto dello stack e dalla parte di input ancora da esaminare.
+Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la stringa in esame è stata scandita completamente, la stringa viene accettata. Il comportamento del parser è descritto dalle sue *configurazioni* che sono costituite dal contenuto dello stack e dalla parte di input ancora da esaminare.
 
 
 #figure(diagram(
@@ -961,20 +968,19 @@ Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la string
   edge(<center>, (0.7, 2), "-|>"),
   edge(<center>, <right>, "-|>"),
   edge(<center>, <bottom>, "-|>"),
-))
+),
+  caption: "Modello di una parser predittivo guidato da una tabella.",
+)
 
+Di seguito un *algoritmo* di *parsing predittivo guidato* da una *tabella*:
 
-#[
-  #set heading(numbering: none, outlined: false)
-  === Algoritmo di parsing predittivo guidato da una tabella
-]
 *INPUT*: Una stringa $w$ e una tabella $M$ relativa ad una grammatica $G$.\
 *OUTPUT*: Se $w in L(G)$, una derivazione sinistra di $w$, altrimenti un errore.\
-*METODO*: Inizialmente $w\$$ nel buffer, il simbolo iniziale $S\$$ nello stack ($S$ in cima),
+*METODO*: Inizialmente $w\$$ nel buffer, il simbolo iniziale $S\$$ nello stack ($S$ in cima).
 #figure(algo()[
   _ip_ punta al primo simbolo $a$ di $w$;\
-  assegna a $X$ il simbolo in cima allo stack $PP(X="pop"(PP))$;\
-  while($X cancel(=, angle: #45deg) \$$) {#i\
+  assegna a $X$ il simbolo in cima allo stack $PP space (X="pop"(PP))$;\
+  while($X != \$$) {#i \/\* lo stack non è vuoto \*\/ \
   if ($X = a$) avanza il puntatore $i p$;\
   else if ($X in Sigma union {\$}$) errore();\
   else if ($M[X, a] = emptyset$) errore();\
@@ -1023,7 +1029,7 @@ Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la string
 
     table.hline(start: 0),
   ),
-  caption: [Mosse del parser predittivo durante l'analisi della stringa *id* + *id* \* *id* ],
+  caption: [Mosse di un parser predittivo durante l'analisi della stringa *id* + *id* \* *id* (grammatica dell'ultimo esempio)],
 )
 
 #figure(
@@ -1049,7 +1055,7 @@ Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la string
     [*id*   ], [$T'E'\$$], [$*+bold(id)\$$], [consuma *id*          ],
     [*id*   ], [$*F T'E'\$$], [$*+bold(id)\$$], [output $T' -> *F T'$],
     [*id* \*], [$F T'E'\$$], [$+bold(id)\$$], [consuma $*$],
-    [*id* \*], [$F T'E'\$$], [$+bold(id)\$$], [                      ],
+    [*id* \*], [$F T'E'\$$], [$+bold(id)\$$], [errore(): $M[F, +] = emptyset$],
   ),
   caption: [Blocco del parser dovuto alla stringa in input non valida *id*\* + *id*],
 )
@@ -1081,12 +1087,10 @@ Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la string
     [( *id*], [$T'E')T'E'\$$], [\$     ], [consuma *id*                               ],
     [( *id*], [$E')T'E'\$$], [\$     ], [output  $T' -> epsilon$                    ],
     [( *id*], [$)T'E'\$$], [\$     ], [output  $E' -> epsilon$                    ],
-    [( *id*], [$)T'E'\$$], [\$     ], [errore(): ')' $cancel(angle: #15deg, =)$\$],
+    [( *id*], [$)T'E'\$$], [\$     ], [errore(): ')' $!=$ \$],
   ),
-  caption: [Blocco del parser dovuto alla stringa in input non valida (*id*],
+  caption: [Blocco del parser dovuto alla stringa in input non valida (*id*. L'errore scatta all'*if* della riga 13 dell'algoritmo: l'input finisce ma ci si aspettava un altro ')'.],
 )
-
-
 
 == Parsing Bottom-Up
 
