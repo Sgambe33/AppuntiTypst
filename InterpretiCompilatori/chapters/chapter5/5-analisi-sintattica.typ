@@ -1101,7 +1101,7 @@ Il parsing bottom-up procede alla costruzione di un albero di parsing per una da
     $
       & E -> T        && | E + T \
       & T -> F        && | T * F \
-      & F -> bold(id) && | (E)
+      & F -> bold(id) && | "(" E ")"
     $,
   )
   #figure(diagram(
@@ -1270,37 +1270,40 @@ Il parsing bottom-up procede alla costruzione di un albero di parsing per una da
   ))
 ]
 
-=== Riduzioni, potatura e handle
+=== Riduzioni
 Gli analizzatori bottom-up partono da una stringa $w$ e procedono a ritroso, effettuando una progressiva riduzione, fino ad ottenere il simbolo distinto $S$. I parser bottom-up si basano sul meccanismo di *riduzione* che consiste nel sostituire la parte destra di una regola con la parte sinistra.
 
-Per definizione, una *riduzione* è l'esatto *opposto* di un passo di *derivazione* (si ricordi che in una derivazione un non-terminale in una forma sentenziale viene sostituito dal corpo di una delle sue produzioni). Lo scopo del parsing bottom-up è quindi quello di costruire una derivazione al rovescio.
+Per definizione, una *riduzione* è esattamente l'*inverso* di un passo di *derivazione* (si ricordi che in una derivazione un non-terminale in una forma sentenziale viene sostituito dal corpo di una delle sue produzioni). Lo scopo del parsing bottom-up è quindi quello di costruire una derivazione al rovescio.
 
 Per gli esempi precedenti, considerando le radici dei sottoalberi, si hanno le sequenze di stringhe:
-- $text("id") * text("id") quad -> quad F * text("id") quad -> quad T * text("id") quad -> quad T * F quad -> quad T quad -> quad E$
-- $text("id") + text("id") quad -> quad F + text("id") quad -> quad T + text("id") quad -> quad E + text("id") quad -> quad E + F quad -> quad E + T quad -> quad E$
+
+- $text("id") * text("id"), space F * text("id"), space T * text("id"), space T * F, space T, space E$
+- $text("id") + text("id"), space F + text("id"), space T + text("id"), space E + text("id"), space E + F, space E + T, space E$
+
 che corrispondono alle derivazioni *destre*:
+
 - $E => T => T * F => T * text("id") => F * text("id") => text("id") * text("id")$
 - $E => E + T => E + F => E + text("id") => T + text("id") => F + text("id") => text("id") + text("id")$
 
-Ad ogni passo dell'analisi, i parser bottom-up effettuano una riduzione oppure scandiscono un simbolo in ingresso. Per questo sono detti anche parser shift-reduce, impila-riduci, sposta-riduci.
-Le decisioni fondamentali ad ogni passo sono se effettuare una riduzione e quale regola utilizzare.
+Ad ogni passo dell'analisi, i parser bottom-up effettuano una riduzione oppure scandiscono un simbolo in ingresso. Per questo sono detti anche parser *shift-reduce* (impila-riduci, sposta-riduci).
+Le decisioni fondamentali ad ogni passo sono _se_ effettuare una riduzione e _quale_ regola utilizzare.
 
-#definition()[
+=== Handle e potatura
+
+#definition("Handle")[
   Una *maniglia* (*handle*) è una sottostringa che corrisponde alla parte destra di una produzione (il corpo) e la cui riduzione verso la parte sinistra (la testa) rappresenta un singolo passo legittimo nella costruzione della *derivazione destra a ritroso*.
 ]
-
-
-//TODO: scegliere tra le immagini
+Ecco alcuni esempi di handle per la grammatica dell'ultimo esempio:
 #figure(
   table(
     stroke: none,
-    columns: (3cm, 3cm, 4cm),
+    columns: (4cm, 3cm, 4cm),
     align: start,
     table.hline(start: 0),
     table.header(
-      table.cell(align: center, [Fdf dx]),
+      table.cell(align: center, [Forma di frase destra]),
       table.cell(align: horizon, [Handle]),
-      table.cell(align: center, [Regola riduzione]),
+      table.cell(align: center, [Produzione riducente]),
     ),
     table.hline(start: 0),
     table.vline(start: 0, x: 2, stroke: (paint: gray, dash: "dotted")),
@@ -1313,7 +1316,7 @@ Le decisioni fondamentali ad ogni passo sono se effettuare una riduzione e quale
     [$E$], [$$], [$$],
 
     table.hline(start: 0),
-
+    
     [*id* $+$ *id*], [*id*   ], [$F -->$ *id* ],
     [$F +$ *id*   ], [$F$], [$T --> F$],
     [$T +$ *id*   ], [$T$], [$E --> T$],
@@ -1323,13 +1326,14 @@ Le decisioni fondamentali ad ogni passo sono se effettuare una riduzione e quale
     [$E$], [$$], [$$],
     table.hline(start: 0),
   ),
-)
+  caption: "Esempi di handle nell'analisi sintattica bottom-up."
+) <esempi-handle>
 
-Nel primo esempio (nella stringa $T * text("id")$), il non-terminale $T$ *non* viene ridotto ad $E$ anche se è la parte destra della regola $E -> T$. Se lo facessimo, otterremmo $E * text("id")$, che è una via senza uscita (il parser andrebbe in errore). Nel secondo esempio, invece, nella stringa $T + text("id")$, $T$ *viene* ridotto con la regola $E -> T$.
-Questo dimostra un concetto chiave: *una sottostringa che corrisponde alla parte destra di una regola non è necessariamente un handle in quel momento*. Dipende dal contesto e dalle precedenze.
+Nel primo esempio, sebbene $T$ sia la parte destra della produzione $E -> T$, il non-terminale $T$ *non* è un handle per la forma di frase $T * bold(text("id"))$. Infatti se $T$ fosse sostituito da $E$ otterremmo la forma $E * bold(text("id"))$ che non può essere derivata dal simbolo iniziale $E$. Nel secondo esempio, invece, nella stringa $T + bold(text("id"))$, $T$ viene ridotto con la regola $E -> T$.\
+Da questo si deduce che una sottostringa che corrisponde alla parte destra di una regola *non è necessariamente un handle* in quel momento. Dipende dal contesto e dalle precedenze.
 
 
-Formalmente, se $S =>^* alpha A w => alpha beta w$, la produzione $A -> beta$ nella posizione che segue $alpha$ è un handle di $alpha beta w$.
+Formalmente, se $S =>_(r m)^* alpha A w =>_(r m) alpha beta w$, la produzione $A -> beta$ nella posizione che segue $alpha$ è un handle di $alpha beta w$ ($r m$ nella derivazione sta per _rightmost_).
 
 #figure(
   diagram(
@@ -1341,7 +1345,7 @@ Formalmente, se $S =>^* alpha A w => alpha beta w$, la produzione $A -> beta$ ne
     node((2.5, 4), $A$, name: <a>),
     node((-2, 7.75), $alpha$),
     node((2.5, 7.75), $beta$),
-    node((8.5, 7.75), $omega$),
+    node((8.5, 7.75), $w$),
 
     edge(<s>, <a>, dash: "dashed"),
     edge(<s>, (15, 7), (3.75, 7)),
@@ -1354,24 +1358,25 @@ Formalmente, se $S =>^* alpha A w => alpha beta w$, la produzione $A -> beta$ ne
 Alternativamente, un handle per una forma sentenziale destra $gamma$ è costituito dalla produzione $A -> beta$ e da una posizione in $gamma$ in cui si trova la stringa $beta$, tale che la sostituzione di tale occorrenza di $beta$ con $A$ produce la forma sentenziale destra precedente in una derivazione destra di $gamma$.
 Si noti che la stringa $w$ a destra dell'handle deve contenere solo simboli terminali. Per semplicità, parlando di handle, ci riferiremo al corpo $beta$ di una produzione $A -> beta$ piuttosto che alla produzione stessa. Se una grammatica non è ambigua, allora ogni forma sentenziale destra della grammatica ammette uno e un solo handle.
 
-Una derivazione destra a rovescio può essere ottenuta mediante un processo noto come *potatura* (*pruning*). Si comincia dalla stringa $w$ costituita dai simboli terminali da analizzare:
+Una derivazione destra a rovescio può essere ottenuta mediante un processo noto come *potatura* (o *handle pruning*). Si comincia dalla stringa $w$ costituita dai simboli terminali da analizzare. Se $w$ è una stringa della grammatica, poniamo $w = y_n$, in cui $y_n$ indica la forma sentenziale destra $n$-esima di una derivazione destra ancora ignota:
 $
   S = gamma_0 => gamma_1 => gamma_2 => ... => gamma_(n-1) => gamma_n = w
 $
 Per ricostruire questa derivazione in ordine inverso, si individua l'handle $beta_n$ in $gamma_n$ e lo si sostituisce con la parte sinistra della regola $A_n -> beta_n$, in modo da ottenere la forma sentenziale destra precedente $gamma_(n-1)$.
-Poi si individua l'handle $beta_(n-1)$ in $gamma_(n-1)$ e si sostituisce con $A_(n-1)$, e così via. Se, procedendo a ritroso in questo modo, otteniamo una forma sentenziale destra costituita unicamente dal simbolo iniziale $S$ della grammatica, significa che il parsing è stato completato con successo.
+Poi si individua l'handle $beta_(n-1)$ in $gamma_(n-1)$ e si sostituisce con $A_(n-1)$, e così via. Se, procedendo a ritroso in questo modo, otteniamo una forma sentenziale destra costituita unicamente dal simbolo iniziale $S$ della grammatica, significa che il parsing è stato completato con successo. La sequenza di produzioni utilizzate per le riduzione, letta in ordine inverso, costituisce una derivazione destra della stringa $w$. Il problema fondamentale è riuscire ad individuare l'handle corretto in ogni forma sentenziale destra, perché questa può contenere diverse parti destre di produzioni.
 
 === Il modello Shift-Reduce
-Nel parsing *impila-riduci* (*shift-reduce*) si usa uno stack per mantenere i simboli grammaticali e un buffer di ingresso che contiene la parte di input ancora da analizzare. Il simbolo `$` viene utilizzato sia come marcatore di fine stringa sia per indicare il fondo dello stack. Inizialmente, lo stack contiene solo `$` e il buffer di ingresso contiene la stringa $w \$$.
+Nel parsing *impila-riduci* (*shift-reduce*) si usa uno stack per mantenere i simboli grammaticali e un buffer di ingresso che contiene la parte di input ancora da analizzare. Il simbolo di fine stringa $\$$ viene utilizzato sia come marcatore di fine stringa sia per indicare il fondo dello stack. Inizialmente, lo stack contiene solo $\$$ e il buffer di ingresso contiene la stringa $w \$$.
 
-Un aspetto fondamentale di questo approccio è che una *maniglia* (handle), subito prima di essere individuata e ridotta, si trova *sempre in cima allo stack*.
+Un aspetto fondamentale di questo approccio è che un handle, subito prima di essere individuato come tale, si trova *sempre in cima allo stack*.
 
 
 La stringa in ingresso viene scandita da sinistra a destra. Il parser inserisce nello stack (azione di *shift*) zero o più simboli finché in cima non si trova una maniglia $beta$. A questo punto viene effettuata una riduzione (azione di *reduce*), sostituendo $beta$ con il non-terminale posto alla sinistra della regola opportuna. Il parser ripete questo procedimento finché non rileva un errore oppure lo stack contiene $\$S$ e nell'ingresso è rimasto solo $\$$, segno che la stringa è stata accettata.
 
-Un parser shift-reduce può compiere quattro azioni fondamentali:
+Un parser shift-reduce può compiere quattro azioni fondamentali ad ogni passo:
+
 + *Shift*: inserisce il prossimo simbolo in ingresso in cima allo stack.
-+ *Reduce*: il simbolo più a destra della stringa da ridurre si trova in cima allo stack. Si effettua una riduzione sostituendo la parte dx della regola con la parte sx.
++ *Reduce*: il simbolo più a destra della stringa da ridurre si trova in cima allo stack. Si effettua una riduzione sostituendo la parte destra della regola con la parte sinistra.
 + *Accept*: indica il corretto completamento dell'analisi.
 + *Error*: si è verificata una situazione di errore.
 
@@ -1379,6 +1384,8 @@ Un parser shift-reduce può compiere quattro azioni fondamentali:
   Nelle tabelle di tracciamento successive, lo stack viene rappresentato con l'elemento di testa a destra. In questo modo, il contenuto dello stack e l'input rimanente, letti di seguito, corrispondono esattamente alla forma sentenziale destra corrente.
 ]
 
+Di seguito sono riportati due esempi di tracciamento di un parser shift-reduce. Il primo esempio riguarda la grammatica $S -> a S b | a A b, A -> a A c | a c$ e la stringa $a a a a c c b b$. Il secondo esempio riguarda la grammatica $E -> E + T | T, T -> T * F | F, F -> bold(id) space | (E)$ e le stringe $bold(text("id")) * bold(text("id"))$ e $bold(text("id")) + bold(text("id"))$.
+#example()[
 #grid(
   columns: (.2fr, .7fr),
   column-gutter: 20pt,
@@ -1400,32 +1407,33 @@ Un parser shift-reduce può compiere quattro azioni fondamentali:
   )],
   grid.cell(
     table(
-      stroke: none,
-      columns: (.2fr, .3fr, .5fr),
-      align: (left, right, left),
-      table.header([Stack], [Input], [Azione]),
-      table.hline(start: 0),
-      table.vline(end: 1, x: 1, stroke: (paint: gray)),
-      table.vline(end: 1, x: 2, stroke: (paint: gray)),
-      table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
-      table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
-      [_\$_     ], [_aaaaccbb\$_], [_shift_              ],
-      [_\$a_    ], [_ aaaccbb\$_], [_shift_              ],
-      [_\$aa_   ], [_  aaccbb\$_], [_shift_              ],
-      [_\$aaa_  ], [_   accbb\$_], [_shift_              ],
-      [_\$aaaa_ ], [_    ccbb\$_], [_shift_              ],
-      [_\$aaaac_], [_     cbb\$_], [_reduce_ $A ->$ _ac_],
-      [_\$aaaA_ ], [_     cbb\$_], [_shift_              ],
-      [_\$aaaAc_], [_      bb\$_], [_reduce_ $A ->$ _aAc_],
-      [_\$aaA_  ], [_      bb\$_], [_shift_              ],
-      [_\$aaAb_ ], [_       b\$_], [_reduce_ $S ->$ _aAb_],
-      [_\$aS_   ], [_       b\$_], [_shift_              ],
-      [_\$aSb_  ], [_        \$_], [_reduce_ $S ->$ _aSb_],
-      [_\$S_    ], [_        \$_], [_accept_              ],
-    ),
+  stroke: none,
+  columns: (.2fr, .3fr, .5fr),
+  align: (left, right, left),
+  table.header([Stack], [Input], [Azione]),
+  table.hline(start: 0),
+  table.vline(end: 1, x: 1, stroke: (paint: gray)),
+  table.vline(end: 1, x: 2, stroke: (paint: gray)),
+  table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
+  table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
+  [$\$$], [$a a a c c b b\$$], [shift],
+  [$\$a$], [$a a c c b b\$$], [shift],
+  [$\$a a$], [$a c c b b\$$], [shift],
+  [$\$a a a$], [$c c b b\$$], [shift],
+  [$\$a a a a$], [$c b b\$$], [shift],
+  [$\$a a a a c$], [$c b b\$$], [reduce $A -> a c$],
+  [$\$a a a A$], [$c b b\$$], [shift],
+  [$\$a a a A c$], [$b b\$$], [reduce $A -> a A c$],
+  [$\$a a A$], [$b b\$$], [shift],
+  [$\$a a A b$], [$b\$$], [reduce $S -> a A b$],
+  [$\$a S$], [$b\$$], [shift],
+  [$\$a S b$], [$\$$], [reduce $S -> a S b$],
+  [$\$S$], [$\$$], [accept],
+)
   ),
 )
-
+]
+#example()[
 #figure(
   table(
     stroke: none,
@@ -1438,15 +1446,15 @@ Un parser shift-reduce può compiere quattro azioni fondamentali:
     table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
     table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
 
-    [_\$_          ], [_*id*\**id*\$_], [_shift_              ],
-    [_\$_ *id*     ], [_    \**id*\$_], [_reduce_ $F ->$ *id* ],
-    [_\$F_         ], [_    \**id*\$_], [_reduce_ $T -> F$],
-    [_\$T_         ], [_    \**id*\$_], [_shift_              ],
-    [_\$T \*_      ], [_      *id*\$_], [_shift_              ],
-    [_\$T \*_ *id* ], [_          \$_], [_reduce_ $F ->$ *id* ],
-    [_\$T \* F_    ], [_          \$_], [_reduce_ $T -> T * F$],
-    [_\$T_         ], [_          \$_], [_reduce_ $E -> T$],
-    [_\$E_         ], [_          \$_], [_accept_              ],
+    [$\$          $], [$bold(text("id")) * bold(text("id"))$], [shift              ],
+    [$\$bold(text("id"))     $], [$    \*bold(text("id"))\$$], [reduce $F -> bold(text("id")) $],
+    [$\$F        $],  [$    \*bold(text("id"))\$$],  [reduce $T -> F$],
+    [$\$T         $], [$    \*bold(text("id"))\$$], [shift              ],
+    [$\$T space \*      $], [$      bold(text("id"))\$$], [shift              ],
+    [$\$T space \* bold(text("id")) $], [$          \$$], [reduce $F -> bold(text("id")) $],
+    [$\$T space \* space F    $], [$          \$$], [reduce $T -> T  F$],
+    [$\$T         $], [$          \$$], [reduce $E -> T$],
+    [$\$E         $], [$          \$$], [accept              ],
   ),
   caption: [Tracciamento Shift-Reduce per la stringa $text("id") * text("id")$],
 )
@@ -1463,113 +1471,112 @@ Un parser shift-reduce può compiere quattro azioni fondamentali:
     table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
     table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
 
-    [_\$_         ], [_*id* + *id*\$_], [_shift_              ],
-    [_\$_   *id*  ], [_     + *id*\$_], [_reduce_ $F ->$ *id* ],
-    [_\$F_        ], [_     + *id*\$_], [_reduce_ $T -> F$],
-    [_\$T_        ], [_     + *id*\$_], [_reduce_ $E -> T$],
-    [_\$E_        ], [_     + *id*\$_], [_shift_              ],
-    [_\$E + _     ], [_       *id*\$_], [_shift_              ],
-    [_\$E + _ *id*], [_           \$_], [_reduce_ $F ->$ *id* ],
-    [_\$E + F_    ], [_           \$_], [_reduce_ $T -> F$],
-    [_\$E + T_    ], [_           \$_], [_reduce_ $E -> E + T$],
-    [_\$E_        ], [_           \$_], [_accept_             ],
+    [$\$          $], [$bold(text("id")) + bold(text("id"))\$$], [shift              ],
+    [$\$bold(text("id"))     $], [$    + bold(text("id"))\$$], [reduce $F -> bold(text("id")) $],
+    [$\$ F        $], [$    + bold(text("id"))\$$], [reduce $T -> F$],
+    [$\$ T        $], [$    + bold(text("id"))\$$], [reduce $E -> T$],
+    [$\$ E        $], [$    + bold(text("id"))\$$], [shift              ],
+    [$\$ E +      $], [$      bold(text("id"))\$$], [shift              ],
+    [$\$ E + bold(text("id")) $], [$          \$$], [reduce $F -> bold(text("id")) $],
+    [$\$ E + F    $], [$          \$$], [reduce $T -> F$],
+    [$\$ E + T    $], [$          \$$], [reduce $E -> E + T$],
+    [$\$ E        $], [$          \$$], [accept              ],
   ),
-  caption: [Tracciamento Shift-Reduce per la stringa $text("id") + text("id")$],
+  caption: [Tracciamento Shift-Reduce per la stringa $bold(text("id")) + bold(text("id"))$],
 )
+]
+Ci sono due problemi fondamentali da risolvere per implementare un parser shift-reduce:
 
-- Quando in cima allo stack c’è la parte destra di una regola, come si fa a sapere se è l’handle e si deve fare la riduzione oppure è necessario fare ancora spostamenti?
+- quando in cima allo stack c'è la parte destra di una regola, come si fa a sapere se è l'handle e si deve fare la riduzione oppure è necessario fare ancora spostamenti?
 - In cima allo stack potrebbero esserci anche le parti destre di due diverse regole: quale si sceglie?
 
+Questi problemi sono risolti dai parser LR.
 
-== Parser LR
+== Parsing LR
 
-Il parsing LR($k$) è il metodo di analisi shift-reduce bottom-up più diffuso: la "L" indica la scansione dell'input da sinistra a destra (*Left-to-right*), la "R" indica la costruzione di una derivazione destra in ordine inverso (*Rightmost derivation*), e $k$ rappresenta il numero di simboli di lookahead (se omesso, $k=1$).
-I parser LR si basano sull'utilizzo di tabelle. Una grammatica per la quale si può costruire una tabella di parsing (con i metodi che seguiranno) viene detta grammatica LR. Perché una grammatica sia LR è sufficiente che un parser shift-reduce sia in grado di riconoscere gli handle delle forme di frase destre quando compaiono in cima allo stack.
+Il tipo più comune di parsing oggi adottato è il parsing LR($k$) (un metodo shift-reduce bottom-up): la "L" indica che le stringhe in input sono scandite da sinistra a destra (_Left-to-right_), la "R" indica che si costruiscono derivazioni destre in ordine inverso (_Rightmost derivation_), e $k$ rappresenta il numero di simboli di lookahead (se omesso, $k=1$).\
+I parser LR si basano sull'utilizzo di tabelle. Una grammatica per la quale si può costruire una tabella di parsing (con i metodi che vedremo) viene detta grammatica LR. Perché una grammatica sia LR è sufficiente che un parser shift-reduce sia in grado di riconoscere gli handle delle forme di frase destre quando compaiono in cima allo stack.
 
 Il parsing LR è importante per le seguenti ragioni:
-- È idoneo per riconoscere i costrutti dei linguaggi di programmazione descritti da grammatiche context-free.
+
+- è idoneo per riconoscere i costrutti dei linguaggi di programmazione descritti da grammatiche context-free.
 - È il metodo più generale di parsing shift-reduce senza backtracking.
 - Individua errori sintattici appena possibile.
 - La classe delle grammatiche riconosciute da un parser LR è un sovrainsieme proprio di quelle riconosciute dai parser LL.
 
+=== L'Automa LR(0)
+Tornando ai problemi che ci ponevamo poco sopra: come fa un parser shift-reduce a decidere quando spostare e quando invece ridurre? Vedasi per esempio quanto avevamo osservato in @esempi-handle: ridurre $T$ a $E$ invece di effettuare uno spostamento sarebbe un errore.
 
-=== Componenti e configurazione del parser
-L'architettura del parser si compone di un buffer di input, un output (le riduzioni effettuate), uno stack esplicito e una tabella di parsing divisa in due sezioni: *ACTION* e *GOTO*.
+Un parser LR prende le decisioni sposta/riduci mantenendo memorizzate informazioni di stato che gli permettono di tenere traccia di dove si trova durante l'analisi. Gli stati rappresentano insiemi di *item*.
 
-A differenza di un generico parser shift-reduce, un parser LR memorizza nella pila una sequenza di *stati dell'automa* $s_0 s_1 dots s_m$ (con $s_m$ in cima), dove $s_0$ funge da marcatore di fondo. Da questi stati è sempre possibile risalire implicitamente ai simboli grammaticali associati.
-#definition()[
-  Una *configurazione* di un parser LR è una coppia che descrive lo stato esatto del sistema ad ogni istante:
-  $ (s_0 s_1 dots s_m, a_i a_(i+1) dots a_n \$) $
-  dove la prima componente rappresenta il contenuto della pila e la seconda la parte residua dell'input.
+#definition("Item LR(0)")[
+  Un *item LR(0)*, o più brevemente un item, di una grammatica $G$ è una produzione di $G$ con un punto in una qualche posizione del corpo. Un item indica quale prefisso di una regola abbiamo già analizzato ad un certo punto durante il parsing.
 ]
-
-=== L'Algoritmo di Parsing
-La mossa successiva del parser a partire dalla configurazione:
-$
-  (s_0 s_1 dots s_m, a_i a_(i+1) dots a_n \$)
-$
-è determinata dal simbolo d'ingresso corrente $a_i$ e dallo stato in cima allo stack $s_m$, consultando il valore della funzione ACTION[$s_m, a_i$]:
-
-+ Se ACTION[$s_m, a_i$] = *shift $s$*, il parser inserisce lo stato $s$ in cima allo stack e avanza nella stringa in ingresso, quindi passa alla configurazione:
-  $
-    (s_0 s_1 dots s_m s, a_(i+1) dots a_n \$)
-  $
-+ Se ACTION[$s_m, a_i$] = *reduce $A -> beta$*, il parser esegue i seguenti passi in sequenza:
-  1. *Output*: emette la produzione $A -> beta$ (permettendo la ricostruzione della derivazione destra invertita).
-  2. *Aggiornamento simboli (se presenti)*: rimuove dallo stack dei simboli la stringa $beta$ e vi inserisce il non-terminale $A$.
-  3. *Cambio di configurazione*: determina la lunghezza del corpo della regola $r = |beta|$. Rimuove dallo stack degli stati $r$ elementi, scoprendo il vecchio stato $s_(m-r)$. Consulta la tabella GOTO per calcolare il nuovo stato $s = text("GOTO")[s_(m-r), A]$ e lo inserisce in cima allo stack.
-
-  La configurazione passa quindi da:
-  $ (s_0 s_1 dots s_m, a_i a_(i+1) dots a_n \$) arrow.long (s_0 s_1 dots s_(m-r) s, a_i a_(i+1) dots a_n \$) $
-
-  #observation()[
-    Si noti che la stringa di input rimanente $(a_i a_(i+1) dots a_n \$)$ rimane del tutto invariata durante la riduzione. Inoltre, nei parser ottimizzati non è necessario mantenere fisicamente lo stack dei simboli, poiché dallo stato corrente si può sempre risalire al simbolo corrispondente.
-  ]
-+ Se ACTION[$s_m, a_i$] = *accept*, il parsing termina con successo.
-+ Se ACTION[$s_m, a_i$] = *error*, è stata rilevata una situazione di errore.
-
-Tutti i parser LR seguono esattamente questo stesso schema generale. L'unica differenza risiede nel modo in cui è costruita la tabella ACTION e GOTO.
-
-#figure(
-  image("images/2026-05-17-19-13-42.png", width: 60%),
-  caption: [Algoritmo generale di esecuzione di un Parser LR],
-)
-
-== L'Automa LR(0)
-Per calcolare gli stati da inserire nelle tabelle si ricorre alla *collezione canonica LR(0)*, un insieme di stati in cui ognuno racchiude una serie di *item*. Un item LR(0) non è altro che una produzione della grammatica contenente un punto ($dot.c$) nel corpo per indicare la porzione di regola già analizzata dal parser.
 
 #example()[
+
   La produzione $A -> X Y Z$ genera quattro item separati:
-  - $A -> dot X Y Z$: ci si aspetta di incontrare la stringa generata da $X Y Z$.
-  - $A -> X dot Y Z$: è stata riconosciuta la componente $X$, ci si aspetta $Y Z$.
-  - $A -> X Y Z dot$: l'intero corpo della regola è stato riconosciuto; l'item è completo ed è candidato ad una riduzione.
+  - $A -> dot X Y Z$: ci si aspetta di incontrare una stringa derivabile da $X Y Z$.
+  - $A -> X dot Y Z$: è stata riconosciuta una stringa derivabile da $X$, ci si aspetta nella sequenza d'ingresso restante di trovare una stringa derivabile da $Y Z$.
+  - $A -> X Y dot Z$: è stata $dots "derivabile da"space X Y space dots space "derivabile da" Z$. 
+  - $A -> X Y Z dot$ : indica che abbiamo appena riconosciuto una stringa derivabile da $X Y Z$ e che si potrebbe fare una riduzione con questa regola (sostituire $X Y Z$ con $A$).
+
+  La produzione $A -> epsilon$ genera un solo item $A -> dot$.
 ]
 
-=== Funzione CLOSURE
-Data una grammatica aumentata $G'$ (ottenuta aggiungendo la regola radice $S' -> S$ per gestire l'accettazione), la funzione `CLOSURE(I)` espande un insieme di item $I$ secondo il principio di aspettativa:
-+ Inserisci tutti gli item di $I$ in `CLOSURE(I)`.
+#definition("Collezione canonica e automa LR(0)")[
+  La *collezione canonica LR(0)* è una collezione di insiemi di item LR(0) che permette di costruire un automa a stati finiti deterministico (incompleto, in quanto non si ha uno stato pozzo corrispondente all'insieme di item vuoto), detto *automa LR(0)*, utilizzabile per prendere le decisioni durante il parsing. Ogni stato dell'automa LR(0) rappresenta un insieme di item della collezione canonica LR(0).
+]
 
-+ Se $A -> alpha dot B beta$ appartiene a `CLOSURE(I)` e $B -> gamma$ è una produzione in $G$, allora si aggiunge $B -> dot gamma$ a `CLOSURE(I)`, se non è già presente. Si ripete questa regola finché non è più possibile aggiungere nuovi item a `CLOSURE(I)`.
+Nelle prossime sezioni andremo a vedere come costruire la collezione canonica LR(0) per una grammatica $G$ (con simbolo iniziale $S$) e dunque l'automa LR(0) a partire da tale grammatica. Consideriamo innanzitutto la *grammatica aumentata* $G'$, ottenuta da $G$ aggiungendo un nuovo simbolo iniziale $S'$ e la regola $S' -> S$. Questa serve per l'accettazione che avviene solo quando il parser può effettuare la riduzione con la regola $S' -> S$. Introduciamo anche *due nuove funzioni*: CLOSURE e GOTO.
+
+
+==== Funzione CLOSURE
+
+Se $I$ è un insieme di item di G, CLOSURE($I$) è un insieme di item costruito a partire da $I$ seguendo queste regole:
+ + Inizialmente CLOSURE($I$) contiene tutti gli item di $I$
+ + Se $A -> alpha dot B beta$ appartiene a CLOSURE($I$) e $B -> gamma$ è una produzione in $G$, allora si aggiunge $B -> dot gamma$ a CLOSURE($I$), se non è già presente. Si ripete questa regola finché non è più possibile aggiungere nuovi item a CLOSURE($I$).
+
+Il fatto che $A -> alpha dot B beta$ appartiene a CLOSURE($I$) ci indica che, a un certo punto, durante il parsing, ci si aspetta di riconoscere una stringa in ingresso prodotta da $B beta$. Questa avrà un prefisso derivabile da $B$ applicando una delle regole per $B$. Si aggiungono quindi tutti gli item relativi alle regole per $B$, cioè se $B ->gamma$ è una regola in $G$, aggiungiamo $B -> dot gamma$ a CLOSURE($I$).
 
 #example()[
   #block(
     $
       & E' && -> && E \
       & E  && -> && E + T     && | T \
-      & T  && -> && T " * " F && | F \
+      & T  && -> && T "*" F && | F \
       & F  && -> && (E)       && | bold(id)
     $,
   )
 
-  Se $I = {[E' -> dot E]}$, allora `CLOSURE`($I$) contiene anche gli item:
+  Se $I = {[E' -> dot E]}$, allora CLOSURE($I$) contiene anche gli item:
+
   - $E -> dot E + T$ e $E -> dot T$ perché $dot$ precede _E_ in $E' -> dot E$
-  - $T -> dot T * F$ e $T -> dot F space$ perché $dot$ precede _T_ in $E' -> dot T$
-  - $F -> dot (E)$ e $F -> dot bold(id) quad$ perché $dot$ precede _E_ in $T' -> dot F$
+  - $T -> dot T * F$ e $T -> dot F space$ perché $dot$ precede _T_ in $E -> dot T$
+  - $F -> dot (E)$ e $F -> dot bold(id) quad$ perché $dot$ precede _E_ in $T -> dot F$
 ]
 
-=== Funzione GOTO
-La funzione `GOTO(I, X)` definisce lo spostamento del punto in avanti a fronte della lettura di un simbolo $X$ (terminale o non-terminale):
-$ text("GOTO")(I, X) = text("CLOSURE")({[A -> alpha X dot beta] | [A -> alpha dot X beta] in I}) $
+Per calcolare la chiusura di un insieme di item si può definire una funzione:
+
+#figure(algo(
+   title: [SetOfItems *CLOSURE*],
+   parameters: ([_I_],),
+ )[
+   J = I\
+   repeat#i\
+   for ( ogni item $A -> alpha dot B beta$ in J )#i\
+   for ( ogni regola $B -> dot gamma$ in G )#i\
+   aggiungi $B -> dot gamma$ a J;#d#d#d\
+   until nessun nuovo item è aggiunto a J;\
+   return J;
+])
+
+==== Funzione GOTO
+
+La funzione GOTO($I, X$), con $I$ insieme di item e $X$ simbolo della grammatica, è definita come chiusura dell'insieme di tutti gli item [$A -> alpha X dot beta$] tali che [$A -> alpha dot X beta$] appartiene ad $I$:
+$
+  "GOTO("I, X")" = "CLOSURE("{[A -> alpha X dot beta] | [A → alpha dot X beta] in I }")".
+$
 
 Viene usata per definire le transizioni dell'automa LR(0). Gli stati dell'automa corrispondono a insiemi di item e GOTO($I$, X) definisce la transizione dallo stato $I$ col simbolo $X$.
 
@@ -1579,392 +1586,247 @@ Viene usata per definire le transizioni dell'automa LR(0). Gli stati dell'automa
     "GOTO"(I, +) & = "CLOSURE"({[E → E + dot T ]}) \
                  & = {[E → E + dot T ], [T → dot T \* F], [T → dot F], [F → dot (E)], [F → dot id] }
   $
+  Per calcolare GOTO($I$, $X$) abbiamo dapprima esaminato in $I$ tutti gli item in cui il simbolo $+$ compare immediatamente alla destra del punto. L'item di interesse è $[E -> E dot + T]$. Spostando il punto a destra del simbolo $+$ otteniamo l'item $[E -> E + dot T]$. Infine, calcoliamo la chiusura dell'insieme fatto da questo unico item.
 ]
 
-Applicando iterativamente `CLOSURE` e `GOTO` a partire dall'item iniziale $[S' -> dot S]$, si mappa l'intero grafo degli stati dell'automa:
+==== Costruzione della collezione canonica e dell'automa LR(0)
+
+A questo punto siamo pronti per definire un algoritmo per il calcolo della collezione canonica ($C$) degli insiemi di item LR(0) relativi alla grammatica aumentata $G'$:
+
+#figure(algo(
+   title: [void *items*],
+   parameters: ($G'$,),
+ )[
+   C = CLOSURE({[$S' -> dot S$]});\
+   repeat#i\
+   for ( ogni insieme di item $I$ in $C$ )#i\
+   for ( ogni simbolo $X$ in $G$ )#i\
+   if ( GOTO($I, X$) non è vuoto e non appartiene a $C$ )#i\
+   aggiungi GOTO($I, X$) a $C$;#d#d#d#d\
+   until nessun nuovo insieme di item è aggiunto a $C$;
+])
 
 #figure(
-  image("images/2026-05-17-18-22-20.png", width: 60%),
-  caption: [Grafo delle transizioni dell'Automa LR(0) risultante],
+  image("images/automaLR0.png", width: 65%),
+  caption: [Automa LR(0) per la grammatica delle espressioni $E->E+T...$ degli esempi sopra.],
+) <automa-lr0>
+
+Gli stati dell'automa sono gli insiemi di item della collezione canonica $C$ e indichiamo con *stato* $bold(j)$ lo stato corrispondente all'insieme di item $I_j$. Lo stato iniziale è CLOSURE(${[S' -> dot S]}$) dove $S'$ è il simbolo iniziale della grammatica aumentata. Tutti gli stati sono finali, e la funzione di transizione è data dalla fuzione GOTO. L'automa per la grammatica delle espressioni $E -> E + T | T, T -> T * F | F, F -> (E) | bold(id)$ è riportato in @automa-lr0.
+
+Vediamo in che modo l'automa LR(0) fornisce un supporto per le decisioni di shift/reduce durante il parsing. Per l'analisi useremo delle tabelle in cui la prima colonna simula una pila con gli stati che si incontrano durante l'analisi, la seconda simula una pila che contiene i simboli grammaticali, la terza visualizza l'input via via che viene analizzato e l'ultima mostra le azioni da fare (shift/reduce). Supponiamo che con la stringa $gamma$ nell'automa si passi dallo stato iniziale $0$ ad uno stato $j$:
+
+  - se dallo stato $j$ c'è una transizione etichettata con il prossimo simbolo in ingresso $a$, allora si sceglie di impilare $a$, altrimenti
+  - si effettua una riduzione utilizzando la produzione indicata dagli item nello stato $j$.
+
+L'algoritmo di parsing LR che introdurremo a breve usa lo stack per tenere traccia degli stati e dei simboli grammaticali.\ Se scegliamo di impilare il simbolo di ingresso, si impila anche lo stato verso cui avviene lo shift. Quando si applica una riduzione $A -> X_1 X_2 dots X_n$, allora dalla pila degli stati dobbiamo togliere $n$ stati e dallo stato $j$ che rimane in cima alla pila guardare l'automa LR(0) per vedere qual è lo stato in cui $j$ va con il simbolo $A$. Ciò è coerente con il significato di item.
+
+Ecco degli esempi di analisi utilizzando l'automa LR(0) per il parsing delle stringhe $bold(text("id")) * bold(text("id"))$ e $bold(text("id")) + bold(text("id"))$.
+
+#figure(
+  table(
+    stroke: none,
+    columns: (.33fr, .33fr, .33fr, 1fr),
+    align: (left, left, right, left),
+    table.header([Stack], [Simboli], [Input], [Azione]),
+    table.hline(start: 0),
+    table.vline(end: 1, x: 1, stroke: (paint: gray)),
+    table.vline(end: 1, x: 2, stroke: (paint: gray)),
+    table.vline(end: 1, x: 3, stroke: (paint: gray)),
+    table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
+    table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
+    table.vline(start: 1, x: 3, stroke: (paint: gray, dash: "dashed")),
+
+    [$0$      ], [$\$                  $], [$bold(text("id")) * bold(text("id"))\$$], [shift 5],
+    [$0 space 5$    ], [$\$ bold(text("id")) $], [$                   * bold(text("id"))\$$], [reduce $F -> bold(text("id"))$],
+    [$0 space 3$    ], [$\$ F                $], [$                   * bold(text("id"))\$$], [reduce $T -> F$],
+    [$0 space 2$    ], [$\$ T                $], [$                   * bold(text("id"))\$$], [shift 7],
+    [$0 space 2 space 7$  ], [$\$ T * $], [$                     bold(text("id"))\$$], [shift 5],
+    [$0 space 2 space 7 space 5$], [$\$ T * bold(text("id"))$], [$                                 \$$], [reduce $F -> bold(text("id"))$],
+    [$0 space 2 space 7 space 10$], [$\$ T * F           $], [$                                 \$$], [reduce $T -> T * F$],
+    [$0 space 2$    ], [$\$ T                $], [$                                 \$$], [reduce $E -> T$],
+    [$0 space 1$    ], [$\$ E                $], [$                                 \$$], [accept],
+  ),
+  caption: [Parsing LR(0) per la stringa $bold(text("id")) * bold(text("id"))$],
+) <es1-lr0>
+Come si vede da @es1-lr0, il simbolo di ingresso è $bold(id)$ e lo stato 0 ha una transizione allo stato 5 in corrispondeza di $bold(id)$, dunque impiliamo. Alla riga 2 della tabella, lo stato 5, cioè il simbolo $bold(id)$, è stato posto sullo stack. Non ci sono transizioni dallo stato 5 per il nuovo simbolo di input $*$, dunque riduciamo: in base all'item $[F -> bold(id) dot]$, per la riduzione usiamo la produzione $F -> bold(id)$. Per quanto riguarda i simboli, la riduzione è stata realizzata rimuovendo dallo stack il corpo della produzione, che alla riga 2 è $bold(id)$, e impilando la testa della produzione, in questo caso $F$. Rimuoviamo quindi lo stato 5 dallo stack lasciando lo 0 in cima e cerchiamo una transizione relativa al simbolo $F$: 0 ha una transizione su $F$ verso lo stato 3, quindi impiliamo questo stato, corrispondente al simbolo $F$, e otteniamo la nuova configurazione mostrata alla riga 3.\ Osserviamo anche la riga 5, in cui lo stato 7 (simbolo $*$) è sulla cima dello stack. Questo stato ha una transizione allo stato 5 in corrispondenza del simbolo d'ingresso $bold(id)$, quindi impiliamo lo stato 5, corrispondente ad $bold(id)$, sullo stack. Lo stato 5 non ha transizioni uscenti, per cui si procede alla riduzione usando $F -> bold(id)$. Rimuovendo lo stato 5, relativo al corpo della produzione $bold(id)$, lo stato 7 rimane sulla cima dello stack. Infine, dal momento che lo stato 7 ha una transizione allo stato 10 sul simbolo $F$, impiliamo lo stato 10, cioè, appunto, il simbolo $F$.
+#figure(
+  table(
+    stroke: none,
+    columns: (.33fr, .33fr, .33fr, 1fr),
+    align: (left, left, right, left),
+    table.header([Stack], [Simboli], [Input], [Azione]),
+    table.hline(start: 0),
+    table.vline(end: 1, x: 1, stroke: (paint: gray)),
+    table.vline(end: 1, x: 2, stroke: (paint: gray)),
+    table.vline(end: 1, x: 3, stroke: (paint: gray)),
+    table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
+    table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
+    table.vline(start: 1, x: 3, stroke: (paint: gray, dash: "dashed")),
+
+    [$0$                      ], [$\$                      $], [$bold(text("id")) + bold(text("id"))\$$], [shift 5],
+    [$0 space 5$              ], [$\$ bold(text("id"))     $], [$                   + bold(text("id"))\$$], [reduce $F -> bold(text("id"))$],
+    [$0 space 3$              ], [$\$ F                    $], [$                   + bold(text("id"))\$$], [reduce $T -> F$],
+    [$0 space 2$              ], [$\$ T                    $], [$                   + bold(text("id"))\$$], [reduce $E -> T$],
+    [$0 space 1$              ], [$\$ E                    $], [$                   + bold(text("id"))\$$], [shift 6],
+    [$0 space 1 space 6$      ], [$\$ E +                  $], [$                     bold(text("id"))\$$], [shift 5],
+    [$0 space 1 space 6 space 5$],[$\$ E + bold(text("id"))$], [$                                     \$$], [reduce $F -> bold(text("id"))$],
+    [$0 space 1 space 6 space 3$],[$\$ E + F               $], [$                                     \$$], [reduce $T -> F$],
+    [$0 space 1 space 6 space 9$],[$\$ E + T               $], [$                                     \$$], [reduce $E -> E + T$],
+    [$0 space 1$              ], [$\$ E                    $], [$                                     \$$], [accept],
+  ),
+  caption: [Parsing LR(0) per la stringa $bold(text("id")) + bold(text("id"))$],
+) <es2-lr0>
+#observation("I limiti dell'automa LR(0)")[
+  Nell'esempio relativo alla stringa $bold(text("id")) * bold(text("id"))$, nella riga 4 della tabella è stata fatta la scelta $"shift" 7$, in accordo con la transizione in ingresso `*`. Tuttavia, lo stato 2 contiene anche l'item completo $E -> T dot$, quindi ci sarebbe anche la possibilità di applicare un'operazione di $"reduce"$ con la produzione $E -> T$.
+
+  In questo caso specifico, si è fatta la scelta corretta per far terminare l'analisi con successo. Se fosse stata scelta la riduzione, si sarebbe arrivati a uno stato di errore. L'automa LR(0) "puro", non guardando mai il lookahead (il prossimo simbolo in input), non possiede gli strumenti per risolvere questa ambiguità (nota come *Conflitto Shift/Reduce*). Per questo motivo, si rende necessario un parser più potente, come SRL, che utilizza l'insieme FOLLOW per risolvere queste indecisioni.
+]
+
+=== Algoritmo di parsing LR
+#figure(image("images/modelloParserLR.png", width: 65%))
+
+Un parser LR consiste di un input, un output, uno stack, un programma e una tabella composta da due parti: ACTION e GOTO. Il programma è lo stesso per tutti i parser LR, è la tabella che fa la differenza tra un parser e l'altro.
+
+Un parser LR legge in input un carattere alla volta e, a differenza di un generico parser shift-reduce, impila *stati* invece di simboli. Lo stack mantiene una sequenza di stati $s_0 s_1 dots s_m$ ($s_m$ in cima). Ogni stato è associato ad un simbolo grammaticale.
+
+==== Struttura della tabella di parsing LR(0)
+La tabella di parsing è composta da due parti: una funzione ACTION e una funzione GOTO.
+
++ La funzione ACTION prende come argomenti uno stato $i$ e un simbolo terminale $a$ (oppure il marcatore di fine input $\$$). Il valore ACTION[$i, a$] può assumere una delle quattro forme:
+
+  - *Shift $j$*: in cui $j$ è uno stato. L'azione svolta dal parser consiste in effetti nell'impilare il simbolo d'ingresso $a$ sullo stack, benché si utilizzi lo stato $j$ per rappresentare $a$.
+  - *Reduce $A -> beta$*: l'azione ha come effetto la sostituzione di $beta$ con $A$ in cima allo stack.
+  - *Accept*: il parser segnala il corretto riconoscimento della stringa.
+  - *Error*: il parser rileva un errore nell'ingresso e intraprende un'azione correttiva.
+
++ Estendiamo agli stati la funzione GOTO già definita: se GOTO[$I_i, A$] = $I_j$, la funzione mappa anche lo stato $i$ e il non-terminale $A$ nello stato $j$.
+
+==== Configurazione del parser LR
+
+Per descrivere il comportamento di un parser LR descriviamo il suo stato per mezzo dello stack e della parte rimanente della stringa in ingresso.
+
+#definition()[
+  Una *configurazione* di un parser LR è una coppia:
+  $
+    (s_0 s_1 dots s_m, a_i a_(i+1) dots a_n \$)
+  $
+  in cui la prima componente è il contenuto dello stack (testa a destra) e la seconda la parte di input rimanente.
+]
+
+Questa configurazione rappresenta la forma sentenziale destra:
+$
+  X_1 X_2 dots X_m a_i a_(i+1) dots a_n
+$
+dove $X_i$ è il simbolo corrispondente allo stato $s_i$. Lo stato $s_0$ non rappresenta nessun simbolo, ma il marcatore di fine stack.
+
+==== Comportamento del parser LR
+La mossa successiva del parser, a partire dalla configurazione
+$
+  (s_0 s_1 dots s_m, a_i a_(i+1) dots a_n \$)
+$
+è determinata dal simbolo d'ingresso corrente $a_i$ e dallo stato in cima allo stack $s_m$, consultando il valore della funzione ACTION[$s_m, a_i$]:
+
++ Se ACTION[$s_m, a_i$] = *shift $s$*, il parser inserisce lo stato $s$ in cima allo stack e avanza nella stringa in ingresso, quindi passa alla configurazione:
+  $
+    (s_0 s_1 dots s_m s, a_(i+1) dots a_n \$)
+  $
+  #observation()[
+    Non è necessario mettere fisicamente i simboli nello stack, poiché dagli stati si può sempre risalire ai simboli corrispondenti, ma non viceversa.
+  ]
++ Se ACTION[$s_m, a_i$] = *reduce $A -> beta$*, il parser esegue una riduzione passando alla configurazione:
+  $
+    (s_0 s_1 dots s_(m-r) s, a_i a_(i+1) dots a_n \$)
+  $
+  in cui $r = |beta|$ (lunghezza del corpo della regola) e $s = text("GOTO")[s_(m-r), A]$. Il parser rimuove dallo stack $r$ stati, corrispondenti ai simboli $X_(m-r+1) dots X_m$ che costituiscono $beta$, lasciando $s_(m-r)$ in cima allo stack, e quindi inserisce il nuovo stato $s$.
++ Se ACTION[$s_m, a_i$] = *accept*, il parsing termina con successo.
++ Se ACTION[$s_m, a_i$] = *error*, il parser ha rilevato un errore e chiama un'opportuna procedura di recupero dagli errori.
+
+Di seguito si illustra l'algoritmo di parsing LR, che segue lo schema appena descritto. Come detto prima, tutti i parser LR seguono esattamente questo stesso schema generale: l'unica differenza risiede nel modo in cui è costruita la tabella ACTION e GOTO.
+
+*INPUT*: Una stringa d'ingresso $w$ e una tabella di parsing LR costituita dalle funzioni ACTION e GOTO relative a una grammatica $G$.\
+*OUTPUT*: Se $w in L(G)$, i passi di riduzione relativi a un parsing bottom-up di $w$, altrimenti una segnalazione di errore.\
+*METODO*: Inizialmente il parser ha lo stato di partenza $s_0$ sullo stack e la sequenza $w\$$ nel buffer di ingresso.
+#figure(image("images/algoParsingLR.png", width: 90%), caption: "Programma di parsing LR")
+
+==== Costruzione di una tabella di parsing a partire dall'automa LR(0)
+È possibile costruire tabelle di parsing a partire dall'automa LR(0). Se la tabella in ogni casella non contiene ambiguità, allora la grammatica è LR(0). Queste però sono di scarsa utilità pratica.
+
+Dall'osservazione dell'automa LR(0), la costruzione della tabella tiene conto delle seguenti istruzioni. Per ogni stato $I$:
+
+- Se c'è un item $A -> alpha dot a beta$, con $a$ terminale, allora ACTION[$I, a$] = shift $j$, dove $j = text("GOTO")(I, a)$;
+- Se c'è un item $A -> alpha dot$, allora ACTION[$I, a$] = reduce ($A -> alpha$) *per ogni terminale* $a$ e per $\$$;
+- Se lo stato contiene l'item iniziale $S' -> S dot$, allora ACTION[$I, \$ $] = accept;
+- Per ogni non-terminale $B$, si pone GOTO[$I, B$] = $j$, dove $j = text("GOTO")(I, B)$.
+
+Nella tabella, "shift j" si abbrevia con "sj", mentre "reduce ($A -> alpha$)" si abbrevia con "ri", dove $i$ è il numero della produzione associata ad $A$, dopo che tutte le regole della grammatica sono state numerate. Di seguito un esempio.
+
+#example()[
+
+  Consideriamo la solita grammatica delle espressioni, numerando le produzioni:
+#grid(
+  columns: (auto, auto, auto, auto),
+  column-gutter: (2em, 4em, 1em),
+  row-gutter: 0.8em,
+  align: (left, left, left, left),
+  
+  $ (1) $, $ E -> E + T $, $ (4) $, $ T -> F $,
+  $ (2) $, $ E -> T $,     $ (5) $, $ F -> (E) $,
+  $ (3) $, $ T -> T * F $, $ (6) $, $ F -> bold(text("id")) $,
 )
-
-== Costruzione delle tabelle
-Una volta ricavata la collezione canonica degli stati $C = \{I_0, I_1, dots, I_n\}$, si può procedere alla compilazione delle tabelle.
-
-=== Il metodo LR(0) puro e i suoi limiti
-Le regole di riempimento standard per una tabella LR(0) prevedono che, per ogni stato $I_i$:
-- Se $[A -> alpha dot a beta] in I_i$ (con $a$ terminale) e $text("GOTO")(I_i, a) = I_j$, allora `ACTION`[$i, a$] = shift $j$.
-- Se $[A -> alpha dot] in I_i$ (item completo), allora `ACTION`[$i, a$] = reduce $A -> alpha$ *per qualsiasi carattere* $a$ dell'alfabeto e per il carattere di fine stringa $\$$.
-- Se $[S' -> S dot] in I_i$, allora `ACTION`[$i, \$$] = accept.
-- Se $text("GOTO")(I_i, B) = I_j$ (con $B$ non-terminale), allora `GOTO`[$i, B$] = $j$.
-
-#example()[
-  È possibile costruire tabelle di parsing a partire dall'automa LR(0). Se la tabella in ogni casella non contiene ambiguità, allora la grammatica è LR(0). Queste però sono di scarsa utilità pratica.
-  Nella tabella, "shift j" si abbrevia con "sj", mentre "reduce ($A -> alpha$)" si abbrevia con "ri", dove $i$ è il numero della produzione associata ad $A$, dopo che tutte le regole della grammatica sono state numerate, come nel seguente esempio:
-  + $E -> E + T$
-  + $E -> T$
-  + $T -> T * F$
-  + $T -> F$
-  + $F -> (E)$
-  + $F -> text("id")$
-
-  #figure(image("images/2026-05-17-19-16-54.png", width: 60%))
+ Ora costruiamo la tabella di parsing LR(0) a partire dall'automa LR(0) mostrato in @automa-lr0.
+  #figure(image("images/tabellaParsingLR0.png"))
+  Si osservi come in corrispondenza dello stato 2, la tabella ACTION[$2, *$] contenga due azioni: "shift 7" e "reduce 2". Questo è un conflitto shift/reduce.
 ]
 
-#observation("Il Conflitto Shift/Reduce")[
-  Questo approccio soffre di forti limitazioni macroscopiche. Se uno stato contiene contemporaneamente un item incompleto pronto per uno shift (es. $E -> E dot + T$) e un item completo pronto per una riduzione (es. $E -> T dot$), la casella della tabella conterrà due azioni sovrapposte. L'automa non sa se avanzare o ridurre; questo errore strutturale prende il nome di *conflitto shift/reduce*.
-]
+=== Parsing SLR
+Per eliminare ambiguità (conflitti shift/reduce) come quelle che emergerebbero nella casella ACTION[$2, *$] della tabella nell'esempio precedente costruita con le regole LR(0), si osserva che ha senso applicare una riduzione $A -> alpha$ solo se il prossimo simbolo di ingresso appartiene a $"FOLLOW"(A)$.
 
+Il metodo *SLR* (_Simple LR_) per la costruzione di tabelle di parsing è il più semplice e si basa proprio su questa osservazione. Le tabelle ottenute vengono dette *tabelle SLR* e i parser che le usano *parser SLR*.
 
-=== La soluzione SLR(1)
-Il metodo SLR risolve molti dei conflitti dell'LR(0) puro applicando un vincolo basato sui contesti semantici dei simboli. Una riduzione $A -> alpha$ ha senso posizionarla in una colonna $a$ *solo e soltanto se* quel simbolo terminale può legittimamente seguire la variabile $A$ all'interno di una frase valida del linguaggio.
+Si utilizzano gli item LR(0) e l'automa LR(0) visti precedentemente. Data una grammatica $G$:
 
-La regola di generazione della tabella si modifica esclusivamente nel punto delle riduzioni:
-- Se $[A -> alpha dot] in I_i$ (con $A eq.not S'$), si inserisce l'azione "reduce $A -> alpha$" *esclusivamente nelle colonne dei terminali $a$ tali che* $a in text("FOLLOW")(A)$.
+- si considera la grammatica aumentata $G'$ col nuovo simbolo iniziale $S'$.
+- Si costruiscono la collezione canonica $C$ e la funzione GOTO.
+- Si costruiscono gli elementi delle sezioni ACTION e GOTO.
+- È necessario conoscere gli insiemi $"FOLLOW"(A)$ per ogni variabile.
 
-Se, applicando la restrizione del `FOLLOW`, tutte le celle della tabella risultano libere da scelte multiple sovrapposte, la grammatica è definita ufficialmente una *grammatica SLR(1)*.
+==== Costruzione di una tabella di parsing SLR
+
+*INPUT*: Una grammatica aumentata $G'$.\
+*OUTPUT*: Le funzioni ACTION e GOTO della tabella di parsing SLR relativa alla grammatica aumentata $G'$.\
+*METODO*:
+1. Si costruisce la collezione $C = {I_0, I_1, dots, I_n}$ degli insiemi di item LR(0) di $G'$.
+2. Si costruisce ogni stato $i$ a partire dall'insieme $I_i$ e si determinano le azioni del parsing per questo stato:
+   - Se $[A -> alpha dot a beta] in I_i$ e $text("GOTO")(I_i, a) = I_j$, si assegna a ACTION[$i, a$] il valore "shift $j$".
+   - Se $[A -> alpha dot] in I_i$ e $A != S'$, si assegna a ACTION[$i, a$] il valore "reduce $A -> alpha$" per ogni $a in "FOLLOW"(A)$.
+   - Se $[S' -> S dot] in I_i$, si assegna a ACTION[$i, \$ $] il valore "accept".
+
+  #observation()[
+    Se l'applicazione delle regole precedenti porta a un conflitto (più di un'azione generata per la stessa casella ACTION[$i, a$]), significa che la grammatica non è SLR(1).
+  ]
+
+3. Se $text("GOTO")(I_i, A) = I_j$ per un non-terminale $A$, allora si pone GOTO[$i, A$] = $j$.
+4. A tutte le celle della tabella non definite dalle regole precedenti si assegna il valore "error".
+5. Lo stato iniziale del parser è quello costruito a partire dall'insieme di item contenente $[S' -> dot S]$.
+
+La tabella costruita con questo metodo è detta tabella SLR(1) di $G$, il parser che la utilizza è il parser SLR(1) per $G$; una grammatica per cui esiste una tabella SLR(1) priva di conflitti è detta grammatica SLR(1).
 
 #example()[
+
   Come prima, numeriamo le regole della grammatica e calcoliamo i FOLLOW:
+
   + $E -> E + T quad "FOLLOW"(E) = {+, ), \$}$
   + $E -> T$
-  + $T -> T * F quad "FOLLOW"(T) = {*, +, ), \$}$
+  + $T -> T * F quad " FOLLOW"(T) = {*, +, ), \$}$
   + $T -> F$
-  + $F -> (E) quad "FOLLOW"(F) = {*, +, ), \$}$
+  + $F -> (E) quad quad "FOLLOW"(F) = {*, +, ), \$}$
   + $F -> text("id")$
 
-  Nella tabella:
-  1. $s_i$ significa "shift e impila lo stato $i$";
-  2. $r_j$ significa "riduci con la regola numero $j$";
-  3. "acc" significa accetta;
-  4. Le caselle vuote indicano un errore sintattico.
+  Nella tabella SLR(1) che segue:
+  1. $s_i$ significa "impila lo stato $i$";
+  2. $r_j$ significa "riduci con la regola $j$";
+  3. $"acc"$ significa accetta;
+  4. Le caselle vuote indicano un errore.
 
-  #figure(image("images/2026-05-17-19-22-23.png", width: 60%))
-  #figure(image("images/2026-05-17-19-22-34.png", width: 60%))
-  #figure(image("images/2026-05-17-19-22-44.png", width: 60%))
-  #figure(image("images/2026-05-17-19-22-52.png", width: 60%))
+  #figure(image("images/tabellaParsingSLR.png", width: 90%))
 ]
-
-// === Insiemi di item
-
-// Un parser LR prende le decisioni shift/reduce mantenendo memorizzate informazioni di stato che gli permettono di tenere traccia di dove si trova durante l'analisi. Gli stati rappresentano insiemi di *“item”*. Un *item* LR(0), o più brevemente un item, di una grammatica G è una produzione di G con un punto in una qualche posizione del corpo. Un item indica quale prefisso di una regola abbiamo già analizzato ad un certo punto durante il parsing.
-
-// #example(
-//   multiple: true,
-// )[
-//   Per esempio, la produzione $A -> X Y Z$ ammette quattro item:
-//   $
-//     & A-> dot X Y Z \
-//     & A-> X dot Y Z \
-//     & A-> X Y dot Z \
-//     & A-> X Y Z dot
-//   $
-//   - L'item $A-> dot X Y Z$ indica che ci aspettiamo in ingresso una stringa derivabile da $X Y Z$.
-//   - L'item $A-> X dot Y Z$ indica che abbiamo appena riconosciuto una stringa derivabile da X e ci aspettiamo in ingresso una stringa derivabile da $Y Z$.
-//   - L'item $A-> X Y Z dot$ indica che abbiamo appena riconosciuto una stringa derivabile da $X Y Z$ e che si potrebbe fare una riduzione con questa regola (sostituire $X Y Z$ con $A$).
-
-//   La produzione $A -> epsilon$, invece, genera il solo item $A -> dot$ .
-// ]
-
-// #definition()[
-//   La *collezione canonica LR(0)* è una collezione di insiemi di item LR(0) che permette di costruire un automa a stati finiti deterministico (incompleto), detto *automa LR(0)*, utilizzabile per prendere le decisioni durante il parsing. Ogni stato dell'automa LR(0) rappresenta un insieme di item della collezione canonica LR(0).
-// ]
-
-// Per costruire la collezione canonica LR(0) per una grammatica $G$ (con simbolo iniziale $S$) consideriamo la grammatica aumentata $G'$, ottenuta da $G$ aggiungendo un nuovo simbolo iniziale $S'$ e la regola $S' → S$. Questa serve per l'accettazione che avviene solo quando il parser può effettuare la riduzione con la regola $S' → S$. Introduciamo anche due nuove funzioni: *CLOSURE* e *GOTO*.
-
-// ==== Funzione CLOSURE
-// Se $I$ è un insieme di item di G, CLOSURE($I$) è un insieme di item costruito a partire da $I$ seguendo queste regole:
-// + Inizialmente CLOSURE($I$) contiene tutti gli item di $I$
-// + Se $A -> alpha dot B beta$ appartiene a CLOSURE($I$) e $B -> gamma$ è una produzione in $G$, allora si aggiunge $B -> dot gamma$ a CLOSURE($I$), se non è già presente. Si ripete questa regola finché non è più possibile aggiungere nuovi item a CLOSURE($I$).
-
-// Se $A -> alpha dot B beta$ appartiene a CLOSURE($I$), a un certo punto durante il parsing, ci si aspetta di riconoscere una stringa prodotta da $B beta$. Questa avrà un prefisso derivabile da $B$ applicando una delle regole per $B$. Si aggiungono quindi tutti gli item relativi alle regole per $B$, cioè se $B ->gamma$ è una regola in $G$, aggiungiamo $B -> dot gamma$ a CLOSURE($I$).
-
-// #example()[
-//   #block(
-//     $
-//       & E' && -> && E \
-//       & E  && -> && E + T     && | T \
-//       & T  && -> && T " * " F && | F \
-//       & F  && -> && (E)       && | bold(id)
-//     $,
-//   )
-
-//   Se $I = {[E' -> dot E]}$, allora `CLOSURE`($I$) contiene anche gli item:
-//   - $E -> dot E + T$ e $E -> dot T$ perché $dot$ precede _E_ in $E' -> dot E$
-//   - $T -> dot T * F$ e $T -> dot F space$ perché $dot$ precede _T_ in $E' -> dot T$
-//   - $F -> dot (E)$ e $F -> dot bold(id) quad$ perché $dot$ precede _E_ in $T' -> dot F$
-// ]
-
-// Per calcolare la chiusura di un insieme di item si può definire una funzione:
-
-// #figure(algo(
-//   title: [SetOfItems *CLOSURE*],
-//   parameters: ([_I_],),
-// )[
-//   J = I\
-//   repeat#i\
-//   for ( ogni item $A -> alpha dot B beta$ in J )#i\
-//   for ( ogni regola $B -> dot gamma$ in G )#i\
-//   aggiungi $B -> dot gamma$ a J;#d#d#d\
-//   until nessun nuovo item è aggiunto a J;\
-//   return J;
-// ])
-
-// ==== Funzione GOTO
-
-// #definition()[
-//   GOTO($I, X$), con $I$ insieme di item e $X$ simbolo della grammatica, è definita come chiusura dell'insieme di tutti gli item [$A -> alpha X dot beta$] tali che [$A -> alpha dot X beta$] appartiene ad $I$.
-//   $
-//     "GOTO("I, X")" = "CLOSURE("{[A -> alpha X dot beta] | [A → alpha dot X beta] in I }")"
-//   $
-// ]
-
-// Viene usata per definire le transizioni dell'automa LR(0). Gli stati dell'automa corrispondono a insiemi di item e GOTO($I$, X) definisce la transizione dallo stato $I$ col simbolo $X$.
-
-// #example()[
-//   Se $I = {[E' -> E dot], [E -> E dot + T ]}$ allora:
-//   $
-//     "GOTO"(I, +) & = "CLOSURE"({[E → E + dot T ]}) \
-//                  & = {[E → E + dot T ], [T → dot T \* F], [T → dot F], [F → dot (E)], [F → dot id] }
-//   $
-// ]
-
-// Per calcolare la collezione canonica degli insiemi di item LR(0) si può definire una funzione:
-
-// #figure(algo(
-//   title: [void *items*],
-//   parameters: ($G'$,),
-// )[
-//   C = `CLOSURE`({[$S' -> dot S$]});\
-//   repeat#i\
-//   for ( ogni insieme di item $I$ in $C$ )#i\
-//   for ( ogni simbolo $X$ in $G$ )#i\
-//   if ( `GOTO`($I, X$) non è vuoto e non appartiene a $C$ )#i\
-//   aggiungi `GOTO`($I, X$) a $C$;#d#d#d#d\
-//   until nessun nuovo insieme di item è aggiunto a $C$;
-// ])
-
-// #figure(
-//   image("images/2026-05-17-18-22-20.png"),
-//   caption: [Automa LR(0) per la grammatica delle espressioni $E->E+T...$],
-// )
-
-// === Automa LR(0)
-// Il parsing LR semplice o SLR si basa sulla costruzione dell'automa LR(0) a partire da una grammatica.
-// - gli stati dell'automa sono gli insiemi di item della collezione canonica, indichiamo con stato $j$ lo stato corrispondente all'insieme di item $I_j$,
-// - lo stato iniziale è CLOSURE(${[S' → dot S ]}$) dove $S'$ è il simbolo iniziale della grammatica aumentata,
-// - tutti gli stati sono finali,
-// - la funzione di transizione è data dalla funzione GOTO.
-
-// L'automa LR(0) fornisce il supporto per le decisioni (Shift o Reduce) durante il parsing. L'algoritmo di analisi utilizza uno schema a colonne:
-// + *Stack (Stati):* simula una pila contenente gli stati dell'automa LR(0) attraversati. Lo stato in cima guida le decisioni.
-// + *Simboli:* simula una pila parallela contenente i simboli grammaticali (terminali e non-terminali).
-// + *Input:* il buffer contenente i token ancora da leggere.
-// + *Azione:* la decisione presa (Shift o Reduce).
-
-// Supponiamo che l'automa si trovi nello stato $j$ (in cima allo stack):
-// - *Shift:* se dallo stato $j$ c'è una transizione GOTO etichettata con il prossimo simbolo in ingresso $a$, allora si impila il simbolo $a$ *e si impila anche il nuovo stato di destinazione*.
-// - *Reduce:* se lo stato $j$ contiene un item "completo" del tipo $A -> X_1 X_2 dots X_n dot$ (il punto è alla fine, indicando che abbiamo letto tutta la maniglia), si effettua una riduzione.
-//   - Si estraggono $n$ elementi dalla pila dei simboli e $n$ elementi dalla pila degli stati.
-//   - Si guarda il "vecchio" stato $k$ che ora è riemerso in cima alla pila degli stati.
-//   - Si consulta l'automa per vedere in quale stato si va partendo da $k$ leggendo il non-terminale $A$, e si impila questo nuovo stato insieme al simbolo $A$.
-
-// #figure(
-//   table(
-//     stroke: none,
-//     columns: (.33fr, .33fr, .33fr, 1fr),
-//     align: (left, left, right, left),
-//     table.header([Stack], [Simboli], [Input], [Azione]),
-//     table.hline(start: 0),
-//     table.vline(end: 1, x: 1, stroke: (paint: gray)),
-//     table.vline(end: 1, x: 2, stroke: (paint: gray)),
-//     table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
-//     table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
-
-//     [0       ], [_\$_          ], [_*id* \* *id* \$_], [_shift_ 5            ],
-//     [0 5     ], [_\$ *id*_     ], [_     \* *id* \$_], [_reduce_ $F ->$ *id* ],
-//     [0 3     ], [_\$ F_        ], [_     \* *id* \$_], [_reduce_ $T -> F$    ],
-//     [0 2     ], [_\$ T_        ], [_     \* *id* \$_], [_shift_ 7            ],
-//     [0 2 7   ], [_\$ T \*_     ], [_        *id* \$_], [_shift_ 5            ],
-//     [0 2 7 5 ], [_\$ T \* *id*_], [_             \$_], [_reduce_ $F ->$ *id* ],
-//     [0 2 7 10], [_\$ T \* F_   ], [_             \$_], [_reduce_ $T -> T * F$],
-//     [0 2     ], [_\$ T_        ], [_             \$_], [_reduce_ $E -> T$    ],
-//     [0 1     ], [_\$ E_        ], [_             \$_], [_accept_             ],
-//   ),
-//   caption: [Parsing LR(0) per la stringa $text("id") * text("id")$],
-// )
-
-// #figure(
-//   table(
-//     stroke: none,
-//     columns: (.33fr, .33fr, .33fr, 1fr),
-//     align: (left, left, right, left),
-//     table.header([Stack], [Simboli], [Input], [Azione]),
-//     table.hline(start: 0),
-//     table.vline(end: 1, x: 1, stroke: (paint: gray)),
-//     table.vline(end: 1, x: 2, stroke: (paint: gray)),
-//     table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
-//     table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
-
-//     [0      ], [_\$_         ], [_*id* + *id*\$_], [_shift_ 5           ],
-//     [0 5    ], [_\$ *id*_    ], [_     + *id*\$_], [_reduce_ $F ->$ *id*],
-//     [0 3    ], [_\$ F_       ], [_     + *id*\$_], [_reduce_ $T -> F$   ],
-//     [0 2    ], [_\$ T_       ], [_     + *id*\$_], [_reduce_ $E -> T$   ],
-//     [0 1    ], [_\$ E_       ], [_       *id*\$_], [_shift_ 6           ],
-//     [0 1 6  ], [_\$ E +_     ], [_           \$_], [_shift_ 5           ],
-//     [0 1 6 5], [_\$ E + *id*_], [_           \$_], [_reduce_ $F ->$ *id*],
-//     [0 1 6 3], [_\$ E + F_   ], [_           \$_], [_reduce_ $T -> F$   ],
-//     [0 1 6 9], [_\$ E + T_   ], [_           \$_], [_reduce_ $E -> E+ T$],
-//     [0 1    ], [_\$ E_       ], [_           \$_], [_accept_            ],
-//   ),
-//   caption: [Parsing LR(0) per la stringa $text("id") + text("id")$],
-// )
-
-// #observation("Il limite dell'automa LR(0)")[
-//   Nell'esempio relativo alla stringa $text("id") * text("id")$, nella riga 4 della tabella è stata fatta la scelta _Shift 7_, in accordo con la transizione in ingresso `*`. Tuttavia, lo stato 2 contiene anche l'item completo $E -> T dot$, che suggerirebbe un'azione di _Reduce_.
-
-//   In questo caso specifico, si è fatta la scelta corretta per far terminare l'analisi con successo. Se avesse scelto la riduzione, si sarebbe arrivati a uno stato di errore. L'automa LR(0) "puro", non guardando mai il lookahead (il prossimo simbolo in input), non possiede gli strumenti per risolvere questa ambiguità (nota come *Conflitto Shift/Reduce*). Per questo motivo, si rende necessario un parser più potente, come l'SLR, che utilizza l'insieme FOLLOW per risolvere queste indecisioni.
-// ]
-
-// === Algoritmo di parsing LR
-// #figure(image("images/2026-05-17-18-52-31.png"))
-
-// Il parser consiste di un input, un output, uno stack, un programma e una tabella composta da due parti: ACTION e GOTO. Il programma è lo stesso per tutti i parser LR, cambia soltanto la tabella.
-
-// Un parser LR legge in input un carattere alla volta e, a differenza di un generico parser shift-reduce, impila *stati* invece di simboli.
-// Lo stack mantiene una sequenza di stati $s_0 s_1 dots s_m$ ($s_m$ in cima). Ogni stato è associato ad un simbolo grammaticale.
-
-// === Tabelle di parsing LR(0)
-// La tabella di parsing è composta da due parti: una funzione ACTION e una funzione GOTO.
-
-// + La funzione ACTION prende come argomenti uno stato $i$ e un simbolo terminale $a$ (oppure il marcatore di fine input $\$$). Il valore ACTION[$i, a$] può assumere una delle quattro forme:
-//   - *Shift $j$*: in cui $j$ è uno stato. L'azione svolta dal parser consiste in effetti nell'impilare il simbolo d'ingresso $a$ sullo stack, benché si utilizzi lo stato $j$ per rappresentare $a$.
-//   - *Reduce $A -> beta$*: L'azione ha come effetto la sostituzione di $beta$ sulla cima dello stack con la testa della produzione $A$.
-//   - *Accept*: Il parser segnala il corretto riconoscimento della stringa.
-//   - *Error*: Il parser rileva un errore nell'ingresso e intraprende un'azione correttiva.
-// + Estendiamo la funzione GOTO già definita agli stati: se GOTO[$I_i, A$] = $I_j$, la funzione mappa anche lo stato $i$ e il non-terminale $A$ nello stato $j$.
-
-// ==== Configurazione del parser LR
-// Per descrivere il comportamento di un parser descriviamo il suo stato per mezzo dello stack e della parte rimanente della stringa in ingresso.
-// #definition()[
-//   Una *configurazione* di un parser LR è una coppia:
-//   $
-//     (s_0 s_1 dots s_m, a_i a_(i+1) dots a_n \$)
-//   $
-//   in cui la prima componente è il contenuto dello stack (testa a destra) e la seconda la parte di input rimanente.
-// ]
-
-// Questa configurazione rappresenta la forma sentenziale destra:
-// $
-//   X_1 X_2 dots X_m a_i a_(i+1) dots a_n
-// $
-// dove $X_i$ è il simbolo corrispondente allo stato $s_i$. Lo stato $s_0$ non rappresenta nessun simbolo ma il marcatore di fondo stack.
-
-// ==== Comportamento del parser LR
-// La mossa successiva del parser a partire dalla configurazione:
-// $
-//   (s_0 s_1 dots s_m, a_i a_(i+1) dots a_n \$)
-// $
-// è determinata dal simbolo d'ingresso corrente $a_i$ e dallo stato in cima allo stack $s_m$, consultando il valore della funzione ACTION[$s_m, a_i$]:
-
-// + Se ACTION[$s_m, a_i$] = *shift $s$*, il parser inserisce lo stato $s$ in cima allo stack e avanza nella stringa in ingresso, quindi passa alla configurazione:
-//   $
-//     (s_0 s_1 dots s_m s, a_(i+1) dots a_n \$)
-//   $
-//   #observation()[
-//     Non è necessario mettere fisicamente i simboli nello stack, poiché dagli stati si può sempre risalire ai simboli corrispondenti, ma non viceversa.
-//   ]
-// + Se ACTION[$s_m, a_i$] = *reduce $A -> beta$*, il parser esegue una riduzione passando alla configurazione:
-//   $
-//     (s_0 s_1 dots s_(m-r) s, a_i a_(i+1) dots a_n \$)
-//   $
-//   in cui $r = |beta|$ (lunghezza del corpo della regola) e $s = text("GOTO")[s_(m-r), A]$. Il parser rimuove dallo stack $r$ stati, corrispondenti ai simboli $X_(m-r+1) dots X_m$ che costituiscono $beta$, lasciando $s_(m-r)$ in cima allo stack, e quindi inserisce il nuovo stato $s$.
-// + Se ACTION[$s_m, a_i$] = *accept*, il parsing termina con successo.
-// + Se ACTION[$s_m, a_i$] = *error*, è stata rilevata una situazione di errore.
-
-// Tutti i parser LR seguono esattamente questo stesso schema generale. L'unica differenza risiede nel modo in cui è costruita la tabella ACTION e GOTO.
-
-// #[
-//   #set heading(numbering: none, outlined: false)
-//   === Algoritmo di parsing LR
-// ]
-// *INPUT*: Una stringa d'ingresso $w$ e una tabella di parsing LR costituita dalle funzioni ACTION e GOTO relative a una grammatica $G$.\
-// *OUTPUT*: Se $w in L(G)$, i passi di riduzione relativi a un parsing bottom-up di $w$, altrimenti una segnalazione di errore.\
-// *METODO*: Inizialmente il parser ha lo stato di partenza $s_0$ sullo stack e la sequenza $w\$$ nel buffer di ingresso.
-// #figure(image("images/2026-05-17-19-13-42.png"))
-
-// #example()[
-//   È possibile costruire tabelle di parsing a partire dall'automa LR(0). Se la tabella in ogni casella non contiene ambiguità, allora la grammatica è LR(0). Queste però sono di scarsa utilità pratica.
-//   Nella tabella, "shift j" si abbrevia con "sj", mentre "reduce ($A -> alpha$)" si abbrevia con "ri", dove $i$ è il numero della produzione associata ad $A$, dopo che tutte le regole della grammatica sono state numerate, come nel seguente esempio:
-//   + $E -> E + T$
-//   + $E -> T$
-//   + $T -> T * F$
-//   + $T -> F$
-//   + $F -> (E)$
-//   + $F -> text("id")$
-
-//   #figure(image("images/2026-05-17-19-16-54.png"))
-// ]
-
-// ==== Costruzione di una tabella di parsing LR(0)
-// Dall'osservazione dell'automa LR(0), la costruzione della tabella tiene conto delle seguenti istruzioni:
-// Per ogni stato $I$:
-// - Se c'è un item $A -> alpha dot a beta$, con $a$ terminale, allora ACTION[$I, a$] = shift $j$, dove $j = text("GOTO")(I, a)$;
-// - Se c'è un item $A -> alpha dot$, allora ACTION[$I, a$] = reduce ($A -> alpha$) *per ogni terminale* $a$ e per $\$$;
-// - Se lo stato contiene l'item iniziale $S' -> S dot$, allora ACTION[$I, \$ $] = accept;
-// - Per ogni non-terminale $B$, si pone GOTO[$I, B$] = $j$, dove $j = text("GOTO")(I, B)$.
-
-
-// === Tabella di parsing SLR
-// Per eliminare ambiguità (conflitti shift/reduce) come quelle che emergerebbero nella casella ACTION[$2, *$] della tabella precedente costruita con le regole LR(0), si osserva che ha senso applicare una riduzione $A -> alpha$ *solo se* il prossimo simbolo di ingresso appartiene a $"FOLLOW"(A)$.
-
-// Il metodo SLR (Simple LR) per la costruzione di tabelle di parsing è il più semplice e si basa proprio su questa osservazione. Le tabelle ottenute vengono dette tabelle SLR e i parser che le usano parser SLR.
-
-// Si utilizzano gli item LR(0) e l'automa LR(0).
-// Data una grammatica $G$:
-// - Si considera la grammatica aumentata $G'$ col nuovo simbolo iniziale $S'$.
-// - Si costruiscono la collezione canonica $C$ e la funzione GOTO.
-// - Si costruiscono gli elementi delle sezioni ACTION e GOTO.
-// - È strettamente necessario calcolare e conoscere gli insiemi $"FOLLOW"(A)$ per ogni variabile.
-
-// ==== Costruzione di una tabella di parsing SLR
-// *INPUT*: Una grammatica aumentata $G'$.\
-// *OUTPUT*: Le funzioni ACTION e GOTO della tabella di parsing SLR relativa alla grammatica aumentata $G'$.\
-// *METODO*:
-
-// 1. Si costruisce la collezione $C = {I_0, I_1, dots, I_n}$ degli insiemi di item LR(0) di $G'$.
-// 2. Si analizza ogni stato $i$ a partire dall'insieme $I_i$ e si determinano le azioni del parsing per questo stato:
-//    - Se $[A -> alpha dot a beta] in I_i$ e $text("GOTO")(I_i, a) = I_j$, si assegna ad ACTION[$i, a$] il valore "shift $j$".
-//    - Se $[A -> alpha dot] in I_i$ e $A != S'$, si assegna ad ACTION[$i, a$] il valore "reduce $A -> alpha$" *per ogni* $a in "FOLLOW"(A)$.
-//    - Se $[S' -> S dot] in I_i$, si assegna ad ACTION[$i, \$ $] il valore "accept".
-
-//    #observation()[
-//      Se l'applicazione delle regole precedenti porta a un conflitto (più di un'azione generata per la stessa casella ACTION[$i, a$]), significa che la grammatica *non* è SLR(1).
-//    ]
-
-// 3. Se $text("GOTO")(I_i, A) = I_j$ per un non-terminale $A$, allora si pone GOTO[$i, A$] = $j$.
-// 4. A tutte le celle della tabella non definite dalle regole precedenti si assegna il valore "error".
-// 5. Lo stato iniziale del parser è quello costruito a partire dall'insieme di item contenente $[S' -> dot S]$.
-
-// La tabella costruita con questo metodo è detta tabella SLR(1) di $G$, il parser che la utilizza è il parser SLR(1) per $G$; una grammatica per cui esiste una tabella SLR(1) priva di conflitti è detta grammatica SLR(1).
-
-// #example()[
-//   Come prima, numeriamo le regole della grammatica e calcoliamo i FOLLOW:
-//   + $E -> E + T quad "FOLLOW"(E) = {+, ), \$}$
-//   + $E -> T$
-//   + $T -> T * F quad "FOLLOW"(T) = {*, +, ), \$}$
-//   + $T -> F$
-//   + $F -> (E) quad "FOLLOW"(F) = {*, +, ), \$}$
-//   + $F -> text("id")$
-
-//   Nella tabella:
-//   1. $s_i$ significa "shift e impila lo stato $i$";
-//   2. $r_j$ significa "riduci con la regola numero $j$";
-//   3. "acc" significa accetta;
-//   4. Le caselle vuote indicano un errore sintattico.
-
-//   #figure(image("images/2026-05-17-19-22-23.png"))
-//   #figure(image("images/2026-05-17-19-22-34.png"))
-//   #figure(image("images/2026-05-17-19-22-44.png"))
-//   #figure(image("images/2026-05-17-19-22-52.png"))
-// ]
