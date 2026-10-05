@@ -387,11 +387,11 @@ Quando il nodo che si sta considerando nell'albero di parsing corrisponde a un t
   ),
 )
 
-Nel passo $(c)$ la freccia nell'albero di parsing si è spostata sul secondo figlio e la freccia nella stringa di ingresso 
-si è spostata sul terminale successivo, cioè *(*. Il successivo passo porta la freccia nell'albero sul nodo $o p t e x p r$ e 
+Nel passo $(c)$ la freccia nell'albero di parsing si è spostata sul secondo figlio e la freccia nella stringa di ingresso
+si è spostata sul terminale successivo, cioè *(*. Il successivo passo porta la freccia nell'albero sul nodo $o p t e x p r$ e
 quella nell'input sul terminale *;*. Considerando il nodo relativo al non-terminale $o p t e x p r$ si ripete la ricerca e la selezione di una produzione per quel simbolo. In questo caso scegliamo la $epsilon$-produzione perchè il terminale *;* non consente di scegliere l'altra produzione che ha *expr* come corpo; tuttavia, le produzioni nulle meriterebbero un trattamento speciale che per ora ignoriamo, le trattiamo semplicemente come scelta di default quando tutte le altre produzioni non possono essere scelte.
 
-In generale, la scelta di una produzione per un dato non-terminale richiede più tentativi. In altre parole, è necessario 
+In generale, la scelta di una produzione per un dato non-terminale richiede più tentativi. In altre parole, è necessario
 scegliere una certa produzione ed eventualmente ritornare indietro rileggendo più di una volta parte della stringa di ingresso (*backtracking*) qualora tale produzione si rivelasse non adatta. Una produzione si rivela non adatta qualora la sua scelta rendesse impossibile completare l'albero di parsing per la stringa d'ingresso. Il problema cruciale ad ogni passo del parsing top-down è determinare quale produzione applicare per un certo non-terminale $A$.
 
 In particolare la tipologia di parsing top-down che può richiedere backtracking si dice *a discesa ricorsiva*. Esiste anche un caso particolare di parsing a discesa ricorsiva che non richiede backtracking, detto *parsing predittivo*.
@@ -414,7 +414,7 @@ Una procedura per un tipico non-terminale è la seguente:
       else \/\* si è verificato un errore \*\/;#d\
       }#d\
       }
-    ]
+    ],
   ),
   caption: "Procedura tipica per un non-terminale in un parser top-down",
 )
@@ -539,14 +539,14 @@ Per calcolare *FIRST* si seguono questi passaggi:
 
 - Se $X$ è una variabile ed esiste in $G$ una produzione $X->Y_1 Y_2 ... Y_k$ con $k gt.eq 1$:
 
-    + Se $Y_1 Y_2 ... Y_(i-1) der(*) epsilon$ e $Y_i cancel(der(*)) epsilon$, allora
-      $
-        "FIRST("X")" #box(scale(x: -100%, [$subset.eq$])) union.big_(j=1)^i "FIRST("Y_j")" without {epsilon}
-      $
-    + Se $Y_1 Y_2 ... Y_k der(*) epsilon$, allora
-      $
-        "FIRST("X")" #box(scale(x: -100%, [$subset.eq$])) union.big_(j=1)^k "FIRST("Y_j")"
-      $
+  + Se $Y_1 Y_2 ... Y_(i-1) der(*) epsilon$ e $Y_i cancel(der(*)) epsilon$, allora
+    $
+      "FIRST("X")" #box(scale(x: -100%, [$subset.eq$])) union.big_(j=1)^i "FIRST("Y_j")" without {epsilon}
+    $
+  + Se $Y_1 Y_2 ... Y_k der(*) epsilon$, allora
+    $
+      "FIRST("X")" #box(scale(x: -100%, [$subset.eq$])) union.big_(j=1)^k "FIRST("Y_j")"
+    $
 
 Allo stesso modo, se si vuole calcolare FIRST su un insieme di variabili:
 
@@ -574,36 +574,36 @@ Allo stesso modo, se si vuole calcolare FIRST su un insieme di variabili:
 
 #example()[
 
-Sia $G$ la grammatica
-$
-  S &-> A x | y B \
-  B &-> epsilon | z B \
-  A &-> epsilon | B a S .
-$
+  Sia $G$ la grammatica
+  $
+    S & -> A x | y B \
+    B & -> epsilon | z B \
+    A & -> epsilon | B a S .
+  $
 
-Si ha:
+  Si ha:
 
-$"FIRST"(S) supset.eq "FIRST"(A) union "FIRST"(x) backslash { epsilon } = "FIRST"(A) union { x } backslash { epsilon }$ (nella prima produzione di $S$ il terminale $x$ funge da $Y_i$ con $i = 2$);
+  $"FIRST"(S) supset.eq "FIRST"(A) union "FIRST"(x) backslash { epsilon } = "FIRST"(A) union { x } backslash { epsilon }$ (nella prima produzione di $S$ il terminale $x$ funge da $Y_i$ con $i = 2$);
 
-$"FIRST"(S) supset.eq "FIRST"(y) = { y }$ (nella seconda produzione di $S$ il teminale $y$ funge da $Y_i$ con $i = 1$);
+  $"FIRST"(S) supset.eq "FIRST"(y) = { y }$ (nella seconda produzione di $S$ il teminale $y$ funge da $Y_i$ con $i = 1$);
 
-$"FIRST"(A) in.rev epsilon$ (ciò è dovuto alla prima produzione di $A$);
+  $"FIRST"(A) in.rev epsilon$ (ciò è dovuto alla prima produzione di $A$);
 
-$"FIRST"(A) supset.eq "FIRST"(B) union "FIRST"(a) backslash { epsilon }$ (nella seconda produzione di $A$ il terminale $a$ funge da $Y_i$ con $i = 2$);
+  $"FIRST"(A) supset.eq "FIRST"(B) union "FIRST"(a) backslash { epsilon }$ (nella seconda produzione di $A$ il terminale $a$ funge da $Y_i$ con $i = 2$);
 
-$"FIRST"(B) in.rev epsilon$ (ciò è dovuto alla prima produzione di $B$);
+  $"FIRST"(B) in.rev epsilon$ (ciò è dovuto alla prima produzione di $B$);
 
-$"FIRST"(B) supset.eq "FIRST"(z) = { z }$ (nella seconda produzione di $B$ il terminale $z$ funge da $Y_i$ con $i = 1$);
+  $"FIRST"(B) supset.eq "FIRST"(z) = { z }$ (nella seconda produzione di $B$ il terminale $z$ funge da $Y_i$ con $i = 1$);
 
-Pertanto:
+  Pertanto:
 
-$"FIRST"(B) = { z, epsilon };$
+  $"FIRST"(B) = { z, epsilon };$
 
-$"FIRST"(A) = { epsilon, z, a };$
+  $"FIRST"(A) = { epsilon, z, a };$
 
-$"FIRST"(S) = { y, x, z, a }.$
+  $"FIRST"(S) = { y, x, z, a }.$
 
-Di norma si comincia il calcolo di FIRST dalle produzioni che contengono terminali o $epsilon$ (tipo $B$ in questo caso) e si procede a ritroso fino a calcolare FIRST di tutte le variabili.
+  Di norma si comincia il calcolo di FIRST dalle produzioni che contengono terminali o $epsilon$ (tipo $B$ in questo caso) e si procede a ritroso fino a calcolare FIRST di tutte le variabili.
 ]
 
 #observation()[
@@ -633,7 +633,7 @@ Di norma si comincia il calcolo di FIRST dalle produzioni che contengono termina
 
 Per calcolare il FOLLOW di tutte le variabili di una grammatica $G$ si procede applicando le regole seguenti finché non è più possibile aggiungere nulla all'insieme FOLLOW, supponendo che ogni stringa sia seguita dal marcatore \$ di fine stringa:
 
-+ $ \$ in "FOLLOW"(S)$, $S$ simbolo iniziale.
++ $\$ in "FOLLOW"(S)$, $S$ simbolo iniziale.
 + Se esiste una produzione del tipo $A -> alpha B beta$, allora $"FOLLOW"(B) supset.eq "FIRST"(beta) without epsilon$.
 + Se esiste una produzione del tipo $A -> alpha B$ oppure del tipo $A -> alpha B beta$ dove $beta der(*) epsilon$ (cioè FIRST($beta$) contiene $epsilon$), allora $"FOLLOW"(B) supset.eq "FOLLOW"(A)$.
 
@@ -649,44 +649,33 @@ Per calcolare il FOLLOW di tutte le variabili di una grammatica $G$ si procede a
 
   Si ha:
 
- #grid(
-  columns: (1.1fr, 1.4fr),
-  column-gutter: 0.8em,
-  row-gutter: 1em,
+  #grid(
+    columns: (1.1fr, 1.4fr),
+    column-gutter: 0.8em,
+    row-gutter: 1em,
 
-  [$"FOLLOW"(S) = { \$ }$],
-  [poiché $S$ è il simbolo iniziale e non compare in nessun'altra produzione;],
+    [$"FOLLOW"(S) = { \$ }$], [poiché $S$ è il simbolo iniziale e non compare in nessun'altra produzione;],
 
-  [$"FOLLOW"(A) supset.eq "FIRST"(C B) without {epsilon}$],
-  [poiché esiste $S -> A C B$;],
+    [$"FOLLOW"(A) supset.eq "FIRST"(C B) without {epsilon}$], [poiché esiste $S -> A C B$;],
 
-  [$"FOLLOW"(A) supset.eq "FOLLOW"(S)$],
-  [poiché esiste $S -> A C B$ e $C B =>^* epsilon$;],
+    [$"FOLLOW"(A) supset.eq "FOLLOW"(S)$], [poiché esiste $S -> A C B$ e $C B =>^* epsilon$;],
 
-  [$"FOLLOW"(B) supset.eq "FIRST"(a) without {epsilon}$],
-  [poiché esiste $S -> B a$;],
+    [$"FOLLOW"(B) supset.eq "FIRST"(a) without {epsilon}$], [poiché esiste $S -> B a$;],
 
-  [$"FOLLOW"(B) supset.eq "FOLLOW"(S)$],
-  [poiché esiste $S -> A C B$;],
+    [$"FOLLOW"(B) supset.eq "FOLLOW"(S)$], [poiché esiste $S -> A C B$;],
 
-  [$"FOLLOW"(B) supset.eq "FIRST"(C) without {epsilon}$],
-  [poiché esiste $A -> B C$;],
+    [$"FOLLOW"(B) supset.eq "FIRST"(C) without {epsilon}$], [poiché esiste $A -> B C$;],
 
-  [$"FOLLOW"(B) supset.eq "FOLLOW"(A)$],
-  [poiché esiste $A -> B C$ e $C -> epsilon$;],
+    [$"FOLLOW"(B) supset.eq "FOLLOW"(A)$], [poiché esiste $A -> B C$ e $C -> epsilon$;],
 
-  [$"FOLLOW"(C) supset.eq "FIRST"(b b) without {epsilon}$],
-  [poiché esiste $S -> C b b$;],
+    [$"FOLLOW"(C) supset.eq "FIRST"(b b) without {epsilon}$], [poiché esiste $S -> C b b$;],
 
-  [$"FOLLOW"(C) supset.eq "FIRST"(B) without {epsilon}$],
-  [poiché esiste $S -> A C B$;],
+    [$"FOLLOW"(C) supset.eq "FIRST"(B) without {epsilon}$], [poiché esiste $S -> A C B$;],
 
-  [$"FOLLOW"(C) supset.eq "FOLLOW"(S)$],
-  [poiché esiste $S -> A C B$ e $B -> epsilon$;],
+    [$"FOLLOW"(C) supset.eq "FOLLOW"(S)$], [poiché esiste $S -> A C B$ e $B -> epsilon$;],
 
-  [$"FOLLOW"(C) supset.eq "FOLLOW"(A)$],
-  [poiché esiste $A -> B C$.],
-)
+    [$"FOLLOW"(C) supset.eq "FOLLOW"(A)$], [poiché esiste $A -> B C$.],
+  )
 
   Poiché $"FIRST"(C B) = "FIRST"(B) union "FIRST"(C) = {h, g, epsilon}$ si ha:
   $
@@ -724,7 +713,7 @@ Per le grammatiche della classe LL(1) è sempre possibile costruire un parser to
 
     - $alpha_j cancel(der(*)) epsilon quad forall j eq.not i quad$ e
     - FOLLOW($A$) $inter$ FIRST($A$) $= emptyset$
-  
+
   Ovvero, per ogni variabile:
 
   - gli insiemi FIRST relativi alle parti destre delle produzioni sono due a due disgiunti.
@@ -771,33 +760,35 @@ Se le regole per la variabile $A$ sono $A-> alpha_1 bar alpha_2 bar ... bar alph
 ))
 
 Cioè, in una grammatica LL(1), la produzione da applicare a un non-terminale $A$ può essere scelta osservando un solo simbolo di ingresso. Supponiamo di aver costruito una derivazione
-  $S =>^* u A beta$ e che la stringa in ingresso sia $u a v$.
+$S =>^* u A beta$ e che la stringa in ingresso sia $u a v$.
 
-  + Se $a in "FIRST"(alpha_i)$, si applica la produzione
-    $A -> alpha_i$, ottenendo
-    $S =>^* u A beta => u alpha_i beta$.
++ Se $a in "FIRST"(alpha_i)$, si applica la produzione
+  $A -> alpha_i$, ottenendo
+  $S =>^* u A beta => u alpha_i beta$.
 
-  + Se $A =>^* epsilon$ e $a in "FOLLOW"(A)$, $A$ può essere
-    annullato, ottenendo
-    $S =>^* u A beta => u beta$.
++ Se $A =>^* epsilon$ e $a in "FOLLOW"(A)$, $A$ può essere
+  annullato, ottenendo
+  $S =>^* u A beta => u beta$.
 
-  La proprietà LL(1) garantisce che la scelta possa essere effettuata
-  utilizzando un solo simbolo di lookahead.
+La proprietà LL(1) garantisce che la scelta possa essere effettuata
+utilizzando un solo simbolo di lookahead.
 
 I costrutti per il controllo del flusso, grazie alle loro specifiche parole chiave, generalmente soddisfano i vincoli della classe LL(1). Per esempio, date le produzioni:
 $
-  s t m t & -> bold("if") "(" e x p r ")" s t m t bold("else") s t m t \ & bar bold("while") "(" e x p r ")" s t m t \ & bar
-  { s t m t"_"l i s t }
+  s t m t & -> bold("if") "(" e x p r ")" s t m t bold("else") s t m t \
+          & bar bold("while") "(" e x p r ")" s t m t \
+          & bar
+            { s t m t"_"l i s t }
 $
 si ha
-  $
-    & "FIRST"(bold("if") "(" e x p r ")" s t m t bold("else") s t m t)
-      = {bold("if")}, \
-    & "FIRST"(bold("while") "(" e x p r ")" s t m t)
-      = {bold("while")}, \
-    & "FIRST"({s t m t"_"l i s t})
-      = {{}}.
-  $
+$
+  & "FIRST"(bold("if") "(" e x p r ")" s t m t bold("else") s t m t)
+    = {bold("if")}, \
+  & "FIRST"(bold("while") "(" e x p r ")" s t m t)
+    = {bold("while")}, \
+  & "FIRST"({s t m t"_"l i s t})
+    = {{}}.
+$
 Poiché questi insiemi sono disgiunti, il prossimo simbolo in ingresso determina *univocamente* quale produzione di $s t m t$ applicare: *if*, *while* oppure ${$.
 
 L'esempio precedente mostra il caso in cui la produzione viene scelta
@@ -911,15 +902,15 @@ Se $M[A, a]$ contiene più di una regola allora la grammatica non è LL(1) perch
       & "FOLLOW"(bold(id)) && ="FOLLOW"(S) && ={e, \$}
     $],
   )
-#figure(table(
-  columns: (.33fr, .9fr, 1fr, 1fr, 1fr, .75fr, .75fr),
-  rows: (1.75em, 1.75em, 3.5em, 1.75em),
-  align: horizon,
-  table.header([], [$a$], [$b$], [$e$], [$i$], [$t$], [\$]),
-  [$S$], [$S -> a$], [ ], [ ], [$S -> i E t S S'$], [], [ ],
-  [$S'$], [ ], [ ], text(fill: red)[$S' -> e S$ \ $S' -> epsilon$], [ ], [], [$S' -> epsilon$],
-  [$E$], [ ], [$E -> b$], [ ], [ ], [], [ ],
-))
+  #figure(table(
+    columns: (.33fr, .9fr, 1fr, 1fr, 1fr, .75fr, .75fr),
+    rows: (1.75em, 1.75em, 3.5em, 1.75em),
+    align: horizon,
+    table.header([], [$a$], [$b$], [$e$], [$i$], [$t$], [\$]),
+    [$S$], [$S -> a$], [ ], [ ], [$S -> i E t S S'$], [], [ ],
+    [$S'$], [ ], [ ], text(fill: red)[$S' -> e S$ \ $S' -> epsilon$], [ ], [], [$S' -> epsilon$],
+    [$E$], [ ], [$E -> b$], [ ], [ ], [], [ ],
+  ))
   Questa non è quindi una grammatica LL(1).
 ]
 
@@ -944,31 +935,39 @@ Inizialmente lo stack contiene il simbolo \$ (in fondo) e il simbolo distinto de
 Se lo stack contiene \$ e il prossimo simbolo in ingresso è \$, cioè la stringa in esame è stata scandita completamente, la stringa viene accettata. Il comportamento del parser è descritto dalle sue *configurazioni* che sono costituite dal contenuto dello stack e dalla parte di input ancora da esaminare.
 
 
-#figure(diagram(
-  node-stroke: none,
-  spacing: 3mm,
+#figure(
+  diagram(
+    node-stroke: none,
+    spacing: 3mm,
 
-  node((0.5, 0), [Input]),
-  node((1.865, 0), table(
-    columns: 8,
-    [⠀], [⠀], [⠀], [⠀], [$a$], [$+$], [$b$], [$s$],
-  )),
-  node((0, 2), "Stack"),
-  node((1, 2.45), table(
-    [$X$],
-    [$Y$],
-    [$Z$],
-    [\$],
-  )),
-  node((2, 2), $\ "Programma "\ "di parsing" \ "predittivo"$, width: 90pt, shape: rect, stroke: 0.9pt, name: <center>),
-  node((4, 2), "Output", name: <right>),
-  node((2, 3.5), $\ "Tabella "\ "di parsing" \ "M"$, width: 90pt, shape: rect, stroke: 0.9pt, name: <bottom>),
+    node((0.5, 0), [Input]),
+    node((1.865, 0), table(
+      columns: 8,
+      [⠀], [⠀], [⠀], [⠀], [$a$], [$+$], [$b$], [$s$],
+    )),
+    node((0, 2), "Stack"),
+    node((1, 2.45), table(
+      [$X$],
+      [$Y$],
+      [$Z$],
+      [\$],
+    )),
+    node(
+      (2, 2),
+      $\ "Programma "\ "di parsing" \ "predittivo"$,
+      width: 90pt,
+      shape: rect,
+      stroke: 0.9pt,
+      name: <center>,
+    ),
+    node((4, 2), "Output", name: <right>),
+    node((2, 3.5), $\ "Tabella "\ "di parsing" \ "M"$, width: 90pt, shape: rect, stroke: 0.9pt, name: <bottom>),
 
-  edge(<center>, (2, 0), "-|>"),
-  edge(<center>, (0.7, 2), "-|>"),
-  edge(<center>, <right>, "-|>"),
-  edge(<center>, <bottom>, "-|>"),
-),
+    edge(<center>, (2, 0), "-|>"),
+    edge(<center>, (0.7, 2), "-|>"),
+    edge(<center>, <right>, "-|>"),
+    edge(<center>, <bottom>, "-|>"),
+  ),
   caption: "Modello di una parser predittivo guidato da una tabella.",
 )
 
@@ -1123,7 +1122,6 @@ Il parsing bottom-up procede alla costruzione di un albero di parsing per una da
     node((13, 0), [*$T$*]),
     node((16, 0), [*$E$*]),
 
-
     node((3, 1), [*id*]),
     node((6, 1), [*$F$*]),
     node((9, 1), [*$F$*]),
@@ -1163,7 +1161,6 @@ Il parsing bottom-up procede alla costruzione di un albero di parsing per una da
     edge((13, 0), (13, 1)),
     edge((13, 0), (14, 1)),
     edge((16, 0), (16, 1)),
-
 
     edge((6, 1), (6, 2)),
     edge((9, 1), (9, 2)),
@@ -1251,7 +1248,6 @@ Il parsing bottom-up procede alla costruzione di un albero di parsing per una da
     edge((19, 0), (19, 1)),
     edge((19, 0), (20, 1)),
 
-
     edge((6, 1), (6, 2)),
     edge((9, 1), (9, 2)),
     edge((12, 1), (12, 2)),
@@ -1316,7 +1312,7 @@ Ecco alcuni esempi di handle per la grammatica dell'ultimo esempio:
     [$E$], [$$], [$$],
 
     table.hline(start: 0),
-    
+
     [*id* $+$ *id*], [*id*   ], [$F -->$ *id* ],
     [$F +$ *id*   ], [$F$], [$T --> F$],
     [$T +$ *id*   ], [$T$], [$E --> T$],
@@ -1326,7 +1322,7 @@ Ecco alcuni esempi di handle per la grammatica dell'ultimo esempio:
     [$E$], [$$], [$$],
     table.hline(start: 0),
   ),
-  caption: "Esempi di handle nell'analisi sintattica bottom-up."
+  caption: "Esempi di handle nell'analisi sintattica bottom-up.",
 ) <esempi-handle>
 
 Nel primo esempio, sebbene $T$ sia la parte destra della produzione $E -> T$, il non-terminale $T$ *non* è un handle per la forma di frase $T * bold(text("id"))$. Infatti se $T$ fosse sostituito da $E$ otterremmo la forma $E * bold(text("id"))$ che non può essere derivata dal simbolo iniziale $E$. Nel secondo esempio, invece, nella stringa $T + bold(text("id"))$, $T$ viene ridotto con la regola $E -> T$.\
@@ -1386,104 +1382,104 @@ Un parser shift-reduce può compiere quattro azioni fondamentali ad ogni passo:
 
 Di seguito sono riportati due esempi di tracciamento di un parser shift-reduce. Il primo esempio riguarda la grammatica $S -> a S b | a A b, A -> a A c | a c$ e la stringa $a a a a c c b b$. Il secondo esempio riguarda la grammatica $E -> E + T | T, T -> T * F | F, F -> bold(id) space | (E)$ e le stringe $bold(text("id")) * bold(text("id"))$ e $bold(text("id")) + bold(text("id"))$.
 #example()[
-#grid(
-  columns: (.2fr, .7fr),
-  column-gutter: 20pt,
-  align: horizon,
+  #grid(
+    columns: (.2fr, .7fr),
+    column-gutter: 20pt,
+    align: horizon,
 
-  [#block(
-    $
-      S & -> a S b | space a A b \
-      A & -> a A c | space a c \
-        \
-        \
-        \
-        \
-      S & => a S b \
-        & => a a A b b \
-        & => a a a A c b b \
-        & => a a a a c c b b
-    $,
-  )],
-  grid.cell(
-    table(
-  stroke: none,
-  columns: (.2fr, .3fr, .5fr),
-  align: (left, right, left),
-  table.header([Stack], [Input], [Azione]),
-  table.hline(start: 0),
-  table.vline(end: 1, x: 1, stroke: (paint: gray)),
-  table.vline(end: 1, x: 2, stroke: (paint: gray)),
-  table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
-  table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
-  [$\$$], [$a a a c c b b\$$], [shift],
-  [$\$a$], [$a a c c b b\$$], [shift],
-  [$\$a a$], [$a c c b b\$$], [shift],
-  [$\$a a a$], [$c c b b\$$], [shift],
-  [$\$a a a a$], [$c b b\$$], [shift],
-  [$\$a a a a c$], [$c b b\$$], [reduce $A -> a c$],
-  [$\$a a a A$], [$c b b\$$], [shift],
-  [$\$a a a A c$], [$b b\$$], [reduce $A -> a A c$],
-  [$\$a a A$], [$b b\$$], [shift],
-  [$\$a a A b$], [$b\$$], [reduce $S -> a A b$],
-  [$\$a S$], [$b\$$], [shift],
-  [$\$a S b$], [$\$$], [reduce $S -> a S b$],
-  [$\$S$], [$\$$], [accept],
-)
-  ),
-)
+    [#block(
+      $
+        S & -> a S b | space a A b \
+        A & -> a A c | space a c \
+          \
+          \
+          \
+          \
+        S & => a S b \
+          & => a a A b b \
+          & => a a a A c b b \
+          & => a a a a c c b b
+      $,
+    )],
+    grid.cell(
+      table(
+        stroke: none,
+        columns: (.2fr, .3fr, .5fr),
+        align: (left, right, left),
+        table.header([Stack], [Input], [Azione]),
+        table.hline(start: 0),
+        table.vline(end: 1, x: 1, stroke: (paint: gray)),
+        table.vline(end: 1, x: 2, stroke: (paint: gray)),
+        table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
+        table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
+        [$\$$], [$a a a c c b b\$$], [shift],
+        [$\$a$], [$a a c c b b\$$], [shift],
+        [$\$a a$], [$a c c b b\$$], [shift],
+        [$\$a a a$], [$c c b b\$$], [shift],
+        [$\$a a a a$], [$c b b\$$], [shift],
+        [$\$a a a a c$], [$c b b\$$], [reduce $A -> a c$],
+        [$\$a a a A$], [$c b b\$$], [shift],
+        [$\$a a a A c$], [$b b\$$], [reduce $A -> a A c$],
+        [$\$a a A$], [$b b\$$], [shift],
+        [$\$a a A b$], [$b\$$], [reduce $S -> a A b$],
+        [$\$a S$], [$b\$$], [shift],
+        [$\$a S b$], [$\$$], [reduce $S -> a S b$],
+        [$\$S$], [$\$$], [accept],
+      ),
+    ),
+  )
 ]
 #example()[
-#figure(
-  table(
-    stroke: none,
-    columns: (.2fr, .3fr, .5fr),
-    align: (left, right, left),
-    table.header([Stack], [Input], [Azione]),
-    table.hline(start: 0),
-    table.vline(end: 1, x: 1, stroke: (paint: gray)),
-    table.vline(end: 1, x: 2, stroke: (paint: gray)),
-    table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
-    table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
+  #figure(
+    table(
+      stroke: none,
+      columns: (.2fr, .3fr, .5fr),
+      align: (left, right, left),
+      table.header([Stack], [Input], [Azione]),
+      table.hline(start: 0),
+      table.vline(end: 1, x: 1, stroke: (paint: gray)),
+      table.vline(end: 1, x: 2, stroke: (paint: gray)),
+      table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
+      table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
 
-    [$\$          $], [$bold(text("id")) * bold(text("id"))$], [shift              ],
-    [$\$bold(text("id"))     $], [$    \*bold(text("id"))\$$], [reduce $F -> bold(text("id")) $],
-    [$\$F        $],  [$    \*bold(text("id"))\$$],  [reduce $T -> F$],
-    [$\$T         $], [$    \*bold(text("id"))\$$], [shift              ],
-    [$\$T space \*      $], [$      bold(text("id"))\$$], [shift              ],
-    [$\$T space \* bold(text("id")) $], [$          \$$], [reduce $F -> bold(text("id")) $],
-    [$\$T space \* space F    $], [$          \$$], [reduce $T -> T  F$],
-    [$\$T         $], [$          \$$], [reduce $E -> T$],
-    [$\$E         $], [$          \$$], [accept              ],
-  ),
-  caption: [Tracciamento Shift-Reduce per la stringa $text("id") * text("id")$],
-)
+      [$\$$], [$bold(text("id")) * bold(text("id"))$], [shift              ],
+      [$\$bold(text("id"))$], [$\*bold(text("id"))\$$], [reduce $F -> bold(text("id"))$],
+      [$\$F$], [$\*bold(text("id"))\$$], [reduce $T -> F$],
+      [$\$T$], [$\*bold(text("id"))\$$], [shift              ],
+      [$\$T space \*$], [$bold(text("id"))\$$], [shift              ],
+      [$\$T space \* bold(text("id"))$], [$\$$], [reduce $F -> bold(text("id"))$],
+      [$\$T space \* space F$], [$\$$], [reduce $T -> T F$],
+      [$\$T$], [$\$$], [reduce $E -> T$],
+      [$\$E$], [$\$$], [accept              ],
+    ),
+    caption: [Tracciamento Shift-Reduce per la stringa $text("id") * text("id")$],
+  )
 
-#figure(
-  table(
-    stroke: none,
-    columns: (.2fr, .3fr, .5fr),
-    align: (left, right, left),
-    table.header([Stack], [Input], [Azione]),
-    table.hline(start: 0),
-    table.vline(end: 1, x: 1, stroke: (paint: gray)),
-    table.vline(end: 1, x: 2, stroke: (paint: gray)),
-    table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
-    table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
+  #figure(
+    table(
+      stroke: none,
+      columns: (.2fr, .3fr, .5fr),
+      align: (left, right, left),
+      table.header([Stack], [Input], [Azione]),
+      table.hline(start: 0),
+      table.vline(end: 1, x: 1, stroke: (paint: gray)),
+      table.vline(end: 1, x: 2, stroke: (paint: gray)),
+      table.vline(start: 1, x: 1, stroke: (paint: gray, dash: "dashed")),
+      table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
 
-    [$\$          $], [$bold(text("id")) + bold(text("id"))\$$], [shift              ],
-    [$\$bold(text("id"))     $], [$    + bold(text("id"))\$$], [reduce $F -> bold(text("id")) $],
-    [$\$ F        $], [$    + bold(text("id"))\$$], [reduce $T -> F$],
-    [$\$ T        $], [$    + bold(text("id"))\$$], [reduce $E -> T$],
-    [$\$ E        $], [$    + bold(text("id"))\$$], [shift              ],
-    [$\$ E +      $], [$      bold(text("id"))\$$], [shift              ],
-    [$\$ E + bold(text("id")) $], [$          \$$], [reduce $F -> bold(text("id")) $],
-    [$\$ E + F    $], [$          \$$], [reduce $T -> F$],
-    [$\$ E + T    $], [$          \$$], [reduce $E -> E + T$],
-    [$\$ E        $], [$          \$$], [accept              ],
-  ),
-  caption: [Tracciamento Shift-Reduce per la stringa $bold(text("id")) + bold(text("id"))$],
-)
+      [$\$$], [$bold(text("id")) + bold(text("id"))\$$], [shift              ],
+      [$\$bold(text("id"))$], [$+ bold(text("id"))\$$], [reduce $F -> bold(text("id"))$],
+      [$\$ F$], [$+ bold(text("id"))\$$], [reduce $T -> F$],
+      [$\$ T$], [$+ bold(text("id"))\$$], [reduce $E -> T$],
+      [$\$ E$], [$+ bold(text("id"))\$$], [shift              ],
+      [$\$ E +$], [$bold(text("id"))\$$], [shift              ],
+      [$\$ E + bold(text("id"))$], [$\$$], [reduce $F -> bold(text("id"))$],
+      [$\$ E + F$], [$\$$], [reduce $T -> F$],
+      [$\$ E + T$], [$\$$], [reduce $E -> E + T$],
+      [$\$ E$], [$\$$], [accept              ],
+    ),
+    caption: [Tracciamento Shift-Reduce per la stringa $bold(text("id")) + bold(text("id"))$],
+  )
 ]
 Ci sono due problemi fondamentali da risolvere per implementare un parser shift-reduce:
 
@@ -1518,7 +1514,7 @@ Un parser LR prende le decisioni sposta/riduci mantenendo memorizzate informazio
   La produzione $A -> X Y Z$ genera quattro item separati:
   - $A -> dot X Y Z$: ci si aspetta di incontrare una stringa derivabile da $X Y Z$.
   - $A -> X dot Y Z$: è stata riconosciuta una stringa derivabile da $X$, ci si aspetta nella sequenza d'ingresso restante di trovare una stringa derivabile da $Y Z$.
-  - $A -> X Y dot Z$: è stata $dots "derivabile da"space X Y space dots space "derivabile da" Z$. 
+  - $A -> X Y dot Z$: è stata $dots "derivabile da"space X Y space dots space "derivabile da" Z$.
   - $A -> X Y Z dot$ : indica che abbiamo appena riconosciuto una stringa derivabile da $X Y Z$ e che si potrebbe fare una riduzione con questa regola (sostituire $X Y Z$ con $A$).
 
   La produzione $A -> epsilon$ genera un solo item $A -> dot$.
@@ -1535,8 +1531,8 @@ Nelle prossime sezioni andremo a vedere come costruire la collezione canonica LR
 
 Se $I$ è un insieme di item di G, CLOSURE($I$) è un insieme di item costruito a partire da $I$ seguendo queste regole:
 
- + Inizialmente CLOSURE($I$) contiene tutti gli item di $I$
- + Se $A -> alpha dot B beta$ appartiene a CLOSURE($I$) e $B -> gamma$ è una produzione in $G$, allora si aggiunge $B -> dot gamma$ a CLOSURE($I$), se non è già presente. Si ripete questa regola finché non è più possibile aggiungere nuovi item a CLOSURE($I$).
++ Inizialmente CLOSURE($I$) contiene tutti gli item di $I$
++ Se $A -> alpha dot B beta$ appartiene a CLOSURE($I$) e $B -> gamma$ è una produzione in $G$, allora si aggiunge $B -> dot gamma$ a CLOSURE($I$), se non è già presente. Si ripete questa regola finché non è più possibile aggiungere nuovi item a CLOSURE($I$).
 
 Il fatto che $A -> alpha dot B beta$ appartiene a CLOSURE($I$) ci indica che, a un certo punto, durante il parsing, ci si aspetta di riconoscere una stringa in ingresso prodotta da $B beta$. Questa avrà un prefisso derivabile da $B$ applicando una delle regole per $B$. Si aggiungono quindi tutti gli item relativi alle regole per $B$, cioè se $B ->gamma$ è una regola in $G$, aggiungiamo $B -> dot gamma$ a CLOSURE($I$).
 
@@ -1544,9 +1540,9 @@ Il fatto che $A -> alpha dot B beta$ appartiene a CLOSURE($I$) ci indica che, a 
   #block(
     $
       & E' && -> && E \
-      & E  && -> && E + T     && | T \
+      & E  && -> && E + T   && | T \
       & T  && -> && T "*" F && | F \
-      & F  && -> && (E)       && | bold(id)
+      & F  && -> && (E)     && | bold(id)
     $,
   )
 
@@ -1560,16 +1556,16 @@ Il fatto che $A -> alpha dot B beta$ appartiene a CLOSURE($I$) ci indica che, a 
 Per calcolare la chiusura di un insieme di item si può definire una funzione:
 
 #figure(algo(
-   title: [SetOfItems *CLOSURE*],
-   parameters: ([_I_],),
- )[
-   J = I\
-   repeat#i\
-   for ( ogni item $A -> alpha dot B beta$ in J )#i\
-   for ( ogni regola $B -> dot gamma$ in G )#i\
-   aggiungi $B -> dot gamma$ a J;#d#d#d\
-   until nessun nuovo item è aggiunto a J;\
-   return J;
+  title: [SetOfItems *CLOSURE*],
+  parameters: ([_I_],),
+)[
+  J = I\
+  repeat#i\
+  for ( ogni item $A -> alpha dot B beta$ in J )#i\
+  for ( ogni regola $B -> dot gamma$ in G )#i\
+  aggiungi $B -> dot gamma$ a J;#d#d#d\
+  until nessun nuovo item è aggiunto a J;\
+  return J;
 ])
 
 ==== Funzione GOTO
@@ -1595,16 +1591,16 @@ Viene usata per definire le transizioni dell'automa LR(0). Gli stati dell'automa
 A questo punto siamo pronti per definire un algoritmo per il calcolo della collezione canonica ($C$) degli insiemi di item LR(0) relativi alla grammatica aumentata $G'$:
 
 #figure(algo(
-   title: [void *items*],
-   parameters: ($G'$,),
- )[
-   C = CLOSURE({[$S' -> dot S$]});\
-   repeat#i\
-   for ( ogni insieme di item $I$ in $C$ )#i\
-   for ( ogni simbolo $X$ in $G$ )#i\
-   if ( GOTO($I, X$) non è vuoto e non appartiene a $C$ )#i\
-   aggiungi GOTO($I, X$) a $C$;#d#d#d#d\
-   until nessun nuovo insieme di item è aggiunto a $C$;
+  title: [void *items*],
+  parameters: ($G'$,),
+)[
+  C = CLOSURE({[$S' -> dot S$]});\
+  repeat#i\
+  for ( ogni insieme di item $I$ in $C$ )#i\
+  for ( ogni simbolo $X$ in $G$ )#i\
+  if ( GOTO($I, X$) non è vuoto e non appartiene a $C$ )#i\
+  aggiungi GOTO($I, X$) a $C$;#d#d#d#d\
+  until nessun nuovo insieme di item è aggiunto a $C$;
 ])
 
 #figure(
@@ -1616,8 +1612,8 @@ Gli stati dell'automa sono gli insiemi di item della collezione canonica $C$ e i
 
 Vediamo in che modo l'automa LR(0) fornisce un supporto per le decisioni di shift/reduce durante il parsing. Per l'analisi useremo delle tabelle in cui la prima colonna simula una pila con gli stati che si incontrano durante l'analisi, la seconda simula una pila che contiene i simboli grammaticali, la terza visualizza l'input via via che viene analizzato e l'ultima mostra le azioni da fare (shift/reduce). Supponiamo che con la stringa $gamma$ nell'automa si passi dallo stato iniziale $0$ ad uno stato $j$:
 
-  - se dallo stato $j$ c'è una transizione etichettata con il prossimo simbolo in ingresso $a$, allora si sceglie di impilare $a$, altrimenti
-  - si effettua una riduzione utilizzando la produzione indicata dagli item nello stato $j$.
+- se dallo stato $j$ c'è una transizione etichettata con il prossimo simbolo in ingresso $a$, allora si sceglie di impilare $a$, altrimenti
+- si effettua una riduzione utilizzando la produzione indicata dagli item nello stato $j$.
 
 L'algoritmo di parsing LR che introdurremo a breve usa lo stack per tenere traccia degli stati e dei simboli grammaticali.\ Se scegliamo di impilare il simbolo di ingresso, si impila anche lo stato verso cui avviene lo shift. Quando si applica una riduzione $A -> X_1 X_2 dots X_n$, allora dalla pila degli stati dobbiamo togliere $n$ stati e dallo stato $j$ che rimane in cima alla pila guardare l'automa LR(0) per vedere qual è lo stato in cui $j$ va con il simbolo $A$. Ciò è coerente con il significato di item.
 
@@ -1637,15 +1633,15 @@ Ecco degli esempi di analisi utilizzando l'automa LR(0) per il parsing delle str
     table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
     table.vline(start: 1, x: 3, stroke: (paint: gray, dash: "dashed")),
 
-    [$0$      ], [$\$                  $], [$bold(text("id")) * bold(text("id"))\$$], [shift 5],
-    [$0 space 5$    ], [$\$ bold(text("id")) $], [$                   * bold(text("id"))\$$], [reduce $F -> bold(text("id"))$],
-    [$0 space 3$    ], [$\$ F                $], [$                   * bold(text("id"))\$$], [reduce $T -> F$],
-    [$0 space 2$    ], [$\$ T                $], [$                   * bold(text("id"))\$$], [shift 7],
-    [$0 space 2 space 7$  ], [$\$ T * $], [$                     bold(text("id"))\$$], [shift 5],
-    [$0 space 2 space 7 space 5$], [$\$ T * bold(text("id"))$], [$                                 \$$], [reduce $F -> bold(text("id"))$],
-    [$0 space 2 space 7 space 10$], [$\$ T * F           $], [$                                 \$$], [reduce $T -> T * F$],
-    [$0 space 2$    ], [$\$ T                $], [$                                 \$$], [reduce $E -> T$],
-    [$0 space 1$    ], [$\$ E                $], [$                                 \$$], [accept],
+    [$0$      ], [$\$$], [$bold(text("id")) * bold(text("id"))\$$], [shift 5],
+    [$0 space 5$    ], [$\$ bold(text("id"))$], [$* bold(text("id"))\$$], [reduce $F -> bold(text("id"))$],
+    [$0 space 3$    ], [$\$ F$], [$* bold(text("id"))\$$], [reduce $T -> F$],
+    [$0 space 2$    ], [$\$ T$], [$* bold(text("id"))\$$], [shift 7],
+    [$0 space 2 space 7$  ], [$\$ T *$], [$bold(text("id"))\$$], [shift 5],
+    [$0 space 2 space 7 space 5$], [$\$ T * bold(text("id"))$], [$\$$], [reduce $F -> bold(text("id"))$],
+    [$0 space 2 space 7 space 10$], [$\$ T * F$], [$\$$], [reduce $T -> T * F$],
+    [$0 space 2$    ], [$\$ T$], [$\$$], [reduce $E -> T$],
+    [$0 space 1$    ], [$\$ E$], [$\$$], [accept],
   ),
   caption: [Parsing LR(0) per la stringa $bold(text("id")) * bold(text("id"))$],
 ) <es1-lr0>
@@ -1664,16 +1660,16 @@ Come si vede da @es1-lr0, il simbolo di ingresso è $bold(id)$ e lo stato 0 ha u
     table.vline(start: 1, x: 2, stroke: (paint: gray, dash: "dashed")),
     table.vline(start: 1, x: 3, stroke: (paint: gray, dash: "dashed")),
 
-    [$0$                      ], [$\$                      $], [$bold(text("id")) + bold(text("id"))\$$], [shift 5],
-    [$0 space 5$              ], [$\$ bold(text("id"))     $], [$                   + bold(text("id"))\$$], [reduce $F -> bold(text("id"))$],
-    [$0 space 3$              ], [$\$ F                    $], [$                   + bold(text("id"))\$$], [reduce $T -> F$],
-    [$0 space 2$              ], [$\$ T                    $], [$                   + bold(text("id"))\$$], [reduce $E -> T$],
-    [$0 space 1$              ], [$\$ E                    $], [$                   + bold(text("id"))\$$], [shift 6],
-    [$0 space 1 space 6$      ], [$\$ E +                  $], [$                     bold(text("id"))\$$], [shift 5],
-    [$0 space 1 space 6 space 5$],[$\$ E + bold(text("id"))$], [$                                     \$$], [reduce $F -> bold(text("id"))$],
-    [$0 space 1 space 6 space 3$],[$\$ E + F               $], [$                                     \$$], [reduce $T -> F$],
-    [$0 space 1 space 6 space 9$],[$\$ E + T               $], [$                                     \$$], [reduce $E -> E + T$],
-    [$0 space 1$              ], [$\$ E                    $], [$                                     \$$], [accept],
+    [$0$                      ], [$\$$], [$bold(text("id")) + bold(text("id"))\$$], [shift 5],
+    [$0 space 5$              ], [$\$ bold(text("id"))$], [$+ bold(text("id"))\$$], [reduce $F -> bold(text("id"))$],
+    [$0 space 3$              ], [$\$ F$], [$+ bold(text("id"))\$$], [reduce $T -> F$],
+    [$0 space 2$              ], [$\$ T$], [$+ bold(text("id"))\$$], [reduce $E -> T$],
+    [$0 space 1$              ], [$\$ E$], [$+ bold(text("id"))\$$], [shift 6],
+    [$0 space 1 space 6$      ], [$\$ E +$], [$bold(text("id"))\$$], [shift 5],
+    [$0 space 1 space 6 space 5$], [$\$ E + bold(text("id"))$], [$\$$], [reduce $F -> bold(text("id"))$],
+    [$0 space 1 space 6 space 3$], [$\$ E + F$], [$\$$], [reduce $T -> F$],
+    [$0 space 1 space 6 space 9$], [$\$ E + T$], [$\$$], [reduce $E -> E + T$],
+    [$0 space 1$              ], [$\$ E$], [$\$$], [accept],
   ),
   caption: [Parsing LR(0) per la stringa $bold(text("id")) + bold(text("id"))$],
 ) <es2-lr0>
@@ -1756,7 +1752,7 @@ Dall'osservazione dell'automa LR(0), la costruzione della tabella tiene conto de
 
 - Se c'è un item $A -> alpha dot a beta$, con $a$ terminale, allora ACTION[$I, a$] = shift $j$, dove $j = text("GOTO")(I, a)$;
 - Se c'è un item $A -> alpha dot$, allora ACTION[$I, a$] = reduce ($A -> alpha$) *per ogni terminale* $a$ e per $\$$;
-- Se lo stato contiene l'item iniziale $S' -> S dot$, allora ACTION[$I, \$ $] = accept;
+- Se lo stato contiene l'item iniziale $S' -> S dot$, allora ACTION[$I, \$$] = accept;
 - Per ogni non-terminale $B$, si pone GOTO[$I, B$] = $j$, dove $j = text("GOTO")(I, B)$.
 
 Nella tabella, "shift j" si abbrevia con "sj", mentre "reduce ($A -> alpha$)" si abbrevia con "ri", dove $i$ è il numero della produzione associata ad $A$, dopo che tutte le regole della grammatica sono state numerate. Di seguito un esempio.
@@ -1764,17 +1760,17 @@ Nella tabella, "shift j" si abbrevia con "sj", mentre "reduce ($A -> alpha$)" si
 #example()[
 
   Consideriamo la solita grammatica delle espressioni, numerando le produzioni:
-#grid(
-  columns: (auto, auto, auto, auto),
-  column-gutter: (2em, 4em, 1em),
-  row-gutter: 0.8em,
-  align: (left, left, left, left),
-  
-  $ (1) $, $ E -> E + T $, $ (4) $, $ T -> F $,
-  $ (2) $, $ E -> T $,     $ (5) $, $ F -> (E) $,
-  $ (3) $, $ T -> T * F $, $ (6) $, $ F -> bold(text("id")) $,
-)
- Ora costruiamo la tabella di parsing LR(0) a partire dall'automa LR(0) mostrato in @automa-lr0.
+  #grid(
+    columns: (auto, auto, auto, auto),
+    column-gutter: (2em, 4em, 1em),
+    row-gutter: 0.8em,
+    align: (left, left, left, left),
+
+    $ (1) $, $ E -> E + T $, $ (4) $, $ T -> F $,
+    $ (2) $, $ E -> T $, $ (5) $, $ F -> (E) $,
+    $ (3) $, $ T -> T * F $, $ (6) $, $ F -> bold(text("id")) $,
+  )
+  Ora costruiamo la tabella di parsing LR(0) a partire dall'automa LR(0) mostrato in @automa-lr0.
   #figure(image("images/tabellaParsingLR0.png"))
   Si osservi come in corrispondenza dello stato 2, la tabella ACTION[$2, *$] contenga due azioni: "shift 7" e "reduce 2". Questo è un conflitto shift/reduce.
 ]
@@ -1798,9 +1794,9 @@ Si utilizzano gli item LR(0) e l'automa LR(0) visti precedentemente. Data una gr
 *METODO*:
 1. Si costruisce la collezione $C = {I_0, I_1, dots, I_n}$ degli insiemi di item LR(0) di $G'$.
 2. Si costruisce ogni stato $i$ a partire dall'insieme $I_i$ e si determinano le azioni del parsing per questo stato:
-   - Se $[A -> alpha dot a beta] in I_i$ e $text("GOTO")(I_i, a) = I_j$, si assegna a ACTION[$i, a$] il valore "shift $j$".
-   - Se $[A -> alpha dot] in I_i$ e $A != S'$, si assegna a ACTION[$i, a$] il valore "reduce $A -> alpha$" per ogni $a in "FOLLOW"(A)$.
-   - Se $[S' -> S dot] in I_i$, si assegna a ACTION[$i, \$ $] il valore "accept".
+  - Se $[A -> alpha dot a beta] in I_i$ e $text("GOTO")(I_i, a) = I_j$, si assegna a ACTION[$i, a$] il valore "shift $j$".
+  - Se $[A -> alpha dot] in I_i$ e $A != S'$, si assegna a ACTION[$i, a$] il valore "reduce $A -> alpha$" per ogni $a in "FOLLOW"(A)$.
+  - Se $[S' -> S dot] in I_i$, si assegna a ACTION[$i, \$$] il valore "accept".
 
   #observation()[
     Se l'applicazione delle regole precedenti porta a un conflitto (più di un'azione generata per la stessa casella ACTION[$i, a$]), significa che la grammatica non è SLR(1).
@@ -1830,4 +1826,37 @@ La tabella costruita con questo metodo è detta tabella SLR(1) di $G$, il parser
   4. Le caselle vuote indicano un errore.
 
   #figure(image("images/tabellaParsingSLR.png", width: 90%))
+  Si noti che il valore di GOTO[$a, a$] per un simbolo terminale $a$ si trova nella sezione action relativa all'azione di shift dello stato $s$ per il simbolo d'ingresso $a$. La sezione GOTO fornisce invece il valore di GOTO[$s, A$] per i non-terminali $A$. La collezione canonica di insiemi di item LR(0) è stata già mostrata in @automa-lr0. Per costruire la tabella esaminiamo quindi gli item (ne consideriamo solo alcuni di esempio):
+
+  *Stato $I_0$* (inizio)
+  - Contiene $[F -> . bold(text("id"))]$ con $text("GOTO")(I_0, bold(text("id"))) = I_5 => text("ACTION")[0, bold(text("id"))] = s 5$.
+  - Contiene $[F -> . (E)]$ con $text("GOTO")(I_0, "(") = I_4 => text("ACTION")[0, "("] = s 4$.
+  - Per la parte $text("GOTO")$: $text("GOTO")(I_0, E) = 1$, $text("GOTO")(I_0, T) = 2$, $text("GOTO")(I_0, F) = 3$.
+
+  #v(0.5em)
+  *Stato $I_2$* (esempio risoluzione del conflitto Shift/Reduce)
+  - Contiene l'item con punto prima del terminale $[T -> T . * F]$. Poiché $text("GOTO")(I_2, *) = I_7$, inseriamo $text("ACTION")[2, *] = s 7$.
+  - Contiene l'item completo $[E -> T .]$ (regola 2).
+    - In LR(0) puro si farebbe reduce su tutti i simboli (creando un conflitto $s 7 \/ r 2$ su $*$);
+    - In SLR(1), la riduzione $r 2$ viene inserita unicamente per i simboli di $text("FOLLOW")(E) = \{+, ), \$\}$:
+      - $text("ACTION")[2, +] = r 2$
+      - $text("ACTION")[2, ")"] = r 2$
+      - $text("ACTION")[2, \$] = r 2$
+  - Sotto $*$ resta solo $s 7$: il conflitto è risolto.
+
+  #v(0.5em)
+  *Stato $I_5$*
+  - Contiene l'item completo $[F -> bold(text("id")) .]$ (regola 6).
+  - Poiché $text("FOLLOW")(F) = \{+, *, ), \$\}$, la riduzione $r 6$ viene copiata sotto tutte queste colonne:
+    - $text("ACTION")[5, +] = r 6$
+    - $text("ACTION")[5, *] = r 6$
+    - $text("ACTION")[5, ")"] = r 6$
+    - $text("ACTION")[5, \$] = r 6$
+  
+  Per vedere all'opera la tabella SLR(1) costruita, eseguiamo il parsing della stringa $bold(text("id") * bold(text("id")) + bold(text("id")))$:
+  #figure(image("images/esParsingConTabSLR.png", width: 70%))
+]
+
+#observation[
+  Il limite fondamentale del metodo SLR(1) risiede nell'uso troppo globale e generico degli insiemi FOLLOW. Quando il parser deve decidere se effettuare una riduzione $A -> alpha$, il metodo controlla se il simbolo di lookahead in input appartiene a FOLLOW(A). Tuttavia, FOLLOW(A) raccoglie tutti i simboli terminali che possono seguire $A$ in qualsiasi derivazione della grammatica, ignorando il contesto specifico dello stato corrente dell'automa. Questo porta SLR a inserire azioni di riduzione anche in contesti in cui non sarebbero mai valide, generando falsi conflitti Shift/Reduce o Reduce/Reduce su grammatiche non ambigue. Per risolvere il problema si ricorre ai parser LR(1) o LALR(1), che associano il simbolo di lookahead direttamente ai singoli item per tracciare il contesto esatto.
 ]
