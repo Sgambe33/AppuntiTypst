@@ -122,7 +122,7 @@ Come si evince chiaramente dal passo induttivo, la relazione di derivazione gode
 === Linguaggio generato da una grammatica
 
 #definition("Forma di frase")[
-  Data una grammatica $G$, una stringa $beta$ si dice *forma di frase* di $G$ se e solo se $beta$ è derivabile in zero o più passi dal simbolo iniziale S di G, cioè se e solo se $S der(*) beta$.
+  Data una grammatica $G$, una stringa $beta$ si dice *forma di frase* (o forma sentenziale) di $G$ se e solo se $beta$ è derivabile in zero o più passi dal simbolo iniziale S di G, cioè se e solo se $S der(*) beta$.
 ]
 #definition("Frase")[
   Una *frase* di G è una particolare forma di frase composta da soli simboli terminali. Quindi, una stringa $w$ è una frase di $G$ se e solo se:
@@ -186,11 +186,15 @@ $
       & => a b * (b 0 1 + I b) \
       & => a b * (b 0 1 + a b)
   $
-  se scrivo l'albero della derivazione sinistra, ottengo:
+  se scrivo l'albero di parsing della derivazione sinistra, ottengo:
   #figure(
     image("chap-3-figures/alberoGrammExpr.jpeg", width: 60%),
   )
   tale albero viene sempre allo stesso modo sia che si usi la derivazione sinistra che quella destra. Facendo una visita in pre-order dell'albero e registrando ogni derivazione ottengo una derivazione sinistra.
+]
+
+#definition("Albero di parsing")[
+  Un *albero di parsing* è una rappresentazione grafica di una derivazione che non dipende dall'ordine in cui le produzioni sono applicate per rimpiazzare i non-terminali. Ogni nodo interno dell'albero è etichettato con il non-terminale $A$, la testa della produzione, mentre i figli di tale nodo, presi ordinatamente da sinistra verso destra, sono etichettati con i simboli che appaiono nel corpo della produzione usata per sostituire la specifica occorrenza di $A$ nella derivazione. I nodi foglia sono etichettati con terminali o non-terminali che, letti da sinistra a destra, formano una forma sentenziale detta _frontiera_ dell'albero.
 ]
 
 == Correttezza e completezza di una grammatica
