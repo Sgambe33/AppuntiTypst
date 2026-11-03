@@ -5,7 +5,7 @@
 #pagebreak()
 = Analisi lessicale
 
-== Automi a stati finiti (DFA)
+== Automi a stati finiti deterministici (DFA)
 
 #definition()[
   Un automa a stati finiti deterministico (DFA) è una quintupla $A=(Q, Sigma, delta, q_0, F)$.
@@ -411,7 +411,7 @@ dagli altri stati, facendolo rimanere in se stesso per qualsiasi simbolo success
   - $q_0 in Q$ stato iniziale
 ]
 
-Gli automi a stati finiti non deterministici NFA sono più flessibili e spesso più semplici da progettare. La funzione di transizione associa ad ogni coppia stato/simbolo un sottoinsieme di Q:
+Gli automi a stati finiti non deterministici NFA sono più flessibili e spesso più semplici da progettare. La funzione di transizione associa ad ogni coppia stato-simbolo un sottoinsieme di Q:
 $
   delta : Q times Sigma -> 2^Q
 $
@@ -425,14 +425,14 @@ L'*algoritmo di simulazione* DFA permette di applicare un DFA ad una stringa spe
 s = s0;
 c = nextChar();
 while ( c != eof ) {
-  s = move(s, c) ;
+  s = move(s, c); // restituisce lo stato successivo a s leggendo c
   c = nextChar(); // restituisce il prossimo carattere in x
 }
-if ( s in F ) return "yes ";
+if ( s in F ) return "yes";
 else return "no";
 ```)
 
-=== Da espressione regolare a NFA
+=== Conversione da espressione regolare a NFA
 
 Ogni espressione regolare può essere convertita in un NFA che definisce lo stesso linguaggio. L'algoritmo che permette di farlo, noto come *Algoritmo di Thompson* (o Costruzione di Thompson), si basa sull'induzione strutturale e sulla suddivisione dell'espressione base in sottoespressioni più semplici.
 
@@ -448,7 +448,7 @@ Ogni espressione regolare può essere convertita in un NFA che definisce lo stes
   node((2, 0), [$f$], radius: 1em, extrude: (-2.5, 0)),
 ))
 
-Dove $i$ e $f$ sono nuovi stati, creati appositamente per essere rispettivamente lo stato iniziale e lo stato accettante. La transizione da $i$ a $f$ è una $epsilon$-transizione, compiuta senza consumare alcun simbolo di input (queste transizioni introducono nondeterminismo e, come vederemo, nel caso d'uso reale dei compilatori, vengono eliminate nella conversione da NFA a DFA). Analogamente, per ogni espressione composta da un singolo carattere terminale $a in Sigma$, si costruisce il seguente NFA:
+Dove $i$ e $f$ sono nuovi stati, creati appositamente per essere rispettivamente lo stato iniziale e lo stato accettante. La transizione da $i$ a $f$ è una *$epsilon$-transizione*, compiuta senza consumare alcun simbolo di input (queste transizioni introducono nondeterminismo e, come vederemo, nel caso d'uso reale dei compilatori, vengono eliminate nella conversione da NFA a DFA). Analogamente, per ogni espressione composta da un singolo carattere terminale $a in Sigma$, si costruisce il seguente NFA:
 
 #figure(diagram(
   node-stroke: 0.9pt,
@@ -566,7 +566,7 @@ Dove $i$ e $f$ sono nuovi stati, creati appositamente per essere rispettivamente
 ))
 
 #example("da regex a NFA")[
-  Applichiamo l'algoritmo appena visto sull'espressione regolare $(a|b)^*a b b$. Per prima cosa dobbiamo costruire gli NFA dei vari simboli:
+  Applichiamo l'algoritmo appena visto all'espressione regolare $(a|b)^*a b b$. Per prima cosa dobbiamo costruire gli NFA dei vari simboli:
 
   #figure(grid(
     columns: 2,
@@ -646,7 +646,7 @@ Dove $i$ e $f$ sono nuovi stati, creati appositamente per essere rispettivamente
   #grafo1
 ]
 
-=== Da NFA a DFA
+=== Conversione da NFA a DFA
 
 Per poter convertire un NFA in un DFA esiste un algoritmo specifico che però necessita dell'uso di alcune operazioni particolari, definite come segue:
 
@@ -662,14 +662,14 @@ Per poter convertire un NFA in un DFA esiste un algoritmo specifico che però ne
   [Insieme degli stati del NFA raggiungibili da un qualsiasi stato $s$ nell'insieme T unicamente mediante $epsilon$-transizioni, cioè $epsilon"-closure"(T)$ = $union.big_(s in T) epsilon"-closure"(s)$.],
 
   [move$(T,a)$],
-  [Insieme degli stati del NFA verso cui vi è una transizione con simbolo d'ingresso $a$, da un qualsiasi stato $s$ in $T$.],
+  [Insieme degli stati del NFA verso cui esiste una transizione con simbolo d'ingresso $a$, da un qualsiasi stato $s$ in $T$.],
 )
 
 Se riprendiamo l'esempio di conversione da espressione regolare a NFA, possiamo vedere a che cosa corrispondono le operazioni appena introdotte:
 
 - $epsilon"-cl(6)"={6,7,1,2,4}$
 - $epsilon"-cl(8)"={8}$
-- move$({2,3},b)={3}$
+- move$({2,3},a)={3}$
 
 Continuiamo la conversione da espressione regolare a DFA, ricordando che l'espressione è $(a|b)^*a b b$. Lo *stato iniziale* $A$ del DFA equivalente si ottiene calcolando l'$epsilon$-closure(0), cioè $A = {0,1,2,4,7}$, poiché questi sono tutti e soli gli stati raggiungibili dallo stato 0 seguendo un percorso formato unicamente da archi etichettati con $epsilon$.
 
@@ -776,7 +776,7 @@ Il DFA finale, compatto e deterministico, è quindi:
     edge(<D>, <B>, [$a$], "-|>", bend: -60deg),
   ))
 ]
-=== Grammatica che accetta lo stesso linguaggio descritto da un NFA
+=== Grammatica che genera lo stesso linguaggio descritto da un NFA
 
 Possiamo costruire in modo meccanico una grammatica in grado di riconoscere lo stesso linguaggio descritto da un NFA utilizzando il seguente metodo:
 
@@ -794,6 +794,7 @@ $
   A_3 &-> epsilon
 $
 
+Notare che essendo un DFA un caso particolare di NFA, la costruzione della grammatica può essere applicata anche a un DFA.
 === Simulazione di un NFA
 
 Una strategia utilizzata, per esempio, in molti programmi di elaborazione di testo consiste nel costruire un NFA a partire da un'espressione regolare e quindi procedere alla sua simulazione mediante la *costruzione per sottoinsiemi effettuata al momento* (on-the-fly), calcolando solo le transizioni necessarie passo dopo passo.

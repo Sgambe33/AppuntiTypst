@@ -171,50 +171,50 @@ Di seguito una serie di esempi:
     $
 
     - #underline("Base"): aa, ab $in L$
-    - #underline("Passo ricorsivo"): se u $in L ==> mtext("uaa, uab, uba, ubb") in L$
+    - #underline("Passo ricorsivo"): u $in L ==> mtext("uaa, uab, uba, ubb") in L$
 
   + Stringhe su {a,b} in cui ogni occorrenza di b è preceduta da a.
     - $underline(text("Base")): epsilon in L$
-    - $underline(text("Passo ricorsivo")): text("se") u in L ==> u a, u a b in L$
-    - $underline(text("Passo ricorsivo")): text("se") u in L ==> a u, a b u in L$
+    - $underline(text("Passo ricorsivo")): u in L ==> u a, u a b in L$
+    - $underline(text("Passo ricorsivo")): u in L ==> a u, a b u in L$
 
   + Linguaggio delle espressioni aritmetiche che coinvolgono $n in {1, dots, 9}$, +, -, \*, ), (, /
     - $underline(text("Base")): n in L$
-    - $underline(text("Passo ricorsivo")):$ se $u,v in L ==> (u),u+v,u-v,u*v,u\/v in L$
+    - $underline(text("Passo ricorsivo")):$ $u,v in L ==> (u),u+v,u-v,u*v,u\/v in L$
 
   + Linguaggio $L={a^n b^(2n) bar n > 0}$
     - $underline(text("Base")): a b b in L$
-    - $underline(text("Passo ricorsivo")):$ se $u in L ==> a u b b in L$
+    - $underline(text("Passo ricorsivo")):$ $u in L ==> a u b b in L$
 
   + Linguaggio $L={a^n b^n bar n>=0}$
     - $underline(text("Base")): epsilon in L$
-    - $underline(text("Passo ricorsivo")):$ se $u in L ==> a u b in L$
+    - $underline(text("Passo ricorsivo")):$ $u in L ==> a u b in L$
 
   + Stringhe su {a,b} che contengono lo stesso numero di $a$ e di $b$.\
     $
       L={w in {a,b}^* bar |w|_a = |w|_b}
     $
     - $underline(text("Base")): epsilon in L$
-    - $underline(text("Passo ricorsivo")):$ se $u, v in L ==> a u b v, b u a v in L$
+    - $underline(text("Passo ricorsivo")):$ $u, v in L ==> a u b v, b u a v in L$
     Passi ricorsivi errati:
-    - $underline(text("Passo ricorsivo")):$ se $u in L ==> u a b in L$ (genera solo stringhe nella forma #mtext("ababab..."))
-    - $underline(text("Passo ricorsivo")):$ se $u in L ==> b u a, a u b in L$ (genera solo stringhe con lettere diverse agli estremi)
+    - $underline(text("Passo ricorsivo")):$ $u in L ==> u a b in L$ (genera solo stringhe nella forma #mtext("ababab..."))
+    - $underline(text("Passo ricorsivo")):$ $u in L ==> b u a, a u b in L$ (genera solo stringhe con lettere diverse agli estremi)
 
   + Linguaggio $L={a^i b^j bar 0 < i < j}$
     - $underline(text("Base")): a b b in L$
-    - $underline(text("Passo ricorsivo")):$ se $u in L ==> u b, a u b in L$
+    - $underline(text("Passo ricorsivo")):$ $u in L ==> u b, a u b in L$
     Supponiamo di voler ottenere $a^5 b^8$. Diventa: abb $=>$ aabbb $=>$ aaabbbb $=>$ aaaabbbbb $=>$ aaaaabbbbbb $=>$ aaaaabbbbbbb $=>$ aaaaabbbbbbbb.
 
   + Linguaggio $L'={a^i b^j bar i > j > 0}$
     - $underline(text("Base")): a a b in L'$
-    - $underline(text("Passo ricorsivo")):$ se $u in L' ==> a u, a u b in L'$
+    - $underline(text("Passo ricorsivo")):$ $u in L' ==> a u, a u b in L'$
 
   + Linguaggio $L''={a^i b^j bar i != j; quad i, j > 0}$\
     Qui non c'è un passo ricorsivo, ma basta osservare che $L'' = L union L'$ (unione degli ultimi 2 linguaggi visti).
 
   + Linguaggio $L = {w in {a,b}^* bar w = w^R}$ ($w = w_1 dots w_k => w^R = w_k dots w_1$)
     - $underline(text("Base")): epsilon, a, b in L$
-    - $underline(text("Passo ricorsivo")):$ se $u in L ==> a u a, b u b in L$
+    - $underline(text("Passo ricorsivo")):$ $u in L ==> a u a, b u b in L$
 ]
 
 === Linguaggi regolari

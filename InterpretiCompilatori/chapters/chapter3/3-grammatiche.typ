@@ -258,7 +258,7 @@ Supponiamo di dover dimostrare che un certo linguaggio $L$ coincida esattamente 
   - $L(G) subset.eq L$: vediamo che $w in L(G) => w in L$. Procediamo per induzione sul numero di passi della derivazione.
     - Base: se il numero di passi della derivazione è 1, allora $S => epsilon$, $epsilon in L$, quindi OK.
     
-    - Ipotesi induttiva: se il numero di passi è $<= n$, allora $w in L$, dunque $S der(*) w$.\ Prendo una derivazione lunga $n+1$ passi ($S der(n+1) w$). Si ha $S => a S b der(n) a u b$, quindi $u in L$ per ipotesi induttiva e allora $u = a^k b^k$. Quindi si ha $a u b = a^(k+1) b^(k+1) in L$.
+    - Ipotesi induttiva: se il numero di passi è $<= n$, allora $w in L$, dunque $S der(*) w$.\ Prendo una derivazione lunga $n+1$ passi ($S der(n+1) w$). Si ha $S => a S b der(n) a u b$, quindi $u in L$ per ipotesi induttiva e allora $u = a^k b^k$, per un $k >= 0$. Quindi si ha $a u b = a^(k+1) b^(k+1) in L$.
 
 + $L = {w in {a, b}^* | w = a u and |w| = 2n"," n > 0}$, ovvero le stringhe su ${a,b}$ che iniziano con $a$ e hanno lunghezza pari\.
 
