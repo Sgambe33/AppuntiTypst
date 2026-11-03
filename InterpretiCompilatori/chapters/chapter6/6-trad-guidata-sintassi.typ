@@ -4,12 +4,24 @@
 #pagebreak()
 
 = Traduzione guidata dalla sintassi
-L'*idea di base* della traduzione guidata dalla sintassi è quella di *associare informazioni* a un costrutto di un linguaggio aggiungendo *attributi* ai simboli della grammatica che rappresentano tale costrutto. Una definizione guidata dalla sintassi specifica i valori assunti dagli attributi per mezzo di regole semantiche associate alle produzioni.
+L'idea di base della traduzione guidata dalla sintassi è quella di
+*associare informazioni* a un costrutto di un linguaggio aggiungendo
+*attributi* ai simboli della grammatica che rappresentano tale costrutto.
+Una definizione guidata dalla sintassi specifica i valori assunti dagli
+attributi per mezzo di regole semantiche associate alle produzioni.
+
+Questa tecnica può essere utilizzata per realizzare l'*analisi semantica*,
+ma anche per costruire alberi sintattici e generare codice intermedio.
+La trattazione dell'analisi semantica si distribuisce quindi tra questo
+capitolo, che introduce gli strumenti per esprimere e organizzare
+il calcolo delle informazioni associate ai costrutti, e il successivo,
+che ne presenta applicazioni concrete, tra cui il *controllo dei tipi*,
+insieme alla generazione del codice intermedio.
 
 == Definizioni guidate dalla sintassi
 #definition()[Una *definizione guidata dalla sintassi* o *SDD (Syntax-Directed Definition)* è una grammatica *context-free* alla quale vengono aggiunti *attributi* e *regole semantiche*.
 
-  - *Attributi:* sono associati ai simboli della grammatica. Possono essere di qualunque tipo, come numeri, tipi, tabelle, riferimenti o stringhe (frammenti di codice). Dato un simbolo della grammatica $X$ e un suo attributo $a$, la notazione $X.a$ indica il valore di $a$ per un nodo dell'albero di parsing etichettato con $X$. Gli attributi possono essere di qualunque tipo: numeri, tipi, tabelle, riferimenti, stringhe (frammenti di codice)...
+  - *Attributi:* sono associati ai simboli della grammatica. Possono essere di qualunque tipo, come numeri, tipi, tabelle, riferimenti o stringhe (frammenti di codice). Dato un simbolo della grammatica $X$ e un suo attributo $a$, la notazione $X.a$ indica il valore di $a$ per un nodo dell'albero di parsing etichettato con $X$.
 
   - *Regole semantiche:* sono associate alle produzioni della grammatica e specificano come calcolare il valore degli attributi.
 ]
@@ -1198,7 +1210,7 @@ Questo principio si basa sul fatto che la rimozione della ricorsione sinistra pr
   $
 ]
 
-==== SDT che calcolano attributi (Trasformazione S $->$ L)
+==== SDT che calcolano attributi
 Quando le azioni di uno SDT calcolano attributi, preservare il solo ordine delle azioni non basta: la trasformazione modifica l'albero di parsing e bisogna adattare il modo in cui vengono trasmessi i valori.
 
 Partendo da una SDD *S-attribuita*, possiamo eliminare la ricorsione sinistra e costruire uno SDT equivalente introducendo attributi ereditati per i risultati intermedi. Lo schema ottenuto implementa una definizione *L-attribuita*.

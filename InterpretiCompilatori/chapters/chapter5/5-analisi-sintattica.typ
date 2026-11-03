@@ -157,11 +157,11 @@ $
 in cui $A'$ è un nuovo non-terminale. Si ripeta questo procedimento finché non esistono più produzioni alternative per uno stesso non-terminale aventi un prefisso comune.
 
 #example()[
-  Data la produzione:
+  Date le produzioni
   $
     A -> a b c d | a b c e | a b f
   $
-  Possiamo applicare l'algoritmo di fattorizzazione sinistra per estrarre i prefissi comuni e ottenere:
+  possiamo applicare l'algoritmo di fattorizzazione sinistra per estrarre i prefissi comuni e ottenere:
   #figure(grid(
     align: left,
     rows: 3,
@@ -556,7 +556,7 @@ Allo stesso modo, se si vuole calcolare FIRST su un insieme di variabili:
   $
 + Se $X_1 X_2 ... X_n der(*) epsilon$, allora
   $
-    "FIRST("X_1 X_2 ... X_n")" = union.big_(j=1)^k "FIRST("X_j")" union {epsilon}
+    "FIRST("X_1 X_2 ... X_n")" = union.big_(j=1)^n "FIRST("X_j")" union {epsilon}
   $
 
 #example()[
@@ -686,11 +686,10 @@ Per calcolare il FOLLOW di tutte le variabili di una grammatica $G$ si procede a
 ]
 
 #observation()[
-  Il FOLLOW di $A$ risponde alla domanda: _"Nelle regole degli altri, chi c'è seduto immediatamente a destra di $A$?"_.
-  *Attenzione:* Per calcolare il FOLLOW di $A$, non devi *mai* guardare le regole che iniziano con $A -> ...$, ma devi cercare dove $A$ compare a destra della freccia (nel corpo delle produzioni).
+  Il FOLLOW di $A$ risponde alla domanda: _"Nelle regole degli altri, chi c'è seduto immediatamente a destra di $A$?"_. *Attenzione:* Per calcolare il FOLLOW di $A$, cerca dove $A$ compare nel corpo delle produzioni, anche in quelle che hanno lo stesso $A$ come testa.
 
   + *La partenza:* metti sempre il simbolo di fine stringa $\$$ nel FOLLOW del simbolo iniziale (es. $S$).
-  + *Chi c'è a destra?*: se a destra c'è un terminale $B$, es. $X -> alpha A B$, il FOLLOW di $A$ "ruba" il *FIRST* di $B$ escluso l'$epsilon$. In particolare, se a destra c'è un non terminale $b$, allora si ha che $"FIRST"(b) = {b}$ e quindi $b in "FOLLOW"(A)$.
+  + *Chi c'è a destra?*: se esiste una produzione $X -> alpha A beta$, aggiungi a $"FOLLOW"(A)$ tutti i simboli di $"FIRST"(beta)$ escluso $epsilon$. In particolare, se subito dopo $A$ c'è un terminale $b$, allora $"FIRST"(b) = {b}$ e quindi $b in "FOLLOW"(A)$.
   + *L'effetto "fine riga" (es. $X -> alpha A$)*: se $A$ è in fondo alla regola, non ha nessuno a destra. In questo caso, chiunque segua $X$, seguirà anche $A$. Quindi il FOLLOW di $A$ "ruba" il *FOLLOW* di $X$ (NB: questo vale anche se $X -> alpha A B$ ma $B$ può svanire diventando $epsilon$).
 ]
 
@@ -923,12 +922,12 @@ Il parser è dotato di:
 - una tabella di parsing
 - uno stream di uscita
 
-Inizialmente lo stack contiene il simbolo \$ (in fondo) e il simbolo distinto della grammatica. Ad ogni passo, il parser considera il simbolo $X$ in cima allo stack e il simbolo d'ingresso corrente $a$.
+Inizialmente lo stack contiene il simbolo \$ (in fondo) e il simbolo iniziale della grammatica. Ad ogni passo, il parser considera il simbolo $X$ in cima allo stack e il simbolo d'ingresso corrente $a$.
 
 - Se $X$ è una variabile, il parser esamina l'elemento $M[X, a]$
   - se contiene una regola $X -> alpha$ allora, nello stack, $X$ viene sostituito da $alpha$ (il primo simbolo in testa), ed eventualmente vengono costruiti i nodi corrispondenti nell'albero di parsing;
   - se è vuoto si ha una situazione di errore che può essere segnalata.
-- Se $X$ è un terminale, viene confrontato col simbolo in ingresso a
+- Se $X$ è un terminale, viene confrontato col simbolo in ingresso $a$
   - se sono uguali $X$ viene rimosso dallo stack e si avanza al prossimo simbolo in ingresso
   - se sono diversi si ha una situazione di errore.
 
@@ -1103,6 +1102,29 @@ Il parsing bottom-up procede alla costruzione di un albero di parsing per una da
       & F -> bold(id) && | "(" E ")"
     $,
   )
+  Consideriamo le stringhe $bold("id") * bold("id")$ e $bold("id") + bold("id")$, generate dalla
+grammatica precedente, il cui simbolo iniziale è $E$. Le due figure
+mostrano, da sinistra verso destra, le fasi della costruzione bottom-up
+dei rispettivi alberi di parsing.
+
+Inizialmente sono presenti soltanto i terminali della stringa,
+che costituiranno le foglie dell'albero. A ogni passo si riconosce
+una sequenza di simboli corrispondente al corpo di una produzione
+e si costruisce sopra di essa un nodo etichettato con il non-terminale
+alla testa della produzione, conservando come figli i nodi già presenti.
+
+Per esempio, nella prima figura, il primo *id* viene riconosciuto
+come un $F$ mediante $F -> bold(upright("id"))$, e poi come un $T$
+mediante $T -> F$. Dopo aver riconosciuto anche il secondo *id*
+come un $F$, i tre nodi $T$, $*$ e $F$ vengono riuniti sotto un nuovo
+nodo $T$, applicando $T -> T * F$. Infine, $E -> T$ permette
+di costruire la radice $E$.
+
+Ogni riquadro mostra quindi i sottoalberi costruiti fino a quel momento.
+Il procedimento termina quando rimane un unico albero con radice $E$
+e con le foglie che, lette da sinistra verso destra, riproducono
+la stringa d'ingresso. La seconda figura illustra lo stesso processo
+per l'addizione.
   #figure(diagram(
     node-stroke: none,
     edge-corner-radius: 5pt,
@@ -1175,7 +1197,9 @@ Il parsing bottom-up procede alla costruzione di un albero di parsing per una da
     edge((17, 2), (17, 3)),
 
     edge((15, 3), (15, 4)),
-  ))
+  ),
+  caption:"Albero di parsing per la stringa "+ $bold("id") * bold("id")$,
+  )
   #figure(diagram(
     node-stroke: none,
     edge-corner-radius: 5pt,
@@ -1263,31 +1287,32 @@ Il parsing bottom-up procede alla costruzione di un albero di parsing per una da
     edge((20, 2), (20, 3)),
 
     edge((18, 3), (18, 4)),
-  ))
+  ),
+  caption:"Albero di parsing per la stringa "+ $bold("id") + bold("id")$,)
 ]
 
 === Riduzioni
-Gli analizzatori bottom-up partono da una stringa $w$ e procedono a ritroso, effettuando una progressiva riduzione, fino ad ottenere il simbolo distinto $S$. I parser bottom-up si basano sul meccanismo di *riduzione* che consiste nel sostituire la parte destra di una regola con la parte sinistra.
+Gli analizzatori bottom-up partono da una stringa $w$ e procedono a ritroso, effettuando una progressiva riduzione, fino ad ottenere il simbolo distinto (iniziale) $S$. I parser bottom-up si basano sul meccanismo di *riduzione* che consiste nel sostituire la parte destra di una regola con la parte sinistra.
 
 Per definizione, una *riduzione* è esattamente l'*inverso* di un passo di *derivazione* (si ricordi che in una derivazione un non-terminale in una forma sentenziale viene sostituito dal corpo di una delle sue produzioni). Lo scopo del parsing bottom-up è quindi quello di costruire una derivazione al rovescio.
 
 Per gli esempi precedenti, considerando le radici dei sottoalberi, si hanno le sequenze di stringhe:
 
-- $text("id") * text("id"), space F * text("id"), space T * text("id"), space T * F, space T, space E$
-- $text("id") + text("id"), space F + text("id"), space T + text("id"), space E + text("id"), space E + F, space E + T, space E$
+- $bold("id") * bold("id"), space F * bold("id"), space T * bold("id"), space T * F, space T, space E$
+- $bold("id") + bold("id"), space F + bold("id"), space T + bold("id"), space E + bold("id"), space E + F, space E + T, space E$
 
 che corrispondono alle derivazioni *destre*:
 
-- $E => T => T * F => T * text("id") => F * text("id") => text("id") * text("id")$
-- $E => E + T => E + F => E + text("id") => T + text("id") => F + text("id") => text("id") + text("id")$
+- $E => T => T * F => T * bold("id") => F * bold("id") => bold("id") * bold("id")$
+- $E => E + T => E + F => E + bold("id") => T + bold("id") => F + bold("id") => bold("id") + bold("id")$
 
-Ad ogni passo dell'analisi, i parser bottom-up effettuano una riduzione oppure scandiscono un simbolo in ingresso. Per questo sono detti anche parser *shift-reduce* (impila-riduci, sposta-riduci).
+Ad ogni passo dell'analisi, i parser bottom-up effettuano una riduzione oppure scandiscono un simbolo in ingresso. Per questo sono detti anche parser *shift-reduce* ("impila-riduci" o "sposta-riduci").
 Le decisioni fondamentali ad ogni passo sono _se_ effettuare una riduzione e _quale_ regola utilizzare.
 
 === Handle e potatura
 
 #definition("Handle")[
-  Una *maniglia* (*handle*) è una sottostringa che corrisponde alla parte destra di una produzione (il corpo) e la cui riduzione verso la parte sinistra (la testa) rappresenta un singolo passo legittimo nella costruzione della *derivazione destra a ritroso*.
+  Una *maniglia* (_handle_) è una sottostringa che corrisponde alla parte destra di una produzione (il corpo) e la cui riduzione verso la parte sinistra (la testa) rappresenta un singolo passo legittimo nella costruzione della *derivazione destra a ritroso*.
 ]
 Ecco alcuni esempi di handle per la grammatica dell'ultimo esempio:
 #figure(
@@ -1362,7 +1387,7 @@ Per ricostruire questa derivazione in ordine inverso, si individua l'handle $bet
 Poi si individua l'handle $beta_(n-1)$ in $gamma_(n-1)$ e si sostituisce con $A_(n-1)$, e così via. Se, procedendo a ritroso in questo modo, otteniamo una forma sentenziale destra costituita unicamente dal simbolo iniziale $S$ della grammatica, significa che il parsing è stato completato con successo. La sequenza di produzioni utilizzate per le riduzione, letta in ordine inverso, costituisce una derivazione destra della stringa $w$. Il problema fondamentale è riuscire ad individuare l'handle corretto in ogni forma sentenziale destra, perché questa può contenere diverse parti destre di produzioni.
 
 === Il modello Shift-Reduce
-Nel parsing *impila-riduci* (*shift-reduce*) si usa uno stack per mantenere i simboli grammaticali e un buffer di ingresso che contiene la parte di input ancora da analizzare. Il simbolo di fine stringa $\$$ viene utilizzato sia come marcatore di fine stringa sia per indicare il fondo dello stack. Inizialmente, lo stack contiene solo $\$$ e il buffer di ingresso contiene la stringa $w \$$.
+Nel parsing impila-riduci si usa uno stack per mantenere i simboli grammaticali e un buffer di ingresso che contiene la parte di input ancora da analizzare. Il simbolo di fine stringa $\$$ viene utilizzato sia come marcatore di fine stringa sia per indicare il fondo dello stack. Inizialmente, lo stack contiene solo $\$$ e il buffer di ingresso contiene la stringa $w \$$.
 
 Un aspetto fondamentale di questo approccio è che un handle, subito prima di essere individuato come tale, si trova *sempre in cima allo stack*.
 
